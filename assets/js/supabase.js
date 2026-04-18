@@ -2,11 +2,10 @@
    CONFIGURACIÓN SUPABASE
 ============================================================ */
 
-// Load from environment variables (never hardcode credentials!)
-// In development: reads from .env via import.meta.env (requires Vite/build tool)
-// In production: use window.ENV injected by server/index.html
-const SUPABASE_URL = import.meta?.env?.VITE_SUPABASE_URL || window.ENV?.SUPABASE_URL || "";
-const SUPABASE_ANON_KEY = import.meta?.env?.VITE_SUPABASE_ANON_KEY || window.ENV?.SUPABASE_ANON_KEY || "";
+// Load from window.ENV injected by index.html (Vite-safe approach)
+// window.ENV is set in index.html before this script loads
+const SUPABASE_URL = window.ENV?.SUPABASE_URL || "";
+const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || "";
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   throw new Error("❌ Supabase credentials not configured. Check .env file or window.ENV injection.");
