@@ -2,9 +2,15 @@
    CONFIGURACIÓN SUPABASE
 ============================================================ */
 
-const SUPABASE_URL = "https://osudezxnludhewdxeaks.supabase.co";
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdWRlenhubHVkaGV3ZHhlYWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0OTQxMTksImV4cCI6MjA4MDA3MDExOX0.RLkgHZ8FHaSzXt18Zag3QHmkBE1SBjfbZ0wSUmh3sxo";
+// Load from environment variables (never hardcode credentials!)
+// In development: reads from .env via import.meta.env (requires Vite/build tool)
+// In production: use window.ENV injected by server/index.html
+const SUPABASE_URL = import.meta?.env?.VITE_SUPABASE_URL || window.ENV?.SUPABASE_URL || "";
+const SUPABASE_ANON_KEY = import.meta?.env?.VITE_SUPABASE_ANON_KEY || window.ENV?.SUPABASE_ANON_KEY || "";
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error("❌ Supabase credentials not configured. Check .env file or window.ENV injection.");
+}
 
 /**
  * ✅ IMPORTANTE:

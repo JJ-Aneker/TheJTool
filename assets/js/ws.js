@@ -1,5 +1,5 @@
 /* ============================================================
-   WEBSERVICES – Gestión completa Glass UI
+   WEBSERVICES – Gestión completa TheJ ToolBox
 ============================================================ */
 
 let selectedServerId = null;

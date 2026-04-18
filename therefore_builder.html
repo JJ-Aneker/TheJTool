@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Therefore Category Builder · Aneker</title>
+
+  <!-- Inject environment variables (required before Supabase initialization) -->
+  <script>
+    window.ENV = {
+      SUPABASE_URL: "https://osudezxnludhewdxeaks.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdWRlenhubHVkaGV3ZHhlYWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0OTQxMTksImV4cCI6MjA4MDA3MDExOX0.RLkgHZ8FHaSzXt18Zag3QHmkBE1SBjfbZ0wSUmh3sxo"
+    };
+  </script>
+
   <link rel="stylesheet" href="styles.css" />
   <style>
     body {
@@ -34,8 +43,14 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    const SUPABASE_URL      = "https://osudezxnludhewdxeaks.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdWRlenhubHVkaGV3ZHhlYWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0OTQxMTksImV4cCI6MjA4MDA3MDExOX0.RLkgHZ8FHaSzXt18Zag3QHmkBE1SBjfbZ0wSUmh3sxo";
+    // Load from window.ENV (injected by server/index.html in production)
+    const SUPABASE_URL      = window.ENV?.SUPABASE_URL || "";
+    const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || "";
+
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      console.error("❌ Supabase credentials not configured. Add window.ENV to your HTML.");
+    }
+
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ── COLOR HELPERS ─────────────────────────────────────────────────────────
