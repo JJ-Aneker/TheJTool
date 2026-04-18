@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Naturgy · Therefore™ · Manual de Usuario (Simple)</title>
+
+  <!-- Carga tu Glass UI (tokens, layout, components) -->
+<link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* Ajustes mínimos del manual sobre tu Glass UI ----------------------- */
+    .cover-wrap{
+      min-height: 82dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .cover{
+      max-width: 980px;
+      width: 100%;
+      padding: 32px 28px;
+    }
+    .cover-header{
+      display:flex; align-items:center; gap:16px; margin-bottom: 16px;
+    }
+    .logo-svg{
+      width: 172px; height: 48px; flex: 0 0 auto; display:block;
+      border-radius: 12px; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12); padding: 8px;
+    }
+    .cover-title{ margin:0; font-size: clamp(22px, 4vw, 34px); font-weight:700; }
+    .cover-sub{ margin:6px 0 0 0; color: var(--txt-2); font-size: clamp(13px, 2.4vw, 16px); }
+    .cover-meta{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+    .meta-card{ border:1px solid var(--panel-stroke); background: var(--panel-grad), rgba(255,255,255,0.04); border-radius: var(--radius); padding: 12px; }
+    .meta-label{ margin:0 0 6px 0; font-size:12px; color: var(--txt-2); }
+    .meta-value{ margin:0; font-size:14px; color:var(--txt-1); font-weight:600; letter-spacing:.2px; word-break:break-word; }
+    .cover-footer{ margin-top:20px; padding-top:12px; border-top:1px solid rgba(255,255,255,.10); display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--txt-2); font-size:12px; }
+
+    /* Cuerpo del manual ---------------------------------------------------- */
+    h2, h3{ margin: 0 0 10px 0; }
+    .chapter{ margin-bottom: 14px; }
+    .tip{ background: rgba(0,0,0,.14); border:1px solid rgba(255,255,255,.10);
+          border-radius: 12px; padding: 10px 12px; color: var(--txt-2); }
+    .kbd{ display:inline-block; padding:2px 6px; border-radius:8px;
+          border:1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+
+    /* Responsive portada */
+    @media (max-width: 720px){
+      .cover-meta{ grid-template-columns: 1fr; }
+      .cover-header{ flex-direction: column; align-items:flex-start; }
+    }
+
+    /* Enlaces índice activos (JS añade .is-active) */
+    .nav .navLink.is-active{ background: rgba(152,206,255,0.10); border-color: rgba(154,209,255,0.30); box-shadow: 0 0 0 1px rgba(154,209,255,0.18) inset; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR --------------------------------------------------------------->
+  <header class="topbar-full">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <!-- Logo compacto (opcional) -->
+        <div class="topbar-title">Naturgy · Therefore™ · Manual de Usuario</div>
+      </div>
+      <div class="topbar-right">
+        <button class="ghost-btn back-btn" onclick="document.getElementById('portada').scrollIntoView({behavior:'smooth'})">
+          Portada
+        </button>
+        <button class="ghost-btn" onclick="document.body.classList.toggle('sidebar-collapsed')" title="Contraer/expandir índice">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PORTADA -------------------------------------------------------------->
+  <div class="cover-wrap" id="portada">
+    <section class="panel cover glass--strong screen-transition screen-transition-active">
+      <div class="cover-header">
+        <!-- Wordmark Naturgy aproximado en SVG (sin dependencias) -->
+        <svg class="logo-svg" viewBox="0 0 360 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Naturgy">
+          <rect x="0" y="0" width="360" height="100" rx="12" fill="rgba(255,255,255,0.00)"/>
+          <text x="20" y="62" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="48" font-weight="700" fill="#FF7F00" letter-spacing="0.5">
+            Naturgy
+          </text>
+          <polygon points="290,36 332,16 318,44" fill="#FF7F00" opacity="0.92"/>
+          <polygon points="290,62 332,84 318,56" fill="#FF7F00" opacity="0.92"/>
+        </svg>
+
+        <div>
+          <h1 class="cover-title">Manual de Usuario · Therefore™</h1>
+          <p class="cover-sub">Guía simple para usuarios finales (Glass UI)</p>
+        </div>
+      </div>
+
+      <div class="cover-meta">
+        <div class="meta-card">
+          <p class="meta-label">Cliente</p>
+          <p class="meta-value">Naturgy</p>
+        </div>
+        <div class="meta-card">
+          <p class="meta-label">Versión</p>
+          <p class="meta-value">v1.0 · 03/2026</p>
+        </div>
+        <div class="meta-card">
+          <p class="meta-label">Autores</p>
+          <p class="meta-value">Equipo de Proyecto</p>
+        </div>
+      </div>
+
+      <div class="cover-footer">
+        <span>© 2026 · Therefore™ / Guía simple</span>
+        <span>Contacto: soporte@canon.es</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- APP SHELL: Sidebar + Main + Footer ---------------------------------->
+  <div class="app-shell">
+
+    <!-- SIDEBAR / ÍNDICE -->
+    <aside class="sidebar">
+      <div class="sideTop">
+        <h3 class="h">Contenido</h3>
+        <button class="sideToggle" title="Contraer índice" onclick="document.body.classList.toggle('sidebar-collapsed')">⟷</button>
+      </div>
+
+      <nav class="nav" id="toc">
+        #intro      <span class="icon">📘</span><span class="label">Introducción</span></a>
+        #requisitos <span class="icon">🧩</span><span class="label">Requisitos previos</span></a>
+        #acceso     <span class="icon">🔐</span><span class="label">Acceso / Sesión</span></a>
+        #ui         <span class="icon">🧭</span><span class="label">Navegación básica</span></a>
+        #busqueda   <span class="icon">🔎</span><span class="label">Búsqueda</span></a>
+        #docs       <span class="icon">📄</span><span class="label">Ver / Descargar</span></a>
+        #tareas     <span class="icon">✅</span><span class="label">Tareas y avisos</span></a>
+        #faq        <span class="icon">❓</span><span class="label">FAQ</span></a>
+        #soporte    <span class="icon">🛟</span><span class="label">Soporte</span></a>
+      </nav>
+
+      <div class="sideFooter footer">
+        Manual simple · Glass UI (v1.0)
+      </div>
+    </aside>
+
+    <!-- MAIN (board + right) -->
+    <main class="board">
+      <div class="content">
+
+        <!-- MAIN CONTENT --------------------------------------------------->
+        <section class="panel resultados screen-transition screen-transition-active" id="main">
+          <h2>Manual — Naturgy · Therefore™</h2>
+
+          <!-- INTRO -->
+          <article id="intro" class="panel glass--soft chapter">
+            <h3>Introducción</h3>
+            <p>
+              Esta guía resume los pasos esenciales para usar Therefore™ de forma segura y productiva:
+              acceder, navegar, buscar información, visualizar o descargar documentos y atender
+              tareas asignadas. El objetivo es que cualquier usuario pueda operar sin curva de
+              aprendizaje técnica. (Estilo visual y componentes provienen de tu Glass UI). [1](https://canoneuropenv-my.sharepoint.com/personal/jose_juan_canon_es/Documents/Microsoft%20Copilot%20Chat%20Files/ntgy_manual_usuario_therefore_web.pdf)
+            </p>
+            <div class="tip">Sugerencia: guarda este manual en favoritos del navegador y usa <span class="kbd">Ctrl</span> + <span class="kbd">F</span> para localizar términos en la página.</div>
+          </article>
+
+          <!-- REQUISITOS -->
+          <article id="requisitos" class="panel glass--soft chapter">
+            <h3>Requisitos previos</h3>
+            <ul>
+              <li>Un navegador moderno actualizado (Edge, Chrome o Firefox).</li>
+              <li>Credenciales corporativas activas y permiso de acceso a Therefore™.</li>
+              <li>Conexión estable a Internet.</li>
+            </ul>
+          </article>
+
+          <!-- ACCESO -->
+          <article id="acceso" class="panel glass--soft chapter">
+            <h3>Acceso y primera sesión</h3>
+            <ol>
+              <li>Abra la URL del portal Therefore™ (según comunicaciones internas).</li>
+              <li>Introduzca <strong>usuario</strong> y <strong>contraseña</strong>. Si es su primer acceso, el sistema puede solicitar cambio de clave.</li>
+              <li>Si olvidó su contraseña, use la opción <em>“¿Olvidaste tu contraseña?”</em> y siga las instrucciones del correo temporal (revise SPAM si no llega).</li>
+            </ol>
+            <p class="tip">Por seguridad, cierre el navegador tras cambiar la contraseña y vuelva a abrirlo antes de iniciar sesión.</p>
+          </article>
+
+          <!-- UI -->
+          <article id="ui" class="panel glass--soft chapter">
+            <h3>Navegación básica</h3>
+            <p>La interfaz se compone de:</p>
+            <ul>
+              <li><strong>Barra superior (Topbar)</strong>: acceso rápido a portada y acciones generales. [1](https://canoneuropenv-my.sharepoint.com/personal/jose_juan_canon_es/Documents/Microsoft%20Copilot%20Chat%20Files/ntgy_manual_usuario_therefore_web.pdf)</li>
+              <li><strong>Índice (Sidebar)</strong>: capítulos del manual y, en la app real, vistas y búsquedas guardadas. [1](https://canoneuropenv-my.sharepoint.com/personal/jose_juan_canon_es/Documents/Microsoft%20Copilot%20Chat%20Files/ntgy_manual_usuario_therefore_web.pdf)</li>
+              <li><strong>Panel principal</strong>: contenido/contexto actual.</li>
+              <li><strong>Panel derecho</strong>: acciones/descargas (colapsable). [1](https://canoneuropenv-my.sharepoint.com/personal/jose_juan_canon_es/Documents/Microsoft%20Copilot%20Chat%20Files/ntgy_manual_usuario_therefore_web.pdf)</li>
+            </ul>
+            <p><span class="kbd">Alt</span> + <span class="kbd">← / →</span> Navega por el historial del navegador.</p>
+          </article>
+
+          <!-- BÚSQUEDA -->
+          <article id="busqueda" class="panel glass--soft chapter">
+            <h3>Búsqueda</h3>
+            <p>Use las búsquedas por <em>datos de índice</em> o por <em>texto completo</em> según configuración del repositorio. Puede aplicar filtros y ordenar resultados por columnas.</p>
+            <div class="table-wrapper" style="margin-top:10px;">
+              <table class="glass-table">
+                <thead>
+                  <tr><th>Tipo</th><th>Cuándo usarla</th><th>Ejemplo</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Índice</td><td>Campos acotados (ID, fecha, tipo)</td><td>“Tipo = Notificación | Fecha ≥ 01/03/2026”</td></tr>
+                  <tr><td>Texto completo</td><td>Palabras en contenido</td><td>“término libre en documentos PDF”</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <!-- DOCUMENTOS -->
+          <article id="docs" class="panel glass--soft chapter">
+            <h3>Visualización y descarga de documentos</h3>
+            <ul>
+              <li>Abra el resultado para ver sus <strong>metadatos</strong> y el documento en el visor.</li>
+              <li>Use las opciones del visor para <strong>descargar</strong> o abrir en nueva pestaña (según permisos).</li>
+              <li>Si el documento tiene versiones o relacionados, aparecerán accesos dedicados.</li>
+            </ul>
+          </article>
+
+          <!-- TAREAS -->
+          <article id="tareas" class="panel glass--soft chapter">
+            <h3>Tareas, avisos y recordatorios</h3>
+            <p>Si su área opera con <em>flujos de trabajo</em>, verá tareas asignadas (p. ej., aceptar, reclasificar, completar datos). Algunas tareas envían recordatorios por correo si no se atienden en plazo.</p>
+            <ul>
+              <li><strong>Aceptar</strong>: confirma y cierra la gestión para su equipo.</li>
+              <li><strong>Reclasificar</strong>: envía un elemento a la cola de revisión/distribución.</li>
+              <li><strong>Solicitar datos</strong>: devuelve para completar información obligatoria.</li>
+            </ul>
+          </article>
+
+          <!-- FAQ -->
+          <article id="faq" class="panel glass--soft chapter">
+            <h3>Preguntas frecuentes</h3>
+            <details class="panel"><summary>No veo un documento que debería tener</summary><p>Verifique filtros y carpeta correcta; pruebe “texto completo”. Si persiste, contacte soporte indicando ID, fecha y descripción.</p></details>
+            <details class="panel"><summary>No recibo correos del sistema</summary><p>Revise SPAM y listas seguras; confirme su dirección en el directorio y la pertenencia a los grupos de seguridad adecuados.</p></details>
+            <details class="panel"><summary>¿Puedo exportar resultados?</summary><p>Según permisos, podrá copiar listas o exportar resultados; consulte con el administrador si no ve la opción en su vista.</p></details>
+          </article>
+
+          <!-- SOPORTE -->
+          <article id="soporte" class="panel glass--soft chapter">
+            <h3>Soporte</h3>
+            <p>Para incidencias funcionales o de acceso, escriba a <a href="mailto:soporte@canon.es">soporte@canon.es</a> indicando:</p>
+            <ul>
+              <li>Descripción clara del problema y pasos previos</li>
+              <li>Captura de pantalla (si procede)</li>
+              <li>Fecha/hora aproximadas e identificador del documento/tarea</li>
+            </ul>
+            <p class="tip">Para contenidos del repositorio (altas, bajas, permisos), siga el procedimiento de su área o abra ticket de servicio.</p>
+          </article>
+        </section>
+
+        <!-- RIGHT PANEL (acciones) ---------------------------------------->
+        <aside class="panel favorites" id="right">
+          <div class="sideTop">
+            <h3 class="h">Acciones</h3>
+            <button class="sideToggle" onclick="document.querySelector('.favorites').classList.toggle('collapsed')" title="Contraer panel derecho">⟷</button>
+          </div>
+
+          <div class="action-panel">
+            <button class="action-btn btn-cta" onclick="window.print()">
+              <span class="icon">⬇️</span><span class="action-text">Descargar / Imprimir PDF</span>
+            </button>
+
+            #intro      <span class="icon">➡️</span><span class="label">Ir a Introducción</span></a>
+            #busqueda   <span class="icon">➡️</span><span class="label">Ir a Búsqueda</span></a>
+            #docs       <span class="icon">➡️</span><span class="label">Ir a Ver/Descargar</span></a>
+            #faq        <span class="icon">➡️</span><span class="label">Ir a FAQ</span></a>
+            #soporte    <span class="icon">➡️</span><span class="label">Ir a Soporte</span></a>
+
+            <div class="actions-sep"></div>
+            <div class="actions-title">Atajos</div>
+            <div class="action-card">
+              <span class="icon">⌨️</span>
+              <span class="action-text">
+                <span class="kbd">Ctrl</span> + <span class="kbd">F</span> Buscar ·
+                <span class="kbd">Alt</span> + <span class="kbd">←/→</span> Historial
+              </span>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </main>
+
+    <!-- FOOTER ------------------------------------------------------------->
+    <footer class="footer--full">
+      <div class="footer-left footer">Naturgy · Therefore™ · Manual simple</div>
+      <div class="footer-right footer">© 2026 · Glass UI</div>
+    </footer>
+  </div>
+
+  <!-- MODAL (opcional) -->
+  <div id="ui-modal-root" style="display:none;">
+    <div class="glass-modal-overlay">
+      <div class="glass-modal">
+        <div class="glass-modal-head">
+          <div class="glass-modal-title">Confirmar acción</div>
+          <button class="glass-modal-x">✕</button>
+        </div>
+        <div class="glass-modal-body">
+          <p class="glass-modal-msg">¿Deseas continuar?</p>
+        </div>
+        <div class="glass-modal-actions">
+          <button class="btn-cta glass-modal-ok">Aceptar</button>
+          <button class="btn-ghost glass-modal-secondary is-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS mínimo: resaltar sección activa y scroll suave -------------------->
+  <script>
+    // Índice lateral - activar link según el scroll
+    const links = Array.from(document.querySelectorAll('#toc a.navLink'));
+    const targets = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+    const onScroll = () => {
+      const y = window.scrollY + 120;
+      let cur = targets[0];
+      for (const s of targets){ if (s.offsetTop <= y) cur = s; }
+      links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === '#' + cur.id));
+    };
+    window.addEventListener('scroll', onScroll); onScroll();
+
+    // Scroll suave para los enlaces del índice y acciones
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('a[href^="#"]');
+      if(!el) return;
+      const to = document.querySelector(el.getAttribute('href'));
+      if (to){ e.preventDefault(); to.scrollIntoView({behavior:'smooth'}); }
+    });
+  </script>
+</body>
+</html>

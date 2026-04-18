@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aneker · Glass UI Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <!-- HEADER full-width -->
+  <header class="topbar-full">
+    <div class="topbar-inner">
+
+      <div class="topbar-left">
+        <!-- ✅ ya no hace falta el burger (toggle está en sidebar)
+             si quieres mantenerlo, déjalo, pero lo puedes borrar -->
+        <!-- <button class="topbar-burger" id="btnToggleSidebar" aria-label="Mostrar/ocultar menú">☰</button> -->
+
+        <img class="topbar-logo" src="assets/images/logo.png" alt="Aneker" />
+        <span class="topbar-title">TheJ - ToolBox</span>
+      </div>
+
+
+      <div class="topbar-right">
+              <button class="navLink" id="btnUser" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M4.5 20a7.5 7.5 0 0 1 15 0" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="label">Datos de usuario</span>
+        </button>
+      </div>
+
+
+
+    </div>
+  </header>
+
+  <!-- APP BODY -->
+  <div class="app-shell" id="workspace">
+
+    <!-- ✅ SIDEBAR VIPREPORT-STYLE (IDs conservados) -->
+    <aside class="sidebar" id="sidebar" aria-label="Menú lateral">
+
+      <div class="sideTop">
+        <p class="h"></p>
+        <button class="btn sideToggle" id="toggleSidebarBtn" type="button" title="Mostrar/ocultar menú">
+          ⇆
+        </button>
+      </div>
+
+      <nav class="nav">
+
+        <!-- Inicio (mantiene id btnHome) -->
+        <button class="navLink" id="btnHome" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M4 5h16v14H4z" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M4 9h16" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="label">Inicio</span>
+        </button>
+
+        <!-- Buscar (antes 🔍) -->
+        <button class="navLink" id="btnSearch" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="6" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M20 20l-3.5-3.5" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="label">Buscar</span>
+        </button>
+
+        <!-- Documentos (antes 🗂) -->
+        <button class="navLink" id="btnDocs" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M6 4h12v16H6z" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M9 8h6M9 12h6M9 16h6" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="label">Documentos</span>
+        </button>
+
+
+        <!-- Therefore Category Builder -->
+        <button class="navLink" id="btnTherefore" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M7 8h10M7 12h6M7 16h8" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="label">Therefore™ Category Builder</span>
+        </button>
+
+        <!-- Therefore eForms Builder -->
+        <button class="navLink" id="btnEForms" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="16" rx="2" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M7 9h4M7 13h8M7 17h5" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
+              <circle cx="17" cy="9" r="2" stroke="rgba(40,215,199,.95)" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <span class="label">Therefore™ eForms Builder</span>
+        </button>
+
+        <!-- Therefore Category Replicator -->
+        <button class="navLink" id="btnCategoryReplicator" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="rgba(40,215,199,.95)" stroke-width="1.8"/>
+              <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="rgba(40,215,199,.95)" stroke-width="1.8"/>
+              <rect x="13" y="13" width="8" height="8" rx="1.5" stroke="rgba(40,215,199,.95)" stroke-width="1.8"/>
+            </svg>
+          </span>
+          <span class="label">Therefore™ Category Replicator</span>
+        </button>
+
+        <!-- Therefore Dynamic View (mantiene id btnWS) -->
+        <button class="navLink" id="btnWS" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 21a9 9 0 1 0-9-9 9 9 0 0 0 9 9z" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M12 16a4 4 0 1 0-4-4 4 4 0 0 0 4 4z" stroke="rgba(40,215,199,.95)" stroke-width="1.9"/>
+              <path d="M12 12h.01" stroke="rgba(40,215,199,.95)" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="label">Therefore™ Online Tenants</span>
+        </button>
+
+
+        <!-- DocAI Processor -->
+        <button class="navLink" id="btnDocAIProcessor" type="button">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M9 3h6v18H9z" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
+              <path d="M4 8h16M4 12h16M4 16h16" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
+              <circle cx="19" cy="7" r="2" stroke="rgba(40,215,199,.95)" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <span class="label">DocAI Processor</span>
+        </button>
+
+        <!-- Logout (mantiene id btnLogout) -->
+        <button class="navLink dangerLink" id="btnLogout" type="button" title="Cerrar sesión">
+          <span class="icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M10 17l5-5-5-5" stroke="rgba(40,215,199,.95)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 12h11" stroke="rgba(238,244,255,.9)" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M20 4v16" stroke="rgba(238,244,255,.35)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="label">Salir del portal</span>
+        </button>
+
+      </nav>
+
+
+    </aside>
+
+    <!-- MAIN -->
+    <section class="board">
+      <main class="content">
+
+        <section class="panel resultados" id="mainPanel">
+          <h2>Resultados de búsqueda</h2>
+
+          <div class="table-wrapper">
+            <table class="glass-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>00123</td>
+                  <td>Juan Pérez</td>
+                  <td>2025-11-26</td>
+                  <td><span class="badge success">Activo</span></td>
+                  <td><button class="cta">Ver</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+<!-- PANEL DERECHO (VIP-style + collapse) -->
+<aside class="panel favorites" id="favoritesPanel" aria-label="Panel de acciones">
+
+<div class="sideTop">
+  <button class="btn sideToggle" id="toggleFavoritesBtn" type="button" title="Mostrar/ocultar acciones">⇆</button>
+  <p class="h">Acciones</p>
+</div>
+
+
+  <div id="actionPanel" class="action-panel"></div>
+
+</aside>
+
+
+      </main>
+    </section>
+
+    <footer class="footer footer--full">
+      <div class="footer-left">Servicio proporcionado por Aneker · © 2025</div>
+      <div class="footer-right">Con tecnología · Supabase</div>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase.js"></script>
+
+<script src="assets/js/core/ui.js"></script>
+<script src="assets/js/core/router.js"></script>
+
+<script src="assets/js/views/home.js"></script>
+<script src="assets/js/views/user.js"></script>
+<script src="assets/js/views/search.js"></script>
+<script src="assets/js/views/docs.js"></script>
+<script src="assets/js/views/ws.js"></script>
+<script src="assets/js/views/therefore.js"></script>
+<script src="assets/js/views/eforms.js"></script>
+<script src="assets/js/views/category_replicator.js"></script>
+<script src="assets/js/views/docai_processor.js"></script>
+
+<script src="assets/js/app.js"></script>
+
+<!-- Tu ws.js actual -->
+<script src="assets/js/ws.js"></script>
+
+  <!-- ✅ Toggle sidebar VIPReport-style + persistencia -->
+
+
+</body>
+</html>

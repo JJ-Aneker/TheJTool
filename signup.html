@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear cuenta · Glass UI</title>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <div class="app login-page">
+
+    <form id="signup-form" class="login-box">
+
+      <img src="assets/images/logo.png" alt="Logo" class="login-logo" />
+
+      <h1>Crear cuenta</h1>
+
+      <div id="signup-error" class="error-box"></div>
+
+      <input id="name" type="text" placeholder="Nombre" required />
+      <input id="surname" type="text" placeholder="Apellidos" required />
+      <input id="phone" type="tel" placeholder="Teléfono" required />
+
+      <input id="email" type="email" placeholder="Correo electrónico" required />
+      <input id="password" type="password" placeholder="Contraseña" required />
+
+      <button type="submit">Crear cuenta</button>
+
+      <div class="loader" id="signup-loader"></div>
+
+      <div class="login-links">
+        <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
+      </div>
+
+    </form>
+
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+
+  <script>
+    const form = document.getElementById("signup-form");
+    const errorBox = document.getElementById("signup-error");
+    const loader = document.getElementById("signup-loader");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      errorBox.style.display = "none";
+      loader.style.display = "block";
+
+      const name = document.getElementById("name").value.trim();
+      const surname = document.getElementById("surname").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      try {
+        // 1) REGISTRO DEL USUARIO
+        const { data, error } = await client.auth.signUp({ email, password });
+
+        if (error) throw error;
+
+        // 2) CREAR PERFIL SIN SESIÓN (permitido por RLS)
+        await client.from("profiles").insert({
+          user_id: data.user.id,
+          email,
+          name,
+          surname,
+          phone,
+          created_at: new Date().toISOString()
+        });
+
+        // 3) REDIRIGIR A verify.html
+        window.location.href = "verify.html";
+
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = "block";
+
+      } finally {
+        loader.style.display = "none";
+      }
+    });
+  </script>
+
+</body>
+</html>
