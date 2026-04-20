@@ -46,13 +46,15 @@
 
   function renderUserList() {
     const tableRows = filteredUsers
-      .map(user => {
+      .map((user, idx) => {
         const userId = user.id || user.user_id;
         const approved = user.approved ? "✅ Sí" : "❌ No";
+        const fullName = user.name || user.nombre || "—";
+        const lastName = user.surname || user.apellido || user.apellidos || "—";
         return `
-          <tr class="user-row" data-user-id="${userId}">
-            <td>${user.full_name || "—"}</td>
-            <td>${user.last_name || "—"}</td>
+          <tr class="user-row" data-user-id="${userId}" data-index="${idx}">
+            <td>${fullName}</td>
+            <td>${lastName}</td>
             <td>${user.role || "—"}</td>
             <td>${approved}</td>
           </tr>
@@ -111,17 +113,18 @@
       document.getElementById("searchInput")?.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase();
         filteredUsers = allUsers.filter(u => {
-          const fullName = `${u.full_name || ""} ${u.last_name || ""}`.toLowerCase();
+          const fullName = `${u.name || ""} ${u.surname || ""}`.toLowerCase();
           return fullName.includes(query);
         });
         renderUserList();
       });
 
       // Attach row click handlers
-      document.querySelectorAll(".user-row").forEach((row, index) => {
+      document.querySelectorAll(".user-row").forEach(row => {
         row.style.cursor = "pointer";
         row.addEventListener("click", () => {
-          selectedUserId = filteredUsers[index]?.id || filteredUsers[index]?.user_id;
+          selectedUserId = row.getAttribute("data-user-id");
+          console.log("Selected user ID:", selectedUserId);
           document.querySelectorAll(".user-row").forEach(r => r.style.backgroundColor = "");
           row.style.backgroundColor = "rgba(40, 215, 199, 0.1)";
           showEditPanel();
@@ -131,14 +134,20 @@
   }
 
   function showEditPanel() {
-    const user = allUsers.find(u => u.id === selectedUserId);
-    if (!user) return;
+    const user = allUsers.find(u => (u.id || u.user_id) === selectedUserId);
+    console.log("Looking for user:", selectedUserId);
+    console.log("All users:", allUsers);
+    console.log("Found user:", user);
+    if (!user) {
+      console.error("User not found:", selectedUserId);
+      return;
+    }
 
     const panelHTML = `
       <div style="display: flex; flex-direction: column; gap: 1rem;">
         <div>
-          <h3>${user.full_name || "Usuario"} ${user.last_name || ""}</h3>
-          <p style="color: rgba(238,244,255,.6); font-size: 0.9em;">ID: ${user.id.substring(0, 8)}...</p>
+          <h3>${user.name || "Usuario"} ${user.surname || ""}</h3>
+          <p style="color: rgba(238,244,255,.6); font-size: 0.9em;">ID: ${(user.id || user.user_id).substring(0, 8)}...</p>
         </div>
 
         <button class="action-card" id="editUserBtn" type="button">
@@ -168,7 +177,7 @@
   }
 
   function showEditForm() {
-    const user = allUsers.find(u => u.id === selectedUserId);
+    const user = allUsers.find(u => (u.id || u.user_id) === selectedUserId);
     if (!user) return;
 
     const panelHTML = `
@@ -180,7 +189,7 @@
           <input
             type="text"
             id="editFullName"
-            value="${user.full_name || ""}"
+            value="${user.name || ""}"
             style="width: 100%; padding: 0.6rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9);"
           />
         </div>
@@ -190,7 +199,7 @@
           <input
             type="text"
             id="editLastName"
-            value="${user.last_name || ""}"
+            value="${user.surname || ""}"
             style="width: 100%; padding: 0.6rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9);"
           />
         </div>
@@ -215,16 +224,16 @@
         try {
           const { error } = await client
             .from("profiles")
-            .update({ full_name: fullName, last_name: lastName })
+            .update({ name: fullName, surname: lastName })
             .eq(getIdColumn(), selectedUserId);
 
           if (error) throw error;
 
           // Update local state
-          const user = allUsers.find(u => u.id === selectedUserId);
+          const user = allUsers.find(u => (u.id || u.user_id) === selectedUserId);
           if (user) {
-            user.full_name = fullName;
-            user.last_name = lastName;
+            user.name = fullName;
+            user.surname = lastName;
           }
 
           // Show success
@@ -249,7 +258,7 @@
   }
 
   async function toggleApproved() {
-    const user = allUsers.find(u => u.id === selectedUserId);
+    const user = allUsers.find(u => (u.id || u.user_id) === selectedUserId);
     if (!user) return;
 
     try {
@@ -270,7 +279,7 @@
   }
 
   function showRoleSelector() {
-    const user = allUsers.find(u => u.id === selectedUserId);
+    const user = allUsers.find(u => (u.id || u.user_id) === selectedUserId);
     if (!user) return;
 
     const panelHTML = `
