@@ -8,6 +8,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       const user = await requireAuth();
       if (!user) return;
     }
+
+    // Check if user is admin to show admin button
+    if (typeof getProfile === "function") {
+      const profile = await getProfile();
+      if (profile && profile.role === "admin") {
+        const btnAdmin = document.getElementById("btnAdmin");
+        if (btnAdmin) btnAdmin.style.display = "";
+      }
+    }
   } catch (e) {
     console.error("Error en requireAuth:", e);
     return;
@@ -29,6 +38,7 @@ function initNavigation() {
   const btnEForms             = document.getElementById("btnEForms");
   const btnCategoryReplicator = document.getElementById("btnCategoryReplicator");
   const btnDocAIProcessor      = document.getElementById("btnDocAIProcessor");
+  const btnAdmin              = document.getElementById("btnAdmin");
   const btnLogout             = document.getElementById("btnLogout");
 
   btnHome?.addEventListener("click", () => Router.setView("home"));
@@ -40,6 +50,7 @@ function initNavigation() {
   btnEForms?.addEventListener("click", () => Router.setView("eforms"));
   btnCategoryReplicator?.addEventListener("click", () => Router.setView("categoryReplicator"));
   btnDocAIProcessor?.addEventListener("click", () => Router.setView("docai_processor"));
+  btnAdmin?.addEventListener("click", () => Router.setView("admin"));
 
   btnLogout?.addEventListener("click", async () => {
     try {
