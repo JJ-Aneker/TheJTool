@@ -13,14 +13,18 @@
     }
 
     try {
+      // Load ALL users - NO filters
       const { data, error } = await client
         .from("profiles")
-        .select("*");
+        .select("*")
+        .limit(1000);
 
       if (error) throw error;
       allUsers = data || [];
       filteredUsers = [...allUsers];
-      console.log("Users loaded:", allUsers.length, allUsers);
+
+      console.log("Total users loaded:", allUsers.length);
+      console.log("Users:", allUsers.map(u => ({ name: u.name, surname: u.surname, role: u.role })));
     } catch (error) {
       console.error("Error:", error);
       UI.replaceWithAnimation(`
@@ -39,7 +43,7 @@
         const userId = user.user_id || user.id;
         const approved = user.approved ? "✅" : "❌";
         return `
-          <tr class="user-row" data-user-id="${userId}" style="cursor: pointer;">
+          <tr class="user-row" data-user-id="${userId}" style="cursor: pointer; border-bottom: 1px solid rgba(40,215,199,.1);">
             <td>${user.name || "—"}</td>
             <td>${user.surname || "—"}</td>
             <td>${user.role || "—"}</td>
@@ -52,9 +56,9 @@
     const html = `
       <section class="panel resultados">
         <h2>Gestión de Usuarios</h2>
-        <input type="text" id="searchInput" placeholder="Buscar..."
+        <input type="text" id="searchInput" placeholder="Buscar por nombre..."
           style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9);" />
-        <p style="color: rgba(238,244,255,.7); margin-bottom: 1rem;">Total: ${filteredUsers.length} usuario(s)</p>
+        <p style="color: rgba(238,244,255,.7); margin-bottom: 1rem;">Total: ${filteredUsers.length} usuario(s) - Haz clic para editar</p>
         <div class="table-wrapper">
           <table class="glass-table">
             <thead><tr><th>Nombre</th><th>Apellidos</th><th>Rol</th><th>Aprobado</th></tr></thead>
@@ -79,35 +83,13 @@
       document.querySelectorAll(".user-row").forEach(row => {
         row.addEventListener("click", () => {
           selectedUserId = row.getAttribute("data-user-id");
-          document.querySelectorAll(".user-row").forEach(r => r.style.backgroundColor = "");
-          row.style.backgroundColor = "rgba(40, 215, 199, 0.1)";
-          showEditPanel();
+          showEditModal();
         });
       });
     }, 0);
   }
 
-  function showEditPanel() {
-    const user = allUsers.find(u => (u.user_id || u.id) === selectedUserId);
-    if (!user) return;
-
-    const panelHTML = `
-      <div style="display: flex; flex-direction: column; gap: 1rem;">
-        <h3>${user.name || "Usuario"} ${user.surname || ""}</h3>
-        <button class="action-card" id="editBtn" type="button">
-          <span class="icon">✏️</span>
-          <span class="action-text">Editar todos los campos</span>
-        </button>
-      </div>
-    `;
-
-    UI.updateActionPanel(panelHTML);
-    setTimeout(() => {
-      document.getElementById("editBtn")?.addEventListener("click", showEditForm);
-    }, 0);
-  }
-
-  function showEditForm() {
+  function showEditModal() {
     const user = allUsers.find(u => (u.user_id || u.id) === selectedUserId);
     if (!user) return;
 
@@ -119,18 +101,18 @@
       const value = user[key];
 
       if (key === "approved") {
-        return `<div>
-          <label style="display: block; font-size: 0.9em; margin-bottom: 0.5rem; color: rgba(238,244,255,.8);">
-            <input type="checkbox" ${value ? "checked" : ""} data-field="${key}" />
-            ${key}
+        return `<div style="margin-bottom: 1rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" ${value ? "checked" : ""} data-field="${key}" style="cursor: pointer;" />
+            <span>${key}</span>
           </label>
         </div>`;
       }
 
       if (key === "role") {
-        return `<div>
+        return `<div style="margin-bottom: 1rem;">
           <label style="display: block; font-size: 0.9em; margin-bottom: 0.3rem; color: rgba(238,244,255,.8);">${key}</label>
-          <select data-field="${key}" style="width: 100%; padding: 0.6rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9);">
+          <select data-field="${key}" style="width: 100%; padding: 0.6rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 1rem;">
             <option value="read" ${value === "read" ? "selected" : ""}>read</option>
             <option value="write" ${value === "write" ? "selected" : ""}>write</option>
             <option value="admin" ${value === "admin" ? "selected" : ""}>admin</option>
@@ -138,30 +120,33 @@
         </div>`;
       }
 
-      return `<div>
+      return `<div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.9em; margin-bottom: 0.3rem; color: rgba(238,244,255,.8);">${key}</label>
-        <input type="text" data-field="${key}" value="${value || ""}"
-          style="width: 100%; padding: 0.6rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9);" />
+        <input type="text" data-field="${key}" value="${value === null ? "" : value}"
+          style="width: 100%; padding: 0.6rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 1rem;" />
       </div>`;
     }).join("");
 
-    const panelHTML = `
-      <div style="max-height: 80vh; overflow-y: auto;">
-        <h3>Editar Usuario</h3>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-          ${formFields}
-          <button class="cta" id="saveBtn" style="width: 100%;">💾 Guardar</button>
-          <button class="btn" id="cancelBtn" style="width: 100%; background: rgba(40,215,199,.1); color: rgba(40,215,199,.9);">Cancelar</button>
+    const modalHTML = `
+      <div id="adminModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div style="background: rgba(20,30,50,0.95); border: 1px solid rgba(40,215,199,.3); border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+          <h2 style="margin-bottom: 1.5rem;">${user.name || "Usuario"} ${user.surname || ""}</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            ${formFields}
+            <button id="saveModalBtn" class="cta" style="width: 100%; padding: 0.75rem;">💾 Guardar cambios</button>
+            <button id="closeModalBtn" class="btn" style="width: 100%; padding: 0.75rem; background: rgba(40,215,199,.1); color: rgba(40,215,199,.9);">Cancelar</button>
+          </div>
         </div>
       </div>
     `;
 
-    UI.updateActionPanel(panelHTML);
+    // Insert modal into DOM
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
 
     setTimeout(() => {
-      document.getElementById("saveBtn")?.addEventListener("click", async () => {
+      document.getElementById("saveModalBtn")?.addEventListener("click", async () => {
         const changes = {};
-        document.querySelectorAll("[data-field]").forEach(input => {
+        document.querySelectorAll("#adminModal [data-field]").forEach(input => {
           const field = input.getAttribute("data-field");
           changes[field] = input.type === "checkbox" ? input.checked : input.value;
         });
@@ -173,23 +158,25 @@
             .eq("user_id", selectedUserId);
 
           if (error) throw error;
-          Object.assign(user, changes);
 
-          const btn = document.getElementById("saveBtn");
-          btn.textContent = "✅ Guardado";
-          btn.disabled = true;
-          setTimeout(() => {
-            btn.textContent = "💾 Guardar";
-            btn.disabled = false;
-            renderUserList();
-            showEditPanel();
-          }, 1500);
+          Object.assign(user, changes);
+          document.getElementById("adminModal")?.remove();
+          renderUserList();
         } catch (e) {
           alert("Error: " + e.message);
         }
       });
 
-      document.getElementById("cancelBtn")?.addEventListener("click", showEditPanel);
+      document.getElementById("closeModalBtn")?.addEventListener("click", () => {
+        document.getElementById("adminModal")?.remove();
+      });
+
+      // Close on overlay click
+      document.getElementById("adminModal")?.addEventListener("click", (e) => {
+        if (e.target.id === "adminModal") {
+          document.getElementById("adminModal")?.remove();
+        }
+      });
     }, 0);
   }
 
