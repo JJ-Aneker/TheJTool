@@ -3,6 +3,15 @@
   let filteredUsers = [];
   let selectedUserId = null;
 
+  // Detect which column is the ID column
+  function getIdColumn() {
+    if (allUsers.length === 0) return "id";
+    const firstUser = allUsers[0];
+    if ("id" in firstUser) return "id";
+    if ("user_id" in firstUser) return "user_id";
+    return "id";
+  }
+
   async function renderAdmin() {
     // Guard: Check if user is admin
     const profile = await getProfile();
@@ -15,7 +24,7 @@
     try {
       const { data, error } = await client
         .from("profiles")
-        .select("id, full_name, last_name, role, approved, created_at")
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -38,9 +47,10 @@
   function renderUserList() {
     const tableRows = filteredUsers
       .map(user => {
+        const userId = user.id || user.user_id;
         const approved = user.approved ? "✅ Sí" : "❌ No";
         return `
-          <tr class="user-row" data-user-id="${user.id}">
+          <tr class="user-row" data-user-id="${userId}">
             <td>${user.full_name || "—"}</td>
             <td>${user.last_name || "—"}</td>
             <td>${user.role || "—"}</td>
@@ -108,10 +118,10 @@
       });
 
       // Attach row click handlers
-      document.querySelectorAll(".user-row").forEach(row => {
+      document.querySelectorAll(".user-row").forEach((row, index) => {
         row.style.cursor = "pointer";
         row.addEventListener("click", () => {
-          selectedUserId = row.getAttribute("data-user-id");
+          selectedUserId = filteredUsers[index]?.id || filteredUsers[index]?.user_id;
           document.querySelectorAll(".user-row").forEach(r => r.style.backgroundColor = "");
           row.style.backgroundColor = "rgba(40, 215, 199, 0.1)";
           showEditPanel();
@@ -206,7 +216,7 @@
           const { error } = await client
             .from("profiles")
             .update({ full_name: fullName, last_name: lastName })
-            .eq("id", selectedUserId);
+            .eq(getIdColumn(), selectedUserId);
 
           if (error) throw error;
 
@@ -247,7 +257,7 @@
       const { error } = await client
         .from("profiles")
         .update({ approved: newStatus })
-        .eq("id", selectedUserId);
+        .eq(getIdColumn(), selectedUserId);
 
       if (error) throw error;
 
@@ -299,7 +309,7 @@
             const { error } = await client
               .from("profiles")
               .update({ role: newRole })
-              .eq("id", selectedUserId);
+              .eq(getIdColumn(), selectedUserId);
 
             if (error) throw error;
 
