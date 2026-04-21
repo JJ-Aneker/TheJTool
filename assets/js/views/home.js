@@ -14,7 +14,7 @@
     }[userRole];
 
     const html = `
-      <section class="panel resultados" id="mainPanel">
+      <section class="panel resultados" id="mainPanel" style="overflow-y: auto; max-height: calc(100vh - 180px); padding-right: 0.5rem;">
         <div class="page-header">
           <div class="page-header-content">
             <h2>Bienvenido a TheJToolbox</h2>
@@ -23,7 +23,7 @@
         </div>
 
         <!-- HERO BANNER -->
-        <div style="width: 100%; height: 300px; margin-bottom: 2rem; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, rgba(40,215,199,0.2) 0%, rgba(88,166,255,0.1) 100%);">
+        <div style="width: 100%; aspect-ratio: 16/9; margin-bottom: 2rem; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, rgba(40,215,199,0.2) 0%, rgba(88,166,255,0.1) 100%);">
           <img src="assets/images/banner.jpg" alt="Banner" style="width: 100%; height: 100%; object-fit: cover;" />
         </div>
 
