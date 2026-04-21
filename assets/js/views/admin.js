@@ -44,10 +44,20 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <h2 style="margin: 0; font-size: 1.5rem;">Gestión de Usuarios</h2>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <p style="color: rgba(238,244,255,.6); margin: 0; font-size: 13px; white-space: nowrap;">Total: ${allUsers.length}</p>
             <input type="text" id="searchInput" placeholder="Buscar..."
               style="width: 240px; padding: 0.5rem 0.75rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 13px;" />
-            <div id="actionPanel" style="display: flex; gap: 0.5rem; align-items: center;"></div>
+            <button class="action-btn" type="button" onclick="openNewUserForm()">
+              <span class="icon">➕</span>
+              <span class="action-text">Nuevo</span>
+            </button>
+            <button class="action-btn" type="button" id="btnEdit" disabled>
+              <span class="icon">✏️</span>
+              <span class="action-text">Editar</span>
+            </button>
+            <button class="action-btn danger" type="button" id="btnDelete" disabled>
+              <span class="icon">🗑️</span>
+              <span class="action-text">Eliminar</span>
+            </button>
           </div>
         </div>
 
@@ -62,11 +72,11 @@
 
     UI.replaceWithAnimation(html);
 
-    // Render action buttons immediately
-    showNoSelectionActions();
-
     // Attach event listeners after DOM is ready
     requestAnimationFrame(() => {
+      // Initialize buttons state (disabled by default)
+      updateButtonsState();
+
       const searchInput = document.getElementById("searchInput");
       searchInput?.addEventListener("input", (e) => {
         const q = e.target.value.toLowerCase();
@@ -119,44 +129,28 @@
     const target = document.querySelector(`.user-row[data-user-id="${userId}"]`);
     if (target) target.classList.add("selected");
 
-    showActionsForSelected();
+    updateButtonsState();
   }
 
-  function showNoSelectionActions() {
-    const html =
-      actionButton({ icon: "➕", text: "Nuevo usuario", onClick: "openNewUserForm()" }) +
-      actionButton({ icon: "✏️", text: "Editar (selecciona uno)", disabled: true }) +
-      actionButton({ icon: "🗑️", text: "Eliminar (selecciona uno)", disabled: true, danger: true });
+  function updateButtonsState() {
+    const btnEdit = document.getElementById("btnEdit");
+    const btnDelete = document.getElementById("btnDelete");
 
-    setActionPanel(html);
+    if (selectedUserId) {
+      // User selected - enable buttons and change onclick handlers
+      btnEdit?.removeAttribute("disabled");
+      btnDelete?.removeAttribute("disabled");
+      btnEdit?.setAttribute("onclick", "openEditUserForm()");
+      btnDelete?.setAttribute("onclick", "deleteSelectedUser()");
+    } else {
+      // No user selected - disable buttons
+      btnEdit?.setAttribute("disabled", "");
+      btnDelete?.setAttribute("disabled", "");
+      btnEdit?.removeAttribute("onclick");
+      btnDelete?.removeAttribute("onclick");
+    }
   }
 
-  function showActionsForSelected() {
-    const html =
-      actionButton({ icon: "✏️", text: "Editar usuario", onClick: "openEditUserForm()" }) +
-      actionButton({ icon: "🗑️", text: "Eliminar", onClick: "deleteSelectedUser()", danger: true }) +
-      actionButton({ icon: "➕", text: "Nuevo usuario", onClick: "openNewUserForm()" });
-
-    setActionPanel(html);
-  }
-
-  function setActionPanel(html) {
-    const panel = document.getElementById("actionPanel");
-    if (panel) panel.innerHTML = html;
-  }
-
-  function actionButton({ icon, text, onClick, disabled = false, danger = false, title = "" }) {
-    const cls = `action-btn${danger ? " danger" : ""}${disabled ? " disabled" : ""}`;
-    const disAttr = disabled ? "disabled" : "";
-    const safeTitle = title ? `title="${escapeHtml(title)}"` : "";
-
-    return `
-      <button class="${cls}" type="button" ${disAttr} ${safeTitle} ${onClick ? `onclick="${onClick}"` : ""}>
-        <span class="icon" aria-hidden="true">${icon}</span>
-        <span class="action-text">${escapeHtml(text)}</span>
-      </button>
-    `;
-  }
 
   function escapeHtml(str) {
     return String(str ?? "")
