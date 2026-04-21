@@ -1340,8 +1340,12 @@ body.sidebar-collapsed .nav .navLink{
     border-right: 1px solid rgba(255,255,255,.08);
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    z-index: 100;
-    overflow-y: auto;
+    z-index: 1000;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    grid-column: unset;
+    grid-row: unset;
   }
   body.sidebar-collapsed .sidebar{
     transform: translateX(0);
