@@ -511,15 +511,15 @@ body.sidebar-collapsed .nav .navLink{
   justify-content: flex-end;
 }
 
-/* Action buttons - outline style */
+/* Action buttons - outline style, compact */
 .action-btn,
 .action-card {
-  padding: 0.45rem 0.9rem;
+  padding: 0.4rem 0.75rem;
   background: transparent;
   border: 1.2px solid rgba(40,215,199,.6);
-  border-radius: 6px;
+  border-radius: 5px;
   color: rgba(238,244,255,.85);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -527,8 +527,8 @@ body.sidebar-collapsed .nav .navLink{
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  height: 36px;
+  gap: 0.35rem;
+  height: 32px;
   line-height: 1;
 }
 
