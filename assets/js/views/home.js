@@ -14,7 +14,7 @@
     }[userRole];
 
     const html = `
-      <section class="panel resultados" id="mainPanel" style="overflow-y: auto; max-height: calc(100vh - 180px); padding-right: 0.5rem;">
+      <section class="panel resultados" id="mainPanel" style="overflow-y: auto; max-height: calc(100vh - 180px); padding: 1.5rem;">
         <div class="page-header">
           <div class="page-header-content">
             <h2>Bienvenido a TheJToolbox</h2>
