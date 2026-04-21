@@ -9,9 +9,13 @@ let selectedServerId = null;
 ============================================================ */
 
 function setActionPanel(html) {
-  const panel = document.getElementById("actionPanel");
-  if (!panel) return;
-  panel.innerHTML = html;
+  // Use UI.updateActionPanel if available (shows action bar)
+  if (typeof UI !== "undefined" && UI.updateActionPanel) {
+    UI.updateActionPanel(html);
+  } else {
+    const panel = document.getElementById("actionPanel");
+    if (panel) panel.innerHTML = html;
+  }
 }
 
 function actionButton({ icon, text, onClick, disabled = false, danger = false, title = "" }) {
