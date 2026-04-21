@@ -32,6 +32,14 @@ With check: (auth.jwt() ->> 'role' = 'admin')
 
 ---
 
+### 4. **INSERT - Users can insert their own profile**
+```sql
+With check: auth.uid() = user_id
+```
+**Propósito**: Permitir crear un perfil inicial durante signup (solo el propio)
+
+---
+
 ## Cómo Funciona
 
 ### getProfile()
@@ -68,9 +76,10 @@ const allProfiles = await getAllProfiles();
 ## Seguridad
 
 - ✅ SELECT: público (la app filtra)
+- ✅ INSERT: permitido solo para crear el propio perfil (usado en signup)
 - ✅ UPDATE: protegido por usuario_id
 - ✅ UPDATE: protegido para admins
-- ✅ No hay INSERT/DELETE (evita creación de perfiles no autorizados)
+- ✅ No DELETE (evita eliminación de perfiles)
 
 ## Si Algo Falla
 
