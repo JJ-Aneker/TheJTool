@@ -1,38 +1,6 @@
 (function () {
   let allUsers = [];
-  let selectedUser = null;
-  window.__adminDirty = false;
-
-  // Guard de cambios sin guardar (igual a user.js)
-  if (window.Router && typeof Router.addBeforeLeaveHook === "function") {
-    Router.addBeforeLeaveHook(async ({ from, to }) => {
-      if (from !== "admin") return true;
-      if (to === "admin") return true;
-      if (!window.__adminDirty) return true;
-
-      const choice = await UI.prompt3({
-        title: "Cambios sin guardar",
-        message: "Tienes cambios sin guardar. ¿Qué quieres hacer?",
-        primaryText: "Guardar y salir",
-        secondaryText: "Volver",
-        tertiaryText: "Salir sin guardar",
-        dangerTertiary: true
-      });
-
-      if (choice === "secondary") return false;
-      if (choice === "tertiary") return true;
-      if (choice === "primary") {
-        try {
-          const ok = await window.__saveAdminSilent?.();
-          return ok === true;
-        } catch (e) {
-          console.error("Error guardando:", e);
-          return false;
-        }
-      }
-      return false;
-    });
-  }
+  let selectedUserId = null;
 
   async function renderAdmin() {
     const profile = await getProfile();
@@ -42,7 +10,6 @@
     }
 
     try {
-      // Use getAllProfiles which respects admin role
       allUsers = await getAllProfiles();
       console.log("Users loaded:", allUsers.length);
     } catch (error) {
@@ -54,31 +21,30 @@
       return;
     }
 
-    renderUserList();
+    renderUserTable();
   }
 
-  function renderUserList() {
-    const tableRows = allUsers
-      .map(user => {
-        const userId = user.user_id || user.id;
-        const approved = user.approved ? "✅" : "❌";
-        return `
-          <tr class="user-row" data-user-id="${userId}" style="cursor: pointer;">
-            <td>${user.name || "—"}</td>
-            <td>${user.surname || "—"}</td>
-            <td>${user.role || "—"}</td>
-            <td>${approved}</td>
-          </tr>
-        `;
-      })
-      .join("");
+  function renderUserTable() {
+    let rows = "";
+    (allUsers || []).forEach((u) => {
+      const userId = u.user_id || u.id;
+      const approved = u.approved ? "✅" : "❌";
+      rows += `
+        <tr class="user-row" data-user-id="${userId}">
+          <td>${escapeHtml(u.name || "—")}</td>
+          <td>${escapeHtml(u.surname || "—")}</td>
+          <td>${escapeHtml(u.role || "—")}</td>
+          <td>${approved}</td>
+        </tr>
+      `;
+    });
 
     const html = `
       <section class="panel resultados" id="mainPanel">
         <div class="page-header">
           <div class="page-header-content">
             <h2>Gestión de Usuarios</h2>
-            <p>Busca y edita usuarios del sistema.</p>
+            <p>Selecciona un usuario para editar.</p>
           </div>
         </div>
 
@@ -90,17 +56,18 @@
         <div class="table-wrapper">
           <table class="glass-table">
             <thead><tr><th>Nombre</th><th>Apellidos</th><th>Rol</th><th>Aprobado</th></tr></thead>
-            <tbody>${tableRows}</tbody>
+            <tbody>${rows}</tbody>
           </table>
         </div>
       </section>
     `;
 
     UI.replaceWithAnimation(html);
-    UI.updateActionPanel("");
+    showNoSelectionActions();
 
     setTimeout(() => {
-      document.getElementById("searchInput")?.addEventListener("input", (e) => {
+      const searchInput = document.getElementById("searchInput");
+      searchInput?.addEventListener("input", (e) => {
         const q = e.target.value.toLowerCase();
         const filtered = allUsers.filter(u =>
           `${u.name || ""} ${u.surname || ""}`.toLowerCase().includes(q)
@@ -111,214 +78,312 @@
       document.querySelectorAll(".user-row").forEach(row => {
         row.addEventListener("click", () => {
           const userId = row.getAttribute("data-user-id");
-          selectedUser = allUsers.find(u => (u.user_id || u.id) === userId);
-          if (selectedUser) showUserForm();
+          selectUser(userId);
         });
       });
     }, 0);
   }
 
   function renderFilteredTable(filtered) {
-    const tableRows = filtered
-      .map(user => {
-        const userId = user.user_id || user.id;
-        const approved = user.approved ? "✅" : "❌";
-        return `
-          <tr class="user-row" data-user-id="${userId}" style="cursor: pointer;">
-            <td>${user.name || "—"}</td>
-            <td>${user.surname || "—"}</td>
-            <td>${user.role || "—"}</td>
-            <td>${approved}</td>
-          </tr>
-        `;
-      })
-      .join("");
+    let rows = "";
+    (filtered || []).forEach((u) => {
+      const userId = u.user_id || u.id;
+      const approved = u.approved ? "✅" : "❌";
+      rows += `
+        <tr class="user-row" data-user-id="${userId}">
+          <td>${escapeHtml(u.name || "—")}</td>
+          <td>${escapeHtml(u.surname || "—")}</td>
+          <td>${escapeHtml(u.role || "—")}</td>
+          <td>${approved}</td>
+        </tr>
+      `;
+    });
 
     const tbody = document.querySelector(".glass-table tbody");
-    if (tbody) tbody.innerHTML = tableRows;
+    if (tbody) tbody.innerHTML = rows;
 
     setTimeout(() => {
       document.querySelectorAll(".user-row").forEach(row => {
         row.addEventListener("click", () => {
           const userId = row.getAttribute("data-user-id");
-          selectedUser = allUsers.find(u => (u.user_id || u.id) === userId);
-          if (selectedUser) showUserForm();
+          selectUser(userId);
         });
       });
     }, 0);
   }
 
-  function showUserForm() {
-    const user = selectedUser;
-    if (!user) return;
+  function selectUser(userId) {
+    selectedUserId = userId;
+    document.querySelectorAll(".user-row").forEach(r => r.classList.remove("selected"));
+    const target = document.querySelector(`.user-row[data-user-id="${userId}"]`);
+    if (target) target.classList.add("selected");
 
-    const html = `
-      <section class="panel resultados user-profile" id="mainPanel">
-        <div class="page-header">
-          <div class="page-header-content">
-            <h2>${user.name || "Usuario"} ${user.surname || ""}</h2>
-            <p>Edita la información de este usuario.</p>
+    showActionsForSelected();
+  }
+
+  function showNoSelectionActions() {
+    const html =
+      actionButton({ icon: "➕", text: "Nuevo usuario", onClick: "openNewUserForm()" }) +
+      actionButton({ icon: "✏️", text: "Editar (selecciona uno)", disabled: true }) +
+      actionButton({ icon: "🗑️", text: "Eliminar (selecciona uno)", disabled: true, danger: true });
+
+    setActionPanel(html);
+  }
+
+  function showActionsForSelected() {
+    const html =
+      actionButton({ icon: "✏️", text: "Editar usuario", onClick: "openEditUserForm()" }) +
+      actionButton({ icon: "🗑️", text: "Eliminar", onClick: "deleteSelectedUser()", danger: true }) +
+      actionButton({ icon: "➕", text: "Nuevo usuario", onClick: "openNewUserForm()" });
+
+    setActionPanel(html);
+  }
+
+  function setActionPanel(html) {
+    const panel = document.getElementById("actionPanel");
+    if (panel) panel.innerHTML = html;
+  }
+
+  function actionButton({ icon, text, onClick, disabled = false, danger = false, title = "" }) {
+    const cls = `action-btn${danger ? " danger" : ""}${disabled ? " disabled" : ""}`;
+    const disAttr = disabled ? "disabled" : "";
+    const safeTitle = title ? `title="${escapeHtml(title)}"` : "";
+
+    return `
+      <button class="${cls}" type="button" ${disAttr} ${safeTitle} ${onClick ? `onclick="${onClick}"` : ""}>
+        <span class="icon" aria-hidden="true">${icon}</span>
+        <span class="action-text">${escapeHtml(text)}</span>
+      </button>
+    `;
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function openUserModal({ title, fields, onSave }) {
+    let root = document.getElementById("admin-modal-root");
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "admin-modal-root";
+      document.body.appendChild(root);
+    }
+
+    const fieldsHtml = fields.map(f => `
+      <div style="margin-bottom:14px">
+        <label class="glass-modal-field-label">${escapeHtml(f.label)}${f.required ? ' <span style="color:#fca5a5">*</span>' : ''}</label>
+        ${f.type === "textarea"
+          ? `<textarea id="adm-${f.id}" class="glass-modal-input" rows="3">${escapeHtml(f.value || "")}</textarea>`
+          : f.type === "select"
+            ? `<select id="adm-${f.id}" class="glass-modal-input">${f.options.map(opt => `<option value="${opt.value}" ${f.value === opt.value ? "selected" : ""}>${escapeHtml(opt.label)}</option>`).join("")}</select>`
+            : f.type === "checkbox"
+              ? `<label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                   <input type="checkbox" id="adm-${f.id}" ${f.value ? "checked" : ""} />
+                   <span>${escapeHtml(f.label)}</span>
+                 </label>`
+              : `<input id="adm-${f.id}" class="glass-modal-input" type="${f.type || "text"}" value="${escapeHtml(f.value || "")}" placeholder="${escapeHtml(f.placeholder || "")}" ${f.disabled ? "disabled" : ""} />`
+        }
+      </div>
+    `).join("");
+
+    root.innerHTML = `
+      <div class="glass-modal-overlay" id="adm-overlay" role="dialog" aria-modal="true">
+        <div class="glass-modal" style="width:520px;max-width:95vw">
+          <div class="glass-modal-head">
+            <div class="glass-modal-title">${escapeHtml(title)}</div>
+            <button class="glass-modal-x" type="button" aria-label="Cerrar" onclick="closeAdminModal()">✕</button>
           </div>
-          <button class="ghost-btn back-btn" type="button">← Volver</button>
+          <div class="glass-modal-body" style="padding:20px 24px">
+            ${fieldsHtml}
+            <div id="adm-error" style="display:none;color:#fecaca;font-size:12px;margin-top:4px;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.25);padding:8px 12px;border-radius:8px"></div>
+          </div>
+          <div class="glass-modal-actions">
+            <button class="ghost-btn glass-modal-cancel" type="button" onclick="closeAdminModal()">Cancelar</button>
+            <button class="cta glass-modal-ok" type="button" onclick="__admSave()">💾 Guardar</button>
+          </div>
         </div>
-
-        <div class="profile-grid">
-          <aside class="profile-card profile-card--avatar">
-            <div class="avatar-block avatar-block--centered">
-              <img src="${user.avatar_url || 'avatar.png'}" class="avatar avatar--xl" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
-              <button type="submit" form="admin-form" class="cta profile-action-btn save-btn">
-                💾 Guardar cambios
-              </button>
-              <button class="ghost-btn back-btn" style="margin-top: 0.5rem;">← Volver</button>
-            </div>
-          </aside>
-
-          <section class="profile-card profile-card--form profile-card--full">
-            <form id="admin-form" class="profile-form">
-
-              <div class="form-section">
-                <div class="section-head">
-                  <h3 class="section-title">Datos personales</h3>
-                </div>
-                <div class="fields-grid">
-                  <div class="field">
-                    <label class="actions-label">Nombre</label>
-                    <input id="form-name" class="input-glass" type="text" value="${user.name || ''}">
-                  </div>
-                  <div class="field">
-                    <label class="actions-label">Apellidos</label>
-                    <input id="form-surname" class="input-glass" type="text" value="${user.surname || ''}">
-                  </div>
-                  <div class="field">
-                    <label class="actions-label">Email</label>
-                    <input id="form-email" class="input-glass" type="email" value="${user.email || ''}" disabled style="opacity: 0.6;">
-                  </div>
-                  <div class="field">
-                    <label class="actions-label">Teléfono</label>
-                    <input id="form-phone" class="input-glass" type="tel" value="${user.phone || ''}">
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-section">
-                <div class="section-head">
-                  <h3 class="section-title">Dirección</h3>
-                </div>
-                <div class="fields-grid">
-                  <div class="field field--full">
-                    <label class="actions-label">Dirección</label>
-                    <input id="form-address" class="input-glass" type="text" value="${user.address || ''}">
-                  </div>
-                  <div class="field">
-                    <label class="actions-label">Ciudad</label>
-                    <input id="form-city" class="input-glass" type="text" value="${user.city || ''}">
-                  </div>
-                  <div class="field">
-                    <label class="actions-label">Provincia</label>
-                    <input id="form-province" class="input-glass" type="text" value="${user.province || ''}">
-                  </div>
-                  <div class="field">
-                    <label class="actions-label">Código Postal</label>
-                    <input id="form-postal" class="input-glass" type="text" value="${user.postal || ''}">
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-section">
-                <div class="section-head">
-                  <h3 class="section-title">Permisos</h3>
-                </div>
-                <div class="fields-grid">
-                  <div class="field">
-                    <label class="actions-label">Rol</label>
-                    <select id="form-role" class="input-glass" style="padding: 0.6rem;">
-                      <option value="read" ${user.role === "read" ? "selected" : ""}>Lector (read)</option>
-                      <option value="write" ${user.role === "write" ? "selected" : ""}>Editor (write)</option>
-                      <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                      <input type="checkbox" id="form-approved" ${user.approved ? "checked" : ""}>
-                      <span class="actions-label">Aprobado</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-            </form>
-          </section>
-        </div>
-      </section>
+      </div>
     `;
 
-    UI.replaceWithAnimation(html);
-    UI.updateActionPanel("");
+    document.getElementById("adm-overlay").addEventListener("click", e => {
+      if (e.target.id === "adm-overlay") closeAdminModal();
+    });
 
-    setTimeout(() => {
-      const form = document.getElementById("admin-form");
-      const inputs = form?.querySelectorAll("input, select");
+    window.__admKeyDown = e => { if (e.key === "Escape") closeAdminModal(); };
+    document.addEventListener("keydown", window.__admKeyDown, true);
 
-      inputs?.forEach(input => {
-        input.addEventListener("change", () => {
-          window.__adminDirty = true;
-        });
-        input.addEventListener("input", () => {
-          window.__adminDirty = true;
-        });
-      });
+    window.__admSave = onSave;
 
-      document.querySelectorAll(".back-btn").forEach(btn => {
-        btn.addEventListener("click", renderUserList);
-      });
-
-      document.querySelector(".save-btn")?.addEventListener("click", async (e) => {
-        e.preventDefault();
-        await saveUser();
-      });
-    }, 0);
+    setTimeout(() => document.getElementById("adm-overlay").focus(), 100);
   }
 
-  async function saveUser() {
-    if (!selectedUser) return;
+  window.openEditUserForm = function() {
+    const user = allUsers.find(u => (u.user_id || u.id) === selectedUserId);
+    if (!user) return;
 
-    const changes = {
-      name: document.getElementById("form-name").value,
-      surname: document.getElementById("form-surname").value,
-      phone: document.getElementById("form-phone").value,
-      address: document.getElementById("form-address").value,
-      city: document.getElementById("form-city").value,
-      province: document.getElementById("form-province").value,
-      postal: document.getElementById("form-postal").value,
-      role: document.getElementById("form-role").value,
-      approved: document.getElementById("form-approved").checked
-    };
+    const roleLabel = { read: "Lector", write: "Editor", admin: "Administrador" }[user.role] || user.role;
+
+    openUserModal({
+      title: `Editar: ${escapeHtml(user.name || "Usuario")}`,
+      fields: [
+        { id: "name", label: "Nombre", type: "text", value: user.name, required: true },
+        { id: "surname", label: "Apellidos", type: "text", value: user.surname },
+        { id: "email", label: "Email", type: "email", value: user.email, disabled: true },
+        { id: "phone", label: "Teléfono", type: "tel", value: user.phone },
+        { id: "address", label: "Dirección", type: "text", value: user.address },
+        { id: "city", label: "Ciudad", type: "text", value: user.city },
+        { id: "province", label: "Provincia", type: "text", value: user.province },
+        { id: "postal", label: "Código Postal", type: "text", value: user.postal },
+        {
+          id: "role",
+          label: "Rol",
+          type: "select",
+          value: user.role,
+          options: [
+            { value: "read", label: "Lector (read)" },
+            { value: "write", label: "Editor (write)" },
+            { value: "admin", label: "Administrador" }
+          ],
+          required: true
+        },
+        { id: "approved", label: "Aprobado", type: "checkbox", value: user.approved }
+      ],
+      onSave: async () => {
+        const changes = {
+          name: document.getElementById("adm-name").value,
+          surname: document.getElementById("adm-surname").value,
+          phone: document.getElementById("adm-phone").value,
+          address: document.getElementById("adm-address").value,
+          city: document.getElementById("adm-city").value,
+          province: document.getElementById("adm-province").value,
+          postal: document.getElementById("adm-postal").value,
+          role: document.getElementById("adm-role").value,
+          approved: document.getElementById("adm-approved").checked
+        };
+
+        try {
+          const { error } = await client
+            .from("profiles")
+            .update(changes)
+            .eq("user_id", selectedUserId);
+
+          if (error) throw error;
+
+          Object.assign(user, changes);
+          closeAdminModal();
+          renderUserTable();
+
+          const idx = allUsers.findIndex(u => (u.user_id || u.id) === selectedUserId);
+          if (idx !== -1) selectUser(selectedUserId);
+        } catch (e) {
+          const errDiv = document.getElementById("adm-error");
+          errDiv.style.display = "block";
+          errDiv.textContent = e.message;
+        }
+      }
+    });
+  };
+
+  window.openNewUserForm = function() {
+    openUserModal({
+      title: "Nuevo usuario",
+      fields: [
+        { id: "name", label: "Nombre", type: "text", required: true },
+        { id: "surname", label: "Apellidos", type: "text" },
+        { id: "email", label: "Email", type: "email", required: true },
+        { id: "phone", label: "Teléfono", type: "tel" },
+        { id: "address", label: "Dirección", type: "text" },
+        { id: "city", label: "Ciudad", type: "text" },
+        { id: "province", label: "Provincia", type: "text" },
+        { id: "postal", label: "Código Postal", type: "text" },
+        {
+          id: "role",
+          label: "Rol",
+          type: "select",
+          value: "read",
+          options: [
+            { value: "read", label: "Lector (read)" },
+            { value: "write", label: "Editor (write)" },
+            { value: "admin", label: "Administrador" }
+          ],
+          required: true
+        },
+        { id: "approved", label: "Aprobado", type: "checkbox", value: false }
+      ],
+      onSave: async () => {
+        const newUser = {
+          name: document.getElementById("adm-name").value,
+          surname: document.getElementById("adm-surname").value,
+          email: document.getElementById("adm-email").value,
+          phone: document.getElementById("adm-phone").value,
+          address: document.getElementById("adm-address").value,
+          city: document.getElementById("adm-city").value,
+          province: document.getElementById("adm-province").value,
+          postal: document.getElementById("adm-postal").value,
+          role: document.getElementById("adm-role").value,
+          approved: document.getElementById("adm-approved").checked
+        };
+
+        if (!newUser.name || !newUser.email) {
+          const errDiv = document.getElementById("adm-error");
+          errDiv.style.display = "block";
+          errDiv.textContent = "Nombre y Email son requeridos";
+          return;
+        }
+
+        try {
+          const { data, error } = await client
+            .from("profiles")
+            .insert([newUser])
+            .select();
+
+          if (error) throw error;
+
+          allUsers.push(data[0]);
+          closeAdminModal();
+          renderUserTable();
+        } catch (e) {
+          const errDiv = document.getElementById("adm-error");
+          errDiv.style.display = "block";
+          errDiv.textContent = e.message;
+        }
+      }
+    });
+  };
+
+  window.deleteSelectedUser = async function() {
+    if (!selectedUserId || !confirm("¿Estás seguro de que quieres eliminar este usuario?")) return;
 
     try {
       const { error } = await client
         .from("profiles")
-        .update(changes)
-        .eq("user_id", selectedUser.user_id || selectedUser.id);
+        .delete()
+        .eq("user_id", selectedUserId);
 
       if (error) throw error;
 
-      Object.assign(selectedUser, changes);
-      window.__adminDirty = false;
-
-      const btn = document.querySelector(".save-btn");
-      btn.textContent = "✅ Guardado";
-      btn.disabled = true;
-
-      setTimeout(() => {
-        btn.textContent = "💾 Guardar cambios";
-        btn.disabled = false;
-      }, 1500);
+      allUsers = allUsers.filter(u => (u.user_id || u.id) !== selectedUserId);
+      selectedUserId = null;
+      renderUserTable();
     } catch (e) {
       alert("Error: " + e.message);
     }
-  }
+  };
 
-  window.__saveAdminSilent = saveUser;
+  window.closeAdminModal = function() {
+    const root = document.getElementById("admin-modal-root");
+    if (root) {
+      root.innerHTML = "";
+      root.remove();
+      document.getElementById("admin-modal-root").remove();
+    }
+    document.removeEventListener("keydown", window.__admKeyDown, true);
+  };
 
   Router.registerView("admin", renderAdmin);
 })();
