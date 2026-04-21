@@ -92,17 +92,30 @@ async function getAllProfiles() {
     return [userProfile]; // Solo devolver el suyo
   }
 
-  const { data, error } = await client
-    .from("profiles")
-    .select("*")
-    .order("created_at", { ascending: false });
+  try {
+    // Usar Edge Function para obtener perfiles con emails sincronizados
+    const response = await client.functions.invoke("get-profiles-with-email");
 
-  if (error) {
-    console.warn("Error cargando perfiles:", error);
-    return [];
+    if (response.error) {
+      console.warn("Error en Edge Function:", response.error);
+      // Fallback a consulta directa si falla
+      const { data, error } = await client
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+      return data || [];
+    }
+
+    return response || [];
+  } catch (e) {
+    console.warn("Error invocando Edge Function:", e);
+    // Fallback a consulta directa
+    const { data, error } = await client
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+    return data || [];
   }
-
-  return data || [];
 }
 
 // Guardar perfil (crea o actualiza automáticamente)
