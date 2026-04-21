@@ -42,13 +42,8 @@
     }
 
     try {
-      const { data, error } = await client
-        .from("profiles")
-        .select("*")
-        .limit(1000);
-
-      if (error) throw error;
-      allUsers = data || [];
+      // Use getAllProfiles which respects admin role
+      allUsers = await getAllProfiles();
       console.log("Users loaded:", allUsers.length);
     } catch (error) {
       console.error("Error:", error);

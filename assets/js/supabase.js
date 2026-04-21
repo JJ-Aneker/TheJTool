@@ -58,7 +58,7 @@ async function requireAuth() {
    PERFIL DE USUARIO
 ============================================================ */
 
-// Obtener perfil
+// Obtener perfil del usuario actual
 async function getProfile() {
   const { data: auth, error: authError } = await client.auth.getUser();
   if (authError || !auth.user) return {};
@@ -77,6 +77,32 @@ async function getProfile() {
   }
 
   return data;
+}
+
+// Obtener TODOS los perfiles (solo para admins)
+async function getAllProfiles() {
+  const { data: auth, error: authError } = await client.auth.getUser();
+  if (authError || !auth.user) return [];
+
+  // Cargar el perfil actual primero
+  const userProfile = await getProfile();
+
+  // Solo admins pueden ver todos
+  if (userProfile.role !== "admin") {
+    return [userProfile]; // Solo devolver el suyo
+  }
+
+  const { data, error } = await client
+    .from("profiles")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.warn("Error cargando perfiles:", error);
+    return [];
+  }
+
+  return data || [];
 }
 
 // Guardar perfil (crea o actualiza automáticamente)
