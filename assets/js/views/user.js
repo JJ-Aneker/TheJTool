@@ -149,6 +149,7 @@
         const changes = {
           name: document.getElementById("usrm-name").value,
           surname: document.getElementById("usrm-surname").value,
+          email: currentUser?.email || "",
           phone: document.getElementById("usrm-phone").value,
           address: document.getElementById("usrm-address").value,
           city: document.getElementById("usrm-city").value,
