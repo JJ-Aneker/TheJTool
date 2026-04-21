@@ -1330,7 +1330,22 @@ body.sidebar-collapsed .nav .navLink{
     grid-template-columns: 1fr;
     grid-template-rows: 1fr var(--footerH);
   }
-  .sidebar{ display:none; }
+  .sidebar{
+    position: fixed;
+    left: 0;
+    top: var(--topbarH);
+    height: calc(100vh - var(--topbarH) - var(--footerH));
+    width: var(--sidebarW);
+    background: rgba(10,20,40,0.95);
+    border-right: 1px solid rgba(255,255,255,.08);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  body.sidebar-collapsed .sidebar{
+    transform: translateX(0);
+  }
   .board{ grid-column: 1 / -1; }
   .content{ grid-template-columns: 1fr; }
   .favorites{ max-width: none; }
