@@ -11,13 +11,19 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   throw new Error("❌ Supabase credentials not configured. Check .env file or window.ENV injection.");
 }
 
-/**
- * ✅ IMPORTANTE:
- * - Asegúrate de que el nombre del archivo de login coincida EXACTAMENTE
- *   con lo que pongas aquí (por mayúsculas/minúsculas).
- *   Ej: "login.html" vs "Login.html"
- */
-const LOGIN_PAGE = "login.html";
+// Detectar URL base dinámicamente (funciona en localhost y Vercel)
+const BASE_URL = (() => {
+  if (typeof window !== "undefined") {
+    const isDev = window.location.hostname === "localhost" ||
+                  window.location.hostname === "127.0.0.1";
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    return `${protocol}//${host}`;
+  }
+  return "";
+})();
+
+const LOGIN_PAGE = BASE_URL ? `${BASE_URL}/login.html` : "login.html";
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
