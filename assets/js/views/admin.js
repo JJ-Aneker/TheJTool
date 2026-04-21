@@ -43,10 +43,11 @@
       <section class="panel resultados" id="mainPanel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <h2 style="margin: 0; font-size: 1.5rem;">Gestión de Usuarios</h2>
-          <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
             <input type="text" id="searchInput" placeholder="Buscar..."
-              style="width: 280px; padding: 0.5rem 0.75rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 13px;" />
+              style="flex: 1; max-width: 280px; padding: 0.5rem 0.75rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 13px;" />
             <p style="color: rgba(238,244,255,.6); margin: 0; font-size: 13px; white-space: nowrap;">Total: ${allUsers.length}</p>
+            <div id="actionPanel" style="display: flex; gap: 0.5rem; align-items: center; margin-left: auto;"></div>
           </div>
         </div>
 
@@ -137,13 +138,8 @@
   }
 
   function setActionPanel(html) {
-    // Use UI.updateActionPanel to show/hide the horizontal action bar
-    if (typeof UI !== "undefined" && UI.updateActionPanel) {
-      UI.updateActionPanel(html);
-    } else {
-      const panel = document.getElementById("actionPanel");
-      if (panel) panel.innerHTML = html;
-    }
+    const panel = document.getElementById("actionPanel");
+    if (panel) panel.innerHTML = html;
   }
 
   function actionButton({ icon, text, onClick, disabled = false, danger = false, title = "" }) {
