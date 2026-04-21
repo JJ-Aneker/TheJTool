@@ -110,6 +110,36 @@ button{
   appearance: none;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(154, 209, 255, 0.4);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(154, 209, 255, 0.7);
+}
+
+/* Firefox */
+* {
+  scrollbar-color: rgba(154, 209, 255, 0.4) rgba(255, 255, 255, 0.02);
+  scrollbar-width: thin;
+}
+
+*:hover {
+  scrollbar-color: rgba(154, 209, 255, 0.7) rgba(255, 255, 255, 0.02);
+}
+
 /* A11y */
 :focus-visible{
   outline: 2px solid var(--accent);
