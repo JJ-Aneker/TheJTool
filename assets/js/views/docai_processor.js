@@ -7,10 +7,21 @@
 
     const html = `
       <section class="panel resultados" id="mainPanel">
-        <div class="page-header">
-          <div class="page-header-content">
-            <h2>DocAI Processor</h2>
-            <p>Procesa documentos con inteligencia artificial.</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 1rem 0; border-bottom: 1px solid rgba(40,215,199,.15); margin-bottom: 1rem;">
+          <div class="page-header" style="margin: 0; flex: 1;">
+            <div class="page-header-content" style="margin: 0;">
+              <h2 style="margin: 0; font-size: 1.5rem;">DocAI Processor</h2>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <button class="action-card" id="docai-process-btn" type="button">
+              <span class="icon">⚙️</span>
+              <span class="action-text">Procesar</span>
+            </button>
+            <button class="action-card" id="docai-clear-btn" type="button">
+              <span class="icon">🗑️</span>
+              <span class="action-text">Limpiar</span>
+            </button>
           </div>
         </div>
 
@@ -45,22 +56,11 @@
     `;
 
     UI.replaceWithAnimation(html);
-    UI.updateActionPanel(`
-      <button class="action-card" id="docai-process-btn" type="button">
-        <span class="icon">⚙️</span>
-        <span class="action-text">Procesar documento</span>
-      </button>
 
-      <button class="action-card" id="docai-clear-btn" type="button">
-        <span class="icon">🗑️</span>
-        <span class="action-text">Limpiar</span>
-      </button>
-    `);
-
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       document.getElementById("docai-process-btn")?.addEventListener("click", processDocument);
       document.getElementById("docai-clear-btn")?.addEventListener("click", clearResults);
-    }, 0);
+    });
   }
 
   async function processDocument() {
