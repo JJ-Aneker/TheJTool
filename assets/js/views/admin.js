@@ -183,7 +183,7 @@
                    <input type="checkbox" id="adm-${f.id}" ${f.value ? "checked" : ""} />
                    <span>${escapeHtml(f.label)}</span>
                  </label>`
-              : `<input id="adm-${f.id}" class="glass-modal-input" type="${f.type || "text"}" value="${escapeHtml(f.value || "")}" placeholder="${escapeHtml(f.placeholder || "")}" style="font-size:14px" ${f.disabled ? "disabled" : ""} />`
+              : `<input id="adm-${f.id}" class="glass-modal-input" type="${f.type || "text"}" value="${escapeHtml(f.value || "")}" placeholder="${escapeHtml(f.placeholder || "")}" style="font-size:14px" ${f.disabled ? "disabled" : ""} ${f.readonly ? "readonly" : ""} />`
         }
       </div>
     `).join("");
@@ -230,7 +230,7 @@
       fields: [
         { id: "name", label: "Nombre", type: "text", value: user.name, required: true },
         { id: "surname", label: "Apellidos", type: "text", value: user.surname },
-        { id: "email", label: "Email", type: "email", value: user.email, disabled: true },
+        { id: "email", label: "Email", type: "email", value: user.email || "No disponible", readonly: true },
         { id: "phone", label: "Teléfono", type: "tel", value: user.phone },
         { id: "address", label: "Dirección", type: "text", value: user.address },
         { id: "city", label: "Ciudad", type: "text", value: user.city },
