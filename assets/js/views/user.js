@@ -12,10 +12,26 @@
 
       const html = `
         <section class="panel resultados" id="mainPanel">
-          <div class="page-header">
-            <div class="page-header-content">
-              <h2>Perfil de usuario</h2>
-              <p>Tu información personal</p>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 0 0 1rem 0; border-bottom: 1px solid rgba(40,215,199,.15); margin-bottom: 1rem;">
+            <div class="page-header" style="margin: 0; flex: 1;">
+              <div class="page-header-content" style="margin: 0;">
+                <h2 style="margin: 0; font-size: 1.5rem;">Perfil de usuario</h2>
+                <p style="margin: 0.3rem 0 0 0;">Tu información personal</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.6rem;">
+              <button class="action-card" type="button" onclick="openEditProfileForm()">
+                <span class="icon">✏️</span>
+                <span class="action-text">Editar</span>
+              </button>
+              <button class="action-card" type="button" onclick="openAvatarUpload()">
+                <span class="icon">🖼️</span>
+                <span class="action-text">Foto</span>
+              </button>
+              <button class="action-card danger" type="button" onclick="logoutUser()">
+                <span class="icon">🚪</span>
+                <span class="action-text">Salir</span>
+              </button>
             </div>
           </div>
 
@@ -40,7 +56,6 @@
       `;
 
       UI.replaceWithAnimation(html);
-      showUserActions();
 
     } catch (e) {
       console.error("Error loading profile:", e);
@@ -48,28 +63,6 @@
     }
   }
 
-  function showUserActions() {
-    const html =
-      actionButton({ icon: "✏️", text: "Editar perfil", onClick: "openEditProfileForm()" }) +
-      actionButton({ icon: "🖼️", text: "Cambiar foto", onClick: "openAvatarUpload()" }) +
-      actionButton({ icon: "🚪", text: "Cerrar sesión", onClick: "logoutUser()", danger: true });
-
-    if (typeof UI !== "undefined" && UI.updateActionPanel) {
-      UI.updateActionPanel(html);
-    }
-  }
-
-  function actionButton({ icon, text, onClick, disabled = false, danger = false }) {
-    const cls = `action-btn${danger ? " danger" : ""}${disabled ? " disabled" : ""}`;
-    const disAttr = disabled ? "disabled" : "";
-
-    return `
-      <button class="${cls}" type="button" ${disAttr} ${onClick ? `onclick="${onClick}"` : ""}>
-        <span class="icon" aria-hidden="true">${icon}</span>
-        <span class="action-text">${escapeHtml(text)}</span>
-      </button>
-    `;
-  }
 
   function escapeHtml(str) {
     return String(str ?? "")
