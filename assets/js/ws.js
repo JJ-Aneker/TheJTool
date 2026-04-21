@@ -73,7 +73,27 @@ async function loadWebServiceList() {
 
   const html = `
     <section class="panel resultados" id="mainPanel">
-      <h2>Servidores Web</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 1rem 0; border-bottom: 1px solid rgba(40,215,199,.15); margin-bottom: 1rem;">
+        <h2 style="margin: 0; font-size: 1.5rem;">Servidores Web</h2>
+        <div style="display: flex; gap: 0.6rem;">
+          <button class="action-card" type="button" onclick="openNewServerForm()">
+            <span class="icon">➕</span>
+            <span class="action-text">Añadir</span>
+          </button>
+          <button class="action-card" type="button" id="ws-edit-btn" disabled>
+            <span class="icon">✏️</span>
+            <span class="action-text">Editar</span>
+          </button>
+          <button class="action-card" type="button" id="ws-test-btn" disabled>
+            <span class="icon">🧪</span>
+            <span class="action-text">Probar</span>
+          </button>
+          <button class="action-card danger" type="button" id="ws-delete-btn" disabled>
+            <span class="icon">🗑️</span>
+            <span class="action-text">Eliminar</span>
+          </button>
+        </div>
+      </div>
 
       <div class="table-wrapper">
         <table class="glass-table">
@@ -104,9 +124,14 @@ async function loadWebServiceList() {
     document.querySelectorAll(".ws-row").forEach((row) => {
       row.addEventListener("click", () => selectServer(row.dataset.id));
     });
+
+    // Attach button listeners
+    document.getElementById("ws-edit-btn")?.addEventListener("click", openEditServer);
+    document.getElementById("ws-test-btn")?.addEventListener("click", testServer);
+    document.getElementById("ws-delete-btn")?.addEventListener("click", deleteServer);
   }, 50);
 
-  showNoSelectionActions();
+  updateWSButtonsState();
 }
 
 /* ============================================================
@@ -122,36 +147,25 @@ function selectServer(id) {
   const target = document.querySelector(`.ws-row[data-id="${id}"]`);
   if (target) target.classList.add("selected");
 
-  showActionsForSelected();
+  updateWSButtonsState();
 }
 
-/* ============================================================
-   PANEL LATERAL: ACCIONES SIN SELECCIÓN
-============================================================ */
+function updateWSButtonsState() {
+  const editBtn = document.getElementById("ws-edit-btn");
+  const testBtn = document.getElementById("ws-test-btn");
+  const deleteBtn = document.getElementById("ws-delete-btn");
 
-function showNoSelectionActions() {
-  const html =
-    actionButton({ icon: "➕", text: "Añadir servidor", onClick: "openNewServerForm()" }) +
-    actionButton({ icon: "✏️", text: "Editar (selecciona uno)", disabled: true }) +
-    actionButton({ icon: "🧪", text: "Probar (selecciona uno)", disabled: true }) +
-    actionButton({ icon: "🗑️", text: "Eliminar (selecciona uno)", disabled: true, danger: true });
-
-  setActionPanel(html);
+  if (selectedServerId) {
+    editBtn?.removeAttribute("disabled");
+    testBtn?.removeAttribute("disabled");
+    deleteBtn?.removeAttribute("disabled");
+  } else {
+    editBtn?.setAttribute("disabled", "");
+    testBtn?.setAttribute("disabled", "");
+    deleteBtn?.setAttribute("disabled", "");
+  }
 }
 
-/* ============================================================
-   PANEL LATERAL: ACCIONES CON SELECCIÓN
-============================================================ */
-
-function showActionsForSelected() {
-  const html =
-    actionButton({ icon: "✏️", text: "Editar servidor", onClick: "openEditServer()" }) +
-    actionButton({ icon: "🧪", text: "Probar conexión", onClick: "testServer()" }) +
-    actionButton({ icon: "🗑️", text: "Eliminar", onClick: "deleteServer()", danger: true }) +
-    actionButton({ icon: "➕", text: "Nuevo servidor", onClick: "openNewServerForm()" });
-
-  setActionPanel(html);
-}
 
 /* ============================================================
    MODAL HELPER
