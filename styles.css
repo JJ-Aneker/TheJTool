@@ -475,16 +475,20 @@ body.sidebar-collapsed .nav .navLink{
   flex: 1;
   min-height: 0;
   overflow: auto;
+  background: #2A2D34;
+  padding: 1rem;
 }
 .panel.resultados h2{
-  margin: 0 0 14px 0;
-  font-size: 22px;
+  margin: 0 0 0.75rem 0;
+  font-size: 20px;
   font-weight: 700;
+  color: #004894;
 }
 .table-wrapper{
   flex: 1;
   overflow: auto;
   min-height: 0;
+  margin-top: 0.75rem;
 }
 
 /* ==========================================================================
@@ -516,11 +520,11 @@ body.sidebar-collapsed .nav .navLink{
 .action-card {
   padding: 0.35rem 0.65rem;
   background: transparent;
-  border: 1px solid rgba(40,215,199,.5);
+  border: 1.5px solid #004894;
   border-radius: 5px;
-  color: rgba(238,244,255,.85);
+  color: #004894;
   font-size: 0.75rem;
-  font-weight: 400;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
@@ -534,22 +538,22 @@ body.sidebar-collapsed .nav .navLink{
 
 .action-btn:hover:not(.disabled),
 .action-card:hover:not(.disabled) {
-  background: rgba(40,215,199,.08);
-  border-color: rgba(40,215,199,.7);
-  color: rgba(238,244,255,.95);
+  background: #004894;
+  border-color: #004894;
+  color: white;
 }
 
 .action-btn.danger,
 .action-card.danger {
-  border-color: rgba(255,100,100,.5);
-  color: rgba(255,150,150,.85);
+  border-color: #d32f2f;
+  color: #d32f2f;
 }
 
 .action-btn.danger:hover:not(.disabled),
 .action-card.danger:hover:not(.disabled) {
-  background: rgba(255,100,100,.08);
-  border-color: rgba(255,100,100,.7);
-  color: rgba(255,150,150,.95);
+  background: #d32f2f;
+  border-color: #d32f2f;
+  color: white;
 }
 
 .action-btn.disabled,
@@ -604,22 +608,27 @@ body.sidebar-collapsed .nav .navLink{
   color: var(--txt-1);
   font-weight: 300;
   font-size: 0.9rem;
+  background: #1F1F1F;
+  border-radius: 6px;
+  overflow: hidden;
 }
 .glass-table thead{
-  background: var(--panel-bg-strong);
+  background: #1F1F1F;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 .glass-table th,
 .glass-table td{
-  padding: 8px 12px;
+  padding: 6px 10px;
   text-align: left;
 }
 .glass-table th{
-  font-weight: 500;
-  letter-spacing: 0.4px;
-  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-size: 0.8rem;
+  color: #004894;
 }
-.glass-table tbody tr:nth-child(even){
-  background: rgba(255,255,255,.02);
+.glass-table tbody tr{
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 /* Badges */
@@ -630,14 +639,15 @@ body.sidebar-collapsed .nav .navLink{
 /* Selectable rows */
 .ws-row, .user-row{
   cursor:pointer;
-  height: 34px;
-  transition: background .2s ease, box-shadow .2s ease, transform .1s ease;
+  height: auto;
+  transition: background .15s ease;
 }
-.ws-row:hover, .user-row:hover{ background: rgba(255,255,255,0.04); }
+.ws-row:hover, .user-row:hover{
+  background: rgba(0, 72, 148, 0.15);
+}
 .ws-row.selected, .user-row.selected{
-  background: rgba(152,206,255,0.10);
-  box-shadow: 0 0 0 1px rgba(154,209,255,0.35), 0 8px 18px rgba(0,0,0,0.35);
-  transform: translateY(-1px);
+  background: rgba(0, 72, 148, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(0, 72, 148, 0.5);
 }
 
 /* ==========================================================================

@@ -2,17 +2,20 @@
   async function renderTherefore() {
     const html = `
       <section class="panel resultados" id="mainPanel" style="display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: flex-end; align-items: center; padding: 1rem 1.5rem 0; gap: 0.5rem; margin-left: auto; width: fit-content;">
-          <button class="action-card" type="button" onclick="window.open('therefore_builder.html','_blank')">
-            <span class="icon">🔗</span>
-            <span class="action-text">Abrir</span>
-          </button>
-          <button class="action-card" type="button" onclick="window.open('therefore_manual.html','_blank')">
-            <span class="icon">📖</span>
-            <span class="action-text">Manual</span>
-          </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <h2>Therefore™ Category Builder</h2>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="action-btn" type="button" onclick="window.open('therefore_builder.html','_blank')">
+              <span class="icon">🔗</span>
+              <span class="action-text">Abrir</span>
+            </button>
+            <button class="action-btn" type="button" onclick="window.open('therefore_manual.html','_blank')">
+              <span class="icon">📖</span>
+              <span class="action-text">Manual</span>
+            </button>
+          </div>
         </div>
-        <div class="iframe-container" style="flex: 1; overflow: hidden; padding: 1rem;">
+        <div class="iframe-container" style="flex: 1; overflow: hidden; background: #1F1F1F; border-radius: 6px;">
           <iframe
             src="therefore_builder.html"
             class="iframe-embed"

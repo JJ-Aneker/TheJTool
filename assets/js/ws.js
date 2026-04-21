@@ -73,22 +73,22 @@ async function loadWebServiceList() {
 
   const html = `
     <section class="panel resultados" id="mainPanel">
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 1rem 0; border-bottom: 1px solid rgba(40,215,199,.15); margin-bottom: 1rem;">
-        <h2 style="margin: 0; font-size: 1.5rem;">Servidores Web</h2>
-        <div style="display: flex; gap: 0.6rem;">
-          <button class="action-card" type="button" onclick="openNewServerForm()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+        <h2>Servidores Web</h2>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="action-btn" type="button" onclick="openNewServerForm()">
             <span class="icon">➕</span>
             <span class="action-text">Añadir</span>
           </button>
-          <button class="action-card" type="button" id="ws-edit-btn" disabled>
+          <button class="action-btn" type="button" id="ws-edit-btn" disabled>
             <span class="icon">✏️</span>
             <span class="action-text">Editar</span>
           </button>
-          <button class="action-card" type="button" id="ws-test-btn" disabled>
+          <button class="action-btn" type="button" id="ws-test-btn" disabled>
             <span class="icon">🧪</span>
             <span class="action-text">Probar</span>
           </button>
-          <button class="action-card danger" type="button" id="ws-delete-btn" disabled>
+          <button class="action-btn danger" type="button" id="ws-delete-btn" disabled>
             <span class="icon">🗑️</span>
             <span class="action-text">Eliminar</span>
           </button>

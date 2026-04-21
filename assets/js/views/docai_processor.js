@@ -7,40 +7,36 @@
 
     const html = `
       <section class="panel resultados" id="mainPanel">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 1rem 0; border-bottom: 1px solid rgba(40,215,199,.15); margin-bottom: 1rem;">
-          <div class="page-header" style="margin: 0; flex: 1;">
-            <div class="page-header-content" style="margin: 0;">
-              <h2 style="margin: 0; font-size: 1.5rem;">DocAI Processor</h2>
-            </div>
-          </div>
-          <div style="display: flex; gap: 0.6rem;">
-            <button class="action-card" id="docai-process-btn" type="button">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <h2>DocAI Processor</h2>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="action-btn" id="docai-process-btn" type="button">
               <span class="icon">⚙️</span>
               <span class="action-text">Procesar</span>
             </button>
-            <button class="action-card" id="docai-clear-btn" type="button">
+            <button class="action-btn" id="docai-clear-btn" type="button">
               <span class="icon">🗑️</span>
               <span class="action-text">Limpiar</span>
             </button>
           </div>
         </div>
 
-        <div class="content-card">
-          <h3>Procesamiento de Documentos</h3>
-          <p>
+        <div style="background: #1F1F1F; padding: 1rem; border-radius: 6px; margin-bottom: 0.75rem;">
+          <h3 style="margin: 0 0 0.5rem 0; color: #004894;">Procesamiento de Documentos</h3>
+          <p style="margin: 0 0 0.75rem 0; font-size: 0.9rem;">
             Utiliza DocAI Processor para analizar, extraer datos y procesar documentos automáticamente.
           </p>
 
-          <div style="margin-top: 20px;">
-            <label for="docai-file" style="display: block; margin-bottom: 10px;">
-              <strong>Selecciona un documento:</strong>
+          <div>
+            <label for="docai-file" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">
+              Selecciona un documento:
             </label>
-            <input type="file" id="docai-file" accept=".pdf,.jpg,.png,.docx" style="margin-bottom: 15px;" />
+            <input type="file" id="docai-file" accept=".pdf,.jpg,.png,.docx" style="margin-bottom: 0.75rem; padding: 0.35rem 0.65rem; border: 1.5px solid #004894; border-radius: 5px; background: #0f1115; color: #e6e7eb; font-size: 12px;" />
 
-            <label for="docai-processor-type" style="display: block; margin-bottom: 10px;">
-              <strong>Tipo de procesamiento:</strong>
+            <label for="docai-processor-type" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">
+              Tipo de procesamiento:
             </label>
-            <select id="docai-processor-type" style="margin-bottom: 15px; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <select id="docai-processor-type" style="margin-bottom: 0; padding: 0.35rem 0.65rem; border-radius: 5px; border: 1.5px solid #004894; background: #0f1115; color: #e6e7eb; font-size: 12px;">
               <option value="extract">Extracción de datos</option>
               <option value="classify">Clasificación</option>
               <option value="analyze">Análisis</option>
@@ -48,9 +44,9 @@
           </div>
         </div>
 
-        <div id="docai-results" style="margin-top: 20px; display: none;">
-          <h3>Resultados</h3>
-          <pre id="docai-output" style="background: #f5f5f5; padding: 15px; border-radius: 4px; overflow-auto;"></pre>
+        <div id="docai-results" style="background: #1F1F1F; padding: 1rem; border-radius: 6px; display: none;">
+          <h3 style="margin: 0 0 0.75rem 0; color: #004894;">Resultados</h3>
+          <pre id="docai-output" style="background: #0f1115; padding: 0.75rem; border-radius: 4px; overflow-auto; margin: 0; font-size: 0.8rem;"></pre>
         </div>
       </section>
     `;

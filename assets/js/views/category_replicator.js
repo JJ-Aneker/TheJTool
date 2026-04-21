@@ -2,13 +2,16 @@
   async function renderCategoryReplicator() {
     const html = `
       <section class="panel resultados" id="mainPanel" style="display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: flex-end; align-items: center; padding: 1rem 1.5rem 0; gap: 0.5rem; margin-left: auto; width: fit-content;">
-          <button class="action-card" type="button" onclick="window.open('category_replicator.html','_blank')">
-            <span class="icon">🔗</span>
-            <span class="action-text">Abrir</span>
-          </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <h2>Therefore™ Category Replicator</h2>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="action-btn" type="button" onclick="window.open('category_replicator.html','_blank')">
+              <span class="icon">🔗</span>
+              <span class="action-text">Abrir</span>
+            </button>
+          </div>
         </div>
-        <div class="iframe-container" style="flex: 1; overflow: hidden; padding: 1rem;">
+        <div class="iframe-container" style="flex: 1; overflow: hidden; background: #1F1F1F; border-radius: 6px;">
           <iframe
             src="category_replicator.html"
             class="iframe-embed"

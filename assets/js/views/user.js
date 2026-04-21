@@ -12,23 +12,18 @@
 
       const html = `
         <section class="panel resultados" id="mainPanel">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 0 0 1rem 0; border-bottom: 1px solid rgba(40,215,199,.15); margin-bottom: 1rem;">
-            <div class="page-header" style="margin: 0; flex: 1;">
-              <div class="page-header-content" style="margin: 0;">
-                <h2 style="margin: 0; font-size: 1.5rem;">Perfil de usuario</h2>
-                <p style="margin: 0.3rem 0 0 0;">Tu información personal</p>
-              </div>
-            </div>
-            <div style="display: flex; gap: 0.6rem;">
-              <button class="action-card" type="button" onclick="openEditProfileForm()">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+            <h2>Perfil de usuario</h2>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="action-btn" type="button" onclick="openEditProfileForm()">
                 <span class="icon">✏️</span>
                 <span class="action-text">Editar</span>
               </button>
-              <button class="action-card" type="button" onclick="openAvatarUpload()">
+              <button class="action-btn" type="button" onclick="openAvatarUpload()">
                 <span class="icon">🖼️</span>
                 <span class="action-text">Foto</span>
               </button>
-              <button class="action-card danger" type="button" onclick="logoutUser()">
+              <button class="action-btn danger" type="button" onclick="logoutUser()">
                 <span class="icon">🚪</span>
                 <span class="action-text">Salir</span>
               </button>
@@ -36,18 +31,18 @@
           </div>
 
           <div style="max-width: 400px;">
-            <div class="profile-card" style="text-align: center; padding: 2rem;">
-              <img src="${currentProfile.avatar_url || 'avatar.png'}" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; display: block; margin-left: auto; margin-right: auto;">
+            <div style="background: #1F1F1F; text-align: center; padding: 1.5rem; border-radius: 6px;">
+              <img src="${currentProfile.avatar_url || 'avatar.png'}" alt="Avatar" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; display: block; margin-left: auto; margin-right: auto;">
 
-              <h3 style="color: rgba(238,244,255,.95); margin: 0 0 0.5rem 0; font-size: 1.1rem;">
+              <h3 style="color: rgba(238,244,255,.95); margin: 0 0 0.5rem 0; font-size: 1rem;">
                 ${escapeHtml(currentProfile.name || "Usuario")}
               </h3>
 
-              <p style="color: rgba(238,244,255,.6); margin: 0 0 0.3rem 0; font-size: 0.9rem;">
+              <p style="color: rgba(238,244,255,.6); margin: 0 0 0.3rem 0; font-size: 0.85rem;">
                 ${escapeHtml(currentUser?.email || "—")}
               </p>
 
-              <p style="color: rgba(40,215,199,.95); margin: 0; font-size: 0.85rem; font-weight: 500;">
+              <p style="color: #004894; margin: 0; font-size: 0.8rem; font-weight: 600;">
                 ${escapeHtml(roleLabel)}
               </p>
             </div>
