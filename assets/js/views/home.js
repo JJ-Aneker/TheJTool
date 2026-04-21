@@ -14,10 +14,10 @@
     }[userRole];
 
     const html = `
-      <section class="panel resultados" id="mainPanel" style="overflow-y: auto; max-height: calc(100vh - 180px);">
+      <section class="panel resultados" id="mainPanel" style="overflow-y: auto; overflow-x: hidden; height: 100%;">
 
         <!-- HERO BANNER (full width) -->
-        <div style="width: 100vw; height: 180px; margin-left: calc(-50vw + 50%); margin-top: -1.5rem; margin-bottom: 2rem; border-radius: 0; overflow: hidden; background: linear-gradient(135deg, rgba(40,215,199,0.2) 0%, rgba(88,166,255,0.1) 100%);">
+        <div style="width: 100%; height: 180px; margin: 0 0 2rem 0; border-radius: 0; overflow: hidden; background: linear-gradient(135deg, rgba(40,215,199,0.2) 0%, rgba(88,166,255,0.1) 100%);">
           <img src="assets/images/banner.jpg" alt="Banner" style="width: 100%; height: 100%; object-fit: cover;" />
         </div>
 
