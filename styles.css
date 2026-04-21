@@ -1327,32 +1327,17 @@ body.sidebar-collapsed .nav .navLink{
    ========================================================================== */
 @media (max-width: 980px){
   .app-shell{
-    grid-template-columns: 1fr;
+    grid-template-columns: var(--sidebarWCollapsed) 1fr var(--rightWCollapsed);
     grid-template-rows: 1fr var(--footerH);
   }
   .sidebar{
-    position: fixed;
-    left: 0;
-    top: var(--topbarH);
-    height: calc(100vh - var(--topbarH) - var(--footerH));
-    width: var(--sidebarW);
-    background: rgba(10,20,40,0.95);
-    border-right: 1px solid rgba(255,255,255,.08);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 1000;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    grid-column: unset;
-    grid-row: unset;
+    width: var(--sidebarWCollapsed);
   }
-  body.sidebar-collapsed .sidebar{
-    transform: translateX(0);
-  }
-  .board{ grid-column: 1 / -1; }
+  .board{ grid-column: 2 / 3; }
   .content{ grid-template-columns: 1fr; }
-  .favorites{ max-width: none; }
+  .favorites{
+    width: var(--rightWCollapsed);
+  }
 
   .profile-grid{
     grid-template-columns: 1fr;
