@@ -175,18 +175,18 @@
     }
 
     const fieldsHtml = fields.map(f => `
-      <div style="margin-bottom:14px">
-        <label class="glass-modal-field-label">${escapeHtml(f.label)}${f.required ? ' <span style="color:#fca5a5">*</span>' : ''}</label>
+      <div style="margin-bottom:10px">
+        <label class="glass-modal-field-label" style="font-size:13px; margin-bottom:4px; display:block">${escapeHtml(f.label)}${f.required ? ' <span style="color:#fca5a5">*</span>' : ''}</label>
         ${f.type === "textarea"
-          ? `<textarea id="adm-${f.id}" class="glass-modal-input" rows="3">${escapeHtml(f.value || "")}</textarea>`
+          ? `<textarea id="adm-${f.id}" class="glass-modal-input" rows="2" style="font-size:14px">${escapeHtml(f.value || "")}</textarea>`
           : f.type === "select"
-            ? `<select id="adm-${f.id}" class="glass-modal-input">${f.options.map(opt => `<option value="${opt.value}" ${f.value === opt.value ? "selected" : ""}>${escapeHtml(opt.label)}</option>`).join("")}</select>`
+            ? `<select id="adm-${f.id}" class="glass-modal-input" style="font-size:14px">${f.options.map(opt => `<option value="${opt.value}" ${f.value === opt.value ? "selected" : ""}>${escapeHtml(opt.label)}</option>`).join("")}</select>`
             : f.type === "checkbox"
-              ? `<label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              ? `<label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size:14px">
                    <input type="checkbox" id="adm-${f.id}" ${f.value ? "checked" : ""} />
                    <span>${escapeHtml(f.label)}</span>
                  </label>`
-              : `<input id="adm-${f.id}" class="glass-modal-input" type="${f.type || "text"}" value="${escapeHtml(f.value || "")}" placeholder="${escapeHtml(f.placeholder || "")}" ${f.disabled ? "disabled" : ""} />`
+              : `<input id="adm-${f.id}" class="glass-modal-input" type="${f.type || "text"}" value="${escapeHtml(f.value || "")}" placeholder="${escapeHtml(f.placeholder || "")}" style="font-size:14px" ${f.disabled ? "disabled" : ""} />`
         }
       </div>
     `).join("");
@@ -198,7 +198,7 @@
             <div class="glass-modal-title">${escapeHtml(title)}</div>
             <button class="glass-modal-x" type="button" aria-label="Cerrar" onclick="closeAdminModal()">✕</button>
           </div>
-          <div class="glass-modal-body" style="padding:20px 24px">
+          <div class="glass-modal-body" style="padding:16px 20px">
             ${fieldsHtml}
             <div id="adm-error" style="display:none;color:#fecaca;font-size:12px;margin-top:4px;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.25);padding:8px 12px;border-radius:8px"></div>
           </div>

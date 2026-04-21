@@ -209,11 +209,11 @@
     }
 
     const fieldsHtml = fields.map(f => `
-      <div style="margin-bottom:14px">
-        <label class="glass-modal-field-label">${escapeHtml(f.label)}${f.required ? ' <span style="color:#fca5a5">*</span>' : ''}</label>
+      <div style="margin-bottom:10px">
+        <label class="glass-modal-field-label" style="font-size:13px; margin-bottom:4px; display:block">${escapeHtml(f.label)}${f.required ? ' <span style="color:#fca5a5">*</span>' : ''}</label>
         ${f.type === "textarea"
-          ? `<textarea id="usrm-${f.id}" class="glass-modal-input" rows="3">${escapeHtml(f.value || "")}</textarea>`
-          : `<input id="usrm-${f.id}" class="glass-modal-input" type="${f.type || "text"}" value="${escapeHtml(f.value || "")}" placeholder="${escapeHtml(f.placeholder || "")}" />`
+          ? `<textarea id="usrm-${f.id}" class="glass-modal-input" rows="2" style="font-size:14px">${escapeHtml(f.value || "")}</textarea>`
+          : `<input id="usrm-${f.id}" class="glass-modal-input" type="${f.type || "text"}" value="${escapeHtml(f.value || "")}" placeholder="${escapeHtml(f.placeholder || "")}" style="font-size:14px" />`
         }
       </div>
     `).join("");
@@ -225,7 +225,7 @@
             <div class="glass-modal-title">${escapeHtml(title)}</div>
             <button class="glass-modal-x" type="button" aria-label="Cerrar" onclick="closeUserModal()">✕</button>
           </div>
-          <div class="glass-modal-body" style="padding:20px 24px">
+          <div class="glass-modal-body" style="padding:16px 20px">
             ${fieldsHtml}
             <div id="usrm-error" style="display:none;color:#fecaca;font-size:12px;margin-top:4px;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.25);padding:8px 12px;border-radius:8px"></div>
           </div>

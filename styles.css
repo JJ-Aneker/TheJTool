@@ -562,14 +562,14 @@ body.sidebar-collapsed .nav .navLink{
 .badge.warning{ color: var(--accent-2); }
 .badge.danger{ color: var(--danger); }
 
-/* WS selectable rows */
-.ws-row{
+/* Selectable rows */
+.ws-row, .user-row{
   cursor:pointer;
   height: 34px;
   transition: background .2s ease, box-shadow .2s ease, transform .1s ease;
 }
-.ws-row:hover{ background: rgba(255,255,255,0.04); }
-.ws-row.selected{
+.ws-row:hover, .user-row:hover{ background: rgba(255,255,255,0.04); }
+.ws-row.selected, .user-row.selected{
   background: rgba(152,206,255,0.10);
   box-shadow: 0 0 0 1px rgba(154,209,255,0.35), 0 8px 18px rgba(0,0,0,0.35);
   transform: translateY(-1px);
