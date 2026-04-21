@@ -68,22 +68,10 @@
       const password = document.getElementById("password").value.trim();
 
       try {
-        // 1) REGISTRO DEL USUARIO
-        const { data, error } = await client.auth.signUp({ email, password });
+        // Usar función signup de supabase.js que crea usuario y perfil
+        await signup(email, password, name, surname, phone);
 
-        if (error) throw error;
-
-        // 2) CREAR PERFIL SIN SESIÓN (permitido por RLS)
-        await client.from("profiles").insert({
-          user_id: data.user.id,
-          email,
-          name,
-          surname,
-          phone,
-          created_at: new Date().toISOString()
-        });
-
-        // 3) REDIRIGIR A verify.html
+        // Redirigir a verificación de email
         window.location.href = "verify.html";
 
       } catch (err) {

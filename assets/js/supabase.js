@@ -150,24 +150,26 @@ async function updateProfile(values) {
    REGISTRO
 ============================================================ */
 
-async function signup(email, password) {
+async function signup(email, password, name = "", surname = "", phone = "") {
   const { data, error } = await client.auth.signUp({ email, password });
 
   if (error) throw new Error(error.message);
 
-  // Crear perfil inicial con email
+  // Crear perfil inicial con todos los datos
   if (data.user) {
     const { error: profileError } = await client
       .from("profiles")
       .insert([{
         user_id: data.user.id,
         email: email,
-        name: "",
+        name: name,
+        surname: surname,
+        phone: phone,
         role: "read",
         approved: false
       }]);
 
-    if (profileError) console.warn("Error creating profile:", profileError);
+    if (profileError) throw new Error("Error creating profile: " + profileError.message);
   }
 
   return data.user;
