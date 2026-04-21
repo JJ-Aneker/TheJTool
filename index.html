@@ -24,14 +24,12 @@
 
 
       <div class="topbar-right">
-              <button class="navLink" id="btnUser" type="button">
-          <span class="icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="rgba(238,244,255,.9)" stroke-width="1.8"/>
-              <path d="M4.5 20a7.5 7.5 0 0 1 15 0" stroke="rgba(40,215,199,.95)" stroke-width="1.9" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="label">Datos de usuario</span>
+        <button class="navLink" id="btnUser" type="button" style="display: flex; align-items: center; gap: 0.75rem;">
+          <img id="userAvatar" src="avatar.png" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; display: none;" />
+          <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
+            <span id="userName" style="font-size: 0.85rem; color: rgba(238,244,255,.95); font-weight: 500;">Usuario</span>
+            <span id="userRole" style="font-size: 0.7rem; color: rgba(238,244,255,.6);">Rol</span>
+          </div>
         </button>
       </div>
 
@@ -183,30 +181,7 @@
       <main class="content">
 
         <section class="panel resultados" id="mainPanel">
-          <h2>Resultados de búsqueda</h2>
-
-          <div class="table-wrapper">
-            <table class="glass-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Fecha</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>00123</td>
-                  <td>Juan Pérez</td>
-                  <td>2025-11-26</td>
-                  <td><span class="badge success">Activo</span></td>
-                  <td><button class="cta">Ver</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <!-- Contenido dinámico cargado por Router -->
         </section>
 
 <!-- PANEL DERECHO (VIP-style + collapse) -->

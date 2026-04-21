@@ -18,6 +18,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.__profile = profile;
       console.log("Profile loaded:", profile.name, profile.role);
 
+      // Update user button in topbar
+      if (profile) {
+        const roleLabel = { read: "Lector", write: "Editor", admin: "Administrador" }[profile.role] || profile.role;
+        document.getElementById("userName").textContent = profile.name || "Usuario";
+        document.getElementById("userRole").textContent = roleLabel || "Rol";
+
+        if (profile.avatar_url) {
+          const avatar = document.getElementById("userAvatar");
+          avatar.src = profile.avatar_url;
+          avatar.style.display = "";
+        }
+      }
+
       // Show admin button if admin role
       if (profile && profile.role === "admin") {
         const btnAdmin = document.getElementById("btnAdmin");
