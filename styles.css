@@ -511,60 +511,58 @@ body.sidebar-collapsed .nav .navLink{
   justify-content: flex-end;
 }
 
-/* Action buttons - outline style, compact */
+/* Action buttons - simple outline style like Editor/Preview */
 .action-btn,
 .action-card {
-  padding: 0.4rem 0.75rem;
+  padding: 0.45rem 1rem;
   background: transparent;
-  border: 1.2px solid rgba(40,215,199,.6);
-  border-radius: 5px;
-  color: rgba(238,244,255,.85);
-  font-size: 0.75rem;
-  font-weight: 500;
+  border: 1px solid rgba(40,215,199,.5);
+  border-radius: 6px;
+  color: rgba(238,244,255,.9);
+  font-size: 0.8rem;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-  height: 32px;
-  line-height: 1;
+  gap: 0.4rem;
+  height: auto;
+  line-height: 1.4;
 }
 
 .action-btn:hover:not(.disabled),
 .action-card:hover:not(.disabled) {
-  background: rgba(40,215,199,.1);
-  border-color: rgba(40,215,199,.9);
+  background: rgba(40,215,199,.08);
+  border-color: rgba(40,215,199,.7);
   color: rgba(238,244,255,.95);
 }
 
 .action-btn.danger,
 .action-card.danger {
-  border-color: rgba(255,100,100,.6);
-  color: rgba(255,150,150,.9);
+  border-color: rgba(255,100,100,.5);
+  color: rgba(255,150,150,.85);
 }
 
 .action-btn.danger:hover:not(.disabled),
 .action-card.danger:hover:not(.disabled) {
   background: rgba(255,100,100,.08);
-  border-color: rgba(255,100,100,.9);
+  border-color: rgba(255,100,100,.7);
   color: rgba(255,150,150,.95);
 }
 
 .action-btn.disabled,
 .action-card.disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   cursor: not-allowed;
   border-color: rgba(40,215,199,.2);
 }
 
 .action-btn .icon,
 .action-card .icon {
-  font-size: 0.9rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 0.8rem;
+  display: inline;
 }
 
 .action-btn .action-text,
