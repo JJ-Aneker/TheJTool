@@ -45,7 +45,7 @@
           <h2 style="margin: 0; font-size: 1.5rem;">Gestión de Usuarios</h2>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <input type="text" id="searchInput" placeholder="Buscar..."
-              style="width: 240px; padding: 0.5rem 0.75rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 13px;" />
+              style="width: 180px; padding: 0.35rem 0.65rem; border: 1px solid rgba(40,215,199,.3); border-radius: 5px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 12px;" />
             <button class="action-btn" type="button" onclick="openNewUserForm()">
               <span class="icon">➕</span>
               <span class="action-text">Nuevo</span>
