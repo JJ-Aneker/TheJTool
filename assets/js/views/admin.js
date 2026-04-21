@@ -30,32 +30,29 @@
       const userId = u.user_id || u.id;
       const approved = u.approved ? "✅" : "❌";
       rows += `
-        <tr class="user-row" data-user-id="${userId}">
-          <td>${escapeHtml(u.name || "—")}</td>
-          <td>${escapeHtml(u.surname || "—")}</td>
-          <td>${escapeHtml(u.role || "—")}</td>
-          <td>${approved}</td>
+        <tr class="user-row" data-user-id="${userId}" style="height: 28px;">
+          <td style="padding: 0.4rem;">${escapeHtml(u.name || "—")}</td>
+          <td style="padding: 0.4rem;">${escapeHtml(u.surname || "—")}</td>
+          <td style="padding: 0.4rem;">${escapeHtml(u.role || "—")}</td>
+          <td style="padding: 0.4rem;">${approved}</td>
         </tr>
       `;
     });
 
     const html = `
       <section class="panel resultados" id="mainPanel">
-        <div class="page-header">
-          <div class="page-header-content">
-            <h2>Gestión de Usuarios</h2>
-            <p>Selecciona un usuario para editar.</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="margin: 0; font-size: 1.5rem;">Gestión de Usuarios</h2>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <input type="text" id="searchInput" placeholder="Buscar..."
+              style="width: 280px; padding: 0.5rem 0.75rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 13px;" />
+            <p style="color: rgba(238,244,255,.6); margin: 0; font-size: 13px; white-space: nowrap;">Total: ${allUsers.length}</p>
           </div>
         </div>
 
-        <input type="text" id="searchInput" placeholder="Buscar..."
-          style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9);" />
-
-        <p style="color: rgba(238,244,255,.7); margin-bottom: 1rem;">Total: ${allUsers.length}</p>
-
         <div class="table-wrapper">
-          <table class="glass-table">
-            <thead><tr><th>Nombre</th><th>Apellidos</th><th>Rol</th><th>Aprobado</th></tr></thead>
+          <table class="glass-table" style="font-size: 13px;">
+            <thead><tr><th style="padding: 0.5rem;">Nombre</th><th style="padding: 0.5rem;">Apellidos</th><th style="padding: 0.5rem;">Rol</th><th style="padding: 0.5rem;">Aprobado</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>
@@ -90,11 +87,11 @@
       const userId = u.user_id || u.id;
       const approved = u.approved ? "✅" : "❌";
       rows += `
-        <tr class="user-row" data-user-id="${userId}">
-          <td>${escapeHtml(u.name || "—")}</td>
-          <td>${escapeHtml(u.surname || "—")}</td>
-          <td>${escapeHtml(u.role || "—")}</td>
-          <td>${approved}</td>
+        <tr class="user-row" data-user-id="${userId}" style="height: 28px;">
+          <td style="padding: 0.4rem;">${escapeHtml(u.name || "—")}</td>
+          <td style="padding: 0.4rem;">${escapeHtml(u.surname || "—")}</td>
+          <td style="padding: 0.4rem;">${escapeHtml(u.role || "—")}</td>
+          <td style="padding: 0.4rem;">${approved}</td>
         </tr>
       `;
     });
