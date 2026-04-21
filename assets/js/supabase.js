@@ -185,5 +185,6 @@ window.login = login;
 window.logout = logout;
 window.requireAuth = requireAuth;
 window.getProfile = getProfile;
+window.getAllProfiles = getAllProfiles;
 window.updateProfile = updateProfile;
 window.signup = signup;
