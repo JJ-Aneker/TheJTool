@@ -43,11 +43,11 @@
       <section class="panel resultados" id="mainPanel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <h2 style="margin: 0; font-size: 1.5rem;">Gestión de Usuarios</h2>
-          <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
-            <input type="text" id="searchInput" placeholder="Buscar..."
-              style="flex: 1; max-width: 280px; padding: 0.5rem 0.75rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 13px;" />
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
             <p style="color: rgba(238,244,255,.6); margin: 0; font-size: 13px; white-space: nowrap;">Total: ${allUsers.length}</p>
-            <div id="actionPanel" style="display: flex; gap: 0.5rem; align-items: center; margin-left: auto;"></div>
+            <input type="text" id="searchInput" placeholder="Buscar..."
+              style="width: 240px; padding: 0.5rem 0.75rem; border: 1px solid rgba(40,215,199,.3); border-radius: 6px; background: rgba(10,20,40,0.5); color: rgba(238,244,255,.9); font-size: 13px;" />
+            <div id="actionPanel" style="display: flex; gap: 0.5rem; align-items: center;"></div>
           </div>
         </div>
 
@@ -61,9 +61,12 @@
     `;
 
     UI.replaceWithAnimation(html);
+
+    // Render action buttons immediately
     showNoSelectionActions();
 
-    setTimeout(() => {
+    // Attach event listeners after DOM is ready
+    requestAnimationFrame(() => {
       const searchInput = document.getElementById("searchInput");
       searchInput?.addEventListener("input", (e) => {
         const q = e.target.value.toLowerCase();
@@ -79,7 +82,7 @@
           selectUser(userId);
         });
       });
-    }, 0);
+    });
   }
 
   function renderFilteredTable(filtered) {
