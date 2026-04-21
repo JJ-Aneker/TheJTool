@@ -510,50 +510,46 @@ body.sidebar-collapsed .nav .navLink{
   align-items: center;
 }
 
-/* Action buttons - compact for panels */
+/* Action buttons - compact for panels, similar to input style */
 .action-btn {
-  padding: 0.4rem 0.8rem;
-  background: rgba(40,215,199,.15);
+  padding: 0.4rem 0.65rem;
+  background: rgba(10,20,40,0.5);
   border: 1px solid rgba(40,215,199,.3);
-  border-radius: 5px;
+  border-radius: 6px;
   color: rgba(238,244,255,.85);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   height: 32px;
   line-height: 1;
 }
 
 .action-btn:hover:not(.disabled) {
-  background: rgba(40,215,199,.25);
+  background: rgba(40,215,199,.1);
   border-color: rgba(40,215,199,.5);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(40,215,199,.2);
 }
 
 .action-btn.danger {
-  background: rgba(255,100,100,.15);
   border-color: rgba(255,100,100,.3);
   color: rgba(255,150,150,.9);
 }
 
 .action-btn.danger:hover:not(.disabled) {
-  background: rgba(255,100,100,.25);
+  background: rgba(255,100,100,.1);
   border-color: rgba(255,100,100,.5);
-  box-shadow: 0 2px 8px rgba(255,100,100,.2);
 }
 
 .action-btn.disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .action-btn .icon {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
