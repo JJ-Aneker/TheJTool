@@ -56,6 +56,14 @@ async function requireAuth() {
     return null;
   }
 
+  // Verificar que el usuario esté aprobado
+  const profile = await getProfile();
+  if (profile && profile.approved === false) {
+    // Usuario no aprobado - mostrar página de espera
+    window.location.href = BASE_URL ? `${BASE_URL}/pending-approval.html` : "pending-approval.html";
+    return null;
+  }
+
   return data.user;
 }
 

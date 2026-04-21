@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pendiente de Aprobación · The *J* ToolBox</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a1428 0%, #1a2845 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: rgba(238, 244, 255, 0.95);
+    }
+
+    .container {
+      max-width: 480px;
+      width: 90%;
+      background: rgba(20, 30, 50, 0.6);
+      border: 1px solid rgba(40, 215, 199, 0.2);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: rgba(238, 244, 255, 0.95);
+      font-weight: 600;
+    }
+
+    .message {
+      color: rgba(238, 244, 255, 0.7);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .info-box {
+      background: rgba(40, 215, 199, 0.1);
+      border: 1px solid rgba(40, 215, 199, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+      color: rgba(238, 244, 255, 0.75);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-direction: column;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-logout {
+      background: rgba(40, 215, 199, 0.95);
+      color: #0a1428;
+      border: 1px solid rgba(40, 215, 199, 0.95);
+    }
+
+    .btn-logout:hover {
+      background: rgba(40, 215, 199, 1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(40, 215, 199, 0.3);
+    }
+
+    .btn-support {
+      background: transparent;
+      color: rgba(40, 215, 199, 0.95);
+      border: 1px solid rgba(40, 215, 199, 0.4);
+    }
+
+    .btn-support:hover {
+      background: rgba(40, 215, 199, 0.1);
+      border-color: rgba(40, 215, 199, 0.6);
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: rgba(238, 244, 255, 0.5);
+    }
+
+    .logo {
+      height: 40px;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <img src="assets/images/logo.png" alt="Aneker" class="logo" />
+
+    <span class="icon">⏳</span>
+
+    <h1>Pendiente de Aprobación</h1>
+
+    <p class="message">
+      Tu solicitud ha sido registrada correctamente, pero aún está pendiente de revisión por parte del equipo de administración.
+    </p>
+
+    <div class="info-box">
+      <strong>¿Qué sucede ahora?</strong>
+      <p style="margin-top: 0.5rem;">
+        Un administrador revisará tu solicitud en breve. Te notificaremos cuando tu cuenta haya sido aprobada.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <button class="btn btn-logout" onclick="logout()">Cerrar sesión</button>
+      <a href="mailto:support@aneker.com" class="btn btn-support">📧 Contactar soporte</a>
+    </div>
+
+    <div class="footer">
+      TheJToolbox · Aneker
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Inject environment variables
+    window.ENV = {
+      SUPABASE_URL: "https://osudezxnludhewdxeaks.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdWRlenhubHVkaGV3ZHhlYWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0OTQxMTksImV4cCI6MjA4MDA3MDExOX0.RLkgHZ8FHaSzXt18Zag3QHmkBE1SBjfbZ0wSUmh3sxo"
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+
+  <script>
+    // Override logout button action
+    const originalLogout = window.logout;
+    window.logout = async function() {
+      try {
+        if (typeof originalLogout === "function") {
+          await originalLogout();
+        } else {
+          window.location.href = "login.html";
+        }
+      } catch (e) {
+        console.error("Error:", e);
+        window.location.href = "login.html";
+      }
+    };
+  </script>
+
+</body>
+</html>
