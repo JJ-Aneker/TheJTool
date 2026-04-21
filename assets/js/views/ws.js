@@ -20,7 +20,6 @@
       </section>
     `;
     UI.replaceWithAnimation(html);
-    UI.updateActionPanel("");
   }
 
   Router.registerView("ws", renderWS);

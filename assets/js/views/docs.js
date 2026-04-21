@@ -12,7 +12,6 @@
       </section>
     `;
     UI.replaceWithAnimation(html);
-    UI.updateActionPanel("");
   }
 
   Router.registerView("docs", renderDocs);

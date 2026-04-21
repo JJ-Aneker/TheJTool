@@ -92,7 +92,6 @@
     `;
 
     UI.replaceWithAnimation(html);
-    UI.updateActionPanel("");
   }
 
   Router.registerView("home", renderHome);
