@@ -4,14 +4,21 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    // Load user auth data
     if (typeof requireAuth === "function") {
       const user = await requireAuth();
       if (!user) return;
+      window.__user = user;
+      console.log("User authenticated:", user.email);
     }
 
-    // Check if user is admin to show admin button
+    // Load user profile data
     if (typeof getProfile === "function") {
       const profile = await getProfile();
+      window.__profile = profile;
+      console.log("Profile loaded:", profile.name, profile.role);
+
+      // Show admin button if admin role
       if (profile && profile.role === "admin") {
         const btnAdmin = document.getElementById("btnAdmin");
         if (btnAdmin) btnAdmin.style.display = "";
