@@ -141,7 +141,21 @@ async function signup(email, password) {
 
   if (error) throw new Error(error.message);
 
-  // signup NO toca el perfil aquí, solo devuelve el usuario auth
+  // Crear perfil inicial con email
+  if (data.user) {
+    const { error: profileError } = await client
+      .from("profiles")
+      .insert([{
+        user_id: data.user.id,
+        email: email,
+        name: "",
+        role: "read",
+        approved: false
+      }]);
+
+    if (profileError) console.warn("Error creating profile:", profileError);
+  }
+
   return data.user;
 }
 

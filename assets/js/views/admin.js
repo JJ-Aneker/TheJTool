@@ -257,6 +257,7 @@
         const changes = {
           name: document.getElementById("adm-name").value,
           surname: document.getElementById("adm-surname").value,
+          email: document.getElementById("adm-email").value,
           phone: document.getElementById("adm-phone").value,
           address: document.getElementById("adm-address").value,
           city: document.getElementById("adm-city").value,
