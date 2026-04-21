@@ -132,15 +132,17 @@ function openUserModal() {
             ${escapeHtml(roleLabel)}
           </p>
 
-          <button type="button" class="cta" style="width: 100%; padding: 0.7rem; margin-bottom: 0.75rem;" onclick="openEditProfileFormTopbar()">
-            ✏️ Editar datos
-          </button>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 1rem;">
+            <button type="button" class="cta" style="padding: 0.5rem 0.75rem; font-size: 13px;" onclick="openEditProfileFormTopbar()">
+              ✏️ Editar
+            </button>
 
-          <button type="button" class="cta" style="width: 100%; padding: 0.7rem; margin-bottom: 0.75rem;" onclick="openAvatarUploadTopbar()">
-            🖼️ Cambiar foto
-          </button>
+            <button type="button" class="cta" style="padding: 0.5rem 0.75rem; font-size: 13px;" onclick="openAvatarUploadTopbar()">
+              🖼️ Foto
+            </button>
+          </div>
 
-          <button type="button" class="cta dangerLink" style="width: 100%; padding: 0.7rem;" onclick="logoutFromTopbar()">
+          <button type="button" class="cta dangerLink" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 13px; margin-top: 0.6rem;" onclick="logoutFromTopbar()">
             🚪 Cerrar sesión
           </button>
         </div>
