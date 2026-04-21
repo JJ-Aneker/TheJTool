@@ -54,12 +54,9 @@
       actionButton({ icon: "🖼️", text: "Cambiar foto", onClick: "openAvatarUpload()" }) +
       actionButton({ icon: "🚪", text: "Cerrar sesión", onClick: "logoutUser()", danger: true });
 
-    setActionPanel(html);
-  }
-
-  function setActionPanel(html) {
-    const panel = document.getElementById("actionPanel");
-    if (panel) panel.innerHTML = html;
+    if (typeof UI !== "undefined" && UI.updateActionPanel) {
+      UI.updateActionPanel(html);
+    }
   }
 
   function actionButton({ icon, text, onClick, disabled = false, danger = false }) {
