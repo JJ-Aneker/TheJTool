@@ -255,6 +255,7 @@
       fields: [
         { id: "name", label: "Nombre", type: "text", value: currentProfile.name, required: true },
         { id: "surname", label: "Apellidos", type: "text", value: currentProfile.surname },
+        { id: "email", label: "Email", type: "email", value: currentProfile.email, disabled: true },
         { id: "phone", label: "Teléfono", type: "tel", value: currentProfile.phone },
         { id: "address", label: "Dirección", type: "text", value: currentProfile.address },
         { id: "city", label: "Ciudad", type: "text", value: currentProfile.city },
