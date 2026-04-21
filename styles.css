@@ -463,23 +463,18 @@ body.sidebar-collapsed .nav .navLink{
   height: 100%;
   min-height: 0;
 
-  display:grid;
-  grid-template-columns: 1.5fr var(--rightW);
-  gap: var(--gap);
+  display: flex;
+  flex-direction: column;
   align-items: stretch;
-
-  transition: grid-template-columns .25s ease;
-}
-.content.collapsed{
-  grid-template-columns: 1.5fr var(--rightWCollapsed);
 }
 
 /* Main results panel */
 .panel.resultados{
-  display:flex;
+  display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   min-height: 0;
+  overflow: auto;
 }
 .panel.resultados h2{
   margin: 0 0 14px 0;
@@ -493,71 +488,96 @@ body.sidebar-collapsed .nav .navLink{
 }
 
 /* ==========================================================================
-   10) RIGHT PANEL (Actions / Favorites)
+   10) HORIZONTAL ACTION BAR
    ========================================================================== */
-.favorites{
-  padding: 0;
-  overflow: hidden;
-  height: 100%;
-  min-height: 0;
-  width: 100%;
-  max-width: var(--rightW);
-  transition: max-width .25s ease;
-  display:flex;
-  flex-direction: column;
+.action-bar {
+  background: rgba(20,30,50,0.4);
+  border-bottom: 1px solid rgba(40,215,199,.15);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .action-panel,
 #actionPanel{
-  padding: 10px;
-  display:flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow:auto;
-  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Action buttons in horizontal bar */
+.action-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(40,215,199,.15);
+  border: 1px solid rgba(40,215,199,.3);
+  border-radius: 6px;
+  color: rgba(238,244,255,.9);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.action-btn:hover:not(.disabled) {
+  background: rgba(40,215,199,.25);
+  border-color: rgba(40,215,199,.5);
+  transform: translateY(-1px);
+}
+
+.action-btn.danger {
+  background: rgba(255,100,100,.15);
+  border-color: rgba(255,100,100,.3);
+}
+
+.action-btn.danger:hover:not(.disabled) {
+  background: rgba(255,100,100,.25);
+  border-color: rgba(255,100,100,.5);
+}
+
+.action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn .icon {
+  font-size: 0.95rem;
+}
+
+.action-btn .action-text {
+  display: inline;
+}
+
+/* Separator in action bar */
+.actions-sep {
+  width: 1px;
+  height: 24px;
+  background: rgba(255,255,255,.15);
+  margin: 0 0.25rem;
 }
 
 /* Forms helpers (ws.js) */
 .actions-title{
-  margin: 2px 2px 8px;
-  font-size: 13px;
-  font-weight: 750;
+  margin: 0 1rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
   letter-spacing: .2px;
   color: rgba(238,244,255,.86);
+  white-space: nowrap;
 }
+
 .actions-label{
-  display:block;
-  margin: 6px 2px 6px;
-  font-size: 12px;
+  display: inline;
+  margin: 0 0.5rem;
+  font-size: 0.85rem;
   color: rgba(238,244,255,.65);
-}
-.actions-sep{
-  height: 1px;
-  margin: 8px 2px;
-  background: rgba(255,255,255,.10);
-}
-
-/* Right collapsed state */
-.favorites.collapsed{
-  max-width: var(--rightWCollapsed);
-}
-.favorites.collapsed .sideTop{
-  justify-content: center;
-}
-.favorites.collapsed .sideTop .h{ display:none; }
-
-.favorites.collapsed .action-card .action-text,
-.favorites.collapsed .action-btn .action-text,
-.favorites.collapsed .actionLink .label,
-.favorites.collapsed .action-card span:not(.icon),
-.favorites.collapsed .action-btn span:not(.icon){
-  display:none !important;
-}
-.favorites.collapsed .action-card,
-.favorites.collapsed .action-btn,
-.favorites.collapsed .actionLink{
-  justify-content: center;
-  padding: 10px 8px;
 }
 
 /* ==========================================================================
@@ -1327,17 +1347,13 @@ body.sidebar-collapsed .nav .navLink{
    ========================================================================== */
 @media (max-width: 980px){
   .app-shell{
-    grid-template-columns: var(--sidebarWCollapsed) 1fr var(--rightWCollapsed);
+    grid-template-columns: var(--sidebarWCollapsed) 1fr;
     grid-template-rows: 1fr var(--footerH);
   }
   .sidebar{
     width: var(--sidebarWCollapsed);
   }
   .board{ grid-column: 2 / 3; }
-  .content{ grid-template-columns: 1fr; }
-  .favorites{
-    width: var(--rightWCollapsed);
-  }
 
   .profile-grid{
     grid-template-columns: 1fr;

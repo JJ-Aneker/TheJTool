@@ -29,50 +29,19 @@
       });
     }
 
-    // ----- RIGHT PANEL -----
-    const favPanel = document.getElementById("favoritesPanel");
-    const favBtn = document.getElementById("toggleFavoritesBtn");
-    const favKey = "favoritesCollapsed";
-    const content = document.querySelector(".content");
-
-    try {
-      if (localStorage.getItem(favKey) === "1") {
-        favPanel?.classList.add("collapsed");
-        content?.classList.add("collapsed");
-      }
-    } catch {}
-
-    if (favBtn) {
-      favBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        favPanel?.classList.toggle("collapsed");
-        content?.classList.toggle("collapsed");
-
-        try {
-          localStorage.setItem(
-            favKey,
-            favPanel?.classList.contains("collapsed") ? "1" : "0"
-          );
-        } catch {}
-      });
-    }
   }
 
   function updateActionPanel(html) {
+    const actionBar = document.getElementById("actionBar");
     const panel = document.getElementById("actionPanel");
-    if (!panel) return;
+    if (!panel || !actionBar) return;
 
     if (!html || html.trim() === "") {
-      panel.innerHTML = `
-        <button class="action-card disabled" type="button" disabled>
-          <span class="icon">ℹ️</span>
-          <span class="action-text">No hay acciones disponibles</span>
-        </button>
-      `;
+      actionBar.style.display = "none";
+      panel.innerHTML = "";
     } else {
       panel.innerHTML = html;
+      actionBar.style.display = "flex";
     }
   }
 
