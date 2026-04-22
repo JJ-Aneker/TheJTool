@@ -6,7 +6,7 @@
 
 **Causa**: Faltaban clonar los bloques `<Counters>` y `<Templates>` globales (14+2 elementos por cada clon).
 
-**Solución**: Se creó `category_replicator_FIXED.html` con la función `cloneCountersAndTemplates()` que replica correctamente todos los elementos.
+**Solución**: Se creó `category_replicator.html` con la función `cloneCountersAndTemplates()` que replica correctamente todos los elementos.
 
 ---
 
@@ -15,7 +15,7 @@
 | Archivo | Propósito |
 |---------|-----------|
 | `ANALISIS_BUG_CATEGORY_REPLICATOR.md` | Análisis técnico detallado del bug |
-| `category_replicator_FIXED.html` | Versión corregida y funcional |
+| `category_replicator.html` | Versión corregida y funcional |
 | `SOLUCION_RESUMEN.md` | Este documento |
 
 ---
@@ -65,18 +65,18 @@
 
 ---
 
-## Cómo Usar category_replicator_FIXED.html
+## Cómo Usar category_replicator.html
 
 ### Paso 1: Abrir en navegador
 ```bash
 # Windows
-start category_replicator_FIXED.html
+start category_replicator.html
 
 # macOS
-open category_replicator_FIXED.html
+open category_replicator.html
 
 # Linux
-xdg-open category_replicator_FIXED.html
+xdg-open category_replicator.html
 ```
 
 ### Paso 2: Cargar XML plantilla
@@ -128,7 +128,7 @@ grep -o '<Template>' archivo.xml | wc -l
 ### Proceso en Solution Designer
 
 1. **File → Import Configuration**
-2. Seleccionar el XML generado por `category_replicator_FIXED.html`
+2. Seleccionar el XML generado por `category_replicator.html`
 3. Therefore reasignará automáticamente:
    - `CtgryNo` (números de categoría reales)
    - `CounterNo` (números de contador reales)
@@ -194,7 +194,7 @@ resultXml = cloneCountersAndTemplates(resultXml, clones.length);  // ← FIX
 
 ## Próximos Pasos
 
-1. ✅ Usar `category_replicator_FIXED.html` para generar XML
+1. ✅ Usar `category_replicator.html` para generar XML
 2. ✅ Descargar el XML generado
 3. ✅ Importar en Solution Designer (File → Import Configuration)
 4. ✅ Verificar en Categories que aparecen las 3 categorías con todos los campos
@@ -214,7 +214,7 @@ Sí, el FIXED soporta cualquier número de clones. Solo ingresa más líneas en 
 Sí, puedes reordenar las líneas del textarea. El orden no importa para la validez del XML.
 
 ### ¿Necesito modificar el XML después de generar?
-No. El XML generado por `category_replicator_FIXED.html` es completamente válido y listo para importar.
+No. El XML generado por `category_replicator.html` es completamente válido y listo para importar.
 
 ---
 

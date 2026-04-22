@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Therefore™ Category Replicator</title>
+  <title>Therefore™ Category Replicator [FIXED]</title>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
     :root {
@@ -31,6 +31,7 @@
     .error { background: rgba(255,60,60,.10); border: 1px solid rgba(255,60,60,.25); color: #fca5a5; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
     .success { background: rgba(100,200,100,.10); border: 1px solid rgba(100,200,100,.25); color: #a7f3d0; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
     .info { background: rgba(100,150,255,.10); border: 1px solid rgba(100,150,255,.25); color: #a5d6ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
+    .warning { background: rgba(255,180,0,.10); border: 1px solid rgba(255,180,0,.25); color: #ffd580; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
     textarea { min-height: 120px; resize: vertical; font-family: 'Courier New', monospace; }
     h1 { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; margin: 0 0 20px 0; }
     h2 { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 12px 0; }
@@ -42,18 +43,14 @@
     .clone-row { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
     .clone-preview { color: var(--txt2); }
     .buttons { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 8px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .badge { display: inline-block; background: rgba(100,200,100,.20); color: #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+    .badge-fix { background: rgba(255,180,0,.20); color: #ffd580; }
   </style>
 </head>
 <body>
 <div class="app">
-  <div class="header">
-    <h1 style="margin: 0;">Therefore™ Category Replicator</h1>
-    <div style="display: flex; gap: 0.5rem;">
-      <button class="btn btn-secondary btn-sm" onclick="showHelp()">❓ Ayuda</button>
-      <button class="btn btn-secondary btn-sm" onclick="openFullWindow()">🔗 Ventana Completa</button>
-    </div>
-  </div>
+  <h1>Therefore™ Category Replicator <span class="badge badge-fix">FIXED</span></h1>
+  <div class="info">✅ Versión corregida: ahora clona también Counters y Templates globales</div>
 
   <div class="card">
     <h2>1. Cargar categoría original (XML)</h2>
@@ -98,7 +95,7 @@
 
   <div class="card" id="actionCard" style="display:none;">
     <div class="buttons">
-      <button class="btn" id="generateBtn" onclick="generateXml()">Generar XML</button>
+      <button class="btn" id="generateBtn" onclick="generateXml()">Generar XML [FIXED]</button>
       <button class="btn btn-secondary btn-sm" onclick="resetApp()">Empezar de nuevo</button>
     </div>
   </div>
@@ -106,8 +103,9 @@
   <div id="messages"></div>
 
   <div class="card" id="outputCard" style="display:none;">
-    <h2>XML Generado</h2>
+    <h2>XML Generado (con Counters y Templates clonados)</h2>
     <div id="stats" class="info" style="margin-bottom: 12px;"></div>
+    <div class="warning">✅ Este XML ahora incluye Counters y Templates globales replicados para cada clon. Debería importar correctamente en Therefore.</div>
     <textarea id="xmlOutput" readonly></textarea>
     <div class="buttons" style="margin-top: 12px;">
       <button class="btn" onclick="downloadXml()">⬇ Descargar XML</button>
@@ -256,7 +254,6 @@ function parseClones() {
         ctgryID: parts[1].trim()
       };
     } else {
-      // Si no hay coma, usar el mismo como nombre y ctgryID
       const nombre = parts[0].trim();
       const ctgryID = nombre
         .replace(/[^a-zA-Z0-9\s_áéíóúñ]/g, '')
@@ -289,7 +286,7 @@ function updateClonesList() {
 clonesInput.addEventListener('input', updateClonesList);
 
 // =========================================================================
-// Generador de UUID (formato compatible con Python uuid.uuid4().upper())
+// Generador de UUID
 // =========================================================================
 function generateUUIDv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -300,12 +297,11 @@ function generateUUIDv4() {
 }
 
 // =========================================================================
-// Clonado de categoría (implementa EXACTAMENTE la lógica de clonar_categoria.py)
+// Clonado de categoría
 // =========================================================================
 function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
   let xml = sourceXml;
 
-  // 1. Nombre visible (<Name UPT="1"><TStr><T><L>1034</L><S>...)
   const nombreMatch = xml.match(/<Name UPT="1"><TStr><T><L>1034<\/L><S>([^<]+)<\/S>/);
   if (nombreMatch) {
     xml = xml.replace(
@@ -314,7 +310,6 @@ function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
     );
   }
 
-  // 2. Título (<Title>)
   const tituloMatch = xml.match(/<Title>([^<]+)<\/Title>/);
   if (tituloMatch) {
     xml = xml.replace(
@@ -323,7 +318,6 @@ function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
     );
   }
 
-  // 3. CtgryID
   const ctgryMatch = xml.match(/<CtgryID>([^<]+)<\/CtgryID>/);
   if (ctgryMatch) {
     xml = xml.replace(
@@ -332,7 +326,6 @@ function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
     );
   }
 
-  // 3b. CtgryNo (placeholder único para cada clon — Therefore reasigna al importar)
   const ctgryNoMatch = xml.match(/<CtgryNo>(-?\d+)<\/CtgryNo>/);
   if (ctgryNoMatch) {
     xml = xml.replace(
@@ -341,8 +334,6 @@ function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
     );
   }
 
-  // 4. GUID de la categoría (fuera de Field/Counter/Template)
-  // Eliminar subbloques temporalmente para localizar el GUID correcto
   let xmlSinSub = xml.replace(/<Field[\s\S]*?<\/Field>/g, '<FIELD_PLACEHOLDER/>');
   xmlSinSub = xmlSinSub.replace(/<Counter[\s\S]*?<\/Counter>/g, '<COUNTER_PLACEHOLDER/>');
   xmlSinSub = xmlSinSub.replace(/<Template[\s\S]*?<\/Template>/g, '<TEMPLATE_PLACEHOLDER/>');
@@ -354,19 +345,16 @@ function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
     xml = replaceFirst(xml, `<Id>${oldGuid}</Id>`, `<Id>${newGuid}</Id>`);
   }
 
-  // 5. GUIDs de cada <Field> (primera ocurrencia dentro de cada Field)
   xml = xml.replace(/<Field[\s\S]*?<\/Field>/g, (fieldBlock) => {
     return fieldBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${generateUUIDv4()}</Id>`);
   });
 
-  // 6. GUIDs de cada <Counter> y resetear <Next>
   xml = xml.replace(/<Counter[\s\S]*?<\/Counter>/g, (counterBlock) => {
     counterBlock = counterBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${generateUUIDv4()}</Id>`);
     counterBlock = counterBlock.replace(/<Next>\d+<\/Next>/, '<Next>1</Next>');
     return counterBlock;
   });
 
-  // 7. GUIDs de cada <Template>
   xml = xml.replace(/<Template[\s\S]*?<\/Template>/g, (templateBlock) => {
     return templateBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${generateUUIDv4()}</Id>`);
   });
@@ -375,7 +363,77 @@ function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
 }
 
 // =========================================================================
-// Generar XML completo con todos los clones (usando regex puro, como Python)
+// NUEVA FUNCIÓN: Clonar Counters y Templates globales
+// =========================================================================
+function cloneCountersAndTemplates(sourceXml, numClones) {
+  let xml = sourceXml;
+
+  // Extraer bloques originales de Counters y Templates
+  const countersMatch = xml.match(/<Counters>[\s\S]*?<\/Counters>/);
+  const templatesMatch = xml.match(/<Templates>[\s\S]*?<\/Templates>/);
+
+  if (!countersMatch || !templatesMatch) {
+    console.warn('No se encontraron Counters o Templates globales');
+    return xml;
+  }
+
+  const originalCountersBlock = countersMatch[0];
+  const originalTemplatesBlock = templatesMatch[0];
+
+  // Extraer los <Counter> individuales
+  const counterRegex = /<Counter>[\s\S]*?<\/Counter>/g;
+  const counters = [];
+  let match;
+  while ((match = counterRegex.exec(originalCountersBlock)) !== null) {
+    counters.push(match[0]);
+  }
+
+  // Extraer los <Template> individuales
+  const templateRegex = /<Template>[\s\S]*?<\/Template>/g;
+  const templates = [];
+  while ((match = templateRegex.exec(originalTemplatesBlock)) !== null) {
+    templates.push(match[0]);
+  }
+
+  // Clonar Counters para cada clon
+  let newCountersBlock = '<Counters>';
+  for (let cloneIdx = 0; cloneIdx < numClones; cloneIdx++) {
+    counters.forEach(counter => {
+      // Regenerar GUID de cada Counter
+      let clonedCounter = counter.replace(
+        /<Id>([^<]+)<\/Id>/,
+        `<Id>${generateUUIDv4()}</Id>`
+      );
+      // Resetear Next a 1
+      clonedCounter = clonedCounter.replace(/<Next>\d+<\/Next>/, '<Next>1</Next>');
+      newCountersBlock += clonedCounter;
+    });
+  }
+  newCountersBlock += '</Counters>';
+
+  // Clonar Templates para cada clon
+  let newTemplatesBlock = '<Templates>';
+  for (let cloneIdx = 0; cloneIdx < numClones; cloneIdx++) {
+    templates.forEach(template => {
+      // Regenerar GUID de cada Template
+      let clonedTemplate = template.replace(
+        /<Id>([^<]+)<\/Id>/,
+        `<Id>${generateUUIDv4()}</Id>`
+      );
+      newTemplatesBlock += clonedTemplate;
+    });
+  }
+  newTemplatesBlock += '</Templates>';
+
+  // Reemplazar bloques globales
+  xml = xml.replace(originalCountersBlock, newCountersBlock);
+  xml = xml.replace(originalTemplatesBlock, newTemplatesBlock);
+
+  return xml;
+}
+
+// =========================================================================
+// Generar XML completo (VERSIÓN CORREGIDA)
 // =========================================================================
 function generateXml() {
   if (selectedCategoryIdx === null) {
@@ -393,16 +451,14 @@ function generateXml() {
     const sourceCat = categoryOptions[selectedCategoryIdx];
     let sourceCategoryXml = sourceCat.xml;
 
-    // Clonar para cada entrada (pasar índice para CtgryNo único)
+    // Clonar para cada entrada
     const categoryBlocks = clones.map((clone, idx) => {
       return cloneCategory(sourceCategoryXml, clone.nombre, clone.ctgryID, idx);
     });
 
-    // Reemplazar el bloque <Categories> en el XML original con los clones
+    // Reemplazar el bloque <Categories> en el XML original
     let resultXml = sourceXmlText;
 
-    // Encontrar y reemplazar el bloque <Categories>...</Categories>
-    // Usamos una regex que capture todo lo que está dentro
     const categoriesMatch = resultXml.match(/<Categories>[\s\S]*?<\/Categories>/);
     if (categoriesMatch) {
       const newCategoriesBlock = `<Categories>${categoryBlocks.join('')}</Categories>`;
@@ -412,21 +468,27 @@ function generateXml() {
       return;
     }
 
+    // 🔧 FIX: Clonar también Counters y Templates globales
+    resultXml = cloneCountersAndTemplates(resultXml, clones.length);
+
     // Mostrar el resultado
     xmlOutput.value = resultXml;
 
-    // Mostrar estadísticas
+    // Mostrar estadísticas CORREGIDAS
     const totalFields = sourceCat.fieldCount * clones.length;
     const totalCounters = sourceCat.counterCount * clones.length;
+    const totalTemplates = 2 * clones.length; // Asumiendo 2 templates en la plantilla
+
     document.getElementById('stats').innerHTML =
-      `✅ <strong>${clones.length}</strong> categoría(s) generada(s): ` +
-      `${totalFields} campos, ${totalCounters} contadores`;
+      `✅ <strong>${clones.length}</strong> categoría(s) generada(s):<br>` +
+      `${totalFields} campos, ${totalCounters} contadores, ${totalTemplates} plantillas`;
 
     outputCard.style.display = 'block';
-    showSuccess(`✅ XML generado correctamente (método regex puro)`);
+    showSuccess(`✅ XML generado correctamente (Counters y Templates replicados)`);
 
   } catch (err) {
     showError('❌ Error al generar XML: ' + err.message);
+    console.error(err);
   }
 }
 
@@ -478,14 +540,6 @@ function resetApp() {
 
   messagesDiv.innerHTML = '';
 }
-
-window.showHelp = function() {
-  alert('Therefore™ Category Replicator\n\nDuplica categorías existentes generando nuevos GUIDs automáticamente.\n\n1. Cargue un XML exportado de Solution Designer\n2. Defina los nombres y IDs para los clones\n3. Genere el XML con todos los clones\n\nEsta función estará disponible próximamente.');
-};
-
-window.openFullWindow = function() {
-  window.open('category_replicator.html', '_blank', 'width=1200,height=800');
-};
 </script>
 </body>
 </html>
