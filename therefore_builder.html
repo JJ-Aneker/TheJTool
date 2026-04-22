@@ -1142,12 +1142,35 @@
             </div>
           </div>
 
+          {/* ═══════════════════════════════════════════════════════════ */}
+          {/* ZONA 1 — CONFIGURACIÓN GLOBAL (siempre visible) */}
+          {/* ═══════════════════════════════════════════════════════════ */}
+
           {/* PLANTILLAS SUPABASE */}
           <TemplateManager
             onLoad={handleTemplateLoad}
             categoriesToSave={categories}
             activeCatName={activeCat.catName}
           />
+
+          {/* CSV + XML IMPORTERS (2 columnas) */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px",marginBottom:"16px"}}>
+            <CsvImporter onImport={handleCsvImport}/>
+            <XmlImporter onImport={handleCsvImport}/>
+          </div>
+
+          {/* COLORES */}
+          <div style={{...S.panel,marginBottom:"16px"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:showColors?"14px":0}}>
+              <span style={S.panelTitle}>🎨 Paleta de colores <span style={{color:"rgba(238,244,255,.35)",fontWeight:400}}>(global)</span></span>
+              <button style={S.btn} onClick={()=>setShowColors(v=>!v)}>{showColors?"▲ Ocultar":"▼ Mostrar"}</button>
+            </div>
+            {showColors&&<ColorEditor palette={palette} onChange={setPalette}/>}
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════ */}
+          {/* ZONA 2 — CATEGORÍAS */}
+          {/* ═══════════════════════════════════════════════════════════ */}
 
           {/* CATEGORY TABS */}
           <div style={{marginBottom:"16px"}}>
@@ -1181,25 +1204,6 @@
             </div>
           </div>
 
-          {/* IDENTITY */}
-          <div style={{...S.panel,marginBottom:"16px"}}>
-            <div style={S.panelTitle}>Identidad — {activeCat.catName||"sin nombre"}</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"12px"}}>
-              <div><label style={S.label}>Nombre visible *</label><input style={S.input} value={activeCat.catName} onChange={e=>patchActive({catName:e.target.value})} placeholder="ej. Contratos Proveedor"/></div>
-              <div><label style={S.label}>TableName (BD) <span style={{color:"rgba(238,244,255,.35)"}}>(opcional)</span></label><input style={S.input} value={activeCat.tableName} onChange={e=>patchActive({tableName:e.target.value.toUpperCase()})} placeholder="Se genera automáticamente"/></div>
-              <div><label style={S.label}>CtgryID (auto)</label><input style={{...S.input,color:"rgba(238,244,255,.40)"}} value={ctgryId} readOnly/></div>
-            </div>
-          </div>
-
-          {/* COLORES */}
-          <div style={{...S.panel,marginBottom:"16px"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:showColors?"14px":0}}>
-              <span style={S.panelTitle}>🎨 Paleta de colores <span style={{color:"rgba(238,244,255,.35)",fontWeight:400}}>(global)</span></span>
-              <button style={S.btn} onClick={()=>setShowColors(v=>!v)}>{showColors?"▲ Ocultar":"▼ Mostrar"}</button>
-            </div>
-            {showColors&&<ColorEditor palette={palette} onChange={setPalette}/>}
-          </div>
-
           {activeView==="preview" ? (
             <div style={S.panel}>
               <div style={S.panelTitle}>Preview — {activeCat.catName||"sin nombre"}</div>
@@ -1209,8 +1213,17 @@
             <div style={S.grid}>
               {/* LEFT */}
               <div>
-                <CsvImporter onImport={handleCsvImport}/>
-                <XmlImporter onImport={handleCsvImport}/>
+                {/* IDENTITY */}
+                <div style={{...S.panel,marginBottom:"16px"}}>
+                  <div style={S.panelTitle}>Identidad — {activeCat.catName||"sin nombre"}</div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"12px"}}>
+                    <div><label style={S.label}>Nombre visible *</label><input style={S.input} value={activeCat.catName} onChange={e=>patchActive({catName:e.target.value})} placeholder="ej. Contratos Proveedor"/></div>
+                    <div><label style={S.label}>TableName (BD) <span style={{color:"rgba(238,244,255,.35)"}}>(opcional)</span></label><input style={S.input} value={activeCat.tableName} onChange={e=>patchActive({tableName:e.target.value.toUpperCase()})} placeholder="Se genera automáticamente"/></div>
+                    <div><label style={S.label}>CtgryID (auto)</label><input style={{...S.input,color:"rgba(238,244,255,.40)"}} value={ctgryId} readOnly/></div>
+                  </div>
+                </div>
+
+                {/* SECTIONS */}
                 <div style={{...S.panel,marginBottom:0}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
                     <span style={S.panelTitle}>Secciones y campos</span>
