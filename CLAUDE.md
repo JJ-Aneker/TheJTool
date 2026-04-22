@@ -125,3 +125,13 @@ If the local docs don't cover something:
 - API operation detail: `https://www.therefore.net/help/2025/en-us/AR/SDK/WebAPI/the_webapi_operation_<operationname>.html`
 
 The endpoint reference in `web-api-endpoints.md` is from Therefore 2020 — prefer online docs when there are discrepancies.
+
+---
+
+## Work Instructions
+
+**Git commits and pushes:** Proceed without asking for confirmation. When you have completed work on a task, commit and push automatically.
+
+**File modifications:** For changes requested explicitly by the user or as part of an assigned task, proceed without asking for confirmation. Only ask if the scope seems unclear or if the change appears destructive beyond what was requested.
+
+**Destructive operations:** Only ask for confirmation on destructive operations (delete files, reset branches, force push, etc.) if they are NOT explicitly requested by the user.
