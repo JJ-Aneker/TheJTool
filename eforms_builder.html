@@ -613,8 +613,7 @@
             </div>
             <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
               {error&&<div style={{fontSize:"11px",color:"#fecaca",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",padding:"6px 12px",borderRadius:"8px"}}>⚠ {error}</div>}
-              <button style={{...S.btnPrimary,display:"flex",alignItems:"center",gap:"6px"}} onClick={generate}>🔨 Generar XML · {totalFields} campos</button>
-              <button style={{...S.btn,borderColor:globalExpandedPanel==="csv"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="csv"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="csv"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="csv"?null:"csv")}>📊 Importar CSV</button>
+              <button style={{...S.btn,borderColor:"#9ad1ff",background:"rgba(154,209,255,.15)",color:"#9ad1ff"}} onClick={generate}>🔨 Generar XML · {totalFields} campos</button>
               {["editor","preview"].map(v=>(
                 <button key={v} onClick={()=>setActiveView(v)} style={{...S.btn,borderColor:activeView===v?"#9ad1ff":"rgba(255,255,255,.14)",background:activeView===v?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:activeView===v?"#9ad1ff":"#e6e7eb"}}>
                   {v==="editor"?"✎ Editor":"👁 Preview"}
