@@ -404,7 +404,7 @@
     }
 
     // ── FIELD ROW ─────────────────────────────────────────────────────────────
-    function FieldRow({ field, onChange, onRemove }) {
+    function FieldRow({ field, onChange, onRemove, showHeader }) {
       const [expanded, setExpanded] = useState(false);
       const isSelect = field.tipo === "select";
       const isText   = field.tipo === "text" || field.tipo === "email";
@@ -412,12 +412,19 @@
       const autoKey = toCamelKey(field.nombre);
 
       return (
-        <div style={{background:"rgba(0,0,0,.20)",border:"1px solid rgba(255,255,255,.07)",borderRadius:"8px",padding:"10px",marginBottom:"6px"}}>
-          {/* Row principal */}
-          <div style={{display:"flex",gap:"6px",flexWrap:"wrap",alignItems:"flex-end"}}>
-            <div style={{flex:"3 1 160px"}}>
-              <label style={S.label}>Etiqueta</label>
-              <input style={S.input} value={field.nombre}
+        <>
+          {showHeader&&<div style={{display:"flex",gap:"8px",alignItems:"center",marginBottom:"8px",paddingBottom:"8px",borderBottom:"2px solid rgba(154,209,255,.25)",fontSize:"11px",fontWeight:600,color:"#9ad1ff"}}>
+            <div style={{flex:"3 1 160px"}}>Etiqueta</div>
+            <div style={{flex:"2 1 110px"}}>Key</div>
+            <div style={{flex:"2 1 120px"}}>Tipo</div>
+            <div style={{flex:"1 0 80px"}}>Obligatorio</div>
+            <div style={{flex:"1 0 80px"}}>Solo lectura</div>
+            <div style={{width:"56px"}}></div>
+          </div>}
+          <div style={{background:"rgba(0,0,0,.15)",border:"1px solid rgba(255,255,255,.06)",borderRadius:"6px",padding:"8px",marginBottom:"6px"}}>
+            {/* Row principal */}
+            <div style={{display:"flex",gap:"6px",flexWrap:"nowrap",alignItems:"center"}}>
+              <input style={{...S.input,flex:"3 1 160px",marginBottom:0}} value={field.nombre}
                 onChange={e=>{
                   const nombre = e.target.value;
                   const autoK = toCamelKey(nombre);
@@ -425,62 +432,58 @@
                     fieldKey: field.fieldKey === toCamelKey(field.nombre) ? autoK : field.fieldKey
                   });
                 }}
-                placeholder="ej. Nombre completo"/>
-            </div>
-            <div style={{flex:"2 1 110px"}}>
-              <label style={S.label}>Key (Form.io)</label>
-              <input style={S.input} value={field.fieldKey}
+                placeholder="Etiqueta"/>
+              <input style={{...S.input,flex:"2 1 110px",marginBottom:0}} value={field.fieldKey}
                 onChange={e=>onChange({...field,fieldKey:e.target.value.replace(/\s+/g,"").replace(/[^A-Za-z0-9_]/g,"")})}
                 placeholder={autoKey}/>
-            </div>
-            <div style={{flex:"2 1 120px"}}>
-              <label style={S.label}>Tipo</label>
-              <select style={S.select} value={field.tipo}
+              <select style={{...S.select,flex:"2 1 120px",marginBottom:0}} value={field.tipo}
                 onChange={e=>onChange({...field,tipo:e.target.value})}>
                 {FIELD_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",flex:"1 0 80px"}}>
+                <input type="checkbox" checked={field.required} onChange={()=>onChange({...field,required:!field.required})} style={{width:"16px",height:"16px",cursor:"pointer"}}/>
+              </div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",flex:"1 0 80px"}}>
+                <input type="checkbox" checked={field.readOnly} onChange={()=>onChange({...field,readOnly:!field.readOnly})} style={{width:"16px",height:"16px",cursor:"pointer"}}/>
+              </div>
+              <div style={{display:"flex",gap:"4px",width:"56px",flexShrink:0}}>
+                <button style={{...S.btn,fontSize:"10px",padding:"4px 6px",flex:1}} onClick={()=>setExpanded(o=>!o)} title="Más">
+                  {expanded?"▲":"▼"}
+                </button>
+                <button style={{...S.btnDanger,padding:"4px 6px",flexShrink:0}} onClick={onRemove} title="Eliminar">✕</button>
+              </div>
             </div>
-            <div style={{display:"flex",flexDirection:"column",gap:"5px",paddingBottom:"2px"}}>
-              <Toggle on={field.required}  onChange={()=>onChange({...field,required:!field.required})}  label="Obligatorio"/>
-              <Toggle on={field.readOnly}  onChange={()=>onChange({...field,readOnly:!field.readOnly})}   label="Solo lectura"/>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:"5px",paddingBottom:"2px"}}>
-              <button style={{...S.btn,fontSize:"11px",padding:"4px 8px"}} onClick={()=>setExpanded(o=>!o)} title="Más opciones">
-                {expanded?"▲":"▼"} Más
-              </button>
-              <button style={{...S.btnDanger,padding:"4px 8px"}} onClick={onRemove} title="Eliminar">✕</button>
-            </div>
-          </div>
 
-          {/* Opciones expandidas */}
-          {expanded&&<div style={{marginTop:"10px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:"10px"}}>
-            <div>
-              <label style={S.label}>Placeholder</label>
-              <input style={S.input} value={field.placeholder}
-                onChange={e=>onChange({...field,placeholder:e.target.value})}
-                placeholder="Texto de ayuda…"/>
-            </div>
-            <div>
-              <label style={S.label}>Valor por defecto</label>
-              <input style={S.input} value={field.defaultValue}
-                onChange={e=>onChange({...field,defaultValue:e.target.value})}
-                placeholder=""/>
-            </div>
-            {isText&&<div>
-              <label style={S.label}>Longitud máxima</label>
-              <input style={S.input} type="number" value={field.maxLength}
-                onChange={e=>onChange({...field,maxLength:e.target.value})}
-                placeholder="500"/>
+            {/* Opciones expandidas */}
+            {expanded&&<div style={{marginTop:"10px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:"10px"}}>
+              <div>
+                <label style={S.label}>Placeholder</label>
+                <input style={S.input} value={field.placeholder}
+                  onChange={e=>onChange({...field,placeholder:e.target.value})}
+                  placeholder="Texto de ayuda…"/>
+              </div>
+              <div>
+                <label style={S.label}>Valor por defecto</label>
+                <input style={S.input} value={field.defaultValue}
+                  onChange={e=>onChange({...field,defaultValue:e.target.value})}
+                  placeholder=""/>
+              </div>
+              {isText&&<div>
+                <label style={S.label}>Longitud máxima</label>
+                <input style={S.input} type="number" value={field.maxLength}
+                  onChange={e=>onChange({...field,maxLength:e.target.value})}
+                  placeholder="500"/>
+              </div>}
+              {isSelect&&<div style={{gridColumn:"1 / -1"}}>
+                <label style={S.label}>Opciones (una por línea: <code style={{color:"#a7f3d0",fontFamily:"monospace"}}>valor=Etiqueta</code> o solo etiqueta)</label>
+                <textarea style={{...S.input,height:"80px",resize:"vertical",fontFamily:"monospace",fontSize:"11px"}}
+                  value={field.options}
+                  onChange={e=>onChange({...field,options:e.target.value})}
+                  placeholder={"ACTIVO=Activo\nPENDIENTE=Pendiente documentación\nBAJA=Baja"}/>
+              </div>}
             </div>}
-            {isSelect&&<div style={{gridColumn:"1 / -1"}}>
-              <label style={S.label}>Opciones (una por línea: <code style={{color:"#a7f3d0",fontFamily:"monospace"}}>valor=Etiqueta</code> o solo etiqueta)</label>
-              <textarea style={{...S.input,height:"80px",resize:"vertical",fontFamily:"monospace",fontSize:"11px"}}
-                value={field.options}
-                onChange={e=>onChange({...field,options:e.target.value})}
-                placeholder={"ACTIVO=Activo\nPENDIENTE=Pendiente documentación\nBAJA=Baja"}/>
-            </div>}
-          </div>}
-        </div>
+          </div>
+        </>
       );
     }
 
@@ -546,6 +549,8 @@
       const [copied,      setCopied]      = useState(false);
       const [error,       setError]       = useState("");
       const [activeView,  setActiveView]  = useState("editor");
+      const [showXmlModal, setShowXmlModal] = useState(false);
+      const [globalExpandedPanel, setGlobalExpandedPanel] = useState(null); // "identity", "csv", "structure"
 
       // Section ops
       const addSection    = ()    => setSections(s=>[...s, newSection("NUEVO PANEL")]);
@@ -580,6 +585,8 @@
         const total = sections.flatMap(s=>s.fields).filter(f=>f.nombre.trim()).length;
         if (total === 0) { setError("Añade al menos un campo."); return; }
         setXml(buildEFormXml({ formName:formName.trim(), submitLabel:submitLabel.trim()||"Enviar", sections, colsPerRow }));
+        setShowXmlModal(true);
+        setCopied(false);
       };
 
       const copy = () => {
@@ -604,7 +611,10 @@
               <h1 style={S.title}>📋 Therefore™ eForms Builder</h1>
               <p style={S.sub}>Genera el XML de importación de eForms para Therefore Solution Designer · Form.io JSON · v2.0</p>
             </div>
-            <div style={{display:"flex",gap:"8px"}}>
+            <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
+              {error&&<div style={{fontSize:"11px",color:"#fecaca",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",padding:"6px 12px",borderRadius:"8px"}}>⚠ {error}</div>}
+              <button style={{...S.btnPrimary,display:"flex",alignItems:"center",gap:"6px"}} onClick={generate}>🔨 Generar XML · {totalFields} campos</button>
+              <button style={{...S.btn,borderColor:globalExpandedPanel==="csv"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="csv"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="csv"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="csv"?null:"csv")}>📊 Importar CSV</button>
               {["editor","preview"].map(v=>(
                 <button key={v} onClick={()=>setActiveView(v)} style={{...S.btn,borderColor:activeView===v?"#9ad1ff":"rgba(255,255,255,.14)",background:activeView===v?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:activeView===v?"#9ad1ff":"#e6e7eb"}}>
                   {v==="editor"?"✎ Editor":"👁 Preview"}
@@ -613,8 +623,19 @@
             </div>
           </div>
 
-          {/* IDENTIDAD */}
-          <div style={{...S.panel,marginBottom:"16px"}}>
+          {/* ═══════════════════════════════════════════════════════════ */}
+          {/* ZONA GLOBAL COMPACTA */}
+          {/* ═══════════════════════════════════════════════════════════ */}
+
+          {/* BOTONES COMPACTOS EN UNA FILA */}
+          <div style={{display:"flex",gap:"8px",marginBottom:"16px",flexWrap:"wrap"}}>
+            <button style={{...S.btn,borderColor:globalExpandedPanel==="identity"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="identity"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="identity"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="identity"?null:"identity")}>📝 Identidad</button>
+            <button style={{...S.btn,borderColor:globalExpandedPanel==="csv"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="csv"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="csv"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="csv"?null:"csv")}>📊 Importar CSV</button>
+            <button style={{...S.btn,borderColor:globalExpandedPanel==="structure"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="structure"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="structure"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="structure"?null:"structure")}>⚙ Estructura XML</button>
+          </div>
+
+          {/* PANELES EXPANDIBLES */}
+          {globalExpandedPanel==="identity"&&<div style={{...S.panel,marginBottom:"16px"}}>
             <div style={S.panelTitle}>Identidad del formulario</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"12px"}}>
               <div>
@@ -642,7 +663,20 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
+
+          {globalExpandedPanel==="csv"&&<div style={{...S.panel,marginBottom:"16px"}}>
+            <CsvImporter onImport={(...args)=>{handleCsvImport(...args);setGlobalExpandedPanel(null);}}/>
+          </div>}
+
+          {globalExpandedPanel==="structure"&&<div style={{...S.panel,marginBottom:"16px"}}>
+            <div style={S.panelTitle}>Estructura del XML</div>
+            <div style={{fontSize:"12px",color:"rgba(238,244,255,.55)",lineHeight:"1.75"}}>
+              <p style={{marginBottom:"8px"}}>Therefore eForms usa <strong style={{color:"#9ad1ff"}}>Form.io</strong> como motor de formularios. El XML contiene el JSON de Form.io dentro del nodo <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>&lt;FDef&gt;</code>.</p>
+              <p style={{marginBottom:"8px"}}>Cada <strong style={{color:"#e6e7eb"}}>Panel</strong> → componente <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>panel</code> de Form.io. Cada fila de campos → <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>columns</code>.</p>
+              <p style={{marginBottom:"0"}}>El <strong style={{color:"#9ad1ff"}}>Key</strong> de cada campo debe coincidir con el <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>FieldID</code> de la categoría vinculada en Therefore.</p>
+            </div>
+          </div>}
 
           {activeView==="preview" ? (
             <div style={S.panel}>
@@ -653,7 +687,6 @@
             <div style={S.grid}>
               {/* LEFT — campos */}
               <div>
-                <CsvImporter onImport={handleCsvImport}/>
                 <div style={S.panel}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
                     <span style={S.panelTitle}>Paneles y campos <span style={{...S.badge,marginLeft:"6px"}}>{totalFields} campos</span></span>
@@ -668,7 +701,7 @@
                         {sections.length>1&&<button style={S.btnDanger} onClick={()=>removeSection(si)}>✕</button>}
                       </div>
                       {sec.fields.map((f,fi)=>(
-                        <FieldRow key={f.id} field={f} onChange={v=>updateField(si,fi,v)} onRemove={()=>removeField(si,fi)}/>
+                        <FieldRow key={f.id} field={f} onChange={v=>updateField(si,fi,v)} onRemove={()=>removeField(si,fi)} showHeader={fi===0}/>
                       ))}
                       <button style={{...S.btn,marginTop:"4px"}} onClick={()=>addField(si)}>+ Campo</button>
                     </div>
@@ -678,57 +711,59 @@
 
               {/* RIGHT */}
               <div style={{display:"flex",flexDirection:"column",gap:"16px"}}>
-                {/* Info Form.io */}
-                <div style={S.panel}>
-                  <div style={S.panelTitle}>Estructura del XML</div>
+                <div style={{...S.panel,background:"rgba(0,0,0,.10)",border:"1px solid rgba(154,209,255,.15)"}}>
+                  <div style={S.panelTitle}>💡 Panel derecho</div>
                   <div style={{fontSize:"12px",color:"rgba(238,244,255,.55)",lineHeight:"1.75"}}>
-                    <p style={{marginBottom:"8px"}}>Therefore eForms usa <strong style={{color:"#9ad1ff"}}>Form.io</strong> como motor de formularios. El XML contiene el JSON de Form.io dentro del nodo <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>&lt;FDef&gt;</code>.</p>
-                    <p style={{marginBottom:"8px"}}>Cada <strong style={{color:"#e6e7eb"}}>Panel</strong> → componente <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>panel</code> de Form.io. Cada fila de campos → <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>columns</code>.</p>
-                    <p style={{marginBottom:"0"}}>El <strong style={{color:"#9ad1ff"}}>Key</strong> de cada campo debe coincidir con el <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>FieldID</code> de la categoría vinculada en Therefore.</p>
-                  </div>
-                </div>
-
-                {/* Generar */}
-                <div style={S.panel}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
-                    <span style={S.panelTitle}>Generar XML</span>
-                    <span style={S.badge}>{totalFields} campos</span>
-                  </div>
-                  {error&&<div style={{color:"#fecaca",fontSize:"12px",marginBottom:"10px",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",padding:"8px 12px",borderRadius:"8px"}}>⚠ {error}</div>}
-                  <button style={S.btnPrimary} onClick={generate}>Generar XML →</button>
-                  {xml&&<div style={{marginTop:"14px"}}>
-                    <div style={{display:"flex",gap:"8px",marginBottom:"8px",flexWrap:"wrap"}}>
-                      <button style={S.btnGreen}  onClick={copy}>{copied?"✓ Copiado":"📋 Copiar XML"}</button>
-                      <button style={S.btn}        onClick={download}>⬇ Descargar .xml</button>
-                      <button style={S.btn}        onClick={()=>{const w=window.open("");w.document.write("<pre style='word-break:break-all;font-size:11px'>"+xml.replace(/</g,"&lt;")+"</pre>");w.document.title="eform.xml";}}>🔗 Nueva pestaña</button>
-                    </div>
-                    <div style={{fontSize:"11px",color:"rgba(238,244,255,.40)",marginBottom:"6px"}}>{xml.length.toLocaleString()} caracteres</div>
-                    <textarea readOnly style={{...S.input,height:"120px",resize:"vertical",fontFamily:"monospace",fontSize:"11px",color:"#a7f3d0"}} value={xml} onClick={e=>e.target.select()}/>
-                  </div>}
-                </div>
-
-                {/* Checklist */}
-                <div style={S.panel}>
-                  <div style={S.panelTitle}>Checklist de publicación</div>
-                  <div style={{fontSize:"12px",color:"rgba(238,244,255,.55)",lineHeight:"2.1"}}>
-                    {[
-                      "Importar el XML en Solution Designer",
-                      "Verificar que el Key de cada campo coincide con el FieldID de la categoría",
-                      "Configurar la categoría vinculada si no existe",
-                      "Publicar desde Herramientas → Publicar eForms",
-                      "Verificar la URL de publicación en IIS",
-                      "Probar envío antes de distribuir el enlace",
-                    ].map((item,i)=>(
-                      <div key={i} style={{display:"flex",gap:"8px"}}>
-                        <span style={{color:"rgba(154,209,255,.45)",flexShrink:0}}>☐</span>
-                        <span>{item}</span>
-                      </div>
-                    ))}
+                    <p>Accede a la <strong style={{color:"#9ad1ff"}}>Identidad, Importar CSV y Estructura XML</strong> desde los botones compactos en la parte superior.</p>
+                    <p>Pulsa <strong style={{color:"#9ad1ff"}}>"Generar XML"</strong> en la barra superior para obtener el XML en un modal.</p>
                   </div>
                 </div>
               </div>
             </div>
           )}
+
+          {/* CHECKLIST DE PUBLICACIÓN */}
+          <div style={{marginTop:"32px",marginBottom:"16px"}}>
+            <div style={S.panel}>
+              <div style={S.panelTitle}>✓ Checklist de publicación</div>
+              <div style={{fontSize:"12px",color:"rgba(238,244,255,.55)",lineHeight:"2.1"}}>
+                {[
+                  "Importar el XML en Solution Designer",
+                  "Verificar que el Key de cada campo coincida con el FieldID de la categoría",
+                  "Configurar la categoría vinculada si no existe",
+                  "Publicar desde Herramientas → Publicar eForms",
+                  "Verificar la URL de publicación en IIS",
+                  "Probar envío antes de distribuir el enlace",
+                ].map((item,i)=>(
+                  <div key={i} style={{display:"flex",gap:"8px"}}>
+                    <span style={{color:"rgba(154,209,255,.45)",flexShrink:0}}>☐</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* MODAL XML */}
+          {showXmlModal&&<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,.60)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999}} onClick={()=>setShowXmlModal(false)}>
+            <div style={{background:"rgba(20,26,35,.95)",border:"1px solid rgba(154,209,255,.30)",borderRadius:"12px",width:"90%",maxWidth:"800px",maxHeight:"80vh",display:"flex",flexDirection:"column",boxShadow:"0 20px 60px rgba(0,0,0,.60)",backdropFilter:"blur(14px)"}} onClick={e=>e.stopPropagation()}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,.08)"}}>
+                <h2 style={{margin:0,fontSize:"16px",fontWeight:600,color:"#9ad1ff"}}>XML Generado</h2>
+                <button style={{background:"none",border:"none",color:"rgba(238,244,255,.60)",cursor:"pointer",fontSize:"20px"}} onClick={()=>setShowXmlModal(false)}>✕</button>
+              </div>
+              <div style={{flex:1,overflow:"auto",padding:"16px 20px"}}>
+                <pre style={{margin:0,background:"rgba(0,0,0,.30)",border:"1px solid rgba(255,255,255,.08)",borderRadius:"8px",padding:"14px",fontFamily:"'Consolas','Cascadia Code',monospace",fontSize:"11px",color:"#a7f3d0",lineHeight:"1.4",whiteSpace:"pre-wrap",wordWrap:"break-word"}}>{xml}</pre>
+              </div>
+              <div style={{display:"flex",gap:"8px",padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,.08)",justifyContent:"flex-end"}}>
+                <button style={{...S.btn}} onClick={()=>setShowXmlModal(false)}>Cerrar</button>
+                <button style={{...S.btnGreen}} onClick={copy}>{copied?"✓ Copiado":"📋 Copiar al portapapeles"}</button>
+                <button style={{...S.btnPrimary}} onClick={download}>⬇ Descargar XML</button>
+              </div>
+              <div style={{padding:"0 20px 12px 20px",fontSize:"11px",color:"rgba(238,244,255,.40)",textAlign:"right"}}>
+                {xml.length.toLocaleString()} caracteres
+              </div>
+            </div>
+          </div>}
 
           <div style={{marginTop:"16px",fontSize:"11px",color:"rgba(238,244,255,.25)",borderTop:"1px solid rgba(255,255,255,.08)",paddingTop:"12px"}}>
             Therefore eForms Builder v2.0 · Aneker · Genera Form.io JSON nativo para Therefore · Próximo: CSS personalizado, validaciones avanzadas
