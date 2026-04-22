@@ -50,7 +50,13 @@
 </head>
 <body>
 <div class="app">
-  <h1>🔍 DocAI Document Processor</h1>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 style="margin: 0;">🔍 DocAI Document Processor</h1>
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="btn btn-secondary btn-sm" onclick="showHelp()">❓ Ayuda</button>
+      <button class="btn btn-secondary btn-sm" onclick="openFullWindow()">🔗 Ventana Completa</button>
+    </div>
+  </div>
   <div class="info">Cargue un documento para extraer información usando DocAI</div>
 
   <div class="card">
@@ -343,6 +349,14 @@ function resetApp() {
 bearerToken.addEventListener('dblclick', function() {
   this.type = this.type === 'password' ? 'text' : 'password';
 });
+
+window.showHelp = function() {
+  alert('DocAI Document Processor\n\nCargue un documento para extraer información usando DocAI.\n\nFormatos soportados: PDF, JPG, PNG, TIFF, BMP\n\nEsta función estará disponible próximamente.');
+};
+
+window.openFullWindow = function() {
+  window.open('docai_processor.html', '_blank', 'width=1200,height=800');
+};
 </script>
 </body>
 </html>

@@ -27,7 +27,7 @@
 
   /* Layout */
   --topbarH: 64px;
-  --footerH: 30px;
+  --footerH: 18px;
 
   --gap: 10px;
   --pad: 10px;
@@ -299,7 +299,7 @@ body.sidebar-collapsed .app-shell{
   align-items:center;
   justify-content:center;
 
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: calc(var(--radius) + 4px);
   border: 1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.06);
@@ -317,10 +317,10 @@ body.sidebar-collapsed .app-shell{
 
 /* Nav */
 .nav{
-  padding: 10px;
+  padding: 6px 8px;
   display:flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   overflow:auto;
   min-height:0;
 }
@@ -342,7 +342,7 @@ body.sidebar-collapsed .sideFooter{ display:none; }
 body.sidebar-collapsed .nav .label{ display:none; }
 body.sidebar-collapsed .nav .navLink{
   justify-content: center;
-  padding: 10px 8px;
+  padding: 2px 8px;
 }
 
 /* ==========================================================================
@@ -356,9 +356,9 @@ body.sidebar-collapsed .nav .navLink{
   display:flex;
   align-items:center;
   justify-content:flex-start;
-  gap: 10px;
+  gap: 8px;
 
-  padding: 10px 10px;
+  padding: 2px 8px;
   border-radius: 14px;
 
   background: var(--pill-bg);
@@ -482,7 +482,7 @@ body.sidebar-collapsed .nav .navLink{
   margin: 0 0 0.75rem 0;
   font-size: 20px;
   font-weight: 700;
-  color: #004894;
+  color: #81A2D1;
 }
 .table-wrapper{
   flex: 1;
@@ -520,9 +520,9 @@ body.sidebar-collapsed .nav .navLink{
 .action-card {
   padding: 0.35rem 0.65rem;
   background: transparent;
-  border: 1.5px solid #004894;
+  border: 1.5px solid #81A2D1;
   border-radius: 5px;
-  color: #004894;
+  color: #81A2D1;
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
@@ -538,8 +538,8 @@ body.sidebar-collapsed .nav .navLink{
 
 .action-btn:hover:not(.disabled),
 .action-card:hover:not(.disabled) {
-  background: #004894;
-  border-color: #004894;
+  background: #81A2D1;
+  border-color: #81A2D1;
   color: white;
 }
 
@@ -625,7 +625,7 @@ body.sidebar-collapsed .nav .navLink{
   font-weight: 600;
   letter-spacing: 0.3px;
   font-size: 0.8rem;
-  color: #004894;
+  color: #81A2D1;
 }
 .glass-table tbody tr{
   border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -668,9 +668,6 @@ body.sidebar-collapsed .nav .navLink{
   display:flex;
   align-items:center;
   justify-content: space-between;
-
-  background: var(--panel-grad), rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .footer-left,

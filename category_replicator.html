@@ -42,11 +42,18 @@
     .clone-row { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
     .clone-preview { color: var(--txt2); }
     .buttons { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 8px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
   </style>
 </head>
 <body>
 <div class="app">
-  <h1>Therefore™ Category Replicator</h1>
+  <div class="header">
+    <h1 style="margin: 0;">Therefore™ Category Replicator</h1>
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="btn btn-secondary btn-sm" onclick="showHelp()">❓ Ayuda</button>
+      <button class="btn btn-secondary btn-sm" onclick="openFullWindow()">🔗 Ventana Completa</button>
+    </div>
+  </div>
 
   <div class="card">
     <h2>1. Cargar categoría original (XML)</h2>
@@ -471,6 +478,14 @@ function resetApp() {
 
   messagesDiv.innerHTML = '';
 }
+
+window.showHelp = function() {
+  alert('Therefore™ Category Replicator\n\nDuplica categorías existentes generando nuevos GUIDs automáticamente.\n\n1. Cargue un XML exportado de Solution Designer\n2. Defina los nombres y IDs para los clones\n3. Genere el XML con todos los clones\n\nEsta función estará disponible próximamente.');
+};
+
+window.openFullWindow = function() {
+  window.open('category_replicator.html', '_blank', 'width=1200,height=800');
+};
 </script>
 </body>
 </html>
