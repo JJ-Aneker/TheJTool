@@ -275,7 +275,7 @@ body.sidebar-collapsed .app-shell{
 
 /* Shared header for side panels (left/right) */
 .sideTop{
-  padding: 12px 12px 10px;
+  padding: 4px 8px 2px;
   border-bottom: 1px solid rgba(255,255,255,.08);
   background: rgba(255,255,255,.05);
 
@@ -299,25 +299,25 @@ body.sidebar-collapsed .app-shell{
   align-items:center;
   justify-content:center;
 
-  padding: 6px 8px;
-  border-radius: calc(var(--radius) + 4px);
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: var(--txt-1);
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(238,244,255,.7);
+  font-size: 16px;
+  line-height: 1;
 
   cursor:pointer;
-  transition: background .15s ease, border-color .15s ease, transform .08s ease;
+  transition: color .15s ease;
 }
 .sideToggle:hover{
-  background: rgba(255,255,255,.10);
-  border-color: rgba(255,255,255,.22);
-  transform: translateY(-1px);
+  color: rgba(238,244,255,.95);
 }
-.sideToggle:active{ transform:none; }
+.sideToggle:active{ opacity: 0.8; }
 
 /* Nav */
 .nav{
-  padding: 6px 8px;
+  padding: 2px 4px;
   display:flex;
   flex-direction: column;
   gap: 4px;
