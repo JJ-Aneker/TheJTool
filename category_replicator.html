@@ -3,543 +3,459 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Therefore™ Category Replicator [FIXED]</title>
+  <title>Therefore™ Category Replicator</title>
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
-    :root {
-      --bg: #0f1115;
-      --accent: #9ad1ff;
-      --txt1: #e6e7eb;
-      --txt2: rgba(238,244,255,.60);
-      --panel: rgba(255,255,255,.06);
-      --panel-dark: rgba(0,0,0,.18);
-      --border: rgba(255,255,255,.10);
+    body {
+      padding: 20px;
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 800px at 80% 10%, #1a2130 0%, var(--bg) 60%),
+        var(--bg);
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
-    body { font: 14px Inter, system-ui, sans-serif; color: var(--txt1); background: var(--bg); }
-    .app { display: flex; flex-direction: column; min-height: 100vh; padding: 20px; max-width: 1000px; margin: 0 auto; }
-    .card { background: linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10); border-radius: 8px; padding: 16px; margin-bottom: 12px; backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
-    .label { font-size: 11px; color: rgba(238,244,255,.65); margin-bottom: 4px; display: block; font-weight: 600; }
-    input, textarea, select { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.18); color: var(--txt1); padding: 7px 10px; border-radius: 8px; font-family: inherit; font-size: 13px; width: 100%; margin-bottom: 8px; box-sizing: border-box; }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,.06); }
-    .btn { background: var(--accent); color: #000; border: none; padding: 9px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; margin-right: 8px; }
-    .btn:hover { opacity: 0.9; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-secondary { background: rgba(255,255,255,.06); color: var(--txt1); border: 1px solid rgba(255,255,255,.14); margin-right: 8px; }
-    .btn-sm { padding: 6px 12px; font-size: 12px; }
-    .error { background: rgba(255,60,60,.10); border: 1px solid rgba(255,60,60,.25); color: #fca5a5; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
-    .success { background: rgba(100,200,100,.10); border: 1px solid rgba(100,200,100,.25); color: #a7f3d0; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
-    .info { background: rgba(100,150,255,.10); border: 1px solid rgba(100,150,255,.25); color: #a5d6ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
-    .warning { background: rgba(255,180,0,.10); border: 1px solid rgba(255,180,0,.25); color: #ffd580; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
-    textarea { min-height: 120px; resize: vertical; font-family: 'Courier New', monospace; }
-    h1 { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; margin: 0 0 20px 0; }
-    h2 { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 12px 0; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-    .stat { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); padding: 10px; border-radius: 6px; }
-    .stat-label { font-size: 11px; color: rgba(238,244,255,.65); display: block; margin-bottom: 4px; }
-    .stat-value { font-size: 14px; font-weight: 600; color: var(--accent); }
-    .clones-list { margin-top: 12px; }
-    .clone-row { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .clone-preview { color: var(--txt2); }
-    .buttons { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 8px; }
-    .badge { display: inline-block; background: rgba(100,200,100,.20); color: #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
-    .badge-fix { background: rgba(255,180,0,.20); color: #ffd580; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
+
+    select { color-scheme: dark; }
+    option { background: #1a1f26; color: #e6e7eb; }
+    option:checked { background: #9ad1ff; color: #000; }
   </style>
 </head>
 <body>
-<div class="app">
-  <h1>Therefore™ Category Replicator <span class="badge badge-fix">FIXED</span></h1>
-  <div class="info">✅ Versión corregida: ahora clona también Counters y Templates globales</div>
+  <div id="root"></div>
 
-  <div class="card">
-    <h2>1. Cargar categoría original (XML)</h2>
-    <label class="label">Archivo XML exportado desde Solution Designer</label>
-    <input type="file" id="xmlFile" accept=".xml" />
-    <div class="info">Suba un XML exportado que contenga la categoría plantilla a clonar. Si hay varias categorías, podrá elegir.</div>
-  </div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <div class="card" id="categoryCard" style="display:none;">
-    <h2>2. Categoría encontrada</h2>
-    <div class="grid">
-      <div class="stat">
-        <span class="stat-label">Nombre original</span>
-        <span class="stat-value" id="origName">—</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">CtgryID</span>
-        <span class="stat-value" id="origCtgryID">—</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Campos</span>
-        <span class="stat-value" id="origFields">—</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Contadores</span>
-        <span class="stat-value" id="origCounters">—</span>
-      </div>
-    </div>
-    <label class="label">Si hay varias, seleccione cuál clonar:</label>
-    <select id="categorySelect" style="display:none;">
-      <option value="">Seleccione una categoría...</option>
-    </select>
-  </div>
+  <script type="text/babel">
+    const { useState, useRef } = React;
 
-  <div class="card" id="clonesCard" style="display:none;">
-    <h2>3. Definir clones</h2>
-    <label class="label">Formato: nombre,CtgryID (una por línea)</label>
-    <textarea id="clonesInput" placeholder="02 - Legal y Fiscal,Legal_Fiscal&#10;03 - Personas,Personas&#10;04 - Servicios,Servicios"></textarea>
-    <div class="info">El nombre puede contener espacios y tildes. El CtgryID debe ser sin espacios, tildes ni caracteres especiales.</div>
-    <div id="clonesList" class="clones-list"></div>
-  </div>
+    // ── HELPERS ───────────────────────────────────────────────────────────────
+    function newGuid() {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16).toUpperCase();
+      });
+    }
 
-  <div class="card" id="actionCard" style="display:none;">
-    <div class="buttons">
-      <button class="btn" id="generateBtn" onclick="generateXml()">Generar XML [FIXED]</button>
-      <button class="btn btn-secondary btn-sm" onclick="resetApp()">Empezar de nuevo</button>
-    </div>
-  </div>
+    function replaceFirst(str, search, replace) {
+      const index = str.indexOf(search);
+      if (index === -1) return str;
+      return str.substring(0, index) + replace + str.substring(index + search.length);
+    }
 
-  <div id="messages"></div>
+    function extractTextFromNode(node, selector) {
+      const el = node.querySelector(selector);
+      return el ? el.textContent.trim() : '';
+    }
 
-  <div class="card" id="outputCard" style="display:none;">
-    <h2>XML Generado (con Counters y Templates clonados)</h2>
-    <div id="stats" class="info" style="margin-bottom: 12px;"></div>
-    <div class="warning">✅ Este XML ahora incluye Counters y Templates globales replicados para cada clon. Debería importar correctamente en Therefore.</div>
-    <textarea id="xmlOutput" readonly></textarea>
-    <div class="buttons" style="margin-top: 12px;">
-      <button class="btn" onclick="downloadXml()">⬇ Descargar XML</button>
-      <button class="btn btn-secondary btn-sm" onclick="copyToClipboard()">📋 Copiar al portapapeles</button>
-    </div>
-  </div>
-</div>
+    // ── STYLES ────────────────────────────────────────────────────────────────
+    const S = {
+      wrap: { fontFamily:"'Inter',system-ui,-apple-system,sans-serif", color:"#e6e7eb" },
+      header: { borderBottom:"1px solid rgba(255,255,255,.10)", paddingBottom:"16px", marginBottom:"20px" },
+      title: { fontSize:"20px", fontWeight:700, color:"#9ad1ff", letterSpacing:"-0.3px", margin:0 },
+      sub: { fontSize:"12px", color:"rgba(238,244,255,.55)", marginTop:"4px" },
+      grid: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" },
+      panel: { background:"linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.10)", borderRadius:"8px", padding:"16px", backdropFilter:"blur(14px)", boxShadow:"0 10px 30px rgba(0,0,0,.35)" },
+      panelTitle: { fontSize:"11px", fontWeight:600, color:"#9ad1ff", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:"14px" },
+      label: { display:"block", fontSize:"11px", color:"rgba(238,244,255,.65)", marginBottom:"4px" },
+      input: { width:"100%", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.18)", borderRadius:"8px", padding:"7px 10px", color:"#e6e7eb", fontSize:"13px", boxSizing:"border-box", outline:"none", fontFamily:"inherit" },
+      select: { width:"100%", background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.18)", borderRadius:"8px", padding:"7px 10px", color:"#e6e7eb", fontSize:"13px", boxSizing:"border-box", fontFamily:"inherit" },
+      btn: { background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.14)", borderRadius:"10px", color:"#e6e7eb", fontSize:"12px", padding:"6px 12px", cursor:"pointer", whiteSpace:"nowrap", fontWeight:500 },
+      btnPrimary: { background:"#9ad1ff", border:"none", borderRadius:"10px", color:"#000", fontSize:"13px", padding:"9px 18px", cursor:"pointer", fontWeight:600 },
+      btnGreen: { background:"rgba(167,243,208,.10)", border:"1px solid rgba(167,243,208,.30)", borderRadius:"10px", color:"#a7f3d0", fontSize:"13px", padding:"8px 16px", cursor:"pointer", fontWeight:600 },
+      badge: { fontSize:"10px", background:"rgba(154,209,255,.12)", color:"#9ad1ff", padding:"2px 7px", borderRadius:"5px", border:"1px solid rgba(154,209,255,.20)" },
+      stat: { background:"rgba(0,0,0,.18)", border:"1px solid rgba(255,255,255,.08)", borderRadius:"8px", padding:"12px", marginBottom:"12px" },
+      statLabel: { fontSize:"11px", color:"rgba(238,244,255,.65)", marginBottom:"4px", display:"block" },
+      statValue: { fontSize:"14px", fontWeight:600, color:"#9ad1ff" },
+    };
 
-<script>
-const xmlFile = document.getElementById('xmlFile');
-const categorySelect = document.getElementById('categorySelect');
-const clonesInput = document.getElementById('clonesInput');
-const messagesDiv = document.getElementById('messages');
-const outputCard = document.getElementById('outputCard');
-const xmlOutput = document.getElementById('xmlOutput');
+    // ── CLONING FUNCTIONS ────────────────────────────────────────────────────
+    function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
+      let xml = sourceXml;
 
-let sourceXmlText = '';
-let sourceDoc = null;
-let categoryOptions = [];
-let selectedCategoryIdx = null;
-
-// =========================================================================
-// Utilidades XML
-// =========================================================================
-function escapeXml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function replaceFirst(str, search, replace) {
-  const index = str.indexOf(search);
-  if (index === -1) return str;
-  return str.substring(0, index) + replace + str.substring(index + search.length);
-}
-
-function extractTextFromNode(node, selector) {
-  const el = node.querySelector(selector);
-  return el ? el.textContent.trim() : '';
-}
-
-// =========================================================================
-// Carga del archivo XML
-// =========================================================================
-xmlFile.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    try {
-      sourceXmlText = ev.target.result;
-      const parser = new DOMParser();
-      sourceDoc = parser.parseFromString(sourceXmlText, 'application/xml');
-
-      if (sourceDoc.querySelector('parsererror')) {
-        showError('❌ El XML no es válido');
-        return;
+      const nombreMatch = xml.match(/<Name UPT="1"><TStr><T><L>1034<\/L><S>([^<]+)<\/S>/);
+      if (nombreMatch) {
+        xml = xml.replace(
+          `<Name UPT="1"><TStr><T><L>1034</L><S>${nombreMatch[1]}</S>`,
+          `<Name UPT="1"><TStr><T><L>1034</L><S>${nuevoNombre}</S>`
+        );
       }
 
-      const categories = sourceDoc.querySelectorAll('Configuration > Categories > Category');
-      if (!categories.length) {
-        showError('❌ No se encontraron categorías en el XML');
-        return;
+      const tituloMatch = xml.match(/<Title>([^<]+)<\/Title>/);
+      if (tituloMatch) {
+        xml = xml.replace(
+          `<Title>${tituloMatch[1]}</Title>`,
+          `<Title>${nuevoNombre}</Title>`
+        );
       }
 
-      // Extraer información de categorías
-      categoryOptions = [];
-      categories.forEach((cat, idx) => {
-        const name = extractTextFromNode(cat, 'Name TStr T S');
-        const ctgryID = extractTextFromNode(cat, 'CtgryID');
-        const fieldCount = cat.querySelectorAll('Fields > Field').length;
-        const counterCount = cat.querySelectorAll('Counters > Counter').length;
+      const ctgryMatch = xml.match(/<CtgryID>([^<]+)<\/CtgryID>/);
+      if (ctgryMatch) {
+        xml = xml.replace(
+          `<CtgryID>${ctgryMatch[1]}</CtgryID>`,
+          `<CtgryID>${nuevoCtgryID}</CtgryID>`
+        );
+      }
 
-        // Extraer el XML de la categoría del fuente original usando regex
-        const categoryXmlMatch = sourceXmlText.match(/<Category>[\s\S]*?<\/Category>/);
-        const categoryXml = categoryXmlMatch ? categoryXmlMatch[0] : new XMLSerializer().serializeToString(cat);
+      const ctgryNoMatch = xml.match(/<CtgryNo>(-?\d+)<\/CtgryNo>/);
+      if (ctgryNoMatch) {
+        xml = xml.replace(
+          `<CtgryNo>${ctgryNoMatch[1]}</CtgryNo>`,
+          `<CtgryNo>-${indiceClone + 1}</CtgryNo>`
+        );
+      }
 
-        categoryOptions.push({
-          index: idx,
-          name,
-          ctgryID,
-          fieldCount,
-          counterCount,
-          element: cat,
-          xml: categoryXml
-        });
+      let xmlSinSub = xml.replace(/<Field[\s\S]*?<\/Field>/g, '<FIELD_PLACEHOLDER/>');
+      xmlSinSub = xmlSinSub.replace(/<Counter[\s\S]*?<\/Counter>/g, '<COUNTER_PLACEHOLDER/>');
+      xmlSinSub = xmlSinSub.replace(/<Template[\s\S]*?<\/Template>/g, '<TEMPLATE_PLACEHOLDER/>');
+
+      const catGuidMatch = xmlSinSub.match(/<Category>[\s\S]*?<Id>([^<]+)<\/Id>[\s\S]*?<\/Category>/);
+      if (catGuidMatch) {
+        const oldGuid = catGuidMatch[1];
+        const newGuid = newGuid();
+        xml = replaceFirst(xml, `<Id>${oldGuid}</Id>`, `<Id>${newGuid}</Id>`);
+      }
+
+      xml = xml.replace(/<Field[\s\S]*?<\/Field>/g, (fieldBlock) => {
+        return fieldBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${newGuid()}</Id>`);
       });
 
-      // Mostrar UI según cantidad de categorías
-      if (categoryOptions.length === 1) {
-        selectedCategoryIdx = 0;
-        showCategory(0);
-      } else {
-        // Mostrar selector
-        const options = categoryOptions.map(c =>
-          `<option value="${c.index}">${c.name} (${c.fieldCount} campos)</option>`
-        );
-        categorySelect.innerHTML = options.join('');
-        categorySelect.style.display = 'block';
-        categorySelect.addEventListener('change', (e) => {
-          selectedCategoryIdx = parseInt(e.target.value);
-          showCategory(selectedCategoryIdx);
-        });
-        // Mostrar primera por defecto
-        selectedCategoryIdx = 0;
-        showCategory(0);
+      xml = xml.replace(/<Counter[\s\S]*?<\/Counter>/g, (counterBlock) => {
+        counterBlock = counterBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${newGuid()}</Id>`);
+        counterBlock = counterBlock.replace(/<Next>\d+<\/Next>/, '<Next>1</Next>');
+        return counterBlock;
+      });
+
+      xml = xml.replace(/<Template[\s\S]*?<\/Template>/g, (templateBlock) => {
+        return templateBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${newGuid()}</Id>`);
+      });
+
+      return xml;
+    }
+
+    function cloneCountersAndTemplates(sourceXml, numClones) {
+      let xml = sourceXml;
+
+      const countersMatch = xml.match(/<Counters>[\s\S]*?<\/Counters>/);
+      const templatesMatch = xml.match(/<Templates>[\s\S]*?<\/Templates>/);
+
+      if (!countersMatch || !templatesMatch) {
+        return xml;
       }
 
-      showSuccess(`✅ ${categories.length} categoría(s) cargada(s)`);
+      const originalCountersBlock = countersMatch[0];
+      const originalTemplatesBlock = templatesMatch[0];
 
-    } catch (err) {
-      showError('❌ Error al procesar XML: ' + err.message);
+      const counterRegex = /<Counter>[\s\S]*?<\/Counter>/g;
+      const counters = [];
+      let match;
+      while ((match = counterRegex.exec(originalCountersBlock)) !== null) {
+        counters.push(match[0]);
+      }
+
+      const templateRegex = /<Template>[\s\S]*?<\/Template>/g;
+      const templates = [];
+      while ((match = templateRegex.exec(originalTemplatesBlock)) !== null) {
+        templates.push(match[0]);
+      }
+
+      let newCountersBlock = '<Counters>';
+      for (let cloneIdx = 0; cloneIdx < numClones; cloneIdx++) {
+        counters.forEach(counter => {
+          let clonedCounter = counter.replace(/<Id>([^<]+)<\/Id>/, `<Id>${newGuid()}</Id>`);
+          clonedCounter = clonedCounter.replace(/<Next>\d+<\/Next>/, '<Next>1</Next>');
+          newCountersBlock += clonedCounter;
+        });
+      }
+      newCountersBlock += '</Counters>';
+
+      let newTemplatesBlock = '<Templates>';
+      for (let cloneIdx = 0; cloneIdx < numClones; cloneIdx++) {
+        templates.forEach(template => {
+          let clonedTemplate = template.replace(/<Id>([^<]+)<\/Id>/, `<Id>${newGuid()}</Id>`);
+          newTemplatesBlock += clonedTemplate;
+        });
+      }
+      newTemplatesBlock += '</Templates>';
+
+      xml = xml.replace(originalCountersBlock, newCountersBlock);
+      xml = xml.replace(originalTemplatesBlock, newTemplatesBlock);
+
+      return xml;
     }
-  };
-  reader.readAsText(file);
-});
 
-function showCategory(idx) {
-  const cat = categoryOptions[idx];
-  document.getElementById('origName').textContent = cat.name;
-  document.getElementById('origCtgryID').textContent = cat.ctgryID;
-  document.getElementById('origFields').textContent = cat.fieldCount;
-  document.getElementById('origCounters').textContent = cat.counterCount;
-  document.getElementById('categoryCard').style.display = 'block';
-  document.getElementById('clonesCard').style.display = 'block';
-  document.getElementById('actionCard').style.display = 'block';
-  updateClonesList();
-}
+    // ── MAIN APP ───────────────────────────────────────────────────────────────
+    function App() {
+      const fileInputRef = useRef(null);
+      const [sourceXmlText, setSourceXmlText] = useState('');
+      const [sourceDoc, setSourceDoc] = useState(null);
+      const [categoryOptions, setCategoryOptions] = useState([]);
+      const [selectedCatIdx, setSelectedCatIdx] = useState(null);
+      const [clonesInput, setClonesInput] = useState('02 - Legal y Fiscal,Legal_Fiscal\n03 - Personas,Personas');
+      const [xml, setXml] = useState('');
+      const [copied, setCopied] = useState(false);
+      const [error, setError] = useState('');
+      const [showXmlModal, setShowXmlModal] = useState(false);
 
-// =========================================================================
-// Parsing de clones desde textarea
-// =========================================================================
-function parseClones() {
-  const lines = clonesInput.value.split('\n')
-    .map(s => s.trim())
-    .filter(s => s && !s.startsWith('#'));
+      const handleFileLoad = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-  const clones = lines.map(line => {
-    const parts = line.split(',');
-    if (parts.length >= 2) {
-      return {
-        nombre: parts[0].trim(),
-        ctgryID: parts[1].trim()
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const text = ev.target.result;
+            setSourceXmlText(text);
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'application/xml');
+
+            if (doc.querySelector('parsererror')) {
+              setError('El XML no es válido');
+              return;
+            }
+
+            const categories = doc.querySelectorAll('Configuration > Categories > Category');
+            if (!categories.length) {
+              setError('No se encontraron categorías en el XML');
+              return;
+            }
+
+            const opts = [];
+            categories.forEach((cat, idx) => {
+              const name = extractTextFromNode(cat, 'Name TStr T S');
+              const ctgryID = extractTextFromNode(cat, 'CtgryID');
+              const fieldCount = cat.querySelectorAll('Fields > Field').length;
+              const counterCount = cat.querySelectorAll('Counters > Counter').length;
+
+              const categoryXmlMatch = text.match(/<Category>[\s\S]*?<\/Category>/);
+              const categoryXml = categoryXmlMatch ? categoryXmlMatch[0] : new XMLSerializer().serializeToString(cat);
+
+              opts.push({
+                index: idx,
+                name,
+                ctgryID,
+                fieldCount,
+                counterCount,
+                element: cat,
+                xml: categoryXml
+              });
+            });
+
+            setCategoryOptions(opts);
+            setSelectedCatIdx(0);
+            setSourceDoc(doc);
+            setError('');
+          } catch (err) {
+            setError('Error al procesar XML: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
       };
-    } else {
-      const nombre = parts[0].trim();
-      const ctgryID = nombre
-        .replace(/[^a-zA-Z0-9\s_áéíóúñ]/g, '')
-        .replace(/\s+/g, '_')
-        .substring(0, 50) || 'Categoria';
-      return { nombre, ctgryID };
-    }
-  });
 
-  return clones;
-}
+      const generateXml = () => {
+        if (selectedCatIdx === null) {
+          setError('Seleccione una categoría');
+          return;
+        }
 
-function updateClonesList() {
-  const clones = parseClones();
-  const list = document.getElementById('clonesList');
+        const clones = clonesInput.split('\n')
+          .map(s => s.trim())
+          .filter(s => s && !s.startsWith('#'))
+          .map(line => {
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+              return { nombre: parts[0].trim(), ctgryID: parts[1].trim() };
+            } else {
+              const nombre = parts[0].trim();
+              const ctgryID = nombre.replace(/[^a-zA-Z0-9\s_áéíóúñ]/g, '').replace(/\s+/g, '_').substring(0, 50) || 'Categoria';
+              return { nombre, ctgryID };
+            }
+          });
 
-  if (!clones.length) {
-    list.innerHTML = '<div class="clone-row"><span style="color: var(--txt2);">Ingrese clones arriba →</span></div>';
-    return;
-  }
+        if (!clones.length) {
+          setError('Ingrese al menos un clon');
+          return;
+        }
 
-  list.innerHTML = clones.map((c, i) => `
-    <div class="clone-row">
-      <span>${i + 1}. <strong>${escapeXml(c.nombre)}</strong></span>
-      <span class="clone-preview">${c.ctgryID}</span>
-    </div>
-  `).join('');
-}
+        try {
+          const sourceCat = categoryOptions[selectedCatIdx];
+          const categoryBlocks = clones.map((clone, idx) => cloneCategory(sourceCat.xml, clone.nombre, clone.ctgryID, idx));
 
-clonesInput.addEventListener('input', updateClonesList);
+          let resultXml = sourceXmlText;
+          const categoriesMatch = resultXml.match(/<Categories>[\s\S]*?<\/Categories>/);
+          if (categoriesMatch) {
+            const newCategoriesBlock = `<Categories>${categoryBlocks.join('')}</Categories>`;
+            resultXml = resultXml.replace(categoriesMatch[0], newCategoriesBlock);
+          } else {
+            setError('No se encontró el bloque <Categories>');
+            return;
+          }
 
-// =========================================================================
-// Generador de UUID
-// =========================================================================
-function generateUUIDv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16).toUpperCase();
-  });
-}
+          resultXml = cloneCountersAndTemplates(resultXml, clones.length);
+          setXml(resultXml);
+          setShowXmlModal(true);
+          setCopied(false);
+          setError('');
+        } catch (err) {
+          setError('Error al generar XML: ' + err.message);
+        }
+      };
 
-// =========================================================================
-// Clonado de categoría
-// =========================================================================
-function cloneCategory(sourceXml, nuevoNombre, nuevoCtgryID, indiceClone = 0) {
-  let xml = sourceXml;
+      const download = () => {
+        const a = document.createElement("a");
+        a.href = "data:application/xml;charset=utf-8," + encodeURIComponent(xml);
+        a.download = "TheConfiguration_clones_" + new Date().toISOString().substring(0, 10) + ".xml";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
 
-  const nombreMatch = xml.match(/<Name UPT="1"><TStr><T><L>1034<\/L><S>([^<]+)<\/S>/);
-  if (nombreMatch) {
-    xml = xml.replace(
-      `<Name UPT="1"><TStr><T><L>1034</L><S>${nombreMatch[1]}</S>`,
-      `<Name UPT="1"><TStr><T><L>1034</L><S>${nuevoNombre}</S>`
-    );
-  }
+      const copy = () => {
+        const fallback = () => {
+          const ta = document.createElement("textarea");
+          ta.value = xml;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        };
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(xml).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }).catch(fallback);
+        } else {
+          fallback();
+        }
+      };
 
-  const tituloMatch = xml.match(/<Title>([^<]+)<\/Title>/);
-  if (tituloMatch) {
-    xml = xml.replace(
-      `<Title>${tituloMatch[1]}</Title>`,
-      `<Title>${nuevoNombre}</Title>`
-    );
-  }
+      const hasXml = categoryOptions.length > 0;
+      const currentCat = selectedCatIdx !== null ? categoryOptions[selectedCatIdx] : null;
 
-  const ctgryMatch = xml.match(/<CtgryID>([^<]+)<\/CtgryID>/);
-  if (ctgryMatch) {
-    xml = xml.replace(
-      `<CtgryID>${ctgryMatch[1]}</CtgryID>`,
-      `<CtgryID>${nuevoCtgryID}</CtgryID>`
-    );
-  }
+      return (
+        <div style={S.wrap}>
+          {/* HEADER */}
+          <div style={{...S.header,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div>
+              <h1 style={S.title}>📋 Therefore™ Category Replicator</h1>
+              <p style={S.sub}>Clona categorías desde XML exportado de Therefore Solution Designer</p>
+            </div>
+            <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
+              {error&&<div style={{fontSize:"11px",color:"#fecaca",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",padding:"6px 12px",borderRadius:"8px"}}>⚠ {error}</div>}
+              <button style={{...S.btn}} onClick={()=>document.documentElement.requestFullscreen?.()}>⛶ Pantalla completa</button>
+              <button style={{...S.btn}} onClick={()=>window.open('https://github.com/JJ-Aneker/TheJTool/blob/main/SOLUCION_RESUMEN.md','_blank')}>❓ Ayuda</button>
+              <button style={{...S.btnPrimary}} onClick={generateXml} disabled={!hasXml}>🔄 Replicar Categoría →</button>
+            </div>
+          </div>
 
-  const ctgryNoMatch = xml.match(/<CtgryNo>(-?\d+)<\/CtgryNo>/);
-  if (ctgryNoMatch) {
-    xml = xml.replace(
-      `<CtgryNo>${ctgryNoMatch[1]}</CtgryNo>`,
-      `<CtgryNo>-${indiceClone + 1}</CtgryNo>`
-    );
-  }
+          {/* ═══════════════════════════════════════════════════════════ */}
+          {/* ZONA GLOBAL COMPACTA */}
+          {/* ═══════════════════════════════════════════════════════════ */}
 
-  let xmlSinSub = xml.replace(/<Field[\s\S]*?<\/Field>/g, '<FIELD_PLACEHOLDER/>');
-  xmlSinSub = xmlSinSub.replace(/<Counter[\s\S]*?<\/Counter>/g, '<COUNTER_PLACEHOLDER/>');
-  xmlSinSub = xmlSinSub.replace(/<Template[\s\S]*?<\/Template>/g, '<TEMPLATE_PLACEHOLDER/>');
+          <div style={{...S.panel,marginBottom:"16px"}}>
+            <div style={S.panelTitle}>📁 Cargar XML</div>
+            <label style={S.label}>Archivo XML exportado desde Solution Designer</label>
+            <input type="file" accept=".xml" onChange={handleFileLoad} ref={fileInputRef} style={{...S.input,marginBottom:"8px"}}/>
+            <div style={{fontSize:"11px",color:"rgba(238,244,255,.55)",lineHeight:"1.6"}}>
+              Suba un XML exportado que contenga la categoría plantilla a clonar. Si hay varias, podrá elegir cuál replicar.
+            </div>
 
-  const catGuidMatch = xmlSinSub.match(/<Category>[\s\S]*?<Id>([^<]+)<\/Id>[\s\S]*?<\/Category>/);
-  if (catGuidMatch) {
-    const oldGuid = catGuidMatch[1];
-    const newGuid = generateUUIDv4();
-    xml = replaceFirst(xml, `<Id>${oldGuid}</Id>`, `<Id>${newGuid}</Id>`);
-  }
+            {categoryOptions.length > 1 && (
+              <div style={{marginTop:"12px"}}>
+                <label style={S.label}>Seleccione categoría a replicar</label>
+                <select style={S.select} value={selectedCatIdx ?? ''} onChange={(e)=>setSelectedCatIdx(parseInt(e.target.value))}>
+                  {categoryOptions.map((cat,idx)=>(
+                    <option key={idx} value={idx}>{cat.name} ({cat.fieldCount} campos)</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
 
-  xml = xml.replace(/<Field[\s\S]*?<\/Field>/g, (fieldBlock) => {
-    return fieldBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${generateUUIDv4()}</Id>`);
-  });
+          {/* MAIN CONTENT */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px",marginBottom:"16px"}}>
+            {/* LEFT: RESUMEN */}
+            <div style={S.panel}>
+              <div style={S.panelTitle}>📊 Resumen de la categoría origen</div>
+              {currentCat ? (
+                <>
+                  <div style={S.stat}>
+                    <span style={S.statLabel}>Nombre</span>
+                    <span style={S.statValue}>{currentCat.name}</span>
+                  </div>
+                  <div style={S.stat}>
+                    <span style={S.statLabel}>CtgryID</span>
+                    <span style={S.statValue}>{currentCat.ctgryID}</span>
+                  </div>
+                  <div style={S.stat}>
+                    <span style={S.statLabel}>Campos</span>
+                    <span style={S.statValue}>{currentCat.fieldCount}</span>
+                  </div>
+                  <div style={S.stat}>
+                    <span style={S.statLabel}>Contadores</span>
+                    <span style={S.statValue}>{currentCat.counterCount}</span>
+                  </div>
+                </>
+              ) : (
+                <div style={{fontSize:"12px",color:"rgba(238,244,255,.40)",padding:"16px",textAlign:"center"}}>Carga un XML para ver la información de la categoría</div>
+              )}
+            </div>
 
-  xml = xml.replace(/<Counter[\s\S]*?<\/Counter>/g, (counterBlock) => {
-    counterBlock = counterBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${generateUUIDv4()}</Id>`);
-    counterBlock = counterBlock.replace(/<Next>\d+<\/Next>/, '<Next>1</Next>');
-    return counterBlock;
-  });
+            {/* RIGHT: OPCIONES DE REPLICACIÓN */}
+            <div style={S.panel}>
+              <div style={S.panelTitle}>⚙ Opciones de replicación</div>
+              {hasXml ? (
+                <>
+                  <label style={S.label}>Nombres de las nuevas categorías</label>
+                  <textarea style={{...S.input,height:"120px",resize:"vertical",fontFamily:"'Consolas',monospace",fontSize:"11px"}} value={clonesInput} onChange={(e)=>setClonesInput(e.target.value)} placeholder="Formato: nombre,CtgryID (una por línea)"/>
+                  <div style={{fontSize:"11px",color:"rgba(238,244,255,.55)",lineHeight:"1.6",marginTop:"8px"}}>
+                    <strong>Formato:</strong> nombre,CtgryID (una por línea). El nombre puede contener espacios y tildes. El CtgryID debe ser sin espacios ni caracteres especiales.
+                  </div>
+                </>
+              ) : (
+                <div style={{fontSize:"12px",color:"rgba(238,244,255,.40)",padding:"16px",textAlign:"center"}}>Carga un XML para definir qué categorías crear</div>
+              )}
+            </div>
+          </div>
 
-  xml = xml.replace(/<Template[\s\S]*?<\/Template>/g, (templateBlock) => {
-    return templateBlock.replace(/<Id>([^<]+)<\/Id>/, `<Id>${generateUUIDv4()}</Id>`);
-  });
+          {/* MODAL XML */}
+          {showXmlModal&&<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,.60)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999}} onClick={()=>setShowXmlModal(false)}>
+            <div style={{background:"rgba(20,26,35,.95)",border:"1px solid rgba(154,209,255,.30)",borderRadius:"12px",width:"90%",maxWidth:"800px",maxHeight:"80vh",display:"flex",flexDirection:"column",boxShadow:"0 20px 60px rgba(0,0,0,.60)",backdropFilter:"blur(14px)"}} onClick={e=>e.stopPropagation()}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,.08)"}}>
+                <h2 style={{margin:0,fontSize:"16px",fontWeight:600,color:"#9ad1ff"}}>XML Generado</h2>
+                <button style={{background:"none",border:"none",color:"rgba(238,244,255,.60)",cursor:"pointer",fontSize:"20px"}} onClick={()=>setShowXmlModal(false)}>✕</button>
+              </div>
+              <div style={{flex:1,overflow:"auto",padding:"16px 20px"}}>
+                <pre style={{margin:0,background:"rgba(0,0,0,.30)",border:"1px solid rgba(255,255,255,.08)",borderRadius:"8px",padding:"14px",fontFamily:"'Consolas','Cascadia Code',monospace",fontSize:"11px",color:"#a7f3d0",lineHeight:"1.4",whiteSpace:"pre-wrap",wordWrap:"break-word"}}>{xml}</pre>
+              </div>
+              <div style={{display:"flex",gap:"8px",padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,.08)",justifyContent:"flex-end"}}>
+                <button style={{...S.btn}} onClick={()=>setShowXmlModal(false)}>Cerrar</button>
+                <button style={{...S.btnGreen}} onClick={copy}>{copied?"✓ Copiado":"📋 Copiar al portapapeles"}</button>
+                <button style={{...S.btnPrimary}} onClick={download}>⬇ Descargar XML</button>
+              </div>
+              <div style={{padding:"0 20px 12px 20px",fontSize:"11px",color:"rgba(238,244,255,.40)",textAlign:"right"}}>
+                {xml.length.toLocaleString()} caracteres
+              </div>
+            </div>
+          </div>}
 
-  return xml;
-}
-
-// =========================================================================
-// NUEVA FUNCIÓN: Clonar Counters y Templates globales
-// =========================================================================
-function cloneCountersAndTemplates(sourceXml, numClones) {
-  let xml = sourceXml;
-
-  // Extraer bloques originales de Counters y Templates
-  const countersMatch = xml.match(/<Counters>[\s\S]*?<\/Counters>/);
-  const templatesMatch = xml.match(/<Templates>[\s\S]*?<\/Templates>/);
-
-  if (!countersMatch || !templatesMatch) {
-    console.warn('No se encontraron Counters o Templates globales');
-    return xml;
-  }
-
-  const originalCountersBlock = countersMatch[0];
-  const originalTemplatesBlock = templatesMatch[0];
-
-  // Extraer los <Counter> individuales
-  const counterRegex = /<Counter>[\s\S]*?<\/Counter>/g;
-  const counters = [];
-  let match;
-  while ((match = counterRegex.exec(originalCountersBlock)) !== null) {
-    counters.push(match[0]);
-  }
-
-  // Extraer los <Template> individuales
-  const templateRegex = /<Template>[\s\S]*?<\/Template>/g;
-  const templates = [];
-  while ((match = templateRegex.exec(originalTemplatesBlock)) !== null) {
-    templates.push(match[0]);
-  }
-
-  // Clonar Counters para cada clon
-  let newCountersBlock = '<Counters>';
-  for (let cloneIdx = 0; cloneIdx < numClones; cloneIdx++) {
-    counters.forEach(counter => {
-      // Regenerar GUID de cada Counter
-      let clonedCounter = counter.replace(
-        /<Id>([^<]+)<\/Id>/,
-        `<Id>${generateUUIDv4()}</Id>`
+          <div style={{marginTop:"16px",fontSize:"11px",color:"rgba(238,244,255,.25)",borderTop:"1px solid rgba(255,255,255,.08)",paddingTop:"12px"}}>
+            Therefore Category Replicator · Aneker · Clona categorías con todos sus elementos (campos, contadores, templates)
+          </div>
+        </div>
       );
-      // Resetear Next a 1
-      clonedCounter = clonedCounter.replace(/<Next>\d+<\/Next>/, '<Next>1</Next>');
-      newCountersBlock += clonedCounter;
-    });
-  }
-  newCountersBlock += '</Counters>';
-
-  // Clonar Templates para cada clon
-  let newTemplatesBlock = '<Templates>';
-  for (let cloneIdx = 0; cloneIdx < numClones; cloneIdx++) {
-    templates.forEach(template => {
-      // Regenerar GUID de cada Template
-      let clonedTemplate = template.replace(
-        /<Id>([^<]+)<\/Id>/,
-        `<Id>${generateUUIDv4()}</Id>`
-      );
-      newTemplatesBlock += clonedTemplate;
-    });
-  }
-  newTemplatesBlock += '</Templates>';
-
-  // Reemplazar bloques globales
-  xml = xml.replace(originalCountersBlock, newCountersBlock);
-  xml = xml.replace(originalTemplatesBlock, newTemplatesBlock);
-
-  return xml;
-}
-
-// =========================================================================
-// Generar XML completo (VERSIÓN CORREGIDA)
-// =========================================================================
-function generateXml() {
-  if (selectedCategoryIdx === null) {
-    showError('❌ Seleccione una categoría');
-    return;
-  }
-
-  const clones = parseClones();
-  if (!clones.length) {
-    showError('❌ Ingrese al menos un clon');
-    return;
-  }
-
-  try {
-    const sourceCat = categoryOptions[selectedCategoryIdx];
-    let sourceCategoryXml = sourceCat.xml;
-
-    // Clonar para cada entrada
-    const categoryBlocks = clones.map((clone, idx) => {
-      return cloneCategory(sourceCategoryXml, clone.nombre, clone.ctgryID, idx);
-    });
-
-    // Reemplazar el bloque <Categories> en el XML original
-    let resultXml = sourceXmlText;
-
-    const categoriesMatch = resultXml.match(/<Categories>[\s\S]*?<\/Categories>/);
-    if (categoriesMatch) {
-      const newCategoriesBlock = `<Categories>${categoryBlocks.join('')}</Categories>`;
-      resultXml = resultXml.replace(categoriesMatch[0], newCategoriesBlock);
-    } else {
-      showError('❌ No se encontró el bloque <Categories> en el XML');
-      return;
     }
 
-    // 🔧 FIX: Clonar también Counters y Templates globales
-    resultXml = cloneCountersAndTemplates(resultXml, clones.length);
-
-    // Mostrar el resultado
-    xmlOutput.value = resultXml;
-
-    // Mostrar estadísticas CORREGIDAS
-    const totalFields = sourceCat.fieldCount * clones.length;
-    const totalCounters = sourceCat.counterCount * clones.length;
-    const totalTemplates = 2 * clones.length; // Asumiendo 2 templates en la plantilla
-
-    document.getElementById('stats').innerHTML =
-      `✅ <strong>${clones.length}</strong> categoría(s) generada(s):<br>` +
-      `${totalFields} campos, ${totalCounters} contadores, ${totalTemplates} plantillas`;
-
-    outputCard.style.display = 'block';
-    showSuccess(`✅ XML generado correctamente (Counters y Templates replicados)`);
-
-  } catch (err) {
-    showError('❌ Error al generar XML: ' + err.message);
-    console.error(err);
-  }
-}
-
-// =========================================================================
-// Descarga y portapapeles
-// =========================================================================
-function downloadXml() {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
-  const blob = new Blob([xmlOutput.value], { type: 'application/xml; charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `TheConfiguration_clones_${timestamp}.xml`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showSuccess('✅ XML descargado');
-}
-
-function copyToClipboard() {
-  xmlOutput.select();
-  document.execCommand('copy');
-  showSuccess('✅ Copiado al portapapeles');
-}
-
-// =========================================================================
-// Mensajes y reset
-// =========================================================================
-function showError(msg) {
-  messagesDiv.innerHTML = `<div class="error">${msg}</div>`;
-}
-
-function showSuccess(msg) {
-  messagesDiv.innerHTML = `<div class="success">${msg}</div>`;
-}
-
-function resetApp() {
-  xmlFile.value = '';
-  sourceXmlText = '';
-  sourceDoc = null;
-  categoryOptions = [];
-  selectedCategoryIdx = null;
-  clonesInput.value = '';
-  xmlOutput.value = '';
-
-  document.getElementById('categoryCard').style.display = 'none';
-  document.getElementById('clonesCard').style.display = 'none';
-  document.getElementById('actionCard').style.display = 'none';
-  document.getElementById('outputCard').style.display = 'none';
-
-  messagesDiv.innerHTML = '';
-}
-</script>
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
 </body>
 </html>
