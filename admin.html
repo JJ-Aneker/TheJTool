@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administración · TheJ ToolBox</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #2A2D34;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto;
+      color: rgba(238,244,255,.95);
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .admin-header h1 {
+      margin: 0;
+      color: #004894;
+      font-size: 1.5rem;
+    }
+    .admin-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .admin-controls input {
+      padding: 0.35rem 0.65rem;
+      border: 1.5px solid #004894;
+      border-radius: 5px;
+      background: #1F1F1F;
+      color: #e6e7eb;
+      font-size: 12px;
+      width: 160px;
+    }
+    .glass-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1F1F1F;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .glass-table thead {
+      background: #1F1F1F;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .glass-table th {
+      padding: 6px 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #004894;
+    }
+    .glass-table td {
+      padding: 6px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .glass-table tbody tr {
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+    .glass-table tbody tr:hover {
+      background: rgba(0, 72, 148, 0.15);
+    }
+    .glass-table tbody tr.selected {
+      background: rgba(0, 72, 148, 0.25);
+      box-shadow: inset 0 0 0 1px rgba(0, 72, 148, 0.5);
+    }
+    .action-btn {
+      padding: 0.35rem 0.65rem;
+      background: transparent;
+      border: 1.5px solid #004894;
+      border-radius: 5px;
+      color: #004894;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      height: auto;
+      line-height: 1.3;
+    }
+    .action-btn:hover:not(:disabled) {
+      background: #004894;
+      color: white;
+    }
+    .action-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-color: rgba(0, 72, 148, 0.2);
+    }
+    .action-btn.danger {
+      border-color: #d32f2f;
+      color: #d32f2f;
+    }
+    .action-btn.danger:hover:not(:disabled) {
+      background: #d32f2f;
+      color: white;
+    }
+    .error-msg {
+      color: #fecaca;
+      font-size: 12px;
+      margin-top: 0.5rem;
+      background: rgba(255,80,80,.12);
+      border: 1px solid rgba(255,80,80,.25);
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: none;
+    }
+    .glass-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .glass-modal {
+      background: rgba(20,30,50,0.8);
+      border: 1px solid rgba(40,215,199,.2);
+      border-radius: 12px;
+      width: 480px;
+      max-width: 95vw;
+    }
+    .glass-modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .glass-modal-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .glass-modal-x {
+      background: none;
+      border: none;
+      color: rgba(238,244,255,.6);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .glass-modal-body {
+      padding: 16px 20px;
+    }
+    .glass-modal-field {
+      margin-bottom: 10px;
+    }
+    .glass-modal-label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .glass-modal-input {
+      width: 100%;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 5px;
+      background: rgba(0,0,0,.3);
+      color: #e6e7eb;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .glass-modal-actions {
+      display: flex;
+      gap: 0.5rem;
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      justify-content: flex-end;
+    }
+    .glass-modal-actions button {
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: transparent;
+      color: rgba(238,244,255,.9);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .glass-modal-ok {
+      background: #004894;
+      border-color: #004894;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-header">
+    <h1>Gestión de Usuarios</h1>
+    <div class="admin-controls">
+      <input type="text" id="searchInput" placeholder="Buscar..." />
+      <button class="action-btn" onclick="openNewUserForm()">➕ Nuevo</button>
+      <button class="action-btn" id="btnEdit" disabled onclick="openEditUserForm()">✏️ Editar</button>
+      <button class="action-btn danger" id="btnDelete" disabled onclick="deleteSelectedUser()">🗑️ Eliminar</button>
+    </div>
+  </div>
+
+  <div style="overflow-x: auto;">
+    <table class="glass-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Apellidos</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Aprobado</th>
+        </tr>
+      </thead>
+      <tbody id="usersTable"></tbody>
+    </table>
+  </div>
+
+  <div id="errorMsg" class="error-msg"></div>
+
+  <script>
+    window.ENV = {
+      SUPABASE_URL: "https://osudezxnludhewdxeaks.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdWRlenhubHVkaGV3ZHhlYWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0OTQxMTksImV4cCI6MjA4MDA3MDExOX0.RLkgHZ8FHaSzXt18Zag3QHmkBE1SBjfbZ0wSUmh3sxo"
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const client = supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
+
+    let allUsers = [];
+    let selectedUserId = null;
+
+    async function init() {
+      try {
+        const { data: { user } } = await client.auth.getUser();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const { data: profile } = await client
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!profile || profile.role !== 'admin') {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        loadUsers();
+      } catch (e) {
+        console.error(e);
+        showError('Error de autenticación');
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const { data, error } = await client
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        allUsers = data || [];
+        renderTable(allUsers);
+      } catch (e) {
+        showError(e.message);
+      }
+    }
+
+    function renderTable(users) {
+      const tbody = document.getElementById('usersTable');
+      tbody.innerHTML = users.map(u => `
+        <tr class="user-row" data-id="${u.user_id || u.id}">
+          <td>${escapeHtml(u.name || '—')}</td>
+          <td>${escapeHtml(u.surname || '—')}</td>
+          <td>${escapeHtml(u.email || '—')}</td>
+          <td>${escapeHtml(u.role || '—')}</td>
+          <td>${u.approved ? '✅' : '❌'}</td>
+        </tr>
+      `).join('');
+
+      document.querySelectorAll('.user-row').forEach(row => {
+        row.addEventListener('click', () => selectUser(row.dataset.id));
+      });
+    }
+
+    function selectUser(id) {
+      selectedUserId = id;
+      document.querySelectorAll('.user-row').forEach(r => r.classList.remove('selected'));
+      document.querySelector(`[data-id="${id}"]`)?.classList.add('selected');
+      updateButtonsState();
+    }
+
+    function updateButtonsState() {
+      const btnEdit = document.getElementById('btnEdit');
+      const btnDelete = document.getElementById('btnDelete');
+
+      if (selectedUserId) {
+        btnEdit.disabled = false;
+        btnDelete.disabled = false;
+      } else {
+        btnEdit.disabled = true;
+        btnDelete.disabled = true;
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('errorMsg').style.display = 'none';
+    }
+
+    window.openNewUserForm = function() {
+      const overlay = document.createElement('div');
+      overlay.className = 'glass-modal-overlay';
+      overlay.id = 'modalOverlay';
+      overlay.innerHTML = `
+        <div class="glass-modal">
+          <div class="glass-modal-head">
+            <div class="glass-modal-title">Nuevo usuario</div>
+            <button class="glass-modal-x" onclick="closeModal()">✕</button>
+          </div>
+          <div class="glass-modal-body">
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Nombre *</label>
+              <input class="glass-modal-input" id="modal-name" type="text" />
+            </div>
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Apellidos</label>
+              <input class="glass-modal-input" id="modal-surname" type="text" />
+            </div>
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Email *</label>
+              <input class="glass-modal-input" id="modal-email" type="email" />
+            </div>
+            <div id="modal-error" class="error-msg"></div>
+          </div>
+          <div class="glass-modal-actions">
+            <button onclick="closeModal()">Cancelar</button>
+            <button class="glass-modal-ok" onclick="saveNewUser()">💾 Guardar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      document.getElementById('modal-name').focus();
+    };
+
+    window.openEditUserForm = function() {
+      const user = allUsers.find(u => (u.user_id || u.id) === selectedUserId);
+      if (!user) return;
+
+      const overlay = document.createElement('div');
+      overlay.className = 'glass-modal-overlay';
+      overlay.id = 'modalOverlay';
+      overlay.innerHTML = `
+        <div class="glass-modal">
+          <div class="glass-modal-head">
+            <div class="glass-modal-title">Editar: ${escapeHtml(user.name || 'Usuario')}</div>
+            <button class="glass-modal-x" onclick="closeModal()">✕</button>
+          </div>
+          <div class="glass-modal-body">
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Nombre *</label>
+              <input class="glass-modal-input" id="modal-name" type="text" value="${escapeHtml(user.name || '')}" />
+            </div>
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Apellidos</label>
+              <input class="glass-modal-input" id="modal-surname" type="text" value="${escapeHtml(user.surname || '')}" />
+            </div>
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Email</label>
+              <input class="glass-modal-input" id="modal-email" type="email" value="${escapeHtml(user.email || '')}" disabled />
+            </div>
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Teléfono</label>
+              <input class="glass-modal-input" id="modal-phone" type="tel" value="${escapeHtml(user.phone || '')}" />
+            </div>
+            <div class="glass-modal-field">
+              <label class="glass-modal-label">Rol</label>
+              <select class="glass-modal-input" id="modal-role">
+                <option value="read" ${user.role === 'read' ? 'selected' : ''}>Lector</option>
+                <option value="write" ${user.role === 'write' ? 'selected' : ''}>Editor</option>
+                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Administrador</option>
+              </select>
+            </div>
+            <div class="glass-modal-field">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="checkbox" id="modal-approved" ${user.approved ? 'checked' : ''} />
+                <span>Aprobado</span>
+              </label>
+            </div>
+            <div id="modal-error" class="error-msg"></div>
+          </div>
+          <div class="glass-modal-actions">
+            <button onclick="closeModal()">Cancelar</button>
+            <button class="glass-modal-ok" onclick="saveEditUser()">💾 Guardar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      document.getElementById('modal-name').focus();
+    };
+
+    window.saveNewUser = async function() {
+      const name = document.getElementById('modal-name').value.trim();
+      const surname = document.getElementById('modal-surname').value.trim();
+      const email = document.getElementById('modal-email').value.trim();
+      const errorEl = document.getElementById('modal-error');
+
+      if (!name || !email) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Nombre y Email son requeridos';
+        return;
+      }
+
+      try {
+        const { error } = await client.from('profiles').insert([{
+          name, surname, email,
+          role: 'read',
+          approved: false
+        }]);
+
+        if (error) throw error;
+        closeModal();
+        loadUsers();
+      } catch (e) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = e.message;
+      }
+    };
+
+    window.saveEditUser = async function() {
+      const user = allUsers.find(u => (u.user_id || u.id) === selectedUserId);
+      if (!user) return;
+
+      const changes = {
+        name: document.getElementById('modal-name').value.trim(),
+        surname: document.getElementById('modal-surname').value.trim(),
+        phone: document.getElementById('modal-phone').value.trim(),
+        role: document.getElementById('modal-role').value,
+        approved: document.getElementById('modal-approved').checked
+      };
+
+      try {
+        const { error } = await client
+          .from('profiles')
+          .update(changes)
+          .eq('user_id', selectedUserId);
+
+        if (error) throw error;
+        closeModal();
+        loadUsers();
+      } catch (e) {
+        const errorEl = document.getElementById('modal-error');
+        errorEl.style.display = 'block';
+        errorEl.textContent = e.message;
+      }
+    };
+
+    window.deleteSelectedUser = async function() {
+      if (!selectedUserId) return;
+      if (!confirm('¿Eliminar este usuario?')) return;
+
+      try {
+        const { error } = await client
+          .from('profiles')
+          .delete()
+          .eq('user_id', selectedUserId);
+
+        if (error) throw error;
+        selectedUserId = null;
+        loadUsers();
+      } catch (e) {
+        showError(e.message);
+      }
+    };
+
+    window.closeModal = function() {
+      document.getElementById('modalOverlay')?.remove();
+    };
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      const filtered = allUsers.filter(u =>
+        `${u.name || ''} ${u.surname || ''}`.toLowerCase().includes(q)
+      );
+      renderTable(filtered);
+    });
+
+    init();
+  </script>
+
+</body>
+</html>
