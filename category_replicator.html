@@ -115,8 +115,8 @@
       const catGuidMatch = xmlSinSub.match(/<Category>[\s\S]*?<Id>([^<]+)<\/Id>[\s\S]*?<\/Category>/);
       if (catGuidMatch) {
         const oldGuid = catGuidMatch[1];
-        const newGuid = newGuid();
-        xml = replaceFirst(xml, `<Id>${oldGuid}</Id>`, `<Id>${newGuid}</Id>`);
+        const newCategoryGuid = newGuid();
+        xml = replaceFirst(xml, `<Id>${oldGuid}</Id>`, `<Id>${newCategoryGuid}</Id>`);
       }
 
       xml = xml.replace(/<Field[\s\S]*?<\/Field>/g, (fieldBlock) => {
@@ -439,8 +439,8 @@
               </div>
               <div style={{display:"flex",gap:"8px",padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,.08)",justifyContent:"flex-end"}}>
                 <button style={{...S.btn}} onClick={()=>setShowXmlModal(false)}>Cerrar</button>
-                <button style={{...S.btnGreen}} onClick={copy}>{copied?"✓ Copiado":"📋 Copiar al portapapeles"}</button>
-                <button style={{...S.btnPrimary}} onClick={download}>⬇ Descargar XML</button>
+                <button style={{...S.btn}} onClick={copy}>{copied?"✓ Copiado":"📋 Copiar al portapapeles"}</button>
+                <button style={{...S.btn}} onClick={download}>⬇ Descargar XML</button>
               </div>
               <div style={{padding:"0 20px 12px 20px",fontSize:"11px",color:"rgba(238,244,255,.40)",textAlign:"right"}}>
                 {xml.length.toLocaleString()} caracteres
