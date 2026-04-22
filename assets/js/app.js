@@ -112,36 +112,37 @@ function openUserModal() {
 
   root.innerHTML = `
     <div class="glass-modal-overlay" id="user-overlay" role="dialog" aria-modal="true">
-      <div class="glass-modal" style="width:420px;max-width:95vw">
+      <div class="glass-modal" style="width:480px;max-width:95vw">
         <div class="glass-modal-head">
           <div class="glass-modal-title">Mi perfil</div>
           <button class="glass-modal-x" type="button" aria-label="Cerrar" onclick="closeUserTopbarModal()">✕</button>
         </div>
-        <div class="glass-modal-body" style="padding:20px; text-align: center;">
-          <img src="${profile.avatar_url || 'avatar.png'}" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem;">
+        <div class="glass-modal-body" style="padding:24px; display:flex; flex-direction:column; gap:1.5rem;">
+          <div style="display:flex; gap:1.5rem; align-items:flex-start;">
+            <img src="${profile.avatar_url || 'avatar.png'}" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #81A2D1; object-fit: cover; flex-shrink:0;">
+            <div style="flex:1; text-align:left;">
+              <h3 style="color: rgba(238,244,255,.95); margin: 0 0 0.25rem 0; font-size: 1.1rem; font-weight: 500;">
+                ${escapeHtml(profile.name || "Usuario")}
+              </h3>
+              <p style="color: rgba(238,244,255,.6); margin: 0 0 0.25rem 0; font-size: 0.8rem;">
+                ${escapeHtml(user.email || "—")}
+              </p>
+              <p style="color: #81A2D1; margin: 0.5rem 0 0 0; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">
+                ${escapeHtml(roleLabel)}
+              </p>
+            </div>
+          </div>
 
-          <h3 style="color: rgba(238,244,255,.95); margin: 0 0 0.3rem 0; font-size: 1rem;">
-            ${escapeHtml(profile.name || "Usuario")}
-          </h3>
-
-          <p style="color: rgba(238,244,255,.6); margin: 0 0 0.5rem 0; font-size: 0.85rem;">
-            ${escapeHtml(user.email || "—")}
-          </p>
-
-          <p style="color: rgba(40,215,199,.95); margin: 0 0 1.5rem 0; font-size: 0.8rem; font-weight: 500;">
-            ${escapeHtml(roleLabel)}
-          </p>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-top: 1.2rem;">
-            <button type="button" class="cta" style="padding: 0.45rem 0.5rem; font-size: 12px; white-space: nowrap;" onclick="openEditProfileFormTopbar()">
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button type="button" style="flex:1; min-width:90px; padding: 0.65rem 1.2rem; background: linear-gradient(135deg, rgba(129,162,209,0.3) 0%, rgba(129,162,209,0.15) 100%); border: 1px solid rgba(129,162,209,0.4); border-radius: 12px; color: #81A2D1; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);" onmouseover="this.style.cssText='flex:1;min-width:90px;padding:0.65rem 1.2rem;background:linear-gradient(135deg,rgba(129,162,209,0.4) 0%,rgba(129,162,209,0.25) 100%);border:1px solid rgba(129,162,209,0.6);border-radius:12px;color:#81A2D1;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 12px rgba(129,162,209,0.2);transform:translateY(-2px)'" onmouseout="this.style.cssText='flex:1;min-width:90px;padding:0.65rem 1.2rem;background:linear-gradient(135deg,rgba(129,162,209,0.3) 0%,rgba(129,162,209,0.15) 100%);border:1px solid rgba(129,162,209,0.4);border-radius:12px;color:#81A2D1;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.2)'" onclick="openEditProfileFormTopbar()">
               ✏️ Editar
             </button>
 
-            <button type="button" class="cta" style="padding: 0.45rem 0.5rem; font-size: 12px; white-space: nowrap;" onclick="openAvatarUploadTopbar()">
+            <button type="button" style="flex:1; min-width:90px; padding: 0.65rem 1.2rem; background: linear-gradient(135deg, rgba(129,162,209,0.3) 0%, rgba(129,162,209,0.15) 100%); border: 1px solid rgba(129,162,209,0.4); border-radius: 12px; color: #81A2D1; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);" onmouseover="this.style.cssText='flex:1;min-width:90px;padding:0.65rem 1.2rem;background:linear-gradient(135deg,rgba(129,162,209,0.4) 0%,rgba(129,162,209,0.25) 100%);border:1px solid rgba(129,162,209,0.6);border-radius:12px;color:#81A2D1;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 12px rgba(129,162,209,0.2);transform:translateY(-2px)'" onmouseout="this.style.cssText='flex:1;min-width:90px;padding:0.65rem 1.2rem;background:linear-gradient(135deg,rgba(129,162,209,0.3) 0%,rgba(129,162,209,0.15) 100%);border:1px solid rgba(129,162,209,0.4);border-radius:12px;color:#81A2D1;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.2)'" onclick="openAvatarUploadTopbar()">
               🖼️ Foto
             </button>
 
-            <button type="button" class="cta dangerLink" style="padding: 0.45rem 0.5rem; font-size: 12px; white-space: nowrap;" onclick="logoutFromTopbar()">
+            <button type="button" style="flex:1; min-width:90px; padding: 0.65rem 1.2rem; background: linear-gradient(135deg, rgba(212,76,76,0.3) 0%, rgba(212,76,76,0.15) 100%); border: 1px solid rgba(212,76,76,0.4); border-radius: 12px; color: #d44; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);" onmouseover="this.style.cssText='flex:1;min-width:90px;padding:0.65rem 1.2rem;background:linear-gradient(135deg,rgba(212,76,76,0.4) 0%,rgba(212,76,76,0.25) 100%);border:1px solid rgba(212,76,76,0.6);border-radius:12px;color:#d44;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 12px rgba(212,76,76,0.2);transform:translateY(-2px)'" onmouseout="this.style.cssText='flex:1;min-width:90px;padding:0.65rem 1.2rem;background:linear-gradient(135deg,rgba(212,76,76,0.3) 0%,rgba(212,76,76,0.15) 100%);border:1px solid rgba(212,76,76,0.4);border-radius:12px;color:#d44;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.2)'" onclick="logoutFromTopbar()">
               🚪 Salir
             </button>
           </div>
