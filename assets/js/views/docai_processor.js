@@ -7,9 +7,12 @@
 
     const html = `
       <section class="panel resultados" id="mainPanel">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-          <h2>DocAI Processor</h2>
-          <div style="display: flex; gap: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="flex-shrink: 0;">
+            <h2 style="margin: 0 0 0.2rem 0;">DocAI Processor</h2>
+            <p style="margin: 0; font-size: 0.8rem; color: rgba(238,244,255,.5);">Procesa y analiza documentos con inteligencia artificial</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
             <button class="action-btn" id="docai-process-btn" type="button">
               <span class="icon">⚙️</span>
               <span class="action-text">Procesar</span>

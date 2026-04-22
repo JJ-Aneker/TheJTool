@@ -41,11 +41,11 @@
 
     const html = `
       <section class="panel resultados" id="mainPanel">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-          <h2>Gestión de Usuarios</h2>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <input type="text" id="searchInput" placeholder="Buscar..."
-              style="width: 160px; padding: 0.35rem 0.65rem; border: 1.5px solid #004894; border-radius: 5px; background: #1F1F1F; color: #e6e7eb; font-size: 12px;" />
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <h2 style="margin: 0; flex-shrink: 0;">Gestión de Usuarios</h2>
+          <input type="text" id="searchInput" placeholder="Buscar..."
+            style="flex: 1; max-width: 200px; padding: 0.35rem 0.65rem; border: 1.5px solid #004894; border-radius: 5px; background: #1F1F1F; color: #e6e7eb; font-size: 12px;" />
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
             <button class="action-btn" type="button" onclick="openNewUserForm()">
               <span class="icon">➕</span>
               <span class="action-text">Nuevo</span>

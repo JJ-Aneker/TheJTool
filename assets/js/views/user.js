@@ -12,9 +12,10 @@
 
       const html = `
         <section class="panel resultados" id="mainPanel">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-            <h2>Perfil de usuario</h2>
-            <div style="display: flex; gap: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <h2 style="margin: 0; flex-shrink: 0;">Perfil de usuario</h2>
+            <div style="flex: 1;"></div>
+            <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
               <button class="action-btn" type="button" onclick="openEditProfileForm()">
                 <span class="icon">✏️</span>
                 <span class="action-text">Editar</span>
