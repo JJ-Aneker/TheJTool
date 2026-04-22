@@ -949,12 +949,12 @@
     // ── COL ROW ───────────────────────────────────────────────────────────────
     function ColRow({ col, onChange, onRemove }) {
       return (
-        <div style={S.row}>
-          <div style={{flex:2}}><label style={S.label}>Cabecera</label><input style={S.input} value={col.name} onChange={e=>onChange({...col,name:e.target.value,colname:e.target.value.replace(/\s+/g,"_").replace(/[^A-Za-z0-9_]/g,"").toUpperCase().slice(0,30)})}/></div>
-          <div style={{flex:1}}><label style={S.label}>ColName</label><input style={S.input} value={col.colname} onChange={e=>onChange({...col,colname:e.target.value.toUpperCase()})}/></div>
-          <div style={{flex:1}}><label style={S.label}>Tipo</label><select style={S.select} value={col.typeno} onChange={e=>onChange({...col,typeno:e.target.value})}>{FIELD_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}</select></div>
-          <div style={{width:"70px"}}><label style={S.label}>Ancho px</label><input style={S.input} type="number" value={col.width} onChange={e=>onChange({...col,width:e.target.value})}/></div>
-          <button style={S.btnDanger} onClick={onRemove}>✕</button>
+        <div style={{display:"flex",gap:"8px",alignItems:"center",marginBottom:"6px",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
+          <input style={{...S.input,flex:2,marginBottom:0}} value={col.name} onChange={e=>onChange({...col,name:e.target.value,colname:e.target.value.replace(/\s+/g,"_").replace(/[^A-Za-z0-9_]/g,"").toUpperCase().slice(0,30)})} placeholder="Cabecera"/>
+          <input style={{...S.input,flex:1,marginBottom:0}} value={col.colname} onChange={e=>onChange({...col,colname:e.target.value.toUpperCase()})} placeholder="ColName"/>
+          <select style={{...S.select,flex:1,marginBottom:0}} value={col.typeno} onChange={e=>onChange({...col,typeno:e.target.value})}>{FIELD_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}</select>
+          <input style={{...S.input,width:"70px",marginBottom:0}} type="number" value={col.width} onChange={e=>onChange({...col,width:e.target.value})} placeholder="Ancho"/>
+          <button style={{...S.btnDanger,padding:"6px 8px",marginBottom:0}} onClick={onRemove}>✕</button>
         </div>
       );
     }
@@ -1266,6 +1266,24 @@
                   </div>}
                 </div>
 
+                {/* Columnas tabla */}
+                {activeCat.hasTabs&&<div style={S.panel}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
+                    <span style={S.panelTitle}>Columnas tabla (pestaña 2)</span>
+                    <button style={S.btn} onClick={addCol}>+ Columna</button>
+                  </div>
+                  {activeCat.tableColumns.length>0&&<div style={{display:"flex",gap:"8px",alignItems:"center",marginBottom:"8px",paddingBottom:"8px",borderBottom:"2px solid rgba(154,209,255,.25)",fontSize:"11px",fontWeight:600,color:"#9ad1ff"}}>
+                    <div style={{flex:2}}>Cabecera</div>
+                    <div style={{flex:1}}>ColName</div>
+                    <div style={{flex:1}}>Tipo</div>
+                    <div style={{width:"70px"}}>Ancho px</div>
+                    <div style={{width:"32px"}}></div>
+                  </div>}
+                  {activeCat.tableColumns.map((col,i)=>(
+                    <ColRow key={i} col={col} onChange={v=>updateCol(i,v)} onRemove={()=>removeCol(i)}/>
+                  ))}
+                </div>}
+
                 {/* eForm vinculado */}
                 <div style={{...S.panel,borderColor:activeCat.withEForm?"rgba(167,243,208,.30)":"rgba(255,255,255,.10)"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:activeCat.withEForm?"14px":0}}>
@@ -1309,17 +1327,6 @@
                     </div>
                   </div>}
                 </div>
-
-                {/* Columnas tabla */}
-                {activeCat.hasTabs&&<div style={S.panel}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
-                    <span style={S.panelTitle}>Columnas tabla (pestaña 2)</span>
-                    <button style={S.btn} onClick={addCol}>+ Columna</button>
-                  </div>
-                  {activeCat.tableColumns.map((col,i)=>(
-                    <ColRow key={i} col={col} onChange={v=>updateCol(i,v)} onRemove={()=>removeCol(i)}/>
-                  ))}
-                </div>}
               </div>
             </div>
           )}
