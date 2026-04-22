@@ -932,28 +932,16 @@
     // ── FIELD ROW ─────────────────────────────────────────────────────────────
     function FieldRow({ field, onChange, onRemove }) {
       return (
-        <div style={S.row}>
-          <div style={{flex:2}}>
-            <label style={S.label}>Nombre visible</label>
-            <input style={S.input} value={field.name}
-              onChange={e=>onChange({...field,name:e.target.value,colname:e.target.value.replace(/\s+/g,"_").replace(/[^A-Za-z0-9_]/g,"").toUpperCase().slice(0,30)})}
-              placeholder="ej. Nombre proveedor"/>
-          </div>
-          <div style={{flex:1}}>
-            <label style={S.label}>ColName</label>
-            <input style={S.input} value={field.colname} onChange={e=>onChange({...field,colname:e.target.value.toUpperCase()})}/>
-          </div>
-          <div style={{flex:1}}>
-            <label style={S.label}>Tipo</label>
-            <select style={S.select} value={field.typeno} onChange={e=>onChange({...field,typeno:e.target.value})}>
-              {FIELD_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}
-            </select>
-          </div>
-          {field.typeno==="1"&&<div style={{width:"70px"}}>
-            <label style={S.label}>Long.</label>
-            <input style={S.input} type="number" value={field.length} onChange={e=>onChange({...field,length:e.target.value})}/>
-          </div>}
-          <button style={S.btnDanger} onClick={onRemove}>✕</button>
+        <div style={{display:"flex",gap:"8px",alignItems:"center",marginBottom:"6px",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
+          <input style={{...S.input,flex:2,marginBottom:0}} value={field.name}
+            onChange={e=>onChange({...field,name:e.target.value,colname:e.target.value.replace(/\s+/g,"_").replace(/[^A-Za-z0-9_]/g,"").toUpperCase().slice(0,30)})}
+            placeholder="Nombre visible"/>
+          <input style={{...S.input,flex:1,marginBottom:0}} value={field.colname} onChange={e=>onChange({...field,colname:e.target.value.toUpperCase()})} placeholder="ColName"/>
+          <select style={{...S.select,flex:1,marginBottom:0}} value={field.typeno} onChange={e=>onChange({...field,typeno:e.target.value})}>
+            {FIELD_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
+          {field.typeno==="1"&&<input style={{...S.input,width:"70px",marginBottom:0}} type="number" value={field.length} onChange={e=>onChange({...field,length:e.target.value})} placeholder="Long."/>}
+          <button style={{...S.btnDanger,padding:"6px 8px",marginBottom:0}} onClick={onRemove}>✕</button>
         </div>
       );
     }
@@ -1000,6 +988,8 @@
       const [activeView, setActiveView]   = useState("editor");
       const [palette, setPalette]         = useState(PALETTES["Corporativa"]);
       const [showColors, setShowColors]   = useState(false);
+      const [showXmlModal, setShowXmlModal] = useState(false);
+      const [globalExpandedPanel, setGlobalExpandedPanel] = useState(null); // "templates", "csv", "xml", "colors"
 
       const activeCat = categories.find(c => c.id === activeCatId) || categories[0];
 
@@ -1111,6 +1101,8 @@
           };
         });
         setXml(buildProjectXml(defs));
+        setShowXmlModal(true);
+        setCopied(false);
       };
 
       const copy = () => {
@@ -1133,7 +1125,9 @@
             <div>
               <h1 style={S.title}>⚙ Therefore Category Builder</h1>
             </div>
-            <div style={{display:"flex",gap:"8px"}}>
+            <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
+              {error&&<div style={{fontSize:"11px",color:"#fecaca",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",padding:"6px 12px",borderRadius:"8px"}}>⚠ {error}</div>}
+              <button style={{...S.btnPrimary,display:"flex",alignItems:"center",gap:"6px"}} onClick={generate}>🔨 Generar XML · {categories.length} categ.</button>
               {["editor","preview"].map(v=>(
                 <button key={v} onClick={()=>setActiveView(v)} style={{...S.btn,borderColor:activeView===v?"#9ad1ff":"rgba(255,255,255,.14)",background:activeView===v?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:activeView===v?"#9ad1ff":"#e6e7eb"}}>
                   {v==="editor"?"✎ Editor":"👁 Preview"}
@@ -1143,30 +1137,33 @@
           </div>
 
           {/* ═══════════════════════════════════════════════════════════ */}
-          {/* ZONA 1 — CONFIGURACIÓN GLOBAL (siempre visible) */}
+          {/* ZONA 1 — CONFIGURACIÓN GLOBAL (botones compactos) */}
           {/* ═══════════════════════════════════════════════════════════ */}
 
-          {/* PLANTILLAS SUPABASE */}
-          <TemplateManager
-            onLoad={handleTemplateLoad}
-            categoriesToSave={categories}
-            activeCatName={activeCat.catName}
-          />
-
-          {/* CSV + XML IMPORTERS (2 columnas) */}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px",marginBottom:"16px"}}>
-            <CsvImporter onImport={handleCsvImport}/>
-            <XmlImporter onImport={handleCsvImport}/>
+          {/* BOTONES COMPACTOS EN UNA FILA */}
+          <div style={{display:"flex",gap:"8px",marginBottom:"16px",flexWrap:"wrap"}}>
+            <button style={{...S.btn,borderColor:globalExpandedPanel==="templates"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="templates"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="templates"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="templates"?null:"templates")}>📁 Plantillas</button>
+            <button style={{...S.btn,borderColor:globalExpandedPanel==="csv"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="csv"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="csv"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="csv"?null:"csv")}>📊 Importar CSV</button>
+            <button style={{...S.btn,borderColor:globalExpandedPanel==="xml"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="xml"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="xml"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="xml"?null:"xml")}>📄 Importar XML</button>
+            <button style={{...S.btn,borderColor:globalExpandedPanel==="colors"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="colors"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="colors"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="colors"?null:"colors")}>🎨 Colores</button>
           </div>
 
-          {/* COLORES */}
-          <div style={{...S.panel,marginBottom:"16px"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:showColors?"14px":0}}>
-              <span style={S.panelTitle}>🎨 Paleta de colores <span style={{color:"rgba(238,244,255,.35)",fontWeight:400}}>(global)</span></span>
-              <button style={S.btn} onClick={()=>setShowColors(v=>!v)}>{showColors?"▲ Ocultar":"▼ Mostrar"}</button>
+          {/* PANELES EXPANDIBLES */}
+          {globalExpandedPanel==="templates"&&<div style={{...S.panel,marginBottom:"16px"}}>
+            <TemplateManager onLoad={parseResult=>{handleTemplateLoad(parseResult);setGlobalExpandedPanel(null);}} categoriesToSave={categories} activeCatName={activeCat.catName}/>
+          </div>}
+          {globalExpandedPanel==="csv"&&<div style={{...S.panel,marginBottom:"16px"}}>
+            <CsvImporter onImport={(parseResult,mode)=>{handleCsvImport(parseResult,mode);setGlobalExpandedPanel(null);}}/>
+          </div>}
+          {globalExpandedPanel==="xml"&&<div style={{...S.panel,marginBottom:"16px"}}>
+            <XmlImporter onImport={(parseResult,mode)=>{handleCsvImport(parseResult,mode);setGlobalExpandedPanel(null);}}/>
+          </div>}
+          {globalExpandedPanel==="colors"&&<div style={{...S.panel,marginBottom:"16px"}}>
+            <span style={S.panelTitle}>🎨 Paleta de colores <span style={{color:"rgba(238,244,255,.35)",fontWeight:400}}>(global)</span></span>
+            <div style={{marginTop:"14px"}}>
+              <ColorEditor palette={palette} onChange={setPalette}/>
             </div>
-            {showColors&&<ColorEditor palette={palette} onChange={setPalette}/>}
-          </div>
+          </div>}
 
           {/* ═══════════════════════════════════════════════════════════ */}
           {/* ZONA 2 — CATEGORÍAS */}
@@ -1236,6 +1233,13 @@
                         <span style={{...S.badge,marginRight:"8px"}}>{sec.fields.filter(f=>f.name).length} campos</span>
                         {activeCat.sections.length>1&&<button style={S.btnDanger} onClick={()=>removeSection(si)}>✕ Sección</button>}
                       </div>
+                      {sec.fields.length>0&&<div style={{display:"flex",gap:"8px",alignItems:"center",marginBottom:"8px",paddingBottom:"8px",borderBottom:"2px solid rgba(154,209,255,.25)",fontSize:"11px",fontWeight:600,color:"#9ad1ff"}}>
+                        <div style={{flex:2}}>Nombre visible</div>
+                        <div style={{flex:1}}>ColName</div>
+                        <div style={{flex:1}}>Tipo</div>
+                        <div style={{width:"70px"}}>Long.</div>
+                        <div style={{width:"32px"}}></div>
+                      </div>}
                       {sec.fields.map((f,fi)=>(
                         <FieldRow key={fi} field={f} onChange={v=>updateField(si,fi,v)} onRemove={()=>removeField(si,fi)}/>
                       ))}
@@ -1316,28 +1320,30 @@
                     <ColRow key={i} col={col} onChange={v=>updateCol(i,v)} onRemove={()=>removeCol(i)}/>
                   ))}
                 </div>}
-
-                {/* Generar */}
-                <div style={S.panel}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
-                    <span style={S.panelTitle}>Generar XML del proyecto</span>
-                    <span style={{...S.badge}}>{categories.length} categ.</span>
-                  </div>
-                  {error&&<div style={{color:"#fecaca",fontSize:"12px",marginBottom:"10px",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",padding:"8px 12px",borderRadius:"8px"}}>⚠ {error}</div>}
-                  <button style={S.btnPrimary} onClick={generate}>Generar XML →</button>
-                  {xml&&<div style={{marginTop:"14px"}}>
-                    <div style={{display:"flex",gap:"8px",marginBottom:"8px",flexWrap:"wrap"}}>
-                      <button style={S.btnGreen} onClick={copy}>{copied?"✓ Copiado":"📋 Copiar XML"}</button>
-                      <button style={S.btn} onClick={download}>⬇ Descargar .xml</button>
-                      <button style={S.btn} onClick={()=>{const w=window.open("");w.document.write("<pre style='word-break:break-all;font-size:12px'>"+xml.replace(/</g,"&lt;")+"</pre>");w.document.title="therefore_project.xml";}}>🔗 Nueva pestaña</button>
-                    </div>
-                    <div style={{fontSize:"11px",color:"rgba(238,244,255,.40)",marginBottom:"6px"}}>{xml.length.toLocaleString()} caracteres · {(xml.match(/<Category>/g)||[]).length} categoría(s){(xml.match(/<EForm>/g)||[]).length>0&&` · ${(xml.match(/<EForm>/g)||[]).length} eForm(s)`}</div>
-                    <textarea readOnly style={{...S.input,height:"120px",resize:"vertical",fontFamily:"'Consolas','Cascadia Code',monospace",fontSize:"11px",color:"#a7f3d0"}} value={xml} onClick={e=>e.target.select()}/>
-                  </div>}
-                </div>
               </div>
             </div>
           )}
+
+          {/* MODAL XML */}
+          {showXmlModal&&<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,.60)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999}} onClick={()=>setShowXmlModal(false)}>
+            <div style={{background:"rgba(20,26,35,.95)",border:"1px solid rgba(154,209,255,.30)",borderRadius:"12px",width:"90%",maxWidth:"800px",maxHeight:"80vh",display:"flex",flexDirection:"column",boxShadow:"0 20px 60px rgba(0,0,0,.60)",backdropFilter:"blur(14px)"}} onClick={e=>e.stopPropagation()}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,.08)"}}>
+                <h2 style={{margin:0,fontSize:"16px",fontWeight:600,color:"#9ad1ff"}}>XML Generado</h2>
+                <button style={{background:"none",border:"none",color:"rgba(238,244,255,.60)",cursor:"pointer",fontSize:"20px"}} onClick={()=>setShowXmlModal(false)}>✕</button>
+              </div>
+              <div style={{flex:1,overflow:"auto",padding:"16px 20px"}}>
+                <pre style={{margin:0,background:"rgba(0,0,0,.30)",border:"1px solid rgba(255,255,255,.08)",borderRadius:"8px",padding:"14px",fontFamily:"'Consolas','Cascadia Code',monospace",fontSize:"11px",color:"#a7f3d0",lineHeight:"1.4",whiteSpace:"pre-wrap",wordWrap:"break-word"}}>{xml}</pre>
+              </div>
+              <div style={{display:"flex",gap:"8px",padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,.08)",justifyContent:"flex-end"}}>
+                <button style={{...S.btn}} onClick={()=>setShowXmlModal(false)}>Cerrar</button>
+                <button style={{...S.btnGreen}} onClick={copy}>{copied?"✓ Copiado":"📋 Copiar al portapapeles"}</button>
+                <button style={{...S.btnPrimary}} onClick={download}>⬇ Descargar XML</button>
+              </div>
+              <div style={{padding:"0 20px 12px 20px",fontSize:"11px",color:"rgba(238,244,255,.40)",textAlign:"right"}}>
+                {xml.length.toLocaleString()} caracteres · {(xml.match(/<Category>/g)||[]).length} categoría(s){(xml.match(/<EForm>/g)||[]).length>0&&` · ${(xml.match(/<EForm>/g)||[]).length} eForm(s)`}
+              </div>
+            </div>
+          </div>}
 
           <div style={{marginTop:"16px",fontSize:"11px",color:"rgba(238,244,255,.25)",borderTop:"1px solid rgba(255,255,255,.08)",paddingTop:"12px"}}>
             Therefore Category Builder v7.0 · Aneker · Multi-categoría · Post-import: mover a carpeta SD · añadir ImageFld · convertir TextCounter si necesario
