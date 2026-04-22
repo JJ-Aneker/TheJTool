@@ -58,44 +58,85 @@
       color: white;
     }
     .profile-card {
-      background: #1F1F1F;
+      background: linear-gradient(135deg, rgba(129,162,209,0.1) 0%, rgba(129,162,209,0.05) 100%);
+      border: 1px solid rgba(129,162,209,0.2);
       padding: 2rem;
-      border-radius: 6px;
-      text-align: center;
-      max-width: 400px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .profile-card-header {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      align-items: flex-start;
     }
     .profile-card img {
-      width: 90px;
-      height: 90px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       object-fit: cover;
-      margin-bottom: 1rem;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
+      border: 2px solid #81A2D1;
+      flex-shrink: 0;
+    }
+    .profile-info {
+      flex: 1;
+      text-align: left;
     }
     .profile-card h3 {
       color: rgba(238,244,255,.95);
-      margin: 0 0 0.5rem 0;
-      font-size: 1rem;
+      margin: 0 0 0.25rem 0;
+      font-size: 1.2rem;
+      font-weight: 500;
     }
     .profile-card p {
       color: rgba(238,244,255,.6);
-      margin: 0 0 0.3rem 0;
-      font-size: 0.85rem;
+      margin: 0 0 0.2rem 0;
+      font-size: 0.8rem;
     }
     .profile-card .role {
       color: #81A2D1;
-      margin: 0;
-      font-size: 0.8rem;
+      margin: 0.5rem 0 0 0;
+      font-size: 0.75rem;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
     .profile-actions {
       display: flex;
       gap: 0.5rem;
-      justify-content: center;
-      margin-top: 1.5rem;
+      margin-top: 2rem;
       flex-wrap: wrap;
+    }
+    .profile-actions button {
+      flex: 1;
+      min-width: 90px;
+      padding: 0.65rem 1.2rem;
+      background: linear-gradient(135deg, rgba(129,162,209,0.3) 0%, rgba(129,162,209,0.15) 100%);
+      border: 1px solid rgba(129,162,209,0.4);
+      border-radius: 12px;
+      color: #81A2D1;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .profile-actions button:hover {
+      background: linear-gradient(135deg, rgba(129,162,209,0.4) 0%, rgba(129,162,209,0.25) 100%);
+      border-color: rgba(129,162,209,0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(129,162,209,0.2);
+    }
+    .profile-actions button.danger {
+      background: linear-gradient(135deg, rgba(212,76,76,0.3) 0%, rgba(212,76,76,0.15) 100%);
+      border-color: rgba(212,76,76,0.4);
+      color: #d44;
+    }
+    .profile-actions button.danger:hover {
+      background: linear-gradient(135deg, rgba(212,76,76,0.4) 0%, rgba(212,76,76,0.25) 100%);
+      border-color: rgba(212,76,76,0.6);
+      box-shadow: 0 4px 12px rgba(212,76,76,0.2);
     }
     .glass-modal-overlay {
       display: none;
@@ -288,14 +329,18 @@
       const roleLabel = { read: "Lector", write: "Editor", admin: "Administrador" }[currentProfile?.role] || currentProfile?.role || "Usuario";
       const html = `
         <div class="profile-card">
-          <img src="${currentProfile?.avatar_url || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 font-size=%2240%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3E👤%3C/text%3E%3C/svg%3E'}" alt="Avatar">
-          <h3>${escapeHtml(currentProfile?.name || 'Usuario')}</h3>
-          <p>${escapeHtml(currentUser?.email || '—')}</p>
-          <p class="role">${escapeHtml(roleLabel)}</p>
+          <div class="profile-card-header">
+            <img src="${currentProfile?.avatar_url || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 font-size=%2240%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3E👤%3C/text%3E%3C/svg%3E'}" alt="Avatar">
+            <div class="profile-info">
+              <h3>${escapeHtml(currentProfile?.name || 'Usuario')}</h3>
+              <p>${escapeHtml(currentUser?.email || '—')}</p>
+              <p class="role">${escapeHtml(roleLabel)}</p>
+            </div>
+          </div>
           <div class="profile-actions">
-            <button class="action-btn" onclick="openEditProfileForm()">✏️ Editar</button>
-            <button class="action-btn" onclick="openAvatarUpload()">🖼️ Foto</button>
-            <button class="action-btn danger" onclick="logoutUser()">🚪 Salir</button>
+            <button onclick="openEditProfileForm()">✏️ Editar</button>
+            <button onclick="openAvatarUpload()">🖼️ Foto</button>
+            <button class="danger" onclick="logoutUser()">🚪 Salir</button>
           </div>
         </div>
       `;
