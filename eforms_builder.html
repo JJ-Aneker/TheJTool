@@ -631,7 +631,6 @@
           <div style={{display:"flex",gap:"8px",marginBottom:"16px",flexWrap:"wrap"}}>
             <button style={{...S.btn,borderColor:globalExpandedPanel==="identity"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="identity"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="identity"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="identity"?null:"identity")}>📝 Identidad</button>
             <button style={{...S.btn,borderColor:globalExpandedPanel==="csv"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="csv"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="csv"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="csv"?null:"csv")}>📊 Importar CSV</button>
-            <button style={{...S.btn,borderColor:globalExpandedPanel==="structure"?"#9ad1ff":"rgba(255,255,255,.14)",background:globalExpandedPanel==="structure"?"rgba(154,209,255,.15)":"rgba(255,255,255,.06)",color:globalExpandedPanel==="structure"?"#9ad1ff":"#e6e7eb"}} onClick={()=>setGlobalExpandedPanel(globalExpandedPanel==="structure"?null:"structure")}>⚙ Estructura XML</button>
           </div>
 
           {/* PANELES EXPANDIBLES */}
@@ -667,15 +666,6 @@
 
           {globalExpandedPanel==="csv"&&<div style={{...S.panel,marginBottom:"16px"}}>
             <CsvImporter onImport={(...args)=>{handleCsvImport(...args);setGlobalExpandedPanel(null);}}/>
-          </div>}
-
-          {globalExpandedPanel==="structure"&&<div style={{...S.panel,marginBottom:"16px"}}>
-            <div style={S.panelTitle}>Estructura del XML</div>
-            <div style={{fontSize:"12px",color:"rgba(238,244,255,.55)",lineHeight:"1.75"}}>
-              <p style={{marginBottom:"8px"}}>Therefore eForms usa <strong style={{color:"#9ad1ff"}}>Form.io</strong> como motor de formularios. El XML contiene el JSON de Form.io dentro del nodo <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>&lt;FDef&gt;</code>.</p>
-              <p style={{marginBottom:"8px"}}>Cada <strong style={{color:"#e6e7eb"}}>Panel</strong> → componente <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>panel</code> de Form.io. Cada fila de campos → <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>columns</code>.</p>
-              <p style={{marginBottom:"0"}}>El <strong style={{color:"#9ad1ff"}}>Key</strong> de cada campo debe coincidir con el <code style={{background:"rgba(154,209,255,.10)",padding:"1px 5px",borderRadius:"3px",color:"#a7f3d0",fontFamily:"monospace"}}>FieldID</code> de la categoría vinculada en Therefore.</p>
-            </div>
           </div>}
 
           {activeView==="preview" ? (
