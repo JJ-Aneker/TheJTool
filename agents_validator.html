@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validador XML - Agente Claude</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+    :root {
+      --bg: #0f1115;
+      --accent: #9ad1ff;
+      --txt1: #e6e7eb;
+      --txt2: rgba(238,244,255,.60);
+      --panel: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.10);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font: 14px Inter, system-ui, sans-serif; color: var(--txt1); background: var(--bg); }
+    .app { display: flex; flex-direction: column; min-height: 100vh; padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    h1 { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; margin: 0 0 8px 0; }
+    .sub { font-size: 12px; color: rgba(238,244,255,.55); margin: 0; }
+    .buttons { display: flex; gap: 8px; }
+    .btn { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); color: var(--txt1); padding: 6px 12px; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: 500; }
+    .btn:hover { background: rgba(255,255,255,.10); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); border: none; color: #000; font-weight: 600; padding: 9px 18px; }
+    .btn-primary:hover { opacity: 0.9; }
+    .panel { background: linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .panel-title { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+    .label { font-size: 11px; color: rgba(238,244,255,.65); margin-bottom: 4px; display: block; font-weight: 600; }
+    textarea, input { width: 100%; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.18); color: var(--txt1); padding: 8px 10px; border-radius: 8px; font-family: inherit; font-size: 13px; margin-bottom: 8px; }
+    textarea:focus, input:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,.06); }
+    textarea { min-height: 150px; resize: vertical; font-family: 'Consolas', monospace; }
+    .error { background: rgba(255,60,60,.10); border: 1px solid rgba(255,60,60,.25); color: #fca5a5; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+    .success { background: rgba(100,200,100,.10); border: 1px solid rgba(100,200,100,.25); color: #a7f3d0; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+    .info { background: rgba(100,150,255,.10); border: 1px solid rgba(100,150,255,.25); color: #a5d6ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(100,150,255,.3); border-top-color: #a5d6ff; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .response { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 6px; padding: 12px; margin-top: 8px; white-space: pre-wrap; word-wrap: break-word; font-size: 13px; max-height: 400px; overflow-y: auto; }
+    .hint { font-size: 11px; color: rgba(238,244,255,.55); line-height: 1.6; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>✓ Validador XML - Agente Claude</h1>
+      <p class="sub">Valida categorías Therefore usando inteligencia artificial</p>
+    </div>
+    <div class="buttons">
+      <button class="btn" onclick="openFullWindow()">🔗 Ventana Completa</button>
+      <button class="btn" onclick="showHelp()">❓ Ayuda</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- INPUT PANEL -->
+    <div class="panel">
+      <div class="panel-title">📝 XML a Validar</div>
+      <label class="label">Pega tu XML de categoría</label>
+      <textarea id="xmlInput" placeholder="Pega aquí el XML exportado desde Therefore Solution Designer..."></textarea>
+      <div class="hint">
+        Soporta: XML de categorías completo o parcial. El validador analizará estructura, campos y errores comunes.
+      </div>
+    </div>
+
+    <!-- RESPONSE PANEL -->
+    <div class="panel">
+      <div class="panel-title">🤖 Respuesta de Claude</div>
+      <div id="responseContainer">
+        <p style="color: rgba(238,244,255,.40); text-align: center; padding: 20px;">
+          Pega XML y haz clic en "Validar" para obtener análisis
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="errorContainer"></div>
+
+  <div class="panel" style="text-align: center;">
+    <button class="btn btn-primary" id="validateBtn" onclick="handleValidate()">✓ Validar XML con Claude →</button>
+    <div class="hint" style="margin-top: 12px;">
+      Se conectará a https://therefore-agents-api.onrender.com para procesar tu solicitud
+    </div>
+  </div>
+
+  <div style="margin-top: 20px; font-size: 11px; color: rgba(238,244,255,.25); border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px;">
+    Validador XML · Aneker · Análisis inteligente de categorías Therefore con Claude
+  </div>
+</div>
+
+<script>
+  async function handleValidate() {
+    const xmlInput = document.getElementById('xmlInput');
+    const responseContainer = document.getElementById('responseContainer');
+    const errorContainer = document.getElementById('errorContainer');
+    const validateBtn = document.getElementById('validateBtn');
+
+    const xml = xmlInput.value.trim();
+
+    if (!xml) {
+      errorContainer.innerHTML = '<div class="error">⚠ Por favor pega el XML a validar</div>';
+      return;
+    }
+
+    validateBtn.disabled = true;
+    validateBtn.innerHTML = '<span class="spinner"></span>Validando...';
+    errorContainer.innerHTML = '';
+    responseContainer.innerHTML = '<div class="info">⏳ Enviando a Claude para análisis...</div>';
+
+    try {
+      const response = await fetch('https://therefore-agents-api.onrender.com/api/agents/validator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: xml }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const reply = data.reply || 'Sin respuesta';
+
+      responseContainer.innerHTML = `<div class="response">${escapeHtml(reply)}</div>`;
+    } catch (err) {
+      errorContainer.innerHTML = `<div class="error">⚠ Error: ${escapeHtml(err.message)}</div>`;
+      responseContainer.innerHTML = '';
+    } finally {
+      validateBtn.disabled = false;
+      validateBtn.innerHTML = '✓ Validar XML con Claude →';
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function openFullWindow() {
+    document.documentElement.requestFullscreen?.();
+  }
+
+  function showHelp() {
+    alert('Validador XML - Agente Claude\n\n' +
+      '1. Pega tu XML de categoría Therefore\n' +
+      '2. Haz clic en "Validar XML con Claude"\n' +
+      '3. Recibe análisis detallado y recomendaciones\n\n' +
+      'El validador revisa:\n' +
+      '• Estructura y sintaxis XML\n' +
+      '• Campos requeridos y tipos de datos\n' +
+      '• GUIDs válidos\n' +
+      '• Errores comunes en categorías\n\n' +
+      'Documentación: github.com/JJ-Aneker/TheJTool');
+  }
+
+  // Permitir envío con Ctrl+Enter
+  document.getElementById('xmlInput').addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      handleValidate();
+    }
+  });
+</script>
+
+</body>
+</html>
