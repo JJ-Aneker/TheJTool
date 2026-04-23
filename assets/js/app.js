@@ -59,6 +59,7 @@ function initNavigation() {
   const btnCategoryReplicator = document.getElementById("btnCategoryReplicator");
   const btnDocAIProcessor      = document.getElementById("btnDocAIProcessor");
   const btnAgents             = document.getElementById("btnAgents");
+  const btnDocGenerator       = document.getElementById("btnDocGenerator");
   const btnAdmin              = document.getElementById("btnAdmin");
   const btnLogout             = document.getElementById("btnLogout");
 
@@ -72,6 +73,7 @@ function initNavigation() {
   btnCategoryReplicator?.addEventListener("click", () => Router.setView("categoryReplicator"));
   btnDocAIProcessor?.addEventListener("click", () => Router.setView("docai_processor"));
   btnAgents?.addEventListener("click", () => Router.setView("agents"));
+  btnDocGenerator?.addEventListener("click", () => Router.setView("docGenerator"));
   btnAdmin?.addEventListener("click", () => Router.setView("admin"));
 
   btnLogout?.addEventListener("click", async () => {
