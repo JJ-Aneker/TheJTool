@@ -317,14 +317,18 @@
         body: JSON.stringify({ messages })
       });
 
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-
       const result = await response.json();
 
+      if (!response.ok) {
+        const errorMsg = result.error || result.hint || `Error ${response.status}`;
+        if (result.raw) {
+          throw new Error(`${errorMsg}\n\nRespuesta: ${result.raw.substring(0, 200)}`);
+        }
+        throw new Error(errorMsg);
+      }
+
       if (!result.success || !result.data) {
-        throw new Error(result.error || 'No se pudieron extraer datos');
+        throw new Error(result.error || result.hint || 'No se pudieron extraer datos. Verifica que el prompt sea claro y específico.');
       }
 
       // Guardar datos y mostrar previsualización
