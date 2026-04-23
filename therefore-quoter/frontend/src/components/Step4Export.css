@@ -1,0 +1,151 @@
+.export-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .export-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.summary-section h3 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  font-size: 12px;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-row span {
+  color: var(--txt2);
+}
+
+.summary-row strong {
+  color: var(--txt1);
+  font-weight: 600;
+}
+
+.summary-row.big {
+  padding: 12px 0;
+  font-size: 14px;
+  background: rgba(154,209,255,.05);
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: 8px -8px 0 -8px;
+  padding-top: 12px;
+  border-bottom: none;
+}
+
+.summary-row.big strong {
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.importe {
+  color: var(--green) !important;
+  font-size: 18px !important;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-save,
+.btn-download {
+  padding: 14px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+}
+
+.btn-save {
+  background: var(--green);
+  color: #000;
+}
+
+.btn-save:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(167, 243, 208, 0.2);
+}
+
+.btn-download {
+  background: var(--accent);
+  color: #000;
+}
+
+.btn-download:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(154, 209, 255, 0.2);
+}
+
+.btn-save:disabled,
+.btn-download:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.export-info {
+  background: rgba(100,150,255,.05);
+  border: 1px solid rgba(100,150,255,.20);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.export-info p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+  color: var(--txt2);
+}
+
+.export-info p:last-child {
+  margin-bottom: 0;
+}
+
+.export-info strong {
+  color: var(--accent);
+  font-weight: 600;
+}

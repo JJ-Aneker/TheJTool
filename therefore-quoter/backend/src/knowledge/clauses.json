@@ -1,0 +1,64 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-04-23",
+  "description": "Cláusulas estándar Canon para cotizaciones",
+  "confidencialidad": {
+    "titulo": "Confidencialidad",
+    "contenido": "Este documento contiene información confidencial y propietaria de Canon España, S.A.U. Su distribución está limitada a los destinatarios autorizados indicados en la propuesta. No debe ser reproducido, distribuido o divulgado sin autorización previa escrita de Canon. Cualquier divulgación no autorizada será tratada conforme a derecho.",
+    "legal": "Conforme a la Ley Orgánica 3/2018, de Protección de Datos Personales y garantía de derechos digitales (LOPD), esta propuesta contiene datos de carácter personal que serán tratados conforme a la Política de Privacidad de Canon."
+  },
+  "supuestosBase": {
+    "todos": [
+      "La propuesta se basa en la información proporcionada. Cambios en requisitos implicarán ajuste de presupuesto",
+      "Los perfiles disponibles son: Senior Architect (SA) y Consultor, conforme a disponibilidad de recursos",
+      "Jornada laboral: 8 horas por día (lunes a viernes, excluidos festivos)",
+      "Estimación basada en ratios validados de implantaciones Therefore™ 2020 y Online",
+      "Comunicaciones con cliente vía email, Teams, o reuniones presenciales (presupuesto de desplazamientos no incluido)",
+      "Cliente proporciona acceso a Therefore™ desde día 1 del proyecto"
+    ],
+    "nuevo": [
+      "Se incluyen licencias base: Cases, Workflow Designer, eForm Designer",
+      "Se incluyen 1-2 usuarios concurrentes para testing. Licencias adicionales se presupuestan aparte",
+      "Implementación estándar (no custom code). Customizaciones técnicas requieren propuesta adicional",
+      "Ambiente de pruebas (UAT) será provisto por cliente o Aneker, con datos de test"
+    ],
+    "evolutivo": [
+      "Sistema Therefore™ debe estar operativo y en mantenimiento activo",
+      "Cambios limitados a configuración estándar (no requieren desarrollo)",
+      "Cliente responsable de backup/rollback en caso de complicaciones",
+      "Se asume conocimiento funcional básico del cliente sobre Therefore™"
+    ]
+  },
+  "exclusionesComunes": {
+    "tecnicas": [
+      "Desarrollo custom (extensiones, plugins, modificaciones de código)",
+      "Migración de datos desde sistemas legacy",
+      "Integración con sistemas no mencionados en propuesta",
+      "Mantenimiento y soporte post-implementación (excepto primer mes)"
+    ],
+    "funcionales": [
+      "Módulos opcionales: Smart Capture, Content Connector, Universal Connector, Signature Manager",
+      "Licencias adicionales de usuarios/accesos concurrentes",
+      "Consultoría estratégica o asesoramiento IT (fuera de Therefore™)",
+      "Capacitación avanzada de desarrolladores"
+    ],
+    "servicios": [
+      "Desplazamientos a ubicaciones del cliente (a menos que se acuerde)",
+      "Hardening de infraestructura o seguridad IT",
+      "Cumplimiento de auditoría ISO/SOC2 (fuera del scope de implementación)",
+      "Garantía de disponibilidad de infraestructura"
+    ]
+  },
+  "condiciones": {
+    "pagos": [
+      "Hito 1 (50%): Firma de contrato",
+      "Hito 2 (50%): UAT completado / Producción"
+    ],
+    "timing": {
+      "nuevo": "Plazo típico 4-8 semanas desde firma a go-live",
+      "evolutivo": "Plazo típico 2-4 semanas"
+    },
+    "recursos": "Dedicación de recursos de Aneker / Canon conforme a calendario acordado",
+    "cambios": "Cambios de alcance serán tratados como change requests y presupuestados aparte"
+  }
+}

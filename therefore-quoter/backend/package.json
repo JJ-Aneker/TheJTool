@@ -1,0 +1,19 @@
+{
+  "name": "therefore-quoter-backend",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
+    "cors": "^2.8.5",
+    "docx": "^8.5.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "mammoth": "^1.8.1",
+    "multer": "^1.4.4",
+    "pdf-parse": "^1.1.1"
+  }
+}

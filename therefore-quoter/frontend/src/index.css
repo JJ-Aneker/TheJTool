@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #0f1115;
+  --accent: #9ad1ff;
+  --txt1: #e6e7eb;
+  --txt2: rgba(238,244,255,.60);
+  --panel: rgba(255,255,255,.06);
+  --border: rgba(255,255,255,.10);
+  --green: #a7f3d0;
+  --red: #C00000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font: 14px Inter, system-ui, sans-serif;
+  color: var(--txt1);
+  background: var(--bg);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input, textarea, select {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.18);
+  color: var(--txt1);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255,255,255,.06);
+}
+
+textarea {
+  resize: vertical;
+  font-family: 'Consolas', monospace;
+  min-height: 100px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th {
+  background: var(--red);
+  color: white;
+  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,.03);
+}
+
+.error {
+  background: rgba(255,60,60,.10);
+  border: 1px solid rgba(255,60,60,.25);
+  color: #fca5a5;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.success {
+  background: rgba(100,200,100,.10);
+  border: 1px solid rgba(100,200,100,.25);
+  color: var(--green);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(100,150,255,.3);
+  border-top-color: #a5d6ff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 6px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

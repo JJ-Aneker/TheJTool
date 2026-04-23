@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "fecha_validacion": "2026-04-15",
+  "proyectos_referencia": ["Building Center", "Carmencita", "Dormitorum"],
+  "tarifa_default": 800,
+  "horas_jornada": 8,
+  "tareas": [
+    { "tipo": "analisis_funcional",       "label": "Análisis funcional",                    "perfil": "SA",           "dias_min": 1,   "dias_max": 2,   "notas": "1d por proceso/módulo. 2d si hay integración ERP o complejidad alta." },
+    { "tipo": "diseno_tecnico_sow",       "label": "Diseño técnico / SoW o CR",             "perfil": "SA",           "dias_min": 0,   "dias_max": 1,   "notas": "Normalmente incluido en análisis (↨). 1d si hay doc. formal de diseño." },
+    { "tipo": "categoria_simple",         "label": "Categoría simple",                       "perfil": "Consultor",    "dias_min": 0.5, "dias_max": 1,   "notas": "0.5d categoría estándar. 1d si tiene versionado o seguridad diferenciada." },
+    { "tipo": "expediente_complejo",      "label": "Expediente / categoría compleja",        "perfil": "SA",           "dias_min": 1,   "dias_max": 1.5, "notas": "1d estructura base. +0.5d por gestión de versiones o estados complejos." },
+    { "tipo": "tabla_maestra",            "label": "Tabla maestra",                          "perfil": "Consultor",    "dias_min": 0.5, "dias_max": 0.5, "notas": "Siempre 0.5d independientemente del nº de campos." },
+    { "tipo": "usuarios_seguridad",       "label": "Usuarios, roles y seguridad",            "perfil": "Consultor",    "dias_min": 0.5, "dias_max": 1,   "notas": "0.5d proyecto simple. 1d multirol o seguridad diferenciada por categoría." },
+    { "tipo": "retencion",                "label": "Políticas de retención",                 "perfil": "Consultor",    "dias_min": 0.5, "dias_max": 0.5, "notas": "Incluida en categoría si es simple. 0.5d si hay múltiples plazos." },
+    { "tipo": "wf_simple",                "label": "WF simple",                              "perfil": "Consultor",    "dias_min": 0.5, "dias_max": 0.5, "notas": "Archivo o traslado sin lógica condicional compleja." },
+    { "tipo": "wf_revision",              "label": "WF revisión / validación",               "perfil": "SA",           "dias_min": 1,   "dias_max": 2,   "notas": "1d por proceso. 2d si es multinivel (dirección) o multi-departamento." },
+    { "tipo": "wf_prototipo_duplicacion", "label": "WF prototipo + duplicación",             "perfil": "SA",           "dias_min": 0.5, "dias_max": 1,   "notas": "Prototipo 0.5d + ~10min/duplicación. Hasta ×15 sigue en 0.5-1d." },
+    { "tipo": "notificaciones",           "label": "Notificaciones automáticas",             "perfil": "Consultor",    "dias_min": 0.5, "dias_max": 0.5, "notas": "Siempre 0.5d, incluible en el WF si es simple." },
+    { "tipo": "integracion_erp",          "label": "Integración ERP",                        "perfil": "SA",           "dias_min": 2,   "dias_max": 3,   "notas": "Muy variable. 2d si API documentada. 3d+ si ERP propio sin documentación." },
+    { "tipo": "capture_connector",        "label": "Capture / Content Connector",            "perfil": "Consultor",    "dias_min": 0.5, "dias_max": 0.5, "notas": "Siempre 0.5d por conector." },
+    { "tipo": "formacion",                "label": "Formación a usuarios",                   "perfil": "SA / Consultor","dias_min": 0.5, "dias_max": 1,   "notas": "0.5d por proceso. 1d si múltiples departamentos o 2 sesiones." },
+    { "tipo": "uat_produccion",           "label": "UAT y puesta en producción",             "perfil": "SA / Consultor","dias_min": 0.5, "dias_max": 2,   "notas": "0.5d evolutivo simple. 1d proyecto nuevo. 2d sistema complejo con integración." },
+    { "tipo": "soporte_post",             "label": "Soporte post-implantación",              "perfil": "SA",           "dias_min": 0,   "dias_max": 0.5, "notas": "Normalmente incluido (↨). Cotizar aparte si hay SLA." }
+  ]
+}
