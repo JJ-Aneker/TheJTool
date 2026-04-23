@@ -60,6 +60,7 @@ function initNavigation() {
   const btnDocAIProcessor      = document.getElementById("btnDocAIProcessor");
   const btnAgents             = document.getElementById("btnAgents");
   const btnDocGenerator       = document.getElementById("btnDocGenerator");
+  const btnQuoter             = document.getElementById("btnQuoter");
   const btnAdmin              = document.getElementById("btnAdmin");
   const btnLogout             = document.getElementById("btnLogout");
 
@@ -74,6 +75,7 @@ function initNavigation() {
   btnDocAIProcessor?.addEventListener("click", () => Router.setView("docai_processor"));
   btnAgents?.addEventListener("click", () => Router.setView("agents"));
   btnDocGenerator?.addEventListener("click", () => Router.setView("docGenerator"));
+  btnQuoter?.addEventListener("click", () => Router.setView("quoter"));
   btnAdmin?.addEventListener("click", () => Router.setView("admin"));
 
   btnLogout?.addEventListener("click", async () => {
