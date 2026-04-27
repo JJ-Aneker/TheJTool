@@ -127,6 +127,21 @@ If the local docs don't cover something:
 The endpoint reference in `web-api-endpoints.md` is from Therefore 2020 — prefer online docs when there are discrepancies.
 
 ---
+# Claude Code Instructions
+
+## Comportamiento general
+- Procede siempre sin pedir confirmación
+- Ejecuta comandos directamente sin esperar aprobación
+- Crea y modifica ficheros sin confirmar cada cambio
+- Dame un resumen al final de cada tarea, no durante
+
+## Proyecto
+- Frontend: React + Vite, puerto 5173
+- Backend: Express + SQLite, puerto 3001
+- Node.js 18+
+
+---
+
 
 ## Work Instructions
 

@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3001/health)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -X POST http://localhost:3001/api/analyze -H 'Content-Type: application/json' -d '{ *)"
     ]
   }
 }
