@@ -3,6 +3,7 @@ import './App.css';
 import Dashboard from './components/Dashboard';
 import Wizard from './components/Wizard';
 import SettingsKnowledge from './components/SettingsKnowledge';
+import apiConfig from './config';
 
 export default function App() {
   const [page, setPage] = useState('dashboard'); // 'dashboard' | 'wizard' | 'settings'
@@ -16,7 +17,7 @@ export default function App() {
 
   const fetchQuotes = async () => {
     try {
-      const res = await fetch('/api/quotes');
+      const res = await fetch(apiConfig.endpoints.quotes);
       if (res.ok) {
         setQuotes(await res.json());
       }
@@ -51,7 +52,7 @@ export default function App() {
   const handleDeleteQuote = async (id) => {
     if (!confirm('¿Eliminar cotización?')) return;
     try {
-      await fetch(`/api/quotes/${id}`, { method: 'DELETE' });
+      await fetch(`${apiConfig.endpoints.quotes}/${id}`, { method: 'DELETE' });
       fetchQuotes();
     } catch (err) {
       console.error('Error deleting quote:', err);

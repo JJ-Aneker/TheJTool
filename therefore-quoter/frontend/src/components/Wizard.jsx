@@ -4,6 +4,7 @@ import Step1Upload from './Step1Upload';
 import Step2Questionnaire from './Step2Questionnaire';
 import Step3Estimation from './Step3Estimation';
 import Step4Export from './Step4Export';
+import apiConfig from '../config';
 
 export default function Wizard({ quoteId, onComplete, onCancel }) {
   const [step, setStep] = useState(1);
@@ -40,7 +41,7 @@ export default function Wizard({ quoteId, onComplete, onCancel }) {
   const loadQuote = async (id) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/quotes/${id}`);
+      const res = await fetch(`${apiConfig.endpoints.quotes}/${id}`);
       if (res.ok) {
         const quote = await res.json();
         const data = typeof quote.data === 'string' ? JSON.parse(quote.data) : quote.data;

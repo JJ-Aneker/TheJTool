@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './Step.css';
+import apiConfig from '../config';
 
 export default function Step1Upload({ onComplete }) {
   const [file, setFile] = useState(null);
@@ -19,7 +20,7 @@ export default function Step1Upload({ onComplete }) {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const res = await fetch('/api/upload', {
+      const res = await fetch(apiConfig.endpoints.upload, {
         method: 'POST',
         body: formData
       });

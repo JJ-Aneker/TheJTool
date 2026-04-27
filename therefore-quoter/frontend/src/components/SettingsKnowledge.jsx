@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './SettingsKnowledge.css';
+import apiConfig from '../config';
 
 export default function SettingsKnowledge({ onBackToDashboard }) {
   const [activeTab, setActiveTab] = useState('guide'); // guide, examples, preview
@@ -18,14 +19,14 @@ export default function SettingsKnowledge({ onBackToDashboard }) {
   const loadKnowledgeBase = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/knowledge');
+      const res = await fetch(`${apiConfig.endpoints.knowledge}`);
       if (res.ok) {
         const data = await res.json();
         setGuide(data.guide);
         setExamples(data.examples);
       }
 
-      const systemRes = await fetch('/api/knowledge/system-prompt');
+      const systemRes = await fetch(`${apiConfig.endpoints.knowledge}/system-prompt`);
       if (systemRes.ok) {
         const { systemPrompt: prompt } = await systemRes.json();
         setSystemPrompt(prompt);
@@ -39,7 +40,7 @@ export default function SettingsKnowledge({ onBackToDashboard }) {
 
   const handleUpdateRatio = async (updatedRatios) => {
     try {
-      const res = await fetch('/api/knowledge/guide', {
+      const res = await fetch(`${apiConfig.endpoints.knowledge}/guide`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ratios: updatedRatios })
@@ -60,7 +61,7 @@ export default function SettingsKnowledge({ onBackToDashboard }) {
 
   const handleAddExample = async (newExample) => {
     try {
-      const res = await fetch('/api/knowledge/examples', {
+      const res = await fetch(`${apiConfig.endpoints.knowledge}/examples`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newExample)
@@ -80,7 +81,7 @@ export default function SettingsKnowledge({ onBackToDashboard }) {
     if (!confirm('¿Eliminar este proyecto de referencia?')) return;
 
     try {
-      const res = await fetch(`/api/knowledge/examples/${exampleId}`, {
+      const res = await fetch(`${apiConfig.endpoints.knowledge}/examples/${exampleId}`, {
         method: 'DELETE'
       });
 

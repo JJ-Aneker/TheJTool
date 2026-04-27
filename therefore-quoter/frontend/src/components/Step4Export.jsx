@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './Step.css';
 import './Step4Export.css';
+import apiConfig from '../config';
 
 export default function Step4Export({
   formData,
@@ -20,7 +21,7 @@ export default function Step4Export({
 
     try {
       const fecha = new Date().toLocaleDateString('es-ES');
-      const res = await fetch('/api/generate', {
+      const res = await fetch(apiConfig.endpoints.generate, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -59,7 +60,7 @@ export default function Step4Export({
     setError('');
 
     try {
-      const res = await fetch('/api/quotes', {
+      const res = await fetch(apiConfig.endpoints.quotes, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

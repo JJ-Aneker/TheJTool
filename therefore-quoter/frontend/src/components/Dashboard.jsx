@@ -1,4 +1,5 @@
 import './Dashboard.css';
+import apiConfig from '../config';
 
 export default function Dashboard({ quotes, loading, onNewQuote, onEditQuote, onDeleteQuote, onOpenSettings }) {
   if (loading) {
@@ -8,7 +9,7 @@ export default function Dashboard({ quotes, loading, onNewQuote, onEditQuote, on
   const handleDownload = async (quote) => {
     try {
       const data = typeof quote.data === 'string' ? JSON.parse(quote.data) : quote.data;
-      const res = await fetch('/api/generate', {
+      const res = await fetch(apiConfig.endpoints.generate, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
