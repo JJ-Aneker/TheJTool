@@ -94,14 +94,26 @@ export default function Wizard({ quoteId, onComplete, onCancel }) {
     setError('');
 
     try {
+      // Sanitize data to avoid JSON encoding issues
+      const payload = {
+        notes: String(formData.notes || '').trim(),
+        fileContent: String(formData.fileContent || '').trim(),
+        answers: {
+          cliente: String(formData.answers.cliente || '').trim(),
+          tipo: String(formData.answers.tipo || 'nuevo').trim(),
+          plataforma: String(formData.answers.plataforma || 'online').trim(),
+          erp: String(formData.answers.erp || '').trim(),
+          usuarios: String(formData.answers.usuarios || '').trim(),
+          eforms: String(formData.answers.eforms || '').trim(),
+          firma: String(formData.answers.firma || '').trim(),
+          enfoque: String(formData.answers.enfoque || '').trim()
+        }
+      };
+
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          notes: formData.notes,
-          fileContent: formData.fileContent,
-          answers: formData.answers
-        })
+        body: JSON.stringify(payload)
       });
 
       const result = await res.json();
