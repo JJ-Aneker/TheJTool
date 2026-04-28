@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, Badge, Avatar, Tabs, Popconfirm, Tooltip } from 'antd'
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, CheckCircleOutlined, CloseCircleOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
+import { supabase } from '../config/supabaseClient'
 
 export default function UserManager() {
   const [form] = Form.useForm()
@@ -10,71 +11,32 @@ export default function UserManager() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [activeTab, setActiveTab] = useState('users')
 
-  const mockUsers = [
-    {
-      id: '1',
-      email: 'admin@buildingcenter.com',
-      fullName: 'Juan Jiménez',
-      role: 'admin',
-      status: 'active',
-      department: 'IT',
-      lastLogin: '2025-04-28 14:30:00',
-      createdAt: '2025-01-15 09:00:00',
-      phone: '+34 912 345 678',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Juan'
-    },
-    {
-      id: '2',
-      email: 'manager@buildingcenter.com',
-      fullName: 'María García',
-      role: 'manager',
-      status: 'active',
-      department: 'Operations',
-      lastLogin: '2025-04-27 16:45:00',
-      createdAt: '2025-02-20 10:30:00',
-      phone: '+34 912 345 679',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria'
-    },
-    {
-      id: '3',
-      email: 'user@buildingcenter.com',
-      fullName: 'Carlos López',
-      role: 'user',
-      status: 'active',
-      department: 'Finance',
-      lastLogin: '2025-04-25 11:20:00',
-      createdAt: '2025-03-10 08:15:00',
-      phone: '+34 912 345 680',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos'
-    },
-    {
-      id: '4',
-      email: 'inactive@buildingcenter.com',
-      fullName: 'Ana Martínez',
-      role: 'user',
-      status: 'inactive',
-      department: 'HR',
-      lastLogin: '2025-03-15 09:30:00',
-      createdAt: '2024-12-05 14:45:00',
-      phone: '+34 912 345 681',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ana'
+  useEffect(() => {
+    loadUsers()
+  }, [])
+
+  const loadUsers = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setUsers(data || [])
+    } catch (err) {
+      message.error('Error al cargar usuarios: ' + err.message)
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
   const roleOptions = [
     { label: 'Administrador', value: 'admin' },
     { label: 'Gerente', value: 'manager' },
     { label: 'Usuario', value: 'user' },
     { label: 'Auditor', value: 'auditor' }
-  ]
-
-  const departmentOptions = [
-    { label: 'IT', value: 'IT' },
-    { label: 'Operations', value: 'Operations' },
-    { label: 'Finance', value: 'Finance' },
-    { label: 'HR', value: 'HR' },
-    { label: 'Sales', value: 'Sales' },
-    { label: 'Legal', value: 'Legal' }
   ]
 
   const columns = [
@@ -86,11 +48,14 @@ export default function UserManager() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Avatar
             size={40}
-            src={record.avatar}
+            src={record.avatar_url}
             icon={<UserOutlined />}
+            style={{ backgroundColor: '#1890ff' }}
           />
           <div>
-            <div style={{ fontWeight: '500' }}>{record.fullName}</div>
+            <div style={{ fontWeight: '500' }}>
+              {record.name && record.surname ? `${record.name} ${record.surname}` : record.name || record.email}
+            </div>
             <div style={{ fontSize: '12px', color: '#8c8c8c' }}>{record.email}</div>
           </div>
         </div>
@@ -118,28 +83,29 @@ export default function UserManager() {
       }
     },
     {
-      title: 'Departamento',
-      dataIndex: 'department',
-      key: 'department',
-      width: 120
+      title: 'Teléfono',
+      dataIndex: 'phone',
+      key: 'phone',
+      width: 120,
+      render: (text) => text || '-'
     },
     {
-      title: 'Estado',
-      dataIndex: 'status',
-      key: 'status',
+      title: 'Aprobado',
+      dataIndex: 'approved',
+      key: 'approved',
       width: 100,
-      render: (status) => (
-        <Tag icon={status === 'active' ? <CheckCircleOutlined /> : <CloseCircleOutlined />} color={status === 'active' ? 'green' : 'red'}>
-          {status === 'active' ? 'Activo' : 'Inactivo'}
+      render: (approved) => (
+        <Tag icon={approved ? <CheckCircleOutlined /> : <CloseCircleOutlined />} color={approved ? 'green' : 'red'}>
+          {approved ? 'Sí' : 'No'}
         </Tag>
       )
     },
     {
-      title: 'Último Acceso',
-      dataIndex: 'lastLogin',
-      key: 'lastLogin',
+      title: 'Creado',
+      dataIndex: 'created_at',
+      key: 'created_at',
       width: 150,
-      render: (text) => <span style={{ fontSize: '12px' }}>{text}</span>
+      render: (text) => text ? new Date(text).toLocaleString('es-ES') : '-'
     },
     {
       title: 'Acciones',
@@ -185,19 +151,35 @@ export default function UserManager() {
   const editUser = (user) => {
     setSelectedUser(user)
     form.setFieldsValue({
-      fullName: user.fullName,
+      name: user.name,
+      surname: user.surname,
       email: user.email,
       role: user.role,
-      department: user.department,
       phone: user.phone,
-      status: user.status
+      address: user.address,
+      city: user.city,
+      province: user.province,
+      postal: user.postal
     })
     setIsModalVisible(true)
   }
 
-  const deleteUser = (user) => {
-    setUsers(users.filter(u => u.id !== user.id))
-    message.success(`Usuario ${user.fullName} eliminado`)
+  const deleteUser = async (user) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', user.id)
+
+      if (error) throw error
+      setUsers(users.filter(u => u.id !== user.id))
+      message.success('Usuario eliminado')
+    } catch (err) {
+      message.error('Error al eliminar: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const showPasswordReset = (user) => {
@@ -221,28 +203,49 @@ export default function UserManager() {
   const handleModalOk = async (values) => {
     setLoading(true)
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500))
-
       if (selectedUser) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            name: values.name,
+            surname: values.surname,
+            role: values.role,
+            phone: values.phone,
+            address: values.address,
+            city: values.city,
+            province: values.province,
+            postal: values.postal,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', selectedUser.id)
+
+        if (error) throw error
         setUsers(users.map(u =>
           u.id === selectedUser.id
-            ? {
-              ...u,
-              ...values,
-              lastLogin: new Date().toLocaleString('es-ES')
-            }
+            ? { ...u, ...values }
             : u
         ))
         message.success('Usuario actualizado exitosamente')
       } else {
-        const newUser = {
-          id: Date.now().toString(),
-          ...values,
-          createdAt: new Date().toLocaleString('es-ES'),
-          lastLogin: '-',
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${values.fullName}`
-        }
-        setUsers([...users, newUser])
+        const { data, error } = await supabase
+          .from('profiles')
+          .insert([{
+            name: values.name,
+            surname: values.surname,
+            email: values.email,
+            role: values.role,
+            phone: values.phone,
+            address: values.address,
+            city: values.city,
+            province: values.province,
+            postal: values.postal,
+            approved: false,
+            created_at: new Date().toISOString()
+          }])
+          .select()
+
+        if (error) throw error
+        setUsers([...users, ...data])
         message.success('Usuario creado exitosamente')
       }
 
@@ -250,14 +253,10 @@ export default function UserManager() {
       form.resetFields()
       setSelectedUser(null)
     } catch (error) {
-      message.error('Error al guardar usuario')
+      message.error('Error al guardar usuario: ' + error.message)
     } finally {
       setLoading(false)
     }
-  }
-
-  if (users.length === 0) {
-    setUsers(mockUsers)
   }
 
   const getStatistics = () => {
@@ -486,13 +485,23 @@ export default function UserManager() {
           layout="vertical"
           onFinish={handleModalOk}
         >
-          <Form.Item
-            label="Nombre Completo"
-            name="fullName"
-            rules={[{ required: true, message: 'Nombre requerido' }]}
-          >
-            <Input placeholder="Ej: Juan Jiménez" />
-          </Form.Item>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <Form.Item
+              label="Nombre"
+              name="name"
+              rules={[{ required: true, message: 'Nombre requerido' }]}
+            >
+              <Input placeholder="Juan" />
+            </Form.Item>
+
+            <Form.Item
+              label="Apellido"
+              name="surname"
+              rules={[{ required: true, message: 'Apellido requerido' }]}
+            >
+              <Input placeholder="Jiménez" />
+            </Form.Item>
+          </div>
 
           <Form.Item
             label="Email"
@@ -502,46 +511,52 @@ export default function UserManager() {
               { type: 'email', message: 'Email inválido' }
             ]}
           >
-            <Input placeholder="usuario@buildingcenter.com" prefix={<MailOutlined />} />
+            <Input placeholder="usuario@buildingcenter.com" prefix={<MailOutlined />} disabled={!!selectedUser} />
           </Form.Item>
 
           <Form.Item
             label="Teléfono"
             name="phone"
-            rules={[{ required: true, message: 'Teléfono requerido' }]}
           >
             <Input placeholder="+34 912 345 678" prefix={<PhoneOutlined />} />
           </Form.Item>
 
+          <Form.Item
+            label="Rol"
+            name="role"
+            rules={[{ required: true, message: 'Rol requerido' }]}
+          >
+            <Select options={roleOptions} placeholder="Selecciona un rol" />
+          </Form.Item>
+
+          <Form.Item
+            label="Dirección"
+            name="address"
+          >
+            <Input placeholder="Calle principal, 123" />
+          </Form.Item>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <Form.Item
-              label="Rol"
-              name="role"
-              rules={[{ required: true, message: 'Rol requerido' }]}
+              label="Ciudad"
+              name="city"
             >
-              <Select options={roleOptions} placeholder="Selecciona un rol" />
+              <Input placeholder="Madrid" />
             </Form.Item>
 
             <Form.Item
-              label="Departamento"
-              name="department"
-              rules={[{ required: true, message: 'Departamento requerido' }]}
+              label="Provincia"
+              name="province"
             >
-              <Select options={departmentOptions} placeholder="Selecciona departamento" />
+              <Input placeholder="Madrid" />
             </Form.Item>
           </div>
 
           <Form.Item
-            label="Estado"
-            name="status"
-            initialValue="active"
+            label="Código Postal"
+            name="postal"
           >
-            <Select
-              options={[
-                { label: 'Activo', value: 'active' },
-                { label: 'Inactivo', value: 'inactive' }
-              ]}
-            />
+            <Input placeholder="28001" />
           </Form.Item>
         </Form>
       </Modal>
