@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Spin } from 'antd'
 import {
   FormOutlined,
   CopyOutlined,
@@ -13,9 +13,14 @@ import {
   HomeOutlined,
   UserOutlined
 } from '@ant-design/icons'
+import { useAuth } from './hooks/useAuth'
+
+// Componentes
+import ProtectedRoute from './components/ProtectedRoute'
 
 // Vistas
 import Home from './views/Home'
+import Login from './views/Login'
 import EFormGenerator from './views/EFormGenerator'
 import CategoryCloner from './views/CategoryCloner'
 import TenantManager from './views/TenantManager'
@@ -88,6 +93,29 @@ function AppContent() {
   const [collapsed, setCollapsed] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const { isAuthenticated, user, logout, loading } = useAuth()
+
+  // Mostrar login si no está autenticado
+  if (!isAuthenticated) {
+    return <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="*" element={<Login />} />
+    </Routes>
+  }
+
+  // Mostrar loading mientras se obtiene el estado de autenticación
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh'
+      }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
 
   const getSelectedKey = () => {
     const item = menuItems.find(m => m.path === location.pathname)
@@ -99,6 +127,11 @@ function AppContent() {
     if (item) {
       navigate(item.path)
     }
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
   }
 
   return (
@@ -147,6 +180,9 @@ function AppContent() {
           borderTop: '1px solid rgba(255,255,255,0.2)',
           padding: '16px'
         }}>
+          <div style={{ color: 'white', fontSize: '12px', marginBottom: '12px', paddingLeft: '8px' }}>
+            {user?.email}
+          </div>
           <Menu
             theme="dark"
             mode="inline"
@@ -155,7 +191,7 @@ function AppContent() {
                 key: 'logout',
                 icon: <LogoutOutlined />,
                 label: 'Salir',
-                onClick: () => window.location.href = '/logout'
+                onClick: handleLogout
               }
             ]}
           />

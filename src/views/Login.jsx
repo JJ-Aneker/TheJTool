@@ -1,13 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, Form, Input, Button, message, Spin, Space, Tabs, Alert } from 'antd'
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('login')
-  const { login, signup } = useAuth()
+  const { login, signup, isAuthenticated, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+
+  // Si ya está autenticado, redirigir al home
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
 
   const handleLogin = async (values) => {
     setLoading(true)
@@ -15,9 +24,9 @@ export default function Login() {
       const result = await login(values.email, values.password)
       if (result.success) {
         message.success('Login exitoso')
-        window.location.href = '/'
+        // La redirección ocurre automáticamente via useEffect cuando isAuthenticated cambia
       } else {
-        message.error(result.error || 'Error en el login')
+        message.error(result.error || 'Error en el login. Verifica email y contraseña.')
       }
     } finally {
       setLoading(false)
@@ -47,6 +56,20 @@ export default function Login() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <Spin size="large" />
+      </div>
+    )
   }
 
   return (
