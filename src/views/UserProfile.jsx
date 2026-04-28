@@ -189,10 +189,13 @@ export default function UserProfile() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
-      <Card style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRadius: 0, marginBottom: 0 }} bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '2px', overflow: 'auto' }}>
+    <Card
+      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      title={<><UserOutlined /> Mi Perfil</>}
+    >
         {/* Encabezado con avatar y info básica */}
-        <Row gutter={2} style={{ marginBottom: '2px' }}>
+        <Row gutter={16} style={{ marginBottom: '16px' }}>
           <Col xs={24} sm={6} style={{ textAlign: 'center' }}>
             <Upload
               name="avatar"
@@ -257,7 +260,7 @@ export default function UserProfile() {
           </Col>
         </Row>
 
-        <Divider style={{ margin: '2px 0' }} />
+        <Divider style={{ margin: '16px 0' }} />
 
         <Tabs
           activeKey={activeTab}
@@ -483,7 +486,6 @@ export default function UserProfile() {
             }
           ]}
         />
-      </Card>
-    </div>
+    </Card>
   )
 }

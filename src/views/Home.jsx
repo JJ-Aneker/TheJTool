@@ -6,7 +6,8 @@ import {
   ApiOutlined,
   AppstoreOutlined,
   FileTextOutlined,
-  SettingOutlined
+  SettingOutlined,
+  HomeOutlined
 } from '@ant-design/icons'
 
 export default function Home() {
@@ -38,16 +39,20 @@ export default function Home() {
   ]
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', gap: '2px' }}>
+    <Card
+      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, gap: '16px' }}
+      title={<><HomeOutlined /> Inicio</>}
+    >
       <Alert
         message="TheJToolbox - Therefore™ Administration Panel"
         description="Panel central para administración de proyectos y configuraciones en Therefore™ DMS"
         type="info"
         showIcon
-        style={{ marginBottom: '2px', borderRadius: 0 }}
+        style={{ margin: 0, borderRadius: 0 }}
       />
 
-      <Row gutter={[2, 2]} style={{ marginBottom: '2px' }}>
+      <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
         <Col xs={24} sm={12} md={6}>
           <Statistic title="Instancias Activas" value={2} />
         </Col>
@@ -62,8 +67,8 @@ export default function Home() {
         </Col>
       </Row>
 
-      <h2 style={{ marginBottom: '2px', marginTop: 0 }}>Herramientas Disponibles</h2>
-      <Row gutter={[2, 2]} style={{ flex: 1, overflow: 'auto' }}>
+      <h2 style={{ marginBottom: '16px', marginTop: 0 }}>Herramientas Disponibles</h2>
+      <Row gutter={[16, 16]} style={{ flex: 1, overflow: 'auto', marginBottom: '16px' }}>
         {tools.map((tool) => (
           <Col xs={24} sm={12} md={8} lg={6} key={tool.title}>
             <Card
@@ -83,8 +88,8 @@ export default function Home() {
         ))}
       </Row>
 
-      <div style={{ flex: 1, overflow: 'auto', marginTop: '2px' }}>
-        <h2 style={{ marginBottom: '2px', marginTop: 0 }}>Últimas Actividades</h2>
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        <h2 style={{ marginBottom: '16px', marginTop: 0 }}>Últimas Actividades</h2>
         <Timeline items={[
           { children: 'Sincronización de categorías completada' },
           { children: 'Nuevo formulario eForms importado' },
@@ -92,6 +97,6 @@ export default function Home() {
           { children: 'Backup de instancias generado' }
         ]} />
       </div>
-    </div>
+    </Card>
   )
 }
