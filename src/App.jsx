@@ -218,7 +218,7 @@ function AppContent() {
             gap: '16px'
           }}>
             <img
-              src="/assets/images/logo.jpg"
+              src="/assets/images/logo.png"
               alt="TheJToolbox"
               style={{
                 width: '48px',
@@ -281,8 +281,9 @@ function AppContent() {
         marginLeft: collapsed ? 64 : 250,
         marginTop: 72,
         marginBottom: 20,
-        minHeight: 'calc(100vh - 92px)',
-        transition: 'margin-left 0.2s',
+        width: collapsed ? 'calc(100% - 64px)' : 'calc(100% - 250px)',
+        height: 'calc(100vh - 92px)',
+        transition: 'all 0.2s',
         display: 'flex',
         flexDirection: 'column'
       }}>
@@ -290,7 +291,7 @@ function AppContent() {
           margin: 0,
           padding: '32px',
           background: isDark ? '#000000' : '#f5f5f5',
-          minHeight: 'calc(100vh - 92px)',
+          height: '100%',
           overflow: 'auto',
           flex: 1
         }}>
