@@ -38,16 +38,16 @@ export default function Home() {
   ]
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', gap: '2px' }}>
       <Alert
         message="TheJToolbox - Therefore™ Administration Panel"
         description="Panel central para administración de proyectos y configuraciones en Therefore™ DMS"
         type="info"
         showIcon
-        style={{ marginBottom: '24px' }}
+        style={{ marginBottom: '2px', borderRadius: 0 }}
       />
 
-      <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
+      <Row gutter={[2, 2]} style={{ marginBottom: '2px' }}>
         <Col xs={24} sm={12} md={6}>
           <Statistic title="Instancias Activas" value={2} />
         </Col>
@@ -62,14 +62,14 @@ export default function Home() {
         </Col>
       </Row>
 
-      <h2 style={{ marginBottom: '16px' }}>Herramientas Disponibles</h2>
-      <Row gutter={[16, 16]}>
+      <h2 style={{ marginBottom: '2px', marginTop: 0 }}>Herramientas Disponibles</h2>
+      <Row gutter={[2, 2]} style={{ flex: 1, overflow: 'auto' }}>
         {tools.map((tool) => (
           <Col xs={24} sm={12} md={8} lg={6} key={tool.title}>
             <Card
               hoverable
               onClick={() => window.location.pathname = tool.path}
-              style={{ textAlign: 'center', cursor: 'pointer' }}
+              style={{ textAlign: 'center', cursor: 'pointer', height: '100%', borderRadius: 0 }}
             >
               <div style={{ marginBottom: '12px' }}>
                 {tool.icon}
@@ -83,8 +83,8 @@ export default function Home() {
         ))}
       </Row>
 
-      <div style={{ marginTop: '32px' }}>
-        <h2 style={{ marginBottom: '16px' }}>Últimas Actividades</h2>
+      <div style={{ flex: 1, overflow: 'auto', marginTop: '2px' }}>
+        <h2 style={{ marginBottom: '2px', marginTop: 0 }}>Últimas Actividades</h2>
         <Timeline items={[
           { children: 'Sincronización de categorías completada' },
           { children: 'Nuevo formulario eForms importado' },

@@ -160,26 +160,16 @@ function AppContent() {
         collapsedWidth={64}
         style={{
           overflow: 'auto',
-          height: 'calc(100vh - 72px - 20px)',
+          height: 'calc(100vh - 48px - 20px)',
           position: 'fixed',
           left: 0,
-          top: 72,
+          top: 48,
           bottom: 20,
           zIndex: 100,
           scrollbarWidth: 'thin'
         }}
       >
-        <div style={{
-          color: 'white',
-          padding: '16px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          marginBottom: '20px',
-          borderBottom: '1px solid rgba(255,255,255,0.2)'
-        }}>
-          {!collapsed && 'TheJToolbox'}
-        </div>
+
 
         <Menu
           theme="dark"
@@ -216,12 +206,12 @@ function AppContent() {
         style={{
           background: isDark ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',
-          padding: '0 32px',
+          padding: '0 8px',
           boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: 72,
+          height: 48,
           position: 'fixed',
           top: 0,
           left: 0,
@@ -234,18 +224,18 @@ function AppContent() {
           {/* Logo y Título */}
           <div style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
+            alignItems: 'left',
+            gap: '8px'
           }}>
             <img
               src="/assets/images/logo.png"
               alt="TheJToolbox"
               style={{
-                width: '48px',
-                height: '48px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '12px',
                 objectFit: 'cover',
-                boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)'
+                boxShadow: '0 4px 12px rgba(2, 23, 43, 0.3)'
               }}
             />
             <div style={{
@@ -263,16 +253,7 @@ function AppContent() {
               }}>
                 TheJToolbox
               </div>
-              <div style={{
-                fontSize: '12px',
-                color: isDark ? '#b3b3b3' : '#8c8c8c',
-                marginTop: '2px',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                Therefore™ Administration
-              </div>
+
             </div>
           </div>
 
@@ -299,17 +280,17 @@ function AppContent() {
 
       <Layout style={{
         marginLeft: collapsed ? 64 : 250,
-        marginTop: 72,
+        marginTop: 48,
         marginBottom: 20,
         width: collapsed ? 'calc(100% - 64px)' : 'calc(100% - 250px)',
-        height: 'calc(100vh - 92px)',
+        height: 'calc(100vh - 68px)',
         transition: 'all 0.2s',
         display: 'flex',
         flexDirection: 'column'
       }}>
         <Content style={{
           margin: 0,
-          padding: '32px',
+          padding: '2px',
           background: isDark ? '#000000' : '#f5f5f5',
           height: '100%',
           overflow: 'auto',

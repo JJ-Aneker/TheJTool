@@ -189,10 +189,10 @@ export default function UserProfile() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto' }}>
-      <Card>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
+      <Card style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRadius: 0, marginBottom: 0 }} bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '2px', overflow: 'auto' }}>
         {/* Encabezado con avatar y info básica */}
-        <Row gutter={24} style={{ marginBottom: '32px' }}>
+        <Row gutter={2} style={{ marginBottom: '2px' }}>
           <Col xs={24} sm={6} style={{ textAlign: 'center' }}>
             <Upload
               name="avatar"
@@ -229,7 +229,7 @@ export default function UserProfile() {
             </Upload>
           </Col>
           <Col xs={24} sm={18}>
-            <h2 style={{ margin: '0 0 8px 0' }}>
+            <h2 style={{ margin: '0 0 2px 0' }}>
               {profile.name && profile.surname ? `${profile.name} ${profile.surname}` : profile.name || 'Usuario'}
             </h2>
             <p style={{ color: '#8c8c8c', marginBottom: '16px' }}>
@@ -257,11 +257,12 @@ export default function UserProfile() {
           </Col>
         </Row>
 
-        <Divider />
+        <Divider style={{ margin: '2px 0' }} />
 
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
           items={[
             {
               key: 'profile',
@@ -273,7 +274,7 @@ export default function UserProfile() {
                     layout="vertical"
                     onFinish={handleUpdateProfile}
                   >
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
                       <Form.Item
                         label="Nombre"
                         name="name"
@@ -330,7 +331,7 @@ export default function UserProfile() {
                       />
                     </Form.Item>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
                       <Form.Item
                         label="Ciudad"
                         name="city"

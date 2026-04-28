@@ -295,18 +295,19 @@ export default function UserManager() {
   const stats = getStatistics()
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <Card title={<><UserOutlined /> Gestión de Usuarios Therefore™</>}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
+      <Card title={<><UserOutlined /> Gestión de Usuarios Therefore™</>} style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRadius: 0, marginBottom: 0 }} bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '2px' }}>
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
           items={[
             {
               key: 'users',
               label: 'Usuarios',
               children: (
-                <div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2px', marginBottom: '2px' }}>
                     <Card size="small">
                       <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{stats.total}</div>
                       <div style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>Usuarios Totales</div>
@@ -325,7 +326,7 @@ export default function UserManager() {
                     </Card>
                   </div>
 
-                  <Space style={{ marginBottom: 16 }}>
+                  <Space style={{ marginBottom: 2 }}>
                     <Button
                       type="primary"
                       icon={<PlusOutlined />}
@@ -337,12 +338,14 @@ export default function UserManager() {
                     </Button>
                   </Space>
 
-                  <Spin spinning={loading}>
+                  <Spin spinning={loading} style={{ flex: 1 }}>
                     <Table
                       columns={columns}
                       dataSource={users}
                       rowKey="id"
                       pagination={{ pageSize: 10 }}
+                      style={{ height: '100%' }}
+                      scroll={{ y: 'calc(100vh - 300px)' }}
                     />
                   </Spin>
                 </div>
@@ -352,8 +355,8 @@ export default function UserManager() {
               key: 'roles',
               label: 'Roles y Permisos',
               children: (
-                <div>
-                  <h4 style={{ marginBottom: '16px' }}>Configuración de Roles</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px' }}>
+                  <h4 style={{ marginBottom: '2px', marginTop: 0 }}>Configuración de Roles</h4>
                   <Table
                     dataSource={[
                       {
@@ -415,8 +418,8 @@ export default function UserManager() {
               key: 'audit',
               label: 'Auditoría',
               children: (
-                <div>
-                  <h4 style={{ marginBottom: '16px' }}>Registro de Actividades</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px' }}>
+                  <h4 style={{ marginBottom: '2px', marginTop: 0 }}>Registro de Actividades</h4>
                   <Table
                     dataSource={[
                       {
