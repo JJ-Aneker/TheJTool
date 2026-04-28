@@ -228,7 +228,7 @@ export default function ProjectDocs() {
   return (
     <Card
       style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
       title={<><FileTextOutlined /> Documentación de Proyectos Therefore™</>}
     >
         <Tabs items={[
@@ -236,7 +236,7 @@ export default function ProjectDocs() {
             key: 'browser',
             label: 'Explorador',
             children: (
-              <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '24px', padding: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '24px' }}>
                 <div style={{ border: '1px solid #d9d9d9', borderRadius: '4px', padding: '8px' }}>
                   <h4 style={{ marginBottom: '12px' }}>Categorías</h4>
                   <Tree

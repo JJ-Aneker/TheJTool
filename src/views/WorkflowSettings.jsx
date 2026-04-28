@@ -337,7 +337,7 @@ export default function WorkflowSettings() {
   return (
     <Card
       style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
       title={<><BgColorsOutlined /> Gestor de Workflows Therefore™</>}
     >
         <Tabs
@@ -348,7 +348,7 @@ export default function WorkflowSettings() {
               key: 'list',
               label: 'Workflows',
               children: (
-                <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', gap: '16px', minHeight: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, flex: 1 }}>
                   <Space>
                     <Button
                       type="primary"

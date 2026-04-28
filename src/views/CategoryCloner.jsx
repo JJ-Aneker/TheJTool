@@ -119,7 +119,7 @@ export default function CategoryCloner() {
   return (
     <Card
       style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
       title={<><CopyOutlined /> Clonador de Categorías Therefore™</>}
       extra={
         <Upload
@@ -132,14 +132,12 @@ export default function CategoryCloner() {
         </Upload>
       }
     >
-
-
-        <Spin spinning={loading} style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px' }}>
+        <Spin spinning={loading} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <h3 style={{ margin: '0 0 16px 0' }}>Categorías Disponibles</h3>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <Table
               columns={columns}
-              dataSource={categories}
+              dataIndex={categories}
               rowKey="ctgryId"
               size="small"
               pagination={{ pageSize: 10 }}
