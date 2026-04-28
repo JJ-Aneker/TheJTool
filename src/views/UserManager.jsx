@@ -170,7 +170,7 @@ export default function UserManager() {
         const { error } = await supabase
           .from('profiles')
           .update({ avatar_url: result.url })
-          .eq('id', selectedUser.id)
+          .eq('user_id', selectedUser.user_id)
 
         if (error) throw error
 
@@ -198,7 +198,7 @@ export default function UserManager() {
       const { error } = await supabase
         .from('profiles')
         .delete()
-        .eq('id', user.id)
+        .eq('user_id', user.user_id)
 
       if (error) throw error
       setUsers(users.filter(u => u.id !== user.id))
@@ -250,7 +250,7 @@ export default function UserManager() {
           approved: values.approved,
           updated_at: new Date().toISOString()
         })
-        .eq('id', selectedUser.id)
+        .eq('user_id', selectedUser.user_id)
 
       if (error) throw error
       setUsers(users.map(u =>
