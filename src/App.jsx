@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Menu, Spin } from 'antd'
+import { Layout, Menu, Spin, Button } from 'antd'
 import {
   FormOutlined,
   CopyOutlined,
@@ -10,9 +10,13 @@ import {
   FileTextOutlined,
   SettingOutlined,
   HomeOutlined,
-  UserOutlined
+  UserOutlined,
+  BgColorsOutlined,
+  SunOutlined,
+  MoonOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
+import { useTheme } from './hooks/useTheme'
 
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
@@ -109,6 +113,7 @@ function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
   const { isAuthenticated, user, logout, loading } = useAuth()
+  const { isDark, toggleTheme } = useTheme()
 
   // Mostrar login si no está autenticado
   if (!isAuthenticated) {
@@ -186,13 +191,14 @@ function AppContent() {
 
       <Layout style={{ marginLeft: collapsed ? 80 : 250, transition: 'margin 0.2s' }}>
         <Header style={{
-          background: '#fff',
+          background: isDark ? '#141414' : '#fff',
           padding: '0 24px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: 64
+          height: 64,
+          transition: 'background 0.3s'
         }}>
           <div style={{
             fontSize: '16px',
@@ -201,7 +207,15 @@ function AppContent() {
           }}>
             Therefore™ Administration Panel
           </div>
-          <UserDropdown />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Button
+              type="text"
+              icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+              onClick={toggleTheme}
+              title={isDark ? 'Modo claro' : 'Modo oscuro'}
+            />
+            <UserDropdown />
+          </div>
         </Header>
 
         <Content style={{
