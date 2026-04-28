@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Card, Form, Input, Button, Avatar, Space, message, Spin, Tabs, Alert, Divider, Row, Col, Upload } from 'antd'
-import { UserOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, SaveOutlined, LockOutlined, CameraOutlined } from '@ant-design/icons'
+import { Card, Form, Input, Button, Avatar, message, Spin, Tabs, Alert, Upload } from 'antd'
+import { UserOutlined, SaveOutlined, LockOutlined, CameraOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'
@@ -168,321 +168,253 @@ export default function UserProfile() {
     )
   }
 
-  const getRoleColor = (role) => {
-    const colors = {
-      admin: 'red',
-      manager: 'orange',
-      user: 'blue',
-      auditor: 'purple'
-    }
-    return colors[role] || 'default'
-  }
-
-  const getRoleLabel = (role) => {
-    const labels = {
-      admin: 'Administrador',
-      manager: 'Gerente',
-      user: 'Usuario',
-      auditor: 'Auditor'
-    }
-    return labels[role] || role
-  }
-
   return (
     <Card
       style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
       bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
       title={<><UserOutlined /> Mi Perfil</>}
     >
-        {/* Encabezado con avatar y info básica */}
-        <Row gutter={16} style={{ marginBottom: '16px' }}>
-          <Col xs={24} sm={6} style={{ textAlign: 'center' }}>
-            <Upload
-              name="avatar"
-              maxCount={1}
-              beforeUpload={handleAvatarUpload}
-              showUploadList={false}
-              accept="image/*"
-            >
-              <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}>
-                <Avatar
-                  size={120}
-                  src={profile.avatar_url}
-                  icon={<UserOutlined />}
-                  style={{ backgroundColor: '#1890ff' }}
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        items={[
+          {
+            key: 'profile',
+            label: 'Mi Perfil',
+            children: (
+              <Spin spinning={loading}>
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr', gap: '24px', alignItems: 'start' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <Upload
+                        name="avatar"
+                        maxCount={1}
+                        beforeUpload={handleAvatarUpload}
+                        showUploadList={false}
+                        accept="image/*"
+                      >
+                        <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}>
+                          <Avatar
+                            size={60}
+                            src={profile.avatar_url}
+                            icon={<UserOutlined />}
+                            style={{ backgroundColor: '#1890ff' }}
+                          />
+                          <div style={{
+                            position: 'absolute',
+                            bottom: -4,
+                            right: -4,
+                            background: '#1890ff',
+                            borderRadius: '50%',
+                            width: '24px',
+                            height: '24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            border: '2px solid white',
+                            opacity: avatarLoading ? 0.6 : 1
+                          }}>
+                            {avatarLoading ? <Spin size="small" /> : <CameraOutlined style={{ fontSize: '12px' }} />}
+                          </div>
+                        </div>
+                      </Upload>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#999', marginBottom: '2px' }}>Email</div>
+                      <div style={{ fontSize: '14px', fontWeight: '500', color: '#1890ff' }}>{user?.email}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#999', marginBottom: '2px' }}>ID</div>
+                      <div style={{ fontSize: '12px', fontFamily: 'monospace', color: '#666' }}>{user?.id}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onFinish={handleUpdateProfile}
+                  style={{ marginTop: '-8px' }}
+                >
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <Form.Item
+                      label="Nombre"
+                      name="name"
+                      rules={[{ required: true, message: 'Nombre requerido' }]}
+                    >
+                      <Input placeholder="Tu nombre" />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Apellido"
+                      name="surname"
+                      rules={[{ required: true, message: 'Apellido requerido' }]}
+                    >
+                      <Input placeholder="Tu apellido" />
+                    </Form.Item>
+                  </div>
+
+                  <Form.Item
+                    label="Teléfono"
+                    name="phone"
+                  >
+                    <Input placeholder="+34 912 345 678" />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Email"
+                    name="email"
+                    hidden
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Dirección"
+                    name="address"
+                  >
+                    <Input placeholder="Calle principal, 123" />
+                  </Form.Item>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <Form.Item
+                      label="Ciudad"
+                      name="city"
+                    >
+                      <Input placeholder="Madrid" />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Provincia"
+                      name="province"
+                    >
+                      <Input placeholder="Madrid" />
+                    </Form.Item>
+                  </div>
+
+                  <Form.Item
+                    label="Código Postal"
+                    name="postal"
+                  >
+                    <Input placeholder="28001" />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Rol"
+                    name="role"
+                  >
+                    <Input disabled />
+                  </Form.Item>
+
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    icon={<SaveOutlined />}
+                    block
+                    loading={loading}
+                  >
+                    Guardar Cambios
+                  </Button>
+                </Form>
+              </Spin>
+            )
+          },
+          {
+            key: 'password',
+            label: 'Cambiar Contraseña',
+            children: (
+              <Spin spinning={loading}>
+                <Alert
+                  message="Seguridad"
+                  description="Por favor ingresa una contraseña segura con al menos 8 caracteres"
+                  type="info"
+                  showIcon
+                  style={{ marginBottom: '24px' }}
                 />
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  background: '#1890ff',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  border: '3px solid white',
-                  opacity: avatarLoading ? 0.6 : 1
-                }}>
-                  {avatarLoading ? <Spin size="small" /> : <CameraOutlined />}
-                </div>
-              </div>
-            </Upload>
-          </Col>
-          <Col xs={24} sm={18}>
-            <h2 style={{ margin: '0 0 2px 0' }}>
-              {profile.name && profile.surname ? `${profile.name} ${profile.surname}` : profile.name || 'Usuario'}
-            </h2>
-            <p style={{ color: '#8c8c8c', marginBottom: '16px' }}>
-              {user?.email}
-            </p>
-            <Space wrap>
-              <div style={{
-                padding: '8px 12px',
-                background: '#f0f2f5',
-                borderRadius: '4px',
-                fontSize: '12px'
-              }}>
-                <strong>Rol:</strong> {getRoleLabel(profile.role)}
-              </div>
-              <div style={{
-                padding: '8px 12px',
-                background: profile.approved ? '#f6ffed' : '#fff1f0',
-                borderRadius: '4px',
-                fontSize: '12px',
-                color: profile.approved ? '#52c41a' : '#ff4d4f'
-              }}>
-                <strong>Estado:</strong> {profile.approved ? 'Aprobado' : 'Pendiente'}
-              </div>
-            </Space>
-          </Col>
-        </Row>
 
-        <Divider style={{ margin: '16px 0' }} />
-
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
-          items={[
-            {
-              key: 'profile',
-              label: 'Mi Perfil',
-              children: (
-                <Spin spinning={loading}>
-                  <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handleUpdateProfile}
+                <Form
+                  layout="vertical"
+                  onFinish={handleChangePassword}
+                >
+                  <Form.Item
+                    label="Nueva Contraseña"
+                    name="newPassword"
+                    rules={[
+                      { required: true, message: 'Contraseña requerida' },
+                      { min: 8, message: 'Mínimo 8 caracteres' }
+                    ]}
                   >
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
-                      <Form.Item
-                        label="Nombre"
-                        name="name"
-                        rules={[{ required: true, message: 'Nombre requerido' }]}
-                      >
-                        <Input
-                          placeholder="Tu nombre"
-                          size="large"
-                        />
-                      </Form.Item>
+                    <Input.Password
+                      placeholder="Nueva contraseña"
+                    />
+                  </Form.Item>
 
-                      <Form.Item
-                        label="Apellido"
-                        name="surname"
-                        rules={[{ required: true, message: 'Apellido requerido' }]}
-                      >
-                        <Input
-                          placeholder="Tu apellido"
-                          size="large"
-                        />
-                      </Form.Item>
-                    </div>
-
-                    <Form.Item
-                      label="Email"
-                      name="email"
-                    >
-                      <Input
-                        disabled
-                        size="large"
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Teléfono"
-                      name="phone"
-                    >
-                      <Input
-                        placeholder="+34 912 345 678"
-                        size="large"
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Dirección"
-                      name="address"
-                    >
-                      <Input
-                        placeholder="Calle principal, 123"
-                        size="large"
-                      />
-                    </Form.Item>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
-                      <Form.Item
-                        label="Ciudad"
-                        name="city"
-                      >
-                        <Input
-                          placeholder="Madrid"
-                          size="large"
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Provincia"
-                        name="province"
-                      >
-                        <Input
-                          placeholder="Madrid"
-                          size="large"
-                        />
-                      </Form.Item>
-                    </div>
-
-                    <Form.Item
-                      label="Código Postal"
-                      name="postal"
-                    >
-                      <Input
-                        placeholder="28001"
-                        size="large"
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Rol"
-                      name="role"
-                    >
-                      <Input disabled size="large" />
-                    </Form.Item>
-
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      size="large"
-                      icon={<SaveOutlined />}
-                      block
-                      loading={loading}
-                    >
-                      Guardar Cambios
-                    </Button>
-                  </Form>
-                </Spin>
-              )
-            },
-            {
-              key: 'password',
-              label: 'Cambiar Contraseña',
-              children: (
-                <Spin spinning={loading}>
-                  <Alert
-                    message="Seguridad"
-                    description="Por favor ingresa una contraseña segura con al menos 8 caracteres"
-                    type="info"
-                    showIcon
-                    style={{ marginBottom: '24px' }}
-                  />
-
-                  <Form
-                    layout="vertical"
-                    onFinish={handleChangePassword}
+                  <Form.Item
+                    label="Confirmar Contraseña"
+                    name="confirmPassword"
+                    rules={[
+                      { required: true, message: 'Confirma tu contraseña' }
+                    ]}
                   >
-                    <Form.Item
-                      label="Nueva Contraseña"
-                      name="newPassword"
-                      rules={[
-                        { required: true, message: 'Contraseña requerida' },
-                        { min: 8, message: 'Mínimo 8 caracteres' }
-                      ]}
-                    >
-                      <Input.Password
-                        prefix={<LockOutlined />}
-                        placeholder="Nueva contraseña"
-                        size="large"
-                      />
-                    </Form.Item>
+                    <Input.Password
+                      placeholder="Repite la contraseña"
+                    />
+                  </Form.Item>
 
-                    <Form.Item
-                      label="Confirmar Contraseña"
-                      name="confirmPassword"
-                      rules={[
-                        { required: true, message: 'Confirma tu contraseña' }
-                      ]}
-                    >
-                      <Input.Password
-                        prefix={<LockOutlined />}
-                        placeholder="Repite la contraseña"
-                        size="large"
-                      />
-                    </Form.Item>
-
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      size="large"
-                      icon={<LockOutlined />}
-                      block
-                      loading={loading}
-                    >
-                      Cambiar Contraseña
-                    </Button>
-                  </Form>
-                </Spin>
-              )
-            },
-            {
-              key: 'info',
-              label: 'Información',
-              children: (
-                <div>
-                  <h4>Información de tu Cuenta</h4>
-                  <table style={{ width: '100%' }}>
-                    <tbody>
-                      <tr>
-                        <td style={{ padding: '8px', fontWeight: 'bold' }}>ID de Usuario:</td>
-                        <td style={{ padding: '8px', fontFamily: 'monospace', fontSize: '12px' }}>
-                          {user.id}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: '8px', fontWeight: 'bold' }}>Email Confirmado:</td>
-                        <td style={{ padding: '8px' }}>
-                          {user.email_confirmed_at ? 'Sí' : 'No'}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: '8px', fontWeight: 'bold' }}>Cuenta Creada:</td>
-                        <td style={{ padding: '8px' }}>
-                          {new Date(user.created_at).toLocaleString('es-ES')}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: '8px', fontWeight: 'bold' }}>Última Actualización:</td>
-                        <td style={{ padding: '8px' }}>
-                          {new Date(user.updated_at).toLocaleString('es-ES')}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )
-            }
-          ]}
-        />
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    icon={<LockOutlined />}
+                    block
+                    loading={loading}
+                  >
+                    Cambiar Contraseña
+                  </Button>
+                </Form>
+              </Spin>
+            )
+          },
+          {
+            key: 'info',
+            label: 'Información',
+            children: (
+              <div>
+                <h4>Información de tu Cuenta</h4>
+                <table style={{ width: '100%' }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: '8px', fontWeight: 'bold' }}>ID de Usuario:</td>
+                      <td style={{ padding: '8px', fontFamily: 'monospace', fontSize: '12px' }}>
+                        {user.id}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Email Confirmado:</td>
+                      <td style={{ padding: '8px' }}>
+                        {user.email_confirmed_at ? 'Sí' : 'No'}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Cuenta Creada:</td>
+                      <td style={{ padding: '8px' }}>
+                        {new Date(user.created_at).toLocaleString('es-ES')}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '8px', fontWeight: 'bold' }}>Última Actualización:</td>
+                      <td style={{ padding: '8px' }}>
+                        {new Date(user.updated_at).toLocaleString('es-ES')}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )
+          }
+        ]}
+      />
     </Card>
   )
 }
