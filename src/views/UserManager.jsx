@@ -307,25 +307,6 @@ export default function UserManager() {
               label: 'Usuarios',
               children: (
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2px', marginBottom: '2px' }}>
-                    <Card size="small">
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{stats.total}</div>
-                      <div style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>Usuarios Totales</div>
-                    </Card>
-                    <Card size="small">
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>{stats.active}</div>
-                      <div style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>Activos</div>
-                    </Card>
-                    <Card size="small">
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#faad14' }}>{stats.inactive}</div>
-                      <div style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>Inactivos</div>
-                    </Card>
-                    <Card size="small">
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4d4f' }}>{stats.admins}</div>
-                      <div style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>Administradores</div>
-                    </Card>
-                  </div>
-
                   <Space style={{ marginBottom: 2 }}>
                     <Button
                       type="primary"

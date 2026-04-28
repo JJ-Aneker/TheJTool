@@ -281,7 +281,7 @@ function AppContent() {
       <Layout style={{
         marginLeft: collapsed ? 64 : 250,
         marginTop: 48,
-        marginBottom: 20,
+        marginBottom: 0,
         width: collapsed ? 'calc(100% - 64px)' : 'calc(100% - 250px)',
         height: 'calc(100vh - 68px)',
         transition: 'all 0.2s',
@@ -292,9 +292,8 @@ function AppContent() {
           margin: 0,
           padding: '2px',
           background: isDark ? '#000000' : '#f5f5f5',
-          height: '100%',
-          overflow: 'auto',
-          flex: 1
+          flex: 1,
+          overflow: 'hidden'
         }}>
           <Routes>
             <Route path="/" element={<Home />} />
