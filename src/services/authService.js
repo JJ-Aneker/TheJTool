@@ -14,10 +14,10 @@ export const authService = {
 
       if (error) throw error
 
-      // Create user profile in database
+      // Create user profile in profiles table
       if (data.user) {
         await supabase
-          .from('users')
+          .from('profiles')
           .insert([
             {
               id: data.user.id,
@@ -27,7 +27,7 @@ export const authService = {
               department: userData.department,
               phone: userData.phone,
               status: 'active',
-              created_at: new Date().toISOString()
+              updated_at: new Date().toISOString()
             }
           ])
       }

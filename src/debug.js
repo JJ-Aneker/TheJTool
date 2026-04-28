@@ -38,19 +38,19 @@ export async function debugSupabase() {
     console.error('❌ Error:', err.message)
   }
 
-  // 4. Verificar tabla 'users'
-  console.log('\n4️⃣ Verificar tabla de usuarios:')
+  // 4. Verificar tabla 'profiles'
+  console.log('\n4️⃣ Verificar tabla de perfiles:')
   try {
     const { data, error } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .limit(5)
 
     if (error) {
-      console.error('❌ Error al leer tabla users:', error.message)
-      console.log('   Posible causa: La tabla "users" no existe o no hay permisos RLS')
+      console.error('❌ Error al leer tabla profiles:', error.message)
+      console.log('   Posible causa: La tabla "profiles" no existe o no hay permisos RLS')
     } else {
-      console.log('✅ Tabla users accesible. Registros:', data.length)
+      console.log('✅ Tabla profiles accesible. Registros:', data.length)
       console.log('   Datos:', data)
     }
   } catch (err) {

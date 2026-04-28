@@ -5,7 +5,7 @@ export const userService = {
   async getUserById(userId) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
@@ -20,7 +20,7 @@ export const userService = {
   // Get all users
   async getAllUsers(filter = {}) {
     try {
-      let query = supabase.from('users').select('*')
+      let query = supabase.from('profiles').select('*')
 
       if (filter.role) {
         query = query.eq('role', filter.role)
@@ -52,9 +52,9 @@ export const userService = {
 
       if (authError) throw authError
 
-      // Create user profile
+      // Create user profile in profiles table
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .insert([
           {
             id: authData.user.id,
@@ -64,7 +64,7 @@ export const userService = {
             department: userData.department,
             phone: userData.phone,
             status: userData.status || 'active',
-            created_at: new Date().toISOString()
+            updated_at: new Date().toISOString()
           }
         ])
         .select()
@@ -80,7 +80,7 @@ export const userService = {
   async updateUser(userId, userData) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({
           ...userData,
           updated_at: new Date().toISOString()
@@ -98,9 +98,9 @@ export const userService = {
   // Delete user
   async deleteUser(userId) {
     try {
-      // Delete from users table
+      // Delete from profiles table
       const { error: dbError } = await supabase
-        .from('users')
+        .from('profiles')
         .delete()
         .eq('id', userId)
 
@@ -115,7 +115,7 @@ export const userService = {
   async assignRole(userId, role) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ role })
         .eq('id', userId)
         .select()
@@ -131,7 +131,7 @@ export const userService = {
   async deactivateUser(userId) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ status: 'inactive' })
         .eq('id', userId)
         .select()
@@ -147,7 +147,7 @@ export const userService = {
   async activateUser(userId) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ status: 'active' })
         .eq('id', userId)
         .select()
@@ -201,7 +201,7 @@ export const userService = {
   async searchUsers(searchTerm) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .or(
           `full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`
