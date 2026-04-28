@@ -1,6 +1,6 @@
 {
-  "buildCommand": "echo 'Static site, no build needed'",
-  "outputDirectory": ".",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "headers": [
     {
       "source": "/api/(.*)",
@@ -14,7 +14,7 @@
   ],
   "rewrites": [
     {
-      "source": "/index",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
