@@ -295,11 +295,12 @@ export default function UserManager() {
   const stats = getStatistics()
 
   return (
-    <Card title={<><UserOutlined /> Gestión de Usuarios Therefore™</>} style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column' }} bodyStyle={{ padding: '2px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+    <Card style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', paddingTop: 0 }} bodyStyle={{ padding: '2px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, paddingTop: 0 }}>
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
         style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        tabBarExtraContent={<><UserOutlined /> Gestión de Usuarios Therefore™</>}
         items={[
             {
               key: 'users',

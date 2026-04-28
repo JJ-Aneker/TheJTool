@@ -224,18 +224,19 @@ function AppContent() {
           {/* Logo y Título */}
           <div style={{
             display: 'flex',
-            alignItems: 'left',
-            gap: '8px'
+            alignItems: 'center',
+            gap: '6px'
           }}>
             <img
               src="/assets/images/logo.png"
               alt="TheJToolbox"
               style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '12px',
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
                 objectFit: 'cover',
-                boxShadow: '0 4px 12px rgba(2, 23, 43, 0.3)'
+                boxShadow: '0 2px 8px rgba(2, 23, 43, 0.2)',
+                flexShrink: 0
               }}
             />
             <div style={{
@@ -244,7 +245,7 @@ function AppContent() {
               minWidth: 0
             }}>
               <div style={{
-                fontSize: '18px',
+                fontSize: '16px',
                 fontWeight: '700',
                 color: isDark ? '#e6e6e6' : '#000',
                 whiteSpace: 'nowrap',
