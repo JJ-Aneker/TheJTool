@@ -43,7 +43,7 @@ export default function UserManager() {
     {
       title: 'Usuario',
       key: 'user',
-      width: 200,
+      width: 250,
       render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Avatar
@@ -52,11 +52,12 @@ export default function UserManager() {
             icon={<UserOutlined />}
             style={{ backgroundColor: '#1890ff' }}
           />
-          <div>
-            <div style={{ fontWeight: '500' }}>
-              {record.name && record.surname ? `${record.name} ${record.surname}` : record.name || record.email}
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: '600', fontSize: '14px' }}>
+              {record.name && record.surname ? `${record.name} ${record.surname}` : 'Sin nombre'}
             </div>
-            <div style={{ fontSize: '12px', color: '#8c8c8c' }}>{record.email}</div>
+            <div style={{ fontSize: '12px', color: '#1890ff', fontWeight: '500' }}>{record.email || 'Sin email'}</div>
+            <div style={{ fontSize: '11px', color: '#999', fontFamily: 'monospace' }}>{record.user_id}</div>
           </div>
         </div>
       )
@@ -464,8 +465,29 @@ export default function UserManager() {
         onOk={() => form.submit()}
         onCancel={() => setIsModalVisible(false)}
         confirmLoading={loading}
-        width={600}
+        width={700}
       >
+        {selectedUser && (
+          <div style={{
+            padding: '12px 16px',
+            marginBottom: '24px',
+            background: '#f5f5f5',
+            borderRadius: '4px',
+            borderLeft: '4px solid #1890ff'
+          }}>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>IDENTIFICACIÓN DEL USUARIO</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px' }}>Email (auth.users)</div>
+                <div style={{ fontSize: '14px', fontWeight: '500', color: '#1890ff' }}>{selectedUser.email}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px' }}>ID Usuario</div>
+                <div style={{ fontSize: '12px', fontFamily: 'monospace', color: '#666' }}>{selectedUser.user_id}</div>
+              </div>
+            </div>
+          </div>
+        )}
         <Form
           form={form}
           layout="vertical"
@@ -490,17 +512,18 @@ export default function UserManager() {
           </div>
 
           <Form.Item
-            label="Email (desde auth)"
-            name="email"
-          >
-            <Input placeholder="usuario@buildingcenter.com" prefix={<MailOutlined />} disabled />
-          </Form.Item>
-
-          <Form.Item
             label="Teléfono"
             name="phone"
           >
             <Input placeholder="+34 912 345 678" prefix={<PhoneOutlined />} />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="email"
+            hidden
+          >
+            <Input />
           </Form.Item>
 
           <Form.Item
