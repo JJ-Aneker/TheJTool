@@ -9,7 +9,6 @@ import {
   AppstoreOutlined,
   FileTextOutlined,
   SettingOutlined,
-  LogoutOutlined,
   HomeOutlined,
   UserOutlined
 } from '@ant-design/icons'
@@ -17,10 +16,12 @@ import { useAuth } from './hooks/useAuth'
 
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
+import UserDropdown from './components/UserDropdown'
 
 // Vistas
 import Home from './views/Home'
 import Login from './views/Login'
+import UserProfile from './views/UserProfile'
 import EFormGenerator from './views/EFormGenerator'
 import CategoryCloner from './views/CategoryCloner'
 import TenantManager from './views/TenantManager'
@@ -129,11 +130,6 @@ function AppContent() {
     }
   }
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/login')
-  }
-
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider
@@ -172,30 +168,6 @@ function AppContent() {
           items={menuItems}
         />
 
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          borderTop: '1px solid rgba(255,255,255,0.2)',
-          padding: '16px'
-        }}>
-          <div style={{ color: 'white', fontSize: '12px', marginBottom: '12px', paddingLeft: '8px' }}>
-            {user?.email}
-          </div>
-          <Menu
-            theme="dark"
-            mode="inline"
-            items={[
-              {
-                key: 'logout',
-                icon: <LogoutOutlined />,
-                label: 'Salir',
-                onClick: handleLogout
-              }
-            ]}
-          />
-        </div>
       </Sider>
 
       <Layout style={{ marginLeft: collapsed ? 80 : 250, transition: 'margin 0.2s' }}>
@@ -205,6 +177,7 @@ function AppContent() {
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           height: 64
         }}>
           <div style={{
@@ -214,6 +187,7 @@ function AppContent() {
           }}>
             Therefore™ Administration Panel
           </div>
+          <UserDropdown />
         </Header>
 
         <Content style={{
@@ -225,6 +199,7 @@ function AppContent() {
         }}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<UserManager />} />
             <Route path="/eforms" element={<EFormGenerator />} />
             <Route path="/category-cloner" element={<CategoryCloner />} />
