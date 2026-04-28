@@ -190,40 +190,91 @@ function AppContent() {
       </Sider>
 
       <Layout style={{ marginLeft: collapsed ? 80 : 250, transition: 'margin 0.2s' }}>
-        <Header style={{
-          background: isDark ? '#141414' : '#fff',
-          padding: '0 24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: 64,
-          transition: 'background 0.3s'
-        }}>
-          <div style={{
-            fontSize: '16px',
-            fontWeight: '500',
-            color: '#1890ff'
+        <Header
+          className="app-header"
+          style={{
+            background: isDark ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            padding: '0 32px',
+            boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: 72,
+            position: 'sticky',
+            top: 0,
+            zIndex: 99,
+            transition: 'all 0.3s ease',
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
           }}>
-            Therefore™ Administration Panel
+
+          {/* Logo y Título */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            flex: 1
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #1890ff, #0050b3)',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '24px',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)'
+            }}>
+              T
+            </div>
+            <div>
+              <div style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                color: isDark ? '#e6e6e6' : '#000'
+              }}>
+                TheJToolbox
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: isDark ? '#b3b3b3' : '#8c8c8c',
+                marginTop: '2px'
+              }}>
+                Therefore™ Administration
+              </div>
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+
+          {/* Controles derecha */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '24px',
+            marginLeft: 'auto'
+          }}>
             <Button
               type="text"
               icon={isDark ? <SunOutlined /> : <MoonOutlined />}
               onClick={toggleTheme}
               title={isDark ? 'Modo claro' : 'Modo oscuro'}
+              style={{
+                fontSize: '18px',
+                color: isDark ? '#e6e6e6' : '#000'
+              }}
             />
             <UserDropdown />
           </div>
         </Header>
 
         <Content style={{
-          margin: '24px 24px',
-          padding: '24px',
-          background: '#fff',
-          borderRadius: '4px',
-          minHeight: 'calc(100vh - 112px)'
+          margin: 0,
+          padding: 0,
+          background: isDark ? '#000000' : '#f5f5f5',
+          minHeight: 'calc(100vh - 72px)',
+          overflow: 'auto'
         }}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -243,8 +294,12 @@ function AppContent() {
 
         <Footer style={{
           textAlign: 'center',
-          background: '#f0f2f5',
-          marginLeft: collapsed ? 0 : 0
+          background: isDark ? 'rgba(20, 20, 20, 0.8)' : 'rgba(245, 245, 245, 0.8)',
+          padding: '12px 24px',
+          borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+          fontSize: '12px',
+          color: isDark ? '#8c8c8c' : '#8c8c8c',
+          backdropFilter: 'blur(5px)'
         }}>
           TheJToolbox ©2025 | Powered by Aneker · Therefore™ Integration
         </Footer>
