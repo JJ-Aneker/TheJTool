@@ -16,18 +16,19 @@ export const authService = {
 
       // Create user profile in profiles table
       if (data.user) {
+        const [name, surname] = (userData.fullName || '').split(' ', 2)
         await supabase
           .from('profiles')
           .insert([
             {
-              id: data.user.id,
+              user_id: data.user.id,
               email: data.user.email,
-              full_name: userData.fullName,
+              name: name || '',
+              surname: surname || '',
+              phone: userData.phone || '',
               role: userData.role || 'user',
-              department: userData.department,
-              phone: userData.phone,
-              status: 'active',
-              updated_at: new Date().toISOString()
+              approved: false,
+              created_at: new Date().toISOString()
             }
           ])
       }
@@ -48,12 +49,19 @@ export const authService = {
 
       if (error) throw error
 
-      // Update last login
+      // Check if user is approved in profiles table
       if (data.user) {
-        await supabase
-          .from('users')
-          .update({ last_login: new Date().toISOString() })
-          .eq('id', data.user.id)
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('approved')
+          .eq('user_id', data.user.id)
+          .single()
+
+        if (profileError || !profile?.approved) {
+          // Sign out user if not approved
+          await supabase.auth.signOut()
+          throw new Error('Tu cuenta no ha sido aprobada aún. Contacta con un administrador.')
+        }
       }
 
       return { success: true, session: data.session }
@@ -99,9 +107,9 @@ export const authService = {
   async updateProfile(userId, userData) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update(userData)
-        .eq('id', userId)
+        .eq('user_id', userId)
         .select()
 
       if (error) throw error
@@ -115,7 +123,7 @@ export const authService = {
   async getAllUsers() {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .order('created_at', { ascending: false })
 
@@ -129,17 +137,13 @@ export const authService = {
   // Delete user (admin only)
   async deleteUser(userId) {
     try {
-      // Delete from users table
+      // Delete from profiles table
       const { error: dbError } = await supabase
-        .from('users')
+        .from('profiles')
         .delete()
-        .eq('id', userId)
+        .eq('user_id', userId)
 
       if (dbError) throw dbError
-
-      // Delete from auth
-      const { error: authError } = await supabase.auth.admin.deleteUser(userId)
-      if (authError) throw authError
 
       return { success: true }
     } catch (error) {

@@ -159,7 +159,8 @@ export default function UserManager() {
       address: user.address,
       city: user.city,
       province: user.province,
-      postal: user.postal
+      postal: user.postal,
+      approved: user.approved
     })
     setIsModalVisible(true)
   }
@@ -219,6 +220,7 @@ export default function UserManager() {
           city: values.city,
           province: values.province,
           postal: values.postal,
+          approved: values.approved,
           updated_at: new Date().toISOString()
         })
         .eq('id', selectedUser.id)
@@ -537,6 +539,20 @@ export default function UserManager() {
             name="postal"
           >
             <Input placeholder="28001" />
+          </Form.Item>
+
+          <Form.Item
+            label="Aprobado"
+            name="approved"
+            initialValue={false}
+          >
+            <Select
+              options={[
+                { label: 'Sí', value: true },
+                { label: 'No', value: false }
+              ]}
+              placeholder="Selecciona"
+            />
           </Form.Item>
         </Form>
       </Modal>
