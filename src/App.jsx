@@ -10,7 +10,8 @@ import {
   FileTextOutlined,
   SettingOutlined,
   LogoutOutlined,
-  HomeOutlined
+  HomeOutlined,
+  UserOutlined
 } from '@ant-design/icons'
 
 // Vistas
@@ -22,6 +23,7 @@ import ApiExplorer from './views/ApiExplorer'
 import CategoryBuilder from './views/CategoryBuilder'
 import ProjectDocs from './views/ProjectDocs'
 import WorkflowSettings from './views/WorkflowSettings'
+import UserManager from './views/UserManager'
 
 const { Header, Sider, Content, Footer } = Layout
 
@@ -35,6 +37,12 @@ function App() {
       icon: <HomeOutlined />,
       label: 'Inicio',
       path: '/'
+    },
+    {
+      key: 'users',
+      icon: <UserOutlined />,
+      label: 'Gestión de Usuarios',
+      path: '/users'
     },
     {
       key: 'eforms',
@@ -177,6 +185,7 @@ function App() {
           }}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/users" element={<UserManager />} />
               <Route path="/eforms" element={<EFormGenerator />} />
               <Route path="/category-cloner" element={<CategoryCloner />} />
               <Route path="/tenants" element={<TenantManager />} />
