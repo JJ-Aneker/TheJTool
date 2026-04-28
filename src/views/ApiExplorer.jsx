@@ -186,8 +186,11 @@ export default function ApiExplorer() {
   }
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <Card title={<><ApiOutlined /> Explorador API REST Therefore™</>}>
+    <Card
+      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      title={<><ApiOutlined /> Explorador API REST Therefore™</>}
+    >
         <Alert
           type="info"
           message="Interfaz Interactiva de API"
@@ -379,7 +382,6 @@ export default function ApiExplorer() {
             )}
           </div>
         </div>
-      </Card>
-    </div>
+    </Card>
   )
 }

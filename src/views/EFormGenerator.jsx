@@ -187,12 +187,12 @@ export default function EFormGenerator() {
   }
 
   return (
-    <div style={{ maxWidth: 1200 }}>
-      <Card title={<><FormOutlined /> Generador de eForms Therefore™</>}>
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          items={[
+    <Card style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }} bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }} title={<><FormOutlined /> Generador de eForms Therefore™</>}>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        items={[
             {
               key: 'list',
               label: 'Lista de eForms',
@@ -418,6 +418,5 @@ export default function EFormGenerator() {
           ]}
         />
       </Card>
-    </div>
   )
 }

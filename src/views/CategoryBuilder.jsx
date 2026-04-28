@@ -292,8 +292,11 @@ export default function CategoryBuilder() {
   }
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <Card title={<><AppstoreOutlined /> Category Builder Therefore™</>}>
+    <Card
+      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      title={<><AppstoreOutlined /> Category Builder Therefore™</>}
+    >
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
@@ -436,7 +439,6 @@ export default function CategoryBuilder() {
             }
           ]}
         />
-      </Card>
-    </div>
+    </Card>
   )
 }

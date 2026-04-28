@@ -226,8 +226,11 @@ export default function ProjectDocs() {
   )
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <Card title={<><FileTextOutlined /> Documentación de Proyectos Therefore™</>}>
+    <Card
+      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      title={<><FileTextOutlined /> Documentación de Proyectos Therefore™</>}
+    >
         <Tabs items={[
           {
             key: 'browser',
@@ -394,7 +397,6 @@ export default function ProjectDocs() {
             )
           }
         ]} />
-      </Card>
-    </div>
+    </Card>
   )
 }

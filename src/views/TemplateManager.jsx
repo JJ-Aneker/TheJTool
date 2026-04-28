@@ -187,8 +187,12 @@ export default function TemplateManager() {
   }
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <Card title={<><FileTextOutlined /> Gestión de Templates</>}>
+    <>
+      <Card
+        style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+        bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        title={<><FileTextOutlined /> Gestión de Templates</>}
+      >
         <Space style={{ marginBottom: 16 }}>
           <Button
             type="primary"
@@ -264,6 +268,6 @@ export default function TemplateManager() {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </>
   )
 }

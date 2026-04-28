@@ -203,8 +203,12 @@ export default function TenantManager() {
   const stats = getTotalStats()
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <Card title={<><CloudOutlined /> Gestión de Tenants Therefore™</>}>
+    <>
+      <Card
+        style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+        bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        title={<><CloudOutlined /> Gestión de Tenants Therefore™</>}
+      >
         <Alert
           type="info"
           message="Administración de Instancias"
@@ -316,6 +320,6 @@ export default function TenantManager() {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </>
   )
 }

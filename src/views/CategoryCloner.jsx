@@ -117,27 +117,22 @@ export default function CategoryCloner() {
   }
 
   return (
-    <div style={{ maxWidth: 1200 }}>
-      <Card
-        title={<><CopyOutlined /> Clonador de Categorías Therefore™</>}
-        extra={
-          <Upload
-            beforeUpload={handleUploadXml}
-            accept=".xml"
-            maxCount={1}
-            showUploadList={false}
-          >
-            <Button icon={<UploadOutlined />}>Importar XML</Button>
-          </Upload>
-        }
-      >
-        <Alert
-          type="info"
-          message="Clone categorías existentes"
-          description="Selecciona una categoría origen y define los parámetros para la nueva categoría. Se regenerarán automáticamente todos los GUIDs, campos y contadores."
-          style={{ marginBottom: 24 }}
-          showIcon
-        />
+    <Card
+      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      title={<><CopyOutlined /> Clonador de Categorías Therefore™</>}
+      extra={
+        <Upload
+          beforeUpload={handleUploadXml}
+          accept=".xml"
+          maxCount={1}
+          showUploadList={false}
+        >
+          <Button icon={<UploadOutlined />}>Importar XML</Button>
+        </Upload>
+      }
+    >
+
 
         <Spin spinning={loading}>
           <div style={{ marginBottom: 24 }}>
@@ -226,6 +221,5 @@ export default function CategoryCloner() {
           )}
         </Spin>
       </Card>
-    </div>
   )
 }

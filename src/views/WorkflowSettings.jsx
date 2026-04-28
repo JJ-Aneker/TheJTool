@@ -335,8 +335,11 @@ export default function WorkflowSettings() {
   }
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <Card title={<><BgColorsOutlined /> Gestor de Workflows Therefore™</>}>
+    <Card
+      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
+      bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      title={<><BgColorsOutlined /> Gestor de Workflows Therefore™</>}
+    >
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
@@ -586,7 +589,6 @@ export default function WorkflowSettings() {
             }
           ]}
         />
-      </Card>
-    </div>
+    </Card>
   )
 }
