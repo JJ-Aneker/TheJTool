@@ -65,13 +65,17 @@ export default function UserManager() {
       key: 'user',
       width: 200,
       render: (_, record) => (
-        <div>
-          <div style={{ fontWeight: '600', fontSize: '14px', marginBottom: '4px' }}>
-            {record.name && record.surname ? `${record.name} ${record.surname}` : 'Sin nombre'}
-          </div>
-          <div style={{ fontSize: '12px', color: '#1890ff' }}>{record.email || 'Sin email'}</div>
+        <div style={{ fontWeight: '600', fontSize: '14px' }}>
+          {record.name && record.surname ? `${record.name} ${record.surname}` : 'Sin nombre'}
         </div>
       )
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: 220,
+      render: (text) => <span style={{ color: '#1890ff' }}>{text || '-'}</span>
     },
     {
       title: 'Rol',
