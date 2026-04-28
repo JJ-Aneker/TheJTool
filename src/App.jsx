@@ -150,21 +150,23 @@ function AppContent() {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
         theme="dark"
         width={250}
+        collapsedWidth={80}
         style={{
           overflow: 'auto',
-          height: '100vh',
+          height: 'calc(100vh - 72px - 20px)',
           position: 'fixed',
           left: 0,
-          top: 0,
-          bottom: 0,
-          zIndex: 100
+          top: 72,
+          bottom: 20,
+          zIndex: 100,
+          scrollbarWidth: 'thin'
         }}
       >
         <div style={{
@@ -189,24 +191,25 @@ function AppContent() {
 
       </Sider>
 
-      <Layout style={{ marginLeft: collapsed ? 80 : 250, transition: 'margin 0.2s' }}>
-        <Header
-          className="app-header"
-          style={{
-            background: isDark ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            padding: '0 32px',
-            boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height: 72,
-            position: 'sticky',
-            top: 0,
-            zIndex: 99,
-            transition: 'all 0.3s ease',
-            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
-          }}>
+      <Header
+        className="app-header"
+        style={{
+          background: isDark ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          padding: '0 32px',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: 72,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 101,
+          transition: 'all 0.3s ease',
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
+        }}>
 
           {/* Logo y Título */}
           <div style={{
@@ -267,13 +270,14 @@ function AppContent() {
             />
             <UserDropdown />
           </div>
-        </Header>
+      </Header>
 
+      <Layout style={{ marginLeft: collapsed ? 80 : 250, transition: 'margin 0.2s', marginTop: 72, marginBottom: 20, minHeight: 'calc(100vh - 92px)' }}>
         <Content style={{
           margin: 0,
           padding: 0,
           background: isDark ? '#000000' : '#f5f5f5',
-          minHeight: 'calc(100vh - 72px)',
+          minHeight: 'calc(100vh - 92px)',
           overflow: 'auto'
         }}>
           <Routes>
@@ -292,18 +296,28 @@ function AppContent() {
           </Routes>
         </Content>
 
-        <Footer style={{
-          textAlign: 'center',
-          background: isDark ? 'rgba(20, 20, 20, 0.8)' : 'rgba(245, 245, 245, 0.8)',
-          padding: '12px 24px',
-          borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-          fontSize: '12px',
-          color: isDark ? '#8c8c8c' : '#8c8c8c',
-          backdropFilter: 'blur(5px)'
-        }}>
-          TheJToolbox ©2025 | Powered by Aneker · Therefore™ Integration
-        </Footer>
       </Layout>
+
+      <Footer style={{
+        textAlign: 'center',
+        background: isDark ? 'rgba(20, 20, 20, 0.9)' : 'rgba(245, 245, 245, 0.9)',
+        padding: '4px 24px',
+        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+        fontSize: '11px',
+        color: isDark ? '#8c8c8c' : '#8c8c8c',
+        backdropFilter: 'blur(5px)',
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 20,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100
+      }}>
+        TheJToolbox ©2025 | Powered by Aneker · Therefore™ Integration
+      </Footer>
     </Layout>
   )
 }

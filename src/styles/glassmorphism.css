@@ -195,3 +195,123 @@ input,
 textarea {
   transition: all 0.2s ease;
 }
+
+/* Scrollbar tipo glassmorphism */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Modal compacto */
+.ant-modal {
+  --modal-padding: 16px;
+}
+
+.ant-modal-content {
+  padding: 16px !important;
+}
+
+.ant-modal-header {
+  padding: 12px 16px !important;
+  margin-bottom: 12px !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .ant-modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.ant-modal-title {
+  font-size: 16px !important;
+  font-weight: 600;
+}
+
+.ant-modal-footer {
+  padding: 12px 0 0 0 !important;
+  margin-top: 12px !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .ant-modal-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Form compacto en modales */
+.ant-modal .ant-form {
+  margin: 0;
+}
+
+.ant-modal .ant-form-item {
+  margin-bottom: 8px !important;
+}
+
+.ant-modal .ant-form-item-label {
+  padding: 0 0 4px 0 !important;
+}
+
+.ant-modal .ant-form-item-label > label {
+  font-size: 12px !important;
+  height: auto !important;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+[data-theme='dark'] .ant-modal .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.ant-modal .ant-input,
+.ant-modal .ant-input-number,
+.ant-modal .ant-select-selector,
+.ant-modal .ant-picker {
+  height: 32px !important;
+  font-size: 12px !important;
+}
+
+.ant-modal .ant-select {
+  height: 32px !important;
+}
+
+.ant-modal .ant-select-selector {
+  padding: 2px 8px !important;
+}
+
+/* Grid de dos columnas en modales */
+.ant-modal .grid-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ant-modal .grid-three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+/* Buttons compactos en modales */
+.ant-modal .ant-btn {
+  height: 32px !important;
+  font-size: 12px !important;
+}
