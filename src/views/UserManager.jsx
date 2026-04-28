@@ -63,22 +63,13 @@ export default function UserManager() {
     {
       title: 'Usuario',
       key: 'user',
-      width: 250,
+      width: 200,
       render: (_, record) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Avatar
-            size={40}
-            src={record.avatar_url}
-            icon={<UserOutlined />}
-            style={{ backgroundColor: '#1890ff' }}
-          />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: '600', fontSize: '14px' }}>
-              {record.name && record.surname ? `${record.name} ${record.surname}` : 'Sin nombre'}
-            </div>
-            <div style={{ fontSize: '12px', color: '#1890ff', fontWeight: '500' }}>{record.email || 'Sin email'}</div>
-            <div style={{ fontSize: '11px', color: '#999', fontFamily: 'monospace' }}>{record.user_id}</div>
+        <div>
+          <div style={{ fontWeight: '600', fontSize: '14px', marginBottom: '4px' }}>
+            {record.name && record.surname ? `${record.name} ${record.surname}` : 'Sin nombre'}
           </div>
+          <div style={{ fontSize: '12px', color: '#1890ff' }}>{record.email || 'Sin email'}</div>
         </div>
       )
     },
@@ -102,13 +93,6 @@ export default function UserManager() {
         }
         return <Tag color={colors[role]}>{labels[role]}</Tag>
       }
-    },
-    {
-      title: 'Teléfono',
-      dataIndex: 'phone',
-      key: 'phone',
-      width: 120,
-      render: (text) => text || '-'
     },
     {
       title: 'Aprobado',
@@ -553,7 +537,7 @@ export default function UserManager() {
             label="Teléfono"
             name="phone"
           >
-            <Input placeholder="+34 912 345 678" prefix={<PhoneOutlined />} />
+            <Input placeholder="+34 912 345 678" />
           </Form.Item>
 
           <Form.Item

@@ -191,13 +191,6 @@ export default function ApiExplorer() {
       bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
       title={<><ApiOutlined /> Explorador API REST Therefore™</>}
     >
-        <Alert
-          type="info"
-          message="Interfaz Interactiva de API"
-          description="Explora y prueba endpoints de la API REST. Selecciona un endpoint, configura parámetros y visualiza respuestas en tiempo real."
-          style={{ marginBottom: '16px' }}
-          showIcon
-        />
 
         <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '24px', flex: 1, minHeight: 0 }}>
           {/* Sidebar con endpoints */}

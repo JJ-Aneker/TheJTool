@@ -220,20 +220,7 @@ export default function EFormGenerator() {
                     </Upload>
                   </Space>
 
-                  <Alert
-                    type="info"
-                    message="eForms basados en form.io"
-                    description="Los eForms se almacenan con esquema JSON en el campo FDef. Soportan validaciones, condicionales y componentes personalizados."
-                    style={{ marginBottom: 16 }}
-                    showIcon
-                  />
 
-                  <Table
-                    columns={eformColumns}
-                    dataSource={eforms}
-                    rowKey="id"
-                    pagination={{ pageSize: 10 }}
-                  />
                 </div>
               )
             },

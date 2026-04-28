@@ -284,7 +284,6 @@ export default function UserProfile() {
                         rules={[{ required: true, message: 'Nombre requerido' }]}
                       >
                         <Input
-                          prefix={<UserOutlined />}
                           placeholder="Tu nombre"
                           size="large"
                         />
@@ -307,7 +306,6 @@ export default function UserProfile() {
                       name="email"
                     >
                       <Input
-                        prefix={<MailOutlined />}
                         disabled
                         size="large"
                       />
@@ -318,7 +316,6 @@ export default function UserProfile() {
                       name="phone"
                     >
                       <Input
-                        prefix={<PhoneOutlined />}
                         placeholder="+34 912 345 678"
                         size="large"
                       />

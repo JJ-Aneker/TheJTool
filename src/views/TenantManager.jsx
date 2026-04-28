@@ -210,13 +210,7 @@ export default function TenantManager() {
         title={<><CloudOutlined /> Gestión de Tenants Therefore™</>}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, flex: 1 }}>
-          <Alert
-            type="info"
-            message="Administración de Instancias"
-            description="Gestiona múltiples instancias de Therefore™ Online. Sincroniza datos, monitora estadísticas y administra acceso a tenants."
-            style={{ margin: 0 }}
-            showIcon
-          />
+
 
           <Row gutter={16}>
             <Col xs={24} sm={8}>
