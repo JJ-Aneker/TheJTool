@@ -281,17 +281,17 @@ function AppContent() {
 
       <Layout style={{
         marginLeft: collapsed ? 64 : 250,
-        marginTop: 48,
+        marginTop: 0,
         marginBottom: 0,
         width: collapsed ? 'calc(100% - 64px)' : 'calc(100% - 250px)',
-        height: 'calc(100vh - 68px)',
+        height: '100vh',
         transition: 'all 0.2s',
         display: 'flex',
         flexDirection: 'column'
       }}>
         <Content style={{
           margin: 0,
-          padding: '2px',
+          padding: 0,
           background: isDark ? '#000000' : '#f5f5f5',
           flex: 1,
           overflow: 'hidden'
