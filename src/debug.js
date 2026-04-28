@@ -94,7 +94,9 @@ export async function testLogin(email, password) {
 // Exportar para uso global
 window.debugSupabase = debugSupabase
 window.testLogin = testLogin
+window.supabase = supabase
 
 console.log('✅ Debug tools cargadas. Ejecuta en consola:')
 console.log('   debugSupabase()  - Verificar conexión')
 console.log('   testLogin("email", "pass") - Probar login')
+console.log('   supabase.auth.signOut() - Cerrar sesión')
