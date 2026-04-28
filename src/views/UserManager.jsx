@@ -15,6 +15,24 @@ export default function UserManager() {
     loadUsers()
   }, [])
 
+  useEffect(() => {
+    if (isModalVisible && selectedUser) {
+      // Ensure form is populated when modal opens
+      form.setFieldsValue({
+        name: selectedUser.name || '',
+        surname: selectedUser.surname || '',
+        email: selectedUser.email || '',
+        role: selectedUser.role || 'user',
+        phone: selectedUser.phone || '',
+        address: selectedUser.address || '',
+        city: selectedUser.city || '',
+        province: selectedUser.province || '',
+        postal: selectedUser.postal || '',
+        approved: selectedUser.approved || false
+      })
+    }
+  }, [isModalVisible, selectedUser, form])
+
   const loadUsers = async () => {
     setLoading(true)
     try {
@@ -151,18 +169,6 @@ export default function UserManager() {
 
   const editUser = (user) => {
     setSelectedUser(user)
-    form.setFieldsValue({
-      name: user.name,
-      surname: user.surname,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      address: user.address,
-      city: user.city,
-      province: user.province,
-      postal: user.postal,
-      approved: user.approved
-    })
     setIsModalVisible(true)
   }
 

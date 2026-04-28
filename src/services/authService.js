@@ -17,7 +17,7 @@ export const authService = {
       // Create user profile in profiles table
       if (data.user) {
         const [name, surname] = (userData.fullName || '').split(' ', 2)
-        await supabase
+        const { error: profileError } = await supabase
           .from('profiles')
           .insert([
             {
@@ -31,10 +31,16 @@ export const authService = {
               created_at: new Date().toISOString()
             }
           ])
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError)
+          throw new Error(`Error al crear perfil: ${profileError.message}`)
+        }
       }
 
       return { success: true, user: data.user }
     } catch (error) {
+      console.error('SignUp error:', error)
       return { success: false, error: error.message }
     }
   },
