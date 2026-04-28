@@ -193,34 +193,36 @@ export default function TemplateManager() {
         bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
         title={<><FileTextOutlined /> Gestión de Templates</>}
       >
-        <Space style={{ marginBottom: 16 }}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setSelectedTemplate(null)
-              form.resetFields()
-              setIsModalVisible(true)
-            }}
-          >
-            Crear Template
-          </Button>
-          <Button
-            onClick={loadTemplates}
-            loading={loading}
-          >
-            Actualizar
-          </Button>
-        </Space>
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', gap: '16px', minHeight: 0, flex: 1 }}>
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setSelectedTemplate(null)
+                form.resetFields()
+                setIsModalVisible(true)
+              }}
+            >
+              Crear Template
+            </Button>
+            <Button
+              onClick={loadTemplates}
+              loading={loading}
+            >
+              Actualizar
+            </Button>
+          </Space>
 
-        <Spin spinning={loading}>
-          <Table
-            columns={columns}
-            dataSource={templates}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-          />
-        </Spin>
+          <Spin spinning={loading} style={{ flex: 1, minHeight: 0 }}>
+            <Table
+              columns={columns}
+              dataSource={templates}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+            />
+          </Spin>
+        </div>
       </Card>
 
       <Modal

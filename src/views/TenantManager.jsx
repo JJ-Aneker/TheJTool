@@ -209,51 +209,55 @@ export default function TenantManager() {
         bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
         title={<><CloudOutlined /> Gestión de Tenants Therefore™</>}
       >
-        <Alert
-          type="info"
-          message="Administración de Instancias"
-          description="Gestiona múltiples instancias de Therefore™ Online. Sincroniza datos, monitora estadísticas y administra acceso a tenants."
-          style={{ marginBottom: 24 }}
-          showIcon
-        />
-
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={8}>
-            <Card size="small">
-              <Statistic title="Tenants Activos" value={tenants.length} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card size="small">
-              <Statistic title="Documentos Totales" value={stats.documents} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card size="small">
-              <Statistic title="Usuarios Totales" value={stats.users} />
-            </Card>
-          </Col>
-        </Row>
-
-        <Spin spinning={loading}>
-          <Space style={{ marginBottom: 16 }}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddTenant}
-            >
-              Agregar Tenant
-            </Button>
-          </Space>
-
-          <Table
-            columns={columns}
-            dataSource={tenants}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-            size="middle"
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', gap: '16px', minHeight: 0, flex: 1 }}>
+          <Alert
+            type="info"
+            message="Administración de Instancias"
+            description="Gestiona múltiples instancias de Therefore™ Online. Sincroniza datos, monitora estadísticas y administra acceso a tenants."
+            style={{ margin: 0 }}
+            showIcon
           />
-        </Spin>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={8}>
+              <Card size="small">
+                <Statistic title="Tenants Activos" value={tenants.length} />
+              </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card size="small">
+                <Statistic title="Documentos Totales" value={stats.documents} />
+              </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card size="small">
+                <Statistic title="Usuarios Totales" value={stats.users} />
+              </Card>
+            </Col>
+          </Row>
+
+          <Spin spinning={loading} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <Space style={{ marginBottom: 16 }}>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleAddTenant}
+              >
+                Agregar Tenant
+              </Button>
+            </Space>
+
+            <div style={{ flex: 1, minHeight: 0 }}>
+              <Table
+                columns={columns}
+                dataSource={tenants}
+                rowKey="id"
+                pagination={{ pageSize: 10 }}
+                size="middle"
+              />
+            </div>
+          </Spin>
+        </div>
       </Card>
 
       <Modal

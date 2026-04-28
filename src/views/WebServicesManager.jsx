@@ -246,35 +246,37 @@ export default function WebServicesManager() {
         bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
         title={<><CloudOutlined /> Gestión de Servicios Web</>}
       >
-        <Space style={{ marginBottom: 16 }}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setSelectedService(null)
-              form.resetFields()
-              setIsModalVisible(true)
-            }}
-          >
-            Crear Servicio
-          </Button>
-          <Button
-            onClick={loadServices}
-            loading={loading}
-          >
-            Actualizar
-          </Button>
-        </Space>
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', gap: '16px', minHeight: 0, flex: 1 }}>
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setSelectedService(null)
+                form.resetFields()
+                setIsModalVisible(true)
+              }}
+            >
+              Crear Servicio
+            </Button>
+            <Button
+              onClick={loadServices}
+              loading={loading}
+            >
+              Actualizar
+            </Button>
+          </Space>
 
-        <Spin spinning={loading}>
-          <Table
-            columns={columns}
-            dataSource={services}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-            scroll={{ x: 1200 }}
-          />
-        </Spin>
+          <Spin spinning={loading} style={{ flex: 1, minHeight: 0 }}>
+            <Table
+              columns={columns}
+              dataSource={services}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+              scroll={{ x: 1200 }}
+            />
+          </Spin>
+        </div>
       </Card>
 
       <Modal

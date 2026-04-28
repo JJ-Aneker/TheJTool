@@ -284,7 +284,7 @@ function AppContent() {
         marginTop: 0,
         marginBottom: 0,
         width: collapsed ? 'calc(100% - 64px)' : 'calc(100% - 250px)',
-        height: '100vh',
+        height: 'calc(100vh - 68px)',
         transition: 'all 0.2s',
         display: 'flex',
         flexDirection: 'column'

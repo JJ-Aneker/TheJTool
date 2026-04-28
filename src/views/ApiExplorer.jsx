@@ -191,15 +191,16 @@ export default function ApiExplorer() {
       bodyStyle={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
       title={<><ApiOutlined /> Explorador API REST Therefore™</>}
     >
-        <Alert
-          type="info"
-          message="Interfaz Interactiva de API"
-          description="Explora y prueba endpoints de la API REST. Selecciona un endpoint, configura parámetros y visualiza respuestas en tiempo real."
-          style={{ marginBottom: 24 }}
-          showIcon
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', gap: '16px', minHeight: 0, flex: 1 }}>
+          <Alert
+            type="info"
+            message="Interfaz Interactiva de API"
+            description="Explora y prueba endpoints de la API REST. Selecciona un endpoint, configura parámetros y visualiza respuestas en tiempo real."
+            style={{ margin: 0 }}
+            showIcon
+          />
 
-        <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '24px', flex: 1, minHeight: 0 }}>
           {/* Sidebar con endpoints */}
           <div style={{ border: '1px solid #d9d9d9', borderRadius: '4px', padding: '8px' }}>
             <h4 style={{ marginBottom: '12px' }}>Categorías</h4>
@@ -381,6 +382,7 @@ export default function ApiExplorer() {
               </Spin>
             )}
           </div>
+        </div>
         </div>
     </Card>
   )

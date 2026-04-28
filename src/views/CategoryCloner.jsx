@@ -134,9 +134,9 @@ export default function CategoryCloner() {
     >
 
 
-        <Spin spinning={loading}>
-          <div style={{ marginBottom: 24 }}>
-            <h3>Categorías Disponibles</h3>
+        <Spin spinning={loading} style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px' }}>
+          <h3 style={{ margin: '0 0 16px 0' }}>Categorías Disponibles</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <Table
               columns={columns}
               dataSource={categories}

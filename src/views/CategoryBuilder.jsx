@@ -305,8 +305,8 @@ export default function CategoryBuilder() {
               key: 'list',
               label: 'Categorías',
               children: (
-                <div>
-                  <Space style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', padding: '16px', gap: '16px', minHeight: 0 }}>
+                  <Space>
                     <Button
                       type="primary"
                       icon={<PlusOutlined />}
@@ -316,12 +316,14 @@ export default function CategoryBuilder() {
                     </Button>
                   </Space>
 
-                  <Table
-                    columns={categoryColumns}
-                    dataSource={categories}
-                    rowKey="id"
-                    pagination={{ pageSize: 10 }}
-                  />
+                  <div style={{ flex: 1, minHeight: 0 }}>
+                    <Table
+                      columns={categoryColumns}
+                      dataSource={categories}
+                      rowKey="id"
+                      pagination={{ pageSize: 10 }}
+                    />
+                  </div>
                 </div>
               )
             },
