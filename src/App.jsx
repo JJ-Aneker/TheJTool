@@ -30,6 +30,8 @@ import CategoryBuilder from './views/CategoryBuilder'
 import ProjectDocs from './views/ProjectDocs'
 import WorkflowSettings from './views/WorkflowSettings'
 import UserManager from './views/UserManager'
+import TemplateManager from './views/TemplateManager'
+import WebServicesManager from './views/WebServicesManager'
 
 const { Header, Sider, Content, Footer } = Layout
 
@@ -87,6 +89,18 @@ const menuItems = [
     icon: <SettingOutlined />,
     label: 'Configuración de Workflows',
     path: '/workflows'
+  },
+  {
+    key: 'templates',
+    icon: <FileTextOutlined />,
+    label: 'Templates',
+    path: '/templates'
+  },
+  {
+    key: 'web-services',
+    icon: <CloudOutlined />,
+    label: 'Servicios Web',
+    path: '/web-services'
   }
 ]
 
@@ -208,6 +222,8 @@ function AppContent() {
             <Route path="/category-builder" element={<CategoryBuilder />} />
             <Route path="/docs" element={<ProjectDocs />} />
             <Route path="/workflows" element={<WorkflowSettings />} />
+            <Route path="/templates" element={<TemplateManager />} />
+            <Route path="/web-services" element={<WebServicesManager />} />
           </Routes>
         </Content>
 
