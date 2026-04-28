@@ -201,53 +201,35 @@ export default function UserManager() {
   }
 
   const handleModalOk = async (values) => {
+    if (!selectedUser) {
+      message.error('Los usuarios nuevos se deben crear a través del formulario de registro')
+      return
+    }
+
     setLoading(true)
     try {
-      if (selectedUser) {
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            name: values.name,
-            surname: values.surname,
-            role: values.role,
-            phone: values.phone,
-            address: values.address,
-            city: values.city,
-            province: values.province,
-            postal: values.postal,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', selectedUser.id)
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: values.name,
+          surname: values.surname,
+          role: values.role,
+          phone: values.phone,
+          address: values.address,
+          city: values.city,
+          province: values.province,
+          postal: values.postal,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedUser.id)
 
-        if (error) throw error
-        setUsers(users.map(u =>
-          u.id === selectedUser.id
-            ? { ...u, ...values }
-            : u
-        ))
-        message.success('Usuario actualizado exitosamente')
-      } else {
-        const { data, error } = await supabase
-          .from('profiles')
-          .insert([{
-            name: values.name,
-            surname: values.surname,
-            email: values.email,
-            role: values.role,
-            phone: values.phone,
-            address: values.address,
-            city: values.city,
-            province: values.province,
-            postal: values.postal,
-            approved: false,
-            created_at: new Date().toISOString()
-          }])
-          .select()
-
-        if (error) throw error
-        setUsers([...users, ...data])
-        message.success('Usuario creado exitosamente')
-      }
+      if (error) throw error
+      setUsers(users.map(u =>
+        u.id === selectedUser.id
+          ? { ...u, ...values }
+          : u
+      ))
+      message.success('Usuario actualizado exitosamente')
 
       setIsModalVisible(false)
       form.resetFields()
@@ -307,8 +289,10 @@ export default function UserManager() {
                       type="primary"
                       icon={<PlusOutlined />}
                       onClick={createNewUser}
+                      title="Los usuarios nuevos se crean a través del formulario de registro"
+                      disabled
                     >
-                      Crear Usuario
+                      Crear Usuario (via registro)
                     </Button>
                   </Space>
 
@@ -504,14 +488,10 @@ export default function UserManager() {
           </div>
 
           <Form.Item
-            label="Email"
+            label="Email (desde auth)"
             name="email"
-            rules={[
-              { required: true, message: 'Email requerido' },
-              { type: 'email', message: 'Email inválido' }
-            ]}
           >
-            <Input placeholder="usuario@buildingcenter.com" prefix={<MailOutlined />} disabled={!!selectedUser} />
+            <Input placeholder="usuario@buildingcenter.com" prefix={<MailOutlined />} disabled />
           </Form.Item>
 
           <Form.Item

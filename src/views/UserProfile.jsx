@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Card, Form, Input, Button, Avatar, Space, message, Spin, Tabs, Alert, Divider, Row, Col } from 'antd'
-import { UserOutlined, MailOutlined, PhoneOutlined, TeamOutlined, EnvironmentOutlined, SaveOutlined, LockOutlined } from '@ant-design/icons'
+import { UserOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, SaveOutlined, LockOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 
@@ -23,32 +23,63 @@ export default function UserProfile() {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single()
 
       if (error) throw error
 
       setProfile(data)
       form.setFieldsValue({
-        full_name: data.full_name,
-        email: data.email,
-        phone: data.phone,
-        department: data.department,
-        role: data.role,
-        status: data.status
+        name: data.name || '',
+        surname: data.surname || '',
+        email: user.email,
+        phone: data.phone || '',
+        address: data.address || '',
+        city: data.city || '',
+        province: data.province || '',
+        postal: data.postal || '',
+        role: data.role || ''
       })
     } catch (err) {
       console.error('Error loading profile:', err)
-      // Crear perfil básico si no existe
-      setProfile({
-        id: user.id,
-        email: user.email,
-        full_name: user.user_metadata?.full_name || '',
-        phone: user.user_metadata?.phone || '',
-        department: user.user_metadata?.department || '',
-        role: user.user_metadata?.role || 'user',
-        status: 'active'
-      })
+      try {
+        const newProfile = {
+          user_id: user.id,
+          name: user.user_metadata?.name || '',
+          surname: user.user_metadata?.surname || '',
+          email: user.email,
+          phone: user.user_metadata?.phone || '',
+          address: user.user_metadata?.address || '',
+          city: user.user_metadata?.city || '',
+          province: user.user_metadata?.province || '',
+          postal: user.user_metadata?.postal || '',
+          role: user.user_metadata?.role || 'user',
+          approved: false,
+          created_at: new Date().toISOString()
+        }
+        const { data: createdProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([newProfile])
+          .select()
+          .single()
+
+        if (createError) throw createError
+        setProfile(createdProfile)
+        form.setFieldsValue({
+          name: createdProfile.name,
+          surname: createdProfile.surname,
+          email: user.email,
+          phone: createdProfile.phone,
+          address: createdProfile.address,
+          city: createdProfile.city,
+          province: createdProfile.province,
+          postal: createdProfile.postal,
+          role: createdProfile.role
+        })
+      } catch (createErr) {
+        console.error('Error creating profile:', createErr)
+        message.error('No se pudo cargar el perfil')
+      }
     } finally {
       setLoading(false)
     }
@@ -60,12 +91,16 @@ export default function UserProfile() {
       const { error } = await supabase
         .from('profiles')
         .update({
-          full_name: values.full_name,
+          name: values.name,
+          surname: values.surname,
           phone: values.phone,
-          department: values.department,
+          address: values.address,
+          city: values.city,
+          province: values.province,
+          postal: values.postal,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id)
+        .eq('user_id', user.id)
 
       if (error) throw error
 
@@ -140,9 +175,11 @@ export default function UserProfile() {
             />
           </Col>
           <Col xs={24} sm={18}>
-            <h2 style={{ margin: '0 0 8px 0' }}>{profile.full_name || 'Usuario'}</h2>
+            <h2 style={{ margin: '0 0 8px 0' }}>
+              {profile.name && profile.surname ? `${profile.name} ${profile.surname}` : profile.name || 'Usuario'}
+            </h2>
             <p style={{ color: '#8c8c8c', marginBottom: '16px' }}>
-              {profile.email}
+              {user?.email}
             </p>
             <Space wrap>
               <div style={{
@@ -155,12 +192,12 @@ export default function UserProfile() {
               </div>
               <div style={{
                 padding: '8px 12px',
-                background: profile.status === 'active' ? '#f6ffed' : '#fff1f0',
+                background: profile.approved ? '#f6ffed' : '#fff1f0',
                 borderRadius: '4px',
                 fontSize: '12px',
-                color: profile.status === 'active' ? '#52c41a' : '#ff4d4f'
+                color: profile.approved ? '#52c41a' : '#ff4d4f'
               }}>
-                <strong>Estado:</strong> {profile.status === 'active' ? 'Activo' : 'Inactivo'}
+                <strong>Estado:</strong> {profile.approved ? 'Aprobado' : 'Pendiente'}
               </div>
             </Space>
           </Col>
@@ -182,17 +219,30 @@ export default function UserProfile() {
                     layout="vertical"
                     onFinish={handleUpdateProfile}
                   >
-                    <Form.Item
-                      label="Nombre Completo"
-                      name="full_name"
-                      rules={[{ required: true, message: 'Nombre requerido' }]}
-                    >
-                      <Input
-                        prefix={<UserOutlined />}
-                        placeholder="Tu nombre completo"
-                        size="large"
-                      />
-                    </Form.Item>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <Form.Item
+                        label="Nombre"
+                        name="name"
+                        rules={[{ required: true, message: 'Nombre requerido' }]}
+                      >
+                        <Input
+                          prefix={<UserOutlined />}
+                          placeholder="Tu nombre"
+                          size="large"
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Apellido"
+                        name="surname"
+                        rules={[{ required: true, message: 'Apellido requerido' }]}
+                      >
+                        <Input
+                          placeholder="Tu apellido"
+                          size="large"
+                        />
+                      </Form.Item>
+                    </div>
 
                     <Form.Item
                       label="Email"
@@ -217,12 +267,43 @@ export default function UserProfile() {
                     </Form.Item>
 
                     <Form.Item
-                      label="Departamento"
-                      name="department"
+                      label="Dirección"
+                      name="address"
                     >
                       <Input
-                        prefix={<EnvironmentOutlined />}
-                        placeholder="Tu departamento"
+                        placeholder="Calle principal, 123"
+                        size="large"
+                      />
+                    </Form.Item>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <Form.Item
+                        label="Ciudad"
+                        name="city"
+                      >
+                        <Input
+                          placeholder="Madrid"
+                          size="large"
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Provincia"
+                        name="province"
+                      >
+                        <Input
+                          placeholder="Madrid"
+                          size="large"
+                        />
+                      </Form.Item>
+                    </div>
+
+                    <Form.Item
+                      label="Código Postal"
+                      name="postal"
+                    >
+                      <Input
+                        placeholder="28001"
                         size="large"
                       />
                     </Form.Item>
@@ -230,13 +311,6 @@ export default function UserProfile() {
                     <Form.Item
                       label="Rol"
                       name="role"
-                    >
-                      <Input disabled size="large" />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Estado"
-                      name="status"
                     >
                       <Input disabled size="large" />
                     </Form.Item>
