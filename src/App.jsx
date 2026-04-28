@@ -189,6 +189,26 @@ function AppContent() {
           items={menuItems}
         />
 
+        {/* User Email Footer */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '12px 16px',
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          background: 'rgba(0,0,0,0.3)',
+          fontSize: '12px',
+          color: '#b3b3b3',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          textAlign: collapsed ? 'center' : 'left'
+        }}>
+          {!collapsed && user?.email}
+          {collapsed && user?.email && user.email.substring(0, 1).toUpperCase()}
+        </div>
+
       </Sider>
 
       <Header
