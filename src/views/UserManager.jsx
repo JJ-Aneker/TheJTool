@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Card, Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, Badge, Avatar, Tabs, Popconfirm, Tooltip } from 'antd'
-import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, CheckCircleOutlined, CloseCircleOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
+import { Card, Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, Badge, Avatar, Tabs, Popconfirm, Tooltip, Upload } from 'antd'
+import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, CheckCircleOutlined, CloseCircleOutlined, MailOutlined, PhoneOutlined, CameraOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
+import { storageService } from '../services/storageService'
 
 export default function UserManager() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
+  const [avatarLoading, setAvatarLoading] = useState(false)
   const [users, setUsers] = useState([])
   const [selectedUser, setSelectedUser] = useState(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -170,6 +172,36 @@ export default function UserManager() {
   const editUser = (user) => {
     setSelectedUser(user)
     setIsModalVisible(true)
+  }
+
+  const handleAvatarUpload = async (file) => {
+    setAvatarLoading(true)
+    try {
+      const result = await storageService.uploadAvatar(file, selectedUser.user_id)
+      if (result.success) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ avatar_url: result.url })
+          .eq('id', selectedUser.id)
+
+        if (error) throw error
+
+        setSelectedUser({ ...selectedUser, avatar_url: result.url })
+        setUsers(users.map(u =>
+          u.id === selectedUser.id
+            ? { ...u, avatar_url: result.url }
+            : u
+        ))
+        message.success('Avatar actualizado exitosamente')
+      } else {
+        message.error('Error al cargar avatar: ' + result.error)
+      }
+    } catch (err) {
+      message.error('Error al actualizar avatar: ' + err.message)
+    } finally {
+      setAvatarLoading(false)
+    }
+    return false
   }
 
   const deleteUser = async (user) => {
@@ -475,14 +507,49 @@ export default function UserManager() {
       >
         {selectedUser && (
           <div style={{
-            padding: '12px 16px',
+            padding: '16px',
             marginBottom: '24px',
             background: '#f5f5f5',
             borderRadius: '4px',
             borderLeft: '4px solid #1890ff'
           }}>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>IDENTIFICACIÓN DEL USUARIO</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '12px', fontWeight: '600' }}>IDENTIFICACIÓN DEL USUARIO</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr', gap: '24px', alignItems: 'start' }}>
+              <div style={{ textAlign: 'center' }}>
+                <Upload
+                  name="avatar"
+                  maxCount={1}
+                  beforeUpload={handleAvatarUpload}
+                  showUploadList={false}
+                  accept="image/*"
+                >
+                  <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}>
+                    <Avatar
+                      size={60}
+                      src={selectedUser.avatar_url}
+                      icon={<UserOutlined />}
+                      style={{ backgroundColor: '#1890ff' }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      bottom: -4,
+                      right: -4,
+                      background: '#1890ff',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      border: '2px solid white',
+                      opacity: avatarLoading ? 0.6 : 1
+                    }}>
+                      {avatarLoading ? <Spin size="small" /> : <CameraOutlined style={{ fontSize: '12px' }} />}
+                    </div>
+                  </div>
+                </Upload>
+              </div>
               <div>
                 <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px' }}>Email (auth.users)</div>
                 <div style={{ fontSize: '14px', fontWeight: '500', color: '#1890ff' }}>{selectedUser.email}</div>

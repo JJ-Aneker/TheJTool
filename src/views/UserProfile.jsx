@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Card, Form, Input, Button, Avatar, Space, message, Spin, Tabs, Alert, Divider, Row, Col } from 'antd'
-import { UserOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, SaveOutlined, LockOutlined } from '@ant-design/icons'
+import { Card, Form, Input, Button, Avatar, Space, message, Spin, Tabs, Alert, Divider, Row, Col, Upload } from 'antd'
+import { UserOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, SaveOutlined, LockOutlined, CameraOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
+import { storageService } from '../services/storageService'
 
 export default function UserProfile() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
+  const [avatarLoading, setAvatarLoading] = useState(false)
   const [profile, setProfile] = useState(null)
   const [activeTab, setActiveTab] = useState('profile')
   const { user, updatePassword } = useAuth()
@@ -133,6 +135,31 @@ export default function UserProfile() {
     }
   }
 
+  const handleAvatarUpload = async (file) => {
+    setAvatarLoading(true)
+    try {
+      const result = await storageService.uploadAvatar(file, user.id)
+      if (result.success) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ avatar_url: result.url })
+          .eq('user_id', user.id)
+
+        if (error) throw error
+
+        setProfile({ ...profile, avatar_url: result.url })
+        message.success('Avatar actualizado exitosamente')
+      } else {
+        message.error('Error al cargar avatar: ' + result.error)
+      }
+    } catch (err) {
+      message.error('Error al actualizar avatar: ' + err.message)
+    } finally {
+      setAvatarLoading(false)
+    }
+    return false
+  }
+
   if (!profile) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -167,12 +194,39 @@ export default function UserProfile() {
         {/* Encabezado con avatar y info básica */}
         <Row gutter={24} style={{ marginBottom: '32px' }}>
           <Col xs={24} sm={6} style={{ textAlign: 'center' }}>
-            <Avatar
-              size={120}
-              src={profile.avatar_url}
-              icon={<UserOutlined />}
-              style={{ backgroundColor: '#1890ff' }}
-            />
+            <Upload
+              name="avatar"
+              maxCount={1}
+              beforeUpload={handleAvatarUpload}
+              showUploadList={false}
+              accept="image/*"
+            >
+              <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}>
+                <Avatar
+                  size={120}
+                  src={profile.avatar_url}
+                  icon={<UserOutlined />}
+                  style={{ backgroundColor: '#1890ff' }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  background: '#1890ff',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  border: '3px solid white',
+                  opacity: avatarLoading ? 0.6 : 1
+                }}>
+                  {avatarLoading ? <Spin size="small" /> : <CameraOutlined />}
+                </div>
+              </div>
+            </Upload>
           </Col>
           <Col xs={24} sm={18}>
             <h2 style={{ margin: '0 0 8px 0' }}>
