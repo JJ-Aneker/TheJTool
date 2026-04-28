@@ -157,7 +157,7 @@ function AppContent() {
         onCollapse={setCollapsed}
         theme="dark"
         width={250}
-        collapsedWidth={80}
+        collapsedWidth={64}
         style={{
           overflow: 'auto',
           height: 'calc(100vh - 72px - 20px)',
@@ -215,36 +215,41 @@ function AppContent() {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
-            flex: 1
+            gap: '16px'
           }}>
+            <img
+              src="/assets/images/logo.jpg"
+              alt="TheJToolbox"
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                objectFit: 'cover',
+                boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)'
+              }}
+            />
             <div style={{
-              width: '48px',
-              height: '48px',
-              background: 'linear-gradient(135deg, #1890ff, #0050b3)',
-              borderRadius: '12px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '24px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)'
+              flexDirection: 'column',
+              minWidth: 0
             }}>
-              T
-            </div>
-            <div>
               <div style={{
                 fontSize: '18px',
                 fontWeight: '700',
-                color: isDark ? '#e6e6e6' : '#000'
+                color: isDark ? '#e6e6e6' : '#000',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}>
                 TheJToolbox
               </div>
               <div style={{
                 fontSize: '12px',
                 color: isDark ? '#b3b3b3' : '#8c8c8c',
-                marginTop: '2px'
+                marginTop: '2px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}>
                 Therefore™ Administration
               </div>
@@ -272,13 +277,22 @@ function AppContent() {
           </div>
       </Header>
 
-      <Layout style={{ marginLeft: collapsed ? 80 : 250, transition: 'margin 0.2s', marginTop: 72, marginBottom: 20, minHeight: 'calc(100vh - 92px)' }}>
+      <Layout style={{
+        marginLeft: collapsed ? 64 : 250,
+        marginTop: 72,
+        marginBottom: 20,
+        minHeight: 'calc(100vh - 92px)',
+        transition: 'margin-left 0.2s',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <Content style={{
           margin: 0,
-          padding: 0,
+          padding: '32px',
           background: isDark ? '#000000' : '#f5f5f5',
           minHeight: 'calc(100vh - 92px)',
-          overflow: 'auto'
+          overflow: 'auto',
+          flex: 1
         }}>
           <Routes>
             <Route path="/" element={<Home />} />
