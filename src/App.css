@@ -1,3 +1,6 @@
+/* Importar estilos de glassmorphism */
+@import './styles/glassmorphism.css';
+
 * {
   margin: 0;
   padding: 0;

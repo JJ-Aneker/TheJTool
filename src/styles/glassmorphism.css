@@ -1,0 +1,162 @@
+/* Glassmorphism Styles - Efecto de vidrio translúcido */
+
+/* Card con efecto de vidrio */
+.glass-card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Modo oscuro - Card */
+[data-theme='dark'] .glass-card {
+  background: rgba(31, 31, 31, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Efecto hover para cards */
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+}
+
+[data-theme='dark'] .glass-card:hover {
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Modal con efecto de vidrio */
+.ant-modal-content {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='dark'] .ant-modal-content {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dropdown con efecto de vidrio */
+.ant-dropdown-menu {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme='dark'] .ant-dropdown-menu {
+  background: rgba(31, 31, 31, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Input con efecto subtle de vidrio */
+.ant-input,
+.ant-input-number,
+.ant-select-selector {
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  transition: all 0.2s ease;
+}
+
+[data-theme='dark'] .ant-input,
+[data-theme='dark'] .ant-input-number,
+[data-theme='dark'] .ant-select-selector {
+  background: rgba(31, 31, 31, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Focus state */
+.ant-input:focus,
+.ant-input-number:focus-within,
+.ant-select-selector:focus {
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+[data-theme='dark'] .ant-input:focus,
+[data-theme='dark'] .ant-input-number:focus-within,
+[data-theme='dark'] .ant-select-selector:focus {
+  box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.2);
+}
+
+/* Button con efecto de vidrio ligero */
+.ant-btn {
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #1890ff, #0050b3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='dark'] .ant-btn-primary {
+  background: linear-gradient(135deg, #177ddc, #0f4c81);
+}
+
+/* Table con efecto de vidrio */
+.ant-table {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .ant-table {
+  background: rgba(31, 31, 31, 0.7);
+}
+
+.ant-table-thead > tr > th {
+  background: rgba(250, 250, 250, 0.9);
+}
+
+[data-theme='dark'] .ant-table-thead > tr > th {
+  background: rgba(38, 38, 38, 0.8);
+}
+
+/* Header con glassmorphism */
+.ant-layout-header {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .ant-layout-header {
+  background: rgba(31, 31, 31, 0.7) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Content con fondo translúcido */
+.ant-layout-content {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+[data-theme='dark'] .ant-layout-content {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Animación suave para transiciones */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Desactivar para elementos específicos que necesitan respuesta rápida */
+.ant-btn,
+.ant-input,
+input,
+textarea {
+  transition: all 0.2s ease;
+}
