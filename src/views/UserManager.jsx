@@ -460,13 +460,8 @@ export default function UserManager() {
       >
         {selectedUser && (
           <div style={{
-            padding: '16px',
-            marginBottom: '24px',
-            background: '#f5f5f5',
-            borderRadius: '4px',
-            borderLeft: '4px solid #1890ff'
+            marginBottom: '16px'
           }}>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '12px', fontWeight: '600' }}>IDENTIFICACIÓN DEL USUARIO</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr', gap: '24px', alignItems: 'start' }}>
               <div style={{ textAlign: 'center' }}>
                 <Upload
@@ -518,6 +513,7 @@ export default function UserManager() {
           form={form}
           layout="vertical"
           onFinish={handleModalOk}
+          style={{ marginTop: '-8px' }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <Form.Item
