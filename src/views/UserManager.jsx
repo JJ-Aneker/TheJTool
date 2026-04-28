@@ -475,7 +475,7 @@ export default function UserManager() {
 
       <Modal
         title={selectedUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={() => form.submit()}
         onCancel={() => setIsModalVisible(false)}
         confirmLoading={loading}

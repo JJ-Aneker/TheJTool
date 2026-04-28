@@ -254,7 +254,7 @@ export default function TenantManager() {
 
       <Modal
         title={selectedTenant ? 'Editar Tenant' : 'Nuevo Tenant'}
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={() => form.submit()}
         onCancel={() => setIsModalVisible(false)}
         confirmLoading={loading}
