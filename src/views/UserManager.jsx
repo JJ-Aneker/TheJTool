@@ -295,50 +295,33 @@ export default function UserManager() {
   const stats = getStatistics()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
-      <Card title={<><UserOutlined /> Gestión de Usuarios Therefore™</>} style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRadius: 0, marginBottom: 0 }} bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '2px' }}>
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
-          items={[
+    <Card title={<><UserOutlined /> Gestión de Usuarios Therefore™</>} style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column' }} bodyStyle={{ padding: '2px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        items={[
             {
               key: 'users',
               label: 'Usuarios',
               children: (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px' }}>
-                  <Space style={{ marginBottom: 2 }}>
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      onClick={createNewUser}
-                      title="Los usuarios nuevos se crean a través del formulario de registro"
-                      disabled
-                    >
-                      Crear Usuario (via registro)
-                    </Button>
-                  </Space>
-
-                  <Spin spinning={loading} style={{ flex: 1 }}>
-                    <Table
-                      columns={columns}
-                      dataSource={users}
-                      rowKey="id"
-                      pagination={{ pageSize: 10 }}
-                      style={{ height: '100%' }}
-                      scroll={{ y: 'calc(100vh - 300px)' }}
-                    />
-                  </Spin>
-                </div>
+                <Spin spinning={loading} style={{ display: 'flex', flex: 1 }}>
+                  <Table
+                    columns={columns}
+                    dataSource={users}
+                    rowKey="id"
+                    pagination={{ pageSize: 10 }}
+                    style={{ width: '100%' }}
+                    scroll={{ y: 'calc(100vh - 250px)' }}
+                  />
+                </Spin>
               )
             },
             {
               key: 'roles',
               label: 'Roles y Permisos',
               children: (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px' }}>
-                  <h4 style={{ marginBottom: '2px', marginTop: 0 }}>Configuración de Roles</h4>
-                  <Table
+                <Table
                     dataSource={[
                       {
                         role: 'admin',
@@ -392,16 +375,13 @@ export default function UserManager() {
                     rowKey="role"
                     pagination={false}
                   />
-                </div>
               )
             },
             {
               key: 'audit',
               label: 'Auditoría',
               children: (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px' }}>
-                  <h4 style={{ marginBottom: '2px', marginTop: 0 }}>Registro de Actividades</h4>
-                  <Table
+                <Table
                     dataSource={[
                       {
                         id: 1,
@@ -474,7 +454,6 @@ export default function UserManager() {
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
                   />
-                </div>
               )
             }
           ]}
@@ -636,6 +615,6 @@ export default function UserManager() {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </Card>
   )
 }
