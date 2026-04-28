@@ -458,8 +458,6 @@ export default function UserManager() {
             }
           ]}
         />
-      </Card>
-
       <Modal
         title={selectedUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
         open={isModalVisible}
