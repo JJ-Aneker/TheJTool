@@ -62,6 +62,12 @@ const getMenuItems = () => [
     label: 'Generador de eForms',
     path: '/eforms'
   },
+    {
+    key: 'category-builder',
+    icon: <AppstoreOutlined />,
+    label: 'Category Builder',
+    path: '/category-builder'
+  },
   {
     key: 'category-cloner',
     icon: <CopyOutlined />,
@@ -80,12 +86,7 @@ const getMenuItems = () => [
     label: 'Explorador API REST',
     path: '/api-explorer'
   },
-  {
-    key: 'category-builder',
-    icon: <AppstoreOutlined />,
-    label: 'Category Builder',
-    path: '/category-builder'
-  },
+
   {
     key: 'docs',
     icon: <FileTextOutlined />,

@@ -368,10 +368,28 @@ select:focus {
 }
 
 .ant-card {
-  background: var(--bg-card);
-  border-color: var(--border-default);
+  background: var(--bg-card) !important;
+  border-color: var(--border-default) !important;
   box-shadow: var(--shadow-sm);
   transition: all 200ms ease;
+}
+
+.ant-card-head {
+  background: var(--bg-card) !important;
+  border-color: var(--border-default) !important;
+}
+
+.ant-card-body {
+  background: var(--bg-card) !important;
+  color: var(--text-primary);
+}
+
+.ant-card-meta-title {
+  color: var(--text-primary) !important;
+}
+
+.ant-card-meta-description {
+  color: var(--text-secondary) !important;
 }
 
 .ant-input,
@@ -563,22 +581,48 @@ select:focus {
   border-color: var(--accent-primary);
 }
 
+.ant-modal {
+  background: transparent !important;
+}
+
 .ant-modal-content {
-  background: var(--bg-card);
+  background: var(--bg-card) !important;
   color: var(--text-primary);
 }
 
 .ant-modal-header {
-  background: var(--bg-card);
-  border-color: var(--border-default);
+  background: var(--bg-card) !important;
+  border-color: var(--border-default) !important;
 }
 
-.ant-modal-title {
+.ant-modal-body {
+  background: var(--bg-card) !important;
   color: var(--text-primary);
 }
 
+.ant-modal-footer {
+  background: var(--bg-card) !important;
+  border-color: var(--border-default) !important;
+}
+
+.ant-modal-title {
+  color: var(--text-primary) !important;
+}
+
 .ant-modal-close-x {
-  color: var(--text-secondary);
+  color: var(--text-secondary) !important;
+}
+
+.ant-modal-close:hover .ant-modal-close-x {
+  color: var(--text-primary) !important;
+}
+
+.ant-divider {
+  border-color: var(--border-default) !important;
+}
+
+.ant-divider-inner-text {
+  color: var(--text-secondary) !important;
 }
 
 .ant-tabs-tab {
