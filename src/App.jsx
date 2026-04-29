@@ -40,105 +40,75 @@ import WebServicesManager from './views/WebServicesManager'
 
 const { Sider, Content } = Layout
 
-// Menu items organized by sections
+// Menu items flat structure
 const getMenuItems = () => [
   {
-    type: 'group',
-    label: 'GENERAL',
-    children: [
-      {
-        key: 'home',
-        icon: <HomeOutlined />,
-        label: 'Inicio',
-        path: '/'
-      },
-      {
-        key: 'users',
-        icon: <UserOutlined />,
-        label: 'Gestión de Usuarios',
-        path: '/users'
-      },
-      {
-        key: 'eforms',
-        icon: <FormOutlined />,
-        label: 'Generador de eForms',
-        path: '/eforms'
-      },
-      {
-        key: 'category-cloner',
-        icon: <CopyOutlined />,
-        label: 'Clonador de Categorías',
-        path: '/category-cloner'
-      },
-      {
-        key: 'tenants',
-        icon: <CloudOutlined />,
-        label: 'Gestión de Tenants',
-        path: '/tenants'
-      }
-    ]
+    key: 'home',
+    icon: <HomeOutlined />,
+    label: 'Inicio',
+    path: '/'
   },
   {
-    type: 'group',
-    label: 'HERRAMIENTAS',
-    children: [
-      {
-        key: 'api-explorer',
-        icon: <ApiOutlined />,
-        label: 'Explorador API REST',
-        path: '/api-explorer'
-      },
-      {
-        key: 'category-builder',
-        icon: <AppstoreOutlined />,
-        label: 'Category Builder',
-        path: '/category-builder'
-      },
-      {
-        key: 'docs',
-        icon: <FileTextOutlined />,
-        label: 'Documentación de Proyectos',
-        path: '/docs'
-      },
-      {
-        key: 'workflows',
-        icon: <SettingOutlined />,
-        label: 'Configuración de Workflows',
-        path: '/workflows'
-      }
-    ]
+    key: 'users',
+    icon: <UserOutlined />,
+    label: 'Gestión de Usuarios',
+    path: '/users'
   },
   {
-    type: 'group',
-    label: 'SOPORTE',
-    children: [
-      {
-        key: 'templates',
-        icon: <FileTextOutlined />,
-        label: 'Templates',
-        path: '/templates'
-      },
-      {
-        key: 'web-services',
-        icon: <CloudOutlined />,
-        label: 'Servicios Web',
-        path: '/web-services'
-      }
-    ]
+    key: 'eforms',
+    icon: <FormOutlined />,
+    label: 'Generador de eForms',
+    path: '/eforms'
+  },
+  {
+    key: 'category-cloner',
+    icon: <CopyOutlined />,
+    label: 'Clonador de Categorías',
+    path: '/category-cloner'
+  },
+  {
+    key: 'tenants',
+    icon: <CloudOutlined />,
+    label: 'Gestión de Tenants',
+    path: '/tenants'
+  },
+  {
+    key: 'api-explorer',
+    icon: <ApiOutlined />,
+    label: 'Explorador API REST',
+    path: '/api-explorer'
+  },
+  {
+    key: 'category-builder',
+    icon: <AppstoreOutlined />,
+    label: 'Category Builder',
+    path: '/category-builder'
+  },
+  {
+    key: 'docs',
+    icon: <FileTextOutlined />,
+    label: 'Documentación de Proyectos',
+    path: '/docs'
+  },
+  {
+    key: 'workflows',
+    icon: <SettingOutlined />,
+    label: 'Configuración de Workflows',
+    path: '/workflows'
+  },
+  {
+    key: 'templates',
+    icon: <FileTextOutlined />,
+    label: 'Templates',
+    path: '/templates'
+  },
+  {
+    key: 'web-services',
+    icon: <CloudOutlined />,
+    label: 'Servicios Web',
+    path: '/web-services'
   }
 ]
-
-// Flatten menu items for finding by path
-const getAllMenuItems = () => {
-  const items = getMenuItems()
-  const flattened = []
-  items.forEach(group => {
-    if (group.children) {
-      flattened.push(...group.children)
-    }
-  })
-  return flattened
-}
 
 function AppContent() {
   const [collapsed, setCollapsed] = useState(() => {
@@ -178,13 +148,13 @@ function AppContent() {
   }
 
   const getSelectedKey = () => {
-    const items = getAllMenuItems()
+    const items = getMenuItems()
     const item = items.find(m => m.path === location.pathname)
     return item ? [item.key] : ['home']
   }
 
   const handleMenuClick = (e) => {
-    const items = getAllMenuItems()
+    const items = getMenuItems()
     const item = items.find(m => m.key === e.key)
     if (item) {
       navigate(item.path)
@@ -248,17 +218,28 @@ function AppContent() {
           height: 'fit-content',
           minHeight: '48px'
         }}>
-          <img
-            src="/assets/images/logo.png"
-            alt="NewLead"
+          <div
+            onClick={() => collapsed && handleSidebarToggle(!collapsed)}
             style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: 'var(--radius-md)',
-              objectFit: 'cover',
-              flexShrink: 0
+              cursor: collapsed ? 'pointer' : 'default',
+              transition: 'opacity 200ms ease',
+              opacity: collapsed ? 0.7 : 1
             }}
-          />
+            onMouseEnter={(e) => collapsed && (e.currentTarget.style.opacity = '1')}
+            onMouseLeave={(e) => collapsed && (e.currentTarget.style.opacity = '0.7')}
+          >
+            <img
+              src="/assets/images/logo.png"
+              alt="NewLead"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: 'var(--radius-md)',
+                objectFit: 'cover',
+                flexShrink: 0
+              }}
+            />
+          </div>
           {!collapsed && (
             <>
               <div style={{
@@ -272,7 +253,7 @@ function AppContent() {
                 NewLead
               </div>
               <button
-                onClick={() => handleSidebarToggle(!collapsed)}
+                onClick={() => handleSidebarToggle(true)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -288,7 +269,7 @@ function AppContent() {
                 onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
                 onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
               >
-                {collapsed ? <MenuUnfoldOutlined size={18} /> : <MenuFoldOutlined size={18} />}
+                <MenuFoldOutlined size={18} />
               </button>
             </>
           )}
@@ -314,7 +295,7 @@ function AppContent() {
         </div>
 
         {/* Sidebar Footer - User Avatar */}
-        <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
+        <Dropdown menu={{ items: userMenuItems }} placement="topLeft" trigger={['click']}>
           <div style={{
             padding: '12px',
             borderTop: '1px solid var(--border-default)',
