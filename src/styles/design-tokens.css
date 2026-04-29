@@ -46,8 +46,8 @@
   --sidebar-transition: width 220ms ease;
 
   /* Contenido */
-  --content-padding-top: 32px;
-  --content-padding-x: 40px;
+  --content-padding-top: 16px;
+  --content-padding-x: 24px;
 
   /* Tabla */
   --table-row-height: 48px;
@@ -241,6 +241,11 @@ select:focus {
 
 .ant-menu-dark .ant-menu-item {
   color: var(--text-muted);
+  height: 36px;
+  line-height: 36px;
+  margin-block: 2px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .ant-menu-dark .ant-menu-item:hover {
@@ -322,4 +327,31 @@ select:focus {
 
 .ant-tabs-ink-bar {
   background: var(--accent-primary);
+}
+
+/* Alert */
+.ant-alert {
+  background: var(--bg-card);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.ant-alert-success {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: var(--accent-success);
+}
+
+.ant-alert-info {
+  background: rgba(54, 99, 255, 0.1);
+  border-color: var(--accent-primary);
+}
+
+.ant-alert-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: var(--kpi-amber);
+}
+
+.ant-alert-error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
 }
