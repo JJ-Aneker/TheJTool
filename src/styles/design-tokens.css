@@ -2,14 +2,14 @@
 
 :root {
   /* Fondos */
-  --bg-canvas: #0f1217;
-  --bg-sidebar: #1a1f2e;
-  --bg-card: #1e2233;
-  --bg-hover: #232932;
-  --bg-input: #1e2233;
+  --bg-canvas: #0a0e17;
+  --bg-sidebar: #131820;
+  --bg-card: #1a1f2e;
+  --bg-hover: #2a2f3f;
+  --bg-input: #1a1f2e;
 
   /* Acentos */
-  --accent-primary: #3663ff;
+  --accent-primary: #6366f1;
   --accent-success: #22c55e;
   --accent-chat: #e879f9;
 
@@ -20,13 +20,13 @@
   --kpi-pink: #ec4899;
 
   /* Texto */
-  --text-primary: rgba(255, 255, 255, 0.9);
-  --text-secondary: rgba(255, 255, 255, 0.45);
-  --text-muted: rgba(255, 255, 255, 0.2);
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.35);
 
   /* Bordes */
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.15);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.2);
 
   /* Chart / gráficos */
   --chart-line: #22c55e;

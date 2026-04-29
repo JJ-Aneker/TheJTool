@@ -14,7 +14,9 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LogoutOutlined,
-  UserSwitchOutlined
+  UserSwitchOutlined,
+  SunOutlined,
+  MoonOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './hooks/useTheme'
@@ -322,52 +324,89 @@ function AppContent() {
           />
         </div>
 
-        {/* Sidebar Footer - User Avatar */}
-        <Dropdown menu={{ items: userMenuItems }} placement="topLeft" trigger={['click']}>
-          <div style={{
-            padding: '12px',
-            borderTop: '1px solid var(--border-default)',
-            background: 'var(--bg-sidebar)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: '12px',
-            cursor: 'pointer',
-            transition: 'background 200ms ease',
-            flexShrink: 0
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-sidebar)'}
-          >
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'var(--accent-primary)',
+        {/* Sidebar Footer - User Avatar + Theme Toggle */}
+        <div style={{
+          borderTop: '1px solid var(--border-default)',
+          background: 'var(--bg-sidebar)',
+          flexShrink: 0
+        }}>
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              background: 'none',
+              border: 'none',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '12px',
-              fontWeight: '600',
-              flexShrink: 0
-            }}>
-              {user?.email ? user.email.substring(0, 1).toUpperCase() : 'U'}
-            </div>
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              gap: '12px',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+              transition: 'background 200ms ease, color 200ms ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--bg-hover)'
+              e.currentTarget.style.color = 'var(--text-primary)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'none'
+              e.currentTarget.style.color = 'var(--text-secondary)'
+            }}
+          >
+            {isDark ? <SunOutlined size={18} /> : <MoonOutlined size={18} />}
             {!collapsed && (
-              <div style={{
-                fontSize: '12px',
-                color: 'var(--text-secondary)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                flex: 1
-              }}>
-                {user?.email || 'Usuario'}
-              </div>
+              <span style={{ fontSize: '12px' }}>
+                {isDark ? 'Modo Claro' : 'Modo Oscuro'}
+              </span>
             )}
-          </div>
-        </Dropdown>
+          </button>
+
+          {/* User Avatar Dropdown */}
+          <Dropdown menu={{ items: userMenuItems }} placement="topLeft" trigger={['click']}>
+            <div style={{
+              padding: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              gap: '12px',
+              cursor: 'pointer',
+              transition: 'background 200ms ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: 'var(--accent-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '12px',
+                fontWeight: '600',
+                flexShrink: 0
+              }}>
+                {user?.email ? user.email.substring(0, 1).toUpperCase() : 'U'}
+              </div>
+              {!collapsed && (
+                <div style={{
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  flex: 1
+                }}>
+                  {user?.email || 'Usuario'}
+                </div>
+              )}
+            </div>
+          </Dropdown>
+        </div>
       </div>
 
       {/* Main Content Area */}
