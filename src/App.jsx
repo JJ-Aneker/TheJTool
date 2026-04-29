@@ -187,9 +187,8 @@ function AppContent() {
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)' }}>
       {/* Sidebar - 100% height with internal header and footer */}
       <Sider
-        collapsible
+        collapsible={false}
         collapsed={collapsed}
-        onCollapse={handleSidebarToggle}
         theme="dark"
         width={210}
         collapsedWidth={48}
@@ -205,7 +204,8 @@ function AppContent() {
           borderRight: '1px solid var(--border-default)',
           transition: 'var(--sidebar-transition)',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          width: collapsed ? 48 : 210
         }}
       >
         {/* Sidebar Header */}
