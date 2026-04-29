@@ -216,7 +216,8 @@ function AppContent() {
           alignItems: 'center',
           justifyContent: collapsed ? 'center' : 'space-between',
           height: 'fit-content',
-          minHeight: '48px'
+          minHeight: '48px',
+          flexShrink: 0
         }}>
           <div
             onClick={() => collapsed && handleSidebarToggle(!collapsed)}
@@ -307,7 +308,8 @@ function AppContent() {
             justifyContent: collapsed ? 'center' : 'flex-start',
             gap: '12px',
             cursor: 'pointer',
-            transition: 'background 200ms ease'
+            transition: 'background 200ms ease',
+            flexShrink: 0
           }}
           onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
           onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-sidebar)'}
