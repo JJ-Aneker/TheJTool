@@ -186,14 +186,8 @@ function AppContent() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)' }}>
       {/* Sidebar - 100% height with internal header and footer */}
-      <Sider
-        collapsible={false}
-        collapsed={collapsed}
-        theme="dark"
-        width={210}
-        collapsedWidth={48}
+      <div
         style={{
-          overflow: 'hidden',
           height: '100vh',
           position: 'fixed',
           left: 0,
@@ -205,7 +199,8 @@ function AppContent() {
           transition: 'var(--sidebar-transition)',
           display: 'flex',
           flexDirection: 'column',
-          width: collapsed ? 48 : 210
+          width: collapsed ? 48 : 210,
+          overflow: 'hidden'
         }}
       >
         {/* Sidebar Header */}
@@ -343,7 +338,7 @@ function AppContent() {
             )}
           </div>
         </Dropdown>
-      </Sider>
+      </div>
 
       {/* Main Content Area */}
       <div style={{
