@@ -39,64 +39,125 @@ export default function Home() {
   ]
 
   return (
-    <Card
-      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, gap: '16px' }}
-      title={<><HomeOutlined /> Inicio</>}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
       <Alert
         message="TheJToolbox - Therefore™ Administration Panel"
         description="Panel central para administración de proyectos y configuraciones en Therefore™ DMS"
         type="info"
         showIcon
-        style={{ margin: 0, borderRadius: 0 }}
+        style={{ margin: 0, borderRadius: 'var(--radius-lg)' }}
       />
 
-      <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+      {/* KPI Stats */}
+      <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6}>
-          <Statistic title="Instancias Activas" value={2} />
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
+            borderTop: '3px solid var(--kpi-blue)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '16px',
+            textAlign: 'center'
+          }}>
+            <div className="kpi-label">Instancias Activas</div>
+            <div className="kpi-value">2</div>
+          </div>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Statistic title="Categorías" value={45} />
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
+            borderTop: '3px solid var(--kpi-green)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '16px',
+            textAlign: 'center'
+          }}>
+            <div className="kpi-label">Categorías</div>
+            <div className="kpi-value">45</div>
+          </div>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Statistic title="Formularios" value={128} />
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
+            borderTop: '3px solid var(--kpi-amber)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '16px',
+            textAlign: 'center'
+          }}>
+            <div className="kpi-label">Formularios</div>
+            <div className="kpi-value">128</div>
+          </div>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Statistic title="Workflows" value={67} />
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
+            borderTop: '3px solid var(--kpi-pink)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '16px',
+            textAlign: 'center'
+          }}>
+            <div className="kpi-label">Workflows</div>
+            <div className="kpi-value">67</div>
+          </div>
         </Col>
       </Row>
 
-      <h2 style={{ marginBottom: '16px', marginTop: 0 }}>Herramientas Disponibles</h2>
-      <Row gutter={[16, 16]} style={{ flex: 1, overflow: 'auto', marginBottom: '16px' }}>
-        {tools.map((tool) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={tool.title}>
-            <Card
-              hoverable
-              onClick={() => window.location.pathname = tool.path}
-              style={{ textAlign: 'center', cursor: 'pointer', height: '100%', borderRadius: 0 }}
-            >
-              <div style={{ marginBottom: '12px' }}>
-                {tool.icon}
+      {/* Herramientas */}
+      <div>
+        <h2 style={{ marginBottom: '16px', marginTop: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>Herramientas Disponibles</h2>
+        <Row gutter={[16, 16]}>
+          {tools.map((tool) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={tool.title}>
+              <div
+                onClick={() => window.location.pathname = tool.path}
+                style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '20px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  height: '100%',
+                  transition: 'all 200ms ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-card)'}
+              >
+                <div style={{ marginBottom: '4px' }}>
+                  {tool.icon}
+                </div>
+                <h3 style={{ marginBottom: '4px', fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>{tool.title}</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '12px', margin: 0 }}>
+                  {tool.description}
+                </p>
               </div>
-              <h3 style={{ marginBottom: '8px' }}>{tool.title}</h3>
-              <p style={{ color: '#8c8c8c', fontSize: '12px' }}>
-                {tool.description}
-              </p>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
-      <div style={{ flex: 1, overflow: 'auto' }}>
-        <h2 style={{ marginBottom: '16px', marginTop: 0 }}>Últimas Actividades</h2>
-        <Timeline items={[
-          { children: 'Sincronización de categorías completada' },
-          { children: 'Nuevo formulario eForms importado' },
-          { children: 'Configuración de workflows actualizada' },
-          { children: 'Backup de instancias generado' }
-        ]} />
+            </Col>
+          ))}
+        </Row>
       </div>
-    </Card>
+
+      {/* Actividades */}
+      <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+        <h2 style={{ marginBottom: '16px', marginTop: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>Últimas Actividades</h2>
+        <div style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '20px'
+        }}>
+          <Timeline items={[
+            { children: 'Sincronización de categorías completada' },
+            { children: 'Nuevo formulario eForms importado' },
+            { children: 'Configuración de workflows actualizada' },
+            { children: 'Backup de instancias generado' }
+          ]} />
+        </div>
+      </div>
+    </div>
   )
 }

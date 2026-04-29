@@ -204,44 +204,68 @@ export default function TenantManager() {
 
   return (
     <>
-      <Card
-        style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-        bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-        title={<><CloudOutlined /> Gestión de Tenants Therefore™</>}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+        {/* Header */}
+        <div>
+          <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CloudOutlined /> Gestión de Tenants Therefore™
+          </h1>
+        </div>
 
+        {/* Stats */}
+        <Row gutter={16}>
+          <Col xs={24} sm={8}>
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderTop: '3px solid var(--kpi-blue)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '16px'
+            }}>
+              <div className="kpi-label">Tenants Activos</div>
+              <div className="kpi-value">{tenants.length}</div>
+            </div>
+          </Col>
+          <Col xs={24} sm={8}>
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderTop: '3px solid var(--kpi-green)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '16px'
+            }}>
+              <div className="kpi-label">Documentos Totales</div>
+              <div className="kpi-value">{stats.documents}</div>
+            </div>
+          </Col>
+          <Col xs={24} sm={8}>
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderTop: '3px solid var(--kpi-amber)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '16px'
+            }}>
+              <div className="kpi-label">Usuarios Totales</div>
+              <div className="kpi-value">{stats.users}</div>
+            </div>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col xs={24} sm={8}>
-              <Card size="small">
-                <Statistic title="Tenants Activos" value={tenants.length} />
-              </Card>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Card size="small">
-                <Statistic title="Documentos Totales" value={stats.documents} />
-              </Card>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Card size="small">
-                <Statistic title="Usuarios Totales" value={stats.users} />
-              </Card>
-            </Col>
-          </Row>
+        {/* Tabla */}
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <Space style={{ marginBottom: 8 }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAddTenant}
+            >
+              Agregar Tenant
+            </Button>
+          </Space>
 
           <Spin spinning={loading} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-            <Space style={{ marginBottom: 16 }}>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAddTenant}
-              >
-                Agregar Tenant
-              </Button>
-            </Space>
-
-            <div style={{ flex: 1, minHeight: 0 }}>
+            <div style={{ flex: 1, minHeight: 0, background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-default)', overflow: 'hidden' }}>
               <Table
                 columns={columns}
                 dataSource={tenants}
@@ -252,7 +276,7 @@ export default function TenantManager() {
             </div>
           </Spin>
         </div>
-      </Card>
+      </div>
 
       <Modal
         title={selectedTenant ? 'Editar Tenant' : 'Nuevo Tenant'}

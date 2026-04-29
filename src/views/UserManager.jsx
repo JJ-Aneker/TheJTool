@@ -283,11 +283,10 @@ export default function UserManager() {
   const stats = getStatistics()
 
   return (
-    <Card
-      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-      title={<><UserOutlined /> Gestión de Usuarios</>}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+      <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+        <UserOutlined /> Gestión de Usuarios
+      </h1>
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
@@ -601,6 +600,6 @@ export default function UserManager() {
           </Form.Item>
         </Form>
       </Modal>
-    </Card>
+    </div>
   )
 }

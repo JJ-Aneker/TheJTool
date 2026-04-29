@@ -117,11 +117,11 @@ export default function CategoryCloner() {
   }
 
   return (
-    <Card
-      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-      title={<><CopyOutlined /> Clonador de Categorías Therefore™</>}
-      extra={
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+          <CopyOutlined /> Clonador de Categorías Therefore™
+        </h1>
         <Upload
           beforeUpload={handleUploadXml}
           accept=".xml"
@@ -130,8 +130,7 @@ export default function CategoryCloner() {
         >
           <Button icon={<UploadOutlined />}>Importar XML</Button>
         </Upload>
-      }
-    >
+      </div>
         <Spin spinning={loading} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <h3 style={{ margin: '0 0 16px 0' }}>Categorías Disponibles</h3>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -218,6 +217,6 @@ export default function CategoryCloner() {
             </Card>
           )}
         </Spin>
-      </Card>
+    </div>
   )
 }
