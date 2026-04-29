@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Table, Button, Space, Modal, Form, Input, Select, Tag, message, Statistic, Row, Col, Alert, Spin, Tabs } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, Select, Tag, message, Statistic, Row, Col, Alert, Spin, Tabs } from 'antd'
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SyncOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 
 export default function TenantManager() {

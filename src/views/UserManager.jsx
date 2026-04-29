@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, Badge, Avatar, Tabs, Popconfirm, Tooltip, Upload } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, Badge, Avatar, Tabs, Popconfirm, Tooltip, Upload } from 'antd'
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, CheckCircleOutlined, CloseCircleOutlined, MailOutlined, PhoneOutlined, CameraOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'

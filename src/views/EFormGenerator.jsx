@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Form, Input, Button, Select, Space, Alert, Table, Tabs, Upload, message, Spin, Tree, InputNumber } from 'antd'
+import { Form, Input, Button, Select, Space, Alert, Table, Tabs, Upload, message, Spin, Tree, InputNumber } from 'antd'
 import { FormOutlined, DownloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 
 export default function EFormGenerator() {

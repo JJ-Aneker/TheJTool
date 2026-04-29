@@ -1,4 +1,4 @@
-import { Card, Row, Col, Statistic, Timeline, Alert } from 'antd'
+import { Row, Col, Statistic, Timeline, Alert } from 'antd'
 import {
   FormOutlined,
   CopyOutlined,
