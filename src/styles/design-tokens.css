@@ -2,10 +2,10 @@
 
 :root {
   /* Fondos */
-  --bg-canvas: #0a0e17;
-  --bg-sidebar: #131820;
+  --bg-canvas: #0f1419;
+  --bg-sidebar: #0f1419;
   --bg-card: #1a1f2e;
-  --bg-hover: #2a2f3f;
+  --bg-hover: #262d3d;
   --bg-input: #1a1f2e;
 
   /* Acentos */
@@ -20,13 +20,13 @@
   --kpi-pink: #ec4899;
 
   /* Texto */
-  --text-primary: rgba(255, 255, 255, 0.95);
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-muted: rgba(255, 255, 255, 0.35);
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --text-muted: rgba(255, 255, 255, 0.3);
 
   /* Bordes */
-  --border-default: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(255, 255, 255, 0.2);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.12);
 
   /* Chart / gráficos */
   --chart-line: #22c55e;

@@ -42,105 +42,75 @@ import WebServicesManager from './views/WebServicesManager'
 
 const { Sider, Content } = Layout
 
-// Menu items organized by sections
+// Menu items flat structure
 const getMenuItems = () => [
   {
-    type: 'group',
-    label: 'GENERAL',
-    children: [
-      {
-        key: 'home',
-        icon: <HomeOutlined />,
-        label: 'Inicio',
-        path: '/'
-      },
-      {
-        key: 'users',
-        icon: <UserOutlined />,
-        label: 'Gestión de Usuarios',
-        path: '/users'
-      },
-      {
-        key: 'eforms',
-        icon: <FormOutlined />,
-        label: 'Generador de eForms',
-        path: '/eforms'
-      },
-      {
-        key: 'category-cloner',
-        icon: <CopyOutlined />,
-        label: 'Clonador de Categorías',
-        path: '/category-cloner'
-      },
-      {
-        key: 'tenants',
-        icon: <CloudOutlined />,
-        label: 'Gestión de Tenants',
-        path: '/tenants'
-      }
-    ]
+    key: 'home',
+    icon: <HomeOutlined />,
+    label: 'Inicio',
+    path: '/'
   },
   {
-    type: 'group',
-    label: 'HERRAMIENTAS',
-    children: [
-      {
-        key: 'api-explorer',
-        icon: <ApiOutlined />,
-        label: 'Explorador API REST',
-        path: '/api-explorer'
-      },
-      {
-        key: 'category-builder',
-        icon: <AppstoreOutlined />,
-        label: 'Category Builder',
-        path: '/category-builder'
-      },
-      {
-        key: 'docs',
-        icon: <FileTextOutlined />,
-        label: 'Documentación de Proyectos',
-        path: '/docs'
-      },
-      {
-        key: 'workflows',
-        icon: <SettingOutlined />,
-        label: 'Configuración de Workflows',
-        path: '/workflows'
-      }
-    ]
+    key: 'users',
+    icon: <UserOutlined />,
+    label: 'Gestión de Usuarios',
+    path: '/users'
   },
   {
-    type: 'group',
-    label: 'SOPORTE',
-    children: [
-      {
-        key: 'templates',
-        icon: <FileTextOutlined />,
-        label: 'Templates',
-        path: '/templates'
-      },
-      {
-        key: 'web-services',
-        icon: <CloudOutlined />,
-        label: 'Servicios Web',
-        path: '/web-services'
-      }
-    ]
+    key: 'eforms',
+    icon: <FormOutlined />,
+    label: 'Generador de eForms',
+    path: '/eforms'
+  },
+  {
+    key: 'category-cloner',
+    icon: <CopyOutlined />,
+    label: 'Clonador de Categorías',
+    path: '/category-cloner'
+  },
+  {
+    key: 'tenants',
+    icon: <CloudOutlined />,
+    label: 'Gestión de Tenants',
+    path: '/tenants'
+  },
+  {
+    key: 'api-explorer',
+    icon: <ApiOutlined />,
+    label: 'Explorador API REST',
+    path: '/api-explorer'
+  },
+  {
+    key: 'category-builder',
+    icon: <AppstoreOutlined />,
+    label: 'Category Builder',
+    path: '/category-builder'
+  },
+  {
+    key: 'docs',
+    icon: <FileTextOutlined />,
+    label: 'Documentación de Proyectos',
+    path: '/docs'
+  },
+  {
+    key: 'workflows',
+    icon: <SettingOutlined />,
+    label: 'Configuración de Workflows',
+    path: '/workflows'
+  },
+  {
+    key: 'templates',
+    icon: <FileTextOutlined />,
+    label: 'Templates',
+    path: '/templates'
+  },
+  {
+    key: 'web-services',
+    icon: <CloudOutlined />,
+    label: 'Servicios Web',
+    path: '/web-services'
   }
 ]
-
-// Flatten menu items for finding by path
-const getAllMenuItems = () => {
-  const items = getMenuItems()
-  const flattened = []
-  items.forEach(group => {
-    if (group.children) {
-      flattened.push(...group.children)
-    }
-  })
-  return flattened
-}
 
 function AppContent() {
   const [collapsed, setCollapsed] = useState(() => {
@@ -180,13 +150,13 @@ function AppContent() {
   }
 
   const getSelectedKey = () => {
-    const items = getAllMenuItems()
+    const items = getMenuItems()
     const item = items.find(m => m.path === location.pathname)
     return item ? [item.key] : ['home']
   }
 
   const handleMenuClick = (e) => {
-    const items = getAllMenuItems()
+    const items = getMenuItems()
     const item = items.find(m => m.key === e.key)
     if (item) {
       navigate(item.path)
