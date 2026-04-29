@@ -167,8 +167,8 @@ function AppContent() {
         collapsed={collapsed}
         onCollapse={handleSidebarToggle}
         theme="dark"
-        width={parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-expanded'))}
-        collapsedWidth={parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-collapsed'))}
+        width={210}
+        collapsedWidth={48}
         style={{
           overflow: 'auto',
           height: 'calc(100vh - 64px)',
