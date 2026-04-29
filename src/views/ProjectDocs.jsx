@@ -237,7 +237,7 @@ export default function ProjectDocs() {
             label: 'Explorador',
             children: (
               <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '24px' }}>
-                <div style={{ border: '1px solid #d9d9d9', borderRadius: '4px', padding: '8px' }}>
+                <div style={{ border: '1px solid var(--border-default)', borderRadius: '4px', padding: '8px' }}>
                   <h4 style={{ marginBottom: '12px' }}>Categorías</h4>
                   <Tree
                     treeData={treeData}
@@ -263,7 +263,7 @@ export default function ProjectDocs() {
                       </div>
 
                       <div style={{
-                        background: '#f5f5f5',
+                        background: 'var(--bg-hover)',
                         padding: '12px',
                         borderRadius: '4px',
                         marginBottom: '16px',
@@ -276,7 +276,7 @@ export default function ProjectDocs() {
                       </div>
 
                       <div style={{
-                        background: '#fafafa',
+                        background: 'var(--bg-hover)',
                         padding: '16px',
                         borderRadius: '4px',
                         marginBottom: '16px',
@@ -362,7 +362,7 @@ export default function ProjectDocs() {
                                   </Tag>
                                 ))}
                               </div>
-                              <span style={{ color: '#8c8c8c', fontSize: '12px' }}>
+                              <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
                                 {doc.file} • {doc.size} • v{doc.version} • {doc.modified}
                               </span>
                             </div>

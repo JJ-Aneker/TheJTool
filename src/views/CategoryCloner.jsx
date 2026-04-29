@@ -146,7 +146,7 @@ export default function CategoryCloner() {
           {selectedCategory && (
             <Card
               title="Parámetros de Clonación"
-              style={{ marginTop: 24, background: '#fafafa' }}
+              style={{ marginTop: 24, background: 'var(--bg-hover)' }}
             >
               <Form
                 form={form}

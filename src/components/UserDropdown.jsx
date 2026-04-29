@@ -44,7 +44,7 @@ export default function UserDropdown() {
         <Avatar
           size={32}
           icon={<UserOutlined />}
-          style={{ backgroundColor: '#1890ff' }}
+          style={{ backgroundColor: 'var(--accent-primary)' }}
         />
         <span style={{ fontSize: '14px' }}>
           {user.email}

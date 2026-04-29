@@ -431,11 +431,11 @@ export default function WorkflowSettings() {
                     </Form.Item>
 
                     <div style={{
-                      border: '1px solid #d9d9d9',
+                      border: '1px solid var(--border-default)',
                       borderRadius: '4px',
                       padding: '16px',
                       marginBottom: '16px',
-                      background: '#fafafa'
+                      background: 'var(--bg-hover)'
                     }}>
                       <div style={{
                         display: 'flex',
@@ -454,7 +454,7 @@ export default function WorkflowSettings() {
                       </div>
 
                       {steps.length === 0 ? (
-                        <p style={{ color: '#8c8c8c' }}>No hay pasos definidos. Haz clic en "Agregar Paso".</p>
+                        <p style={{ color: 'var(--text-muted)' }}>No hay pasos definidos. Haz clic en "Agregar Paso".</p>
                       ) : (
                         <Table
                           columns={stepColumns}
@@ -485,7 +485,7 @@ export default function WorkflowSettings() {
                               </Button>
 
                               {conditions.length === 0 ? (
-                                <p style={{ color: '#8c8c8c' }}>No hay condiciones definidas.</p>
+                                <p style={{ color: 'var(--text-muted)' }}>No hay condiciones definidas.</p>
                               ) : (
                                 <List
                                   dataSource={conditions}

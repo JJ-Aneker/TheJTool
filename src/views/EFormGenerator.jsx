@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Form, Input, Button, Select, Space, Alert, Table, Tabs, Upload, message, Spin, Tree, InputNumber } from 'antd'
+import { Form, Input, Button, Select, Space, Alert, Table, Upload, message, Spin, InputNumber } from 'antd'
 import { FormOutlined, DownloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 
 export default function EFormGenerator() {
@@ -35,7 +35,7 @@ export default function EFormGenerator() {
       width: 100,
       render: (status) => (
         <span style={{
-          color: status === 'published' ? '#52c41a' : '#faad14',
+          color: status === 'published' ? 'var(--accent-success)' : 'var(--kpi-amber)',
           fontWeight: 'bold'
         }}>
           {status === 'published' ? '✓ Publicado' : '● Borrador'}
@@ -191,222 +191,261 @@ export default function EFormGenerator() {
       <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
         <FormOutlined /> Generador de eForms Therefore™
       </h1>
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-        items={[
-            {
-              key: 'list',
-              label: 'Lista de eForms',
-              children: (
-                <div>
-                  <Space style={{ marginBottom: 16 }}>
+
+      {/* Tabs + Botones en la misma línea */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid var(--border-default)' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: '0' }}>
+            <button
+              onClick={() => setActiveTab('list')}
+              style={{
+                padding: '8px 16px',
+                background: activeTab === 'list' ? 'var(--accent-primary)' : 'transparent',
+                color: activeTab === 'list' ? 'white' : 'var(--text-primary)',
+                border: 'none',
+                borderBottom: activeTab === 'list' ? '2px solid var(--accent-primary)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+                fontSize: '14px'
+              }}
+            >
+              Lista de eForms
+            </button>
+            <button
+              onClick={() => setActiveTab('editor')}
+              style={{
+                padding: '8px 16px',
+                background: activeTab === 'editor' ? 'var(--accent-primary)' : 'transparent',
+                color: activeTab === 'editor' ? 'white' : 'var(--text-primary)',
+                border: 'none',
+                borderBottom: activeTab === 'editor' ? '2px solid var(--accent-primary)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+                fontSize: '14px'
+              }}
+            >
+              Editor de eForm
+            </button>
+          </div>
+        </div>
+
+        {/* Botones alineados a la derecha */}
+        {activeTab === 'list' && (
+          <Space style={{ paddingBottom: '6px', paddingRight: '0' }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={createNewEForm}
+              size="small"
+            >
+              Crear Nuevo eForm
+            </Button>
+            <Upload
+              beforeUpload={handleUploadXml}
+              accept=".xml"
+              maxCount={1}
+              showUploadList={false}
+            >
+              <Button icon={<UploadOutlined />} size="small">Importar XML</Button>
+            </Upload>
+          </Space>
+        )}
+      </div>
+
+      {/* Contenido de los tabs */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        {activeTab === 'list' && (
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            <Table
+              columns={eformColumns}
+              dataSource={eforms}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+            />
+          </div>
+        )}
+
+        {activeTab === 'editor' && (
+          <Spin spinning={loading} style={{ flex: 1 }}>
+            <div style={{ flex: 1, overflow: 'auto', paddingRight: '16px' }}>
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={saveEForm}
+              >
+                <Form.Item
+                  label="ID del eForm"
+                  name="id"
+                  rules={[
+                    { required: true, message: 'ID requerido' },
+                    { pattern: /^[A-Z_0-9]+$/, message: 'Solo mayúsculas y números' }
+                  ]}
+                >
+                  <Input placeholder="Ej: EFORM_MATRICULAS_001" />
+                </Form.Item>
+
+                <Form.Item
+                  label="Nombre del eForm"
+                  name="name"
+                  rules={[{ required: true, message: 'Nombre requerido' }]}
+                >
+                  <Input placeholder="Ej: eForm Matrículas" />
+                </Form.Item>
+
+                <Form.Item
+                  label="Descripción"
+                  name="description"
+                >
+                  <Input.TextArea rows={2} />
+                </Form.Item>
+
+                <Form.Item
+                  label="Estado"
+                  name="status"
+                  initialValue="draft"
+                >
+                  <Select
+                    options={[
+                      { label: 'Borrador', value: 'draft' },
+                      { label: 'Publicado', value: 'published' }
+                    ]}
+                  />
+                </Form.Item>
+
+                <div style={{
+                  border: '1px solid var(--border-default)',
+                  borderRadius: '4px',
+                  padding: '16px',
+                  marginBottom: '16px',
+                  background: 'var(--bg-hover)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '12px'
+                  }}>
+                    <h4>Campos del Formulario</h4>
                     <Button
-                      type="primary"
+                      size="small"
                       icon={<PlusOutlined />}
-                      onClick={createNewEForm}
+                      onClick={addField}
                     >
-                      Crear Nuevo eForm
+                      Agregar Campo
                     </Button>
-                    <Upload
-                      beforeUpload={handleUploadXml}
-                      accept=".xml"
-                      maxCount={1}
-                      showUploadList={false}
-                    >
-                      <Button icon={<UploadOutlined />}>Importar XML</Button>
-                    </Upload>
-                  </Space>
+                  </div>
 
-
-                </div>
-              )
-            },
-            {
-              key: 'editor',
-              label: 'Editor de eForm',
-              children: (
-                <Spin spinning={loading}>
-                  <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={saveEForm}
-                  >
-                    <Form.Item
-                      label="ID del eForm"
-                      name="id"
-                      rules={[
-                        { required: true, message: 'ID requerido' },
-                        { pattern: /^[A-Z_0-9]+$/, message: 'Solo mayúsculas y números' }
+                  {fields.length === 0 ? (
+                    <p style={{ color: 'var(--text-muted)' }}>No hay campos definidos. Haz clic en "Agregar Campo".</p>
+                  ) : (
+                    <Table
+                      dataSource={fields}
+                      columns={[
+                        {
+                          title: 'Nombre',
+                          dataIndex: 'name',
+                          key: 'name',
+                          render: (text, record, index) => (
+                            <Input
+                              value={text}
+                              onChange={(e) => {
+                                const newFields = [...fields]
+                                newFields[index].name = e.target.value
+                                setFields(newFields)
+                              }}
+                              size="small"
+                            />
+                          )
+                        },
+                        {
+                          title: 'Etiqueta',
+                          dataIndex: 'label',
+                          key: 'label',
+                          render: (text, record, index) => (
+                            <Input
+                              value={text}
+                              onChange={(e) => {
+                                const newFields = [...fields]
+                                newFields[index].label = e.target.value
+                                setFields(newFields)
+                              }}
+                              size="small"
+                            />
+                          )
+                        },
+                        {
+                          title: 'Tipo',
+                          dataIndex: 'type',
+                          key: 'type',
+                          width: 120,
+                          render: (text, record, index) => (
+                            <Select
+                              value={text}
+                              onChange={(value) => {
+                                const newFields = [...fields]
+                                newFields[index].type = value
+                                setFields(newFields)
+                              }}
+                              options={fieldTypeOptions}
+                              size="small"
+                            />
+                          )
+                        },
+                        {
+                          title: 'Acción',
+                          key: 'action',
+                          width: 80,
+                          render: (_, record) => (
+                            <Button
+                              type="text"
+                              danger
+                              size="small"
+                              icon={<DeleteOutlined />}
+                              onClick={() => removeField(record.id)}
+                            />
+                          )
+                        }
                       ]}
+                      rowKey="id"
+                      pagination={false}
+                      size="small"
+                    />
+                  )}
+                </div>
+
+                <Space>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                  >
+                    Guardar eForm
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setActiveTab('list')
+                      form.resetFields()
+                      setSelectedEForm(null)
+                      setFields([])
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  {selectedEForm && (
+                    <Button
+                      type="default"
+                      onClick={() => downloadEForm(selectedEForm)}
+                      icon={<DownloadOutlined />}
                     >
-                      <Input placeholder="Ej: EFORM_MATRICULAS_001" />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Nombre del eForm"
-                      name="name"
-                      rules={[{ required: true, message: 'Nombre requerido' }]}
-                    >
-                      <Input placeholder="Ej: eForm Matrículas" />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Descripción"
-                      name="description"
-                    >
-                      <Input.TextArea rows={2} />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Estado"
-                      name="status"
-                      initialValue="draft"
-                    >
-                      <Select
-                        options={[
-                          { label: 'Borrador', value: 'draft' },
-                          { label: 'Publicado', value: 'published' }
-                        ]}
-                      />
-                    </Form.Item>
-
-                    <div style={{
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '4px',
-                      padding: '16px',
-                      marginBottom: '16px',
-                      background: '#fafafa'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '12px'
-                      }}>
-                        <h4>Campos del Formulario</h4>
-                        <Button
-                          size="small"
-                          icon={<PlusOutlined />}
-                          onClick={addField}
-                        >
-                          Agregar Campo
-                        </Button>
-                      </div>
-
-                      {fields.length === 0 ? (
-                        <p style={{ color: '#8c8c8c' }}>No hay campos definidos. Haz clic en "Agregar Campo".</p>
-                      ) : (
-                        <Table
-                          dataSource={fields}
-                          columns={[
-                            {
-                              title: 'Nombre',
-                              dataIndex: 'name',
-                              key: 'name',
-                              render: (text, record, index) => (
-                                <Input
-                                  value={text}
-                                  onChange={(e) => {
-                                    const newFields = [...fields]
-                                    newFields[index].name = e.target.value
-                                    setFields(newFields)
-                                  }}
-                                  size="small"
-                                />
-                              )
-                            },
-                            {
-                              title: 'Etiqueta',
-                              dataIndex: 'label',
-                              key: 'label',
-                              render: (text, record, index) => (
-                                <Input
-                                  value={text}
-                                  onChange={(e) => {
-                                    const newFields = [...fields]
-                                    newFields[index].label = e.target.value
-                                    setFields(newFields)
-                                  }}
-                                  size="small"
-                                />
-                              )
-                            },
-                            {
-                              title: 'Tipo',
-                              dataIndex: 'type',
-                              key: 'type',
-                              width: 120,
-                              render: (text, record, index) => (
-                                <Select
-                                  value={text}
-                                  onChange={(value) => {
-                                    const newFields = [...fields]
-                                    newFields[index].type = value
-                                    setFields(newFields)
-                                  }}
-                                  options={fieldTypeOptions}
-                                  size="small"
-                                />
-                              )
-                            },
-                            {
-                              title: 'Acción',
-                              key: 'action',
-                              width: 80,
-                              render: (_, record) => (
-                                <Button
-                                  type="text"
-                                  danger
-                                  size="small"
-                                  icon={<DeleteOutlined />}
-                                  onClick={() => removeField(record.id)}
-                                />
-                              )
-                            }
-                          ]}
-                          rowKey="id"
-                          pagination={false}
-                          size="small"
-                        />
-                      )}
-                    </div>
-
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading}
-                      >
-                        Guardar eForm
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setActiveTab('list')
-                          form.resetFields()
-                          setSelectedEForm(null)
-                          setFields([])
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                      {selectedEForm && (
-                        <Button
-                          type="default"
-                          onClick={() => downloadEForm(selectedEForm)}
-                          icon={<DownloadOutlined />}
-                        >
-                          Descargar XML
-                        </Button>
-                      )}
-                    </Space>
-                  </Form>
-                </Spin>
-              )
-            }
-          ]}
-        />
+                      Descargar XML
+                    </Button>
+                  )}
+                </Space>
+              </Form>
+            </div>
+          </Spin>
+        )}
+      </div>
     </div>
   )
 }

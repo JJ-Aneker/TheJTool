@@ -27,20 +27,20 @@ body {
   justify-content: center;
   min-height: 400px;
   text-align: center;
-  color: #8c8c8c;
+  color: var(--text-muted);
 }
 
 .placeholder-view .anticon {
   font-size: 48px;
   margin-bottom: 16px;
-  color: #d9d9d9;
+  color: var(--border-default);
 }
 
 .placeholder-view h2 {
   margin-bottom: 8px;
-  color: #262626;
+  color: var(--text-primary);
 }
 
 .placeholder-view p {
-  color: #8c8c8c;
+  color: var(--text-muted);
 }

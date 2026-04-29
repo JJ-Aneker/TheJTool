@@ -1,4 +1,3 @@
-import { Empty, Button } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 
 export default function Placeholder({ icon: Icon, title, description, status = 'development' }) {
@@ -14,7 +13,7 @@ export default function Placeholder({ icon: Icon, title, description, status = '
       <div style={{
         display: 'inline-block',
         padding: '8px 16px',
-        background: '#faad14',
+        background: 'var(--kpi-amber)',
         borderRadius: '4px',
         color: '#fff',
         marginBottom: '24px',
@@ -22,14 +21,13 @@ export default function Placeholder({ icon: Icon, title, description, status = '
       }}>
         Estado: {status === 'development' ? '🔨 En Desarrollo' : status}
       </div>
-      <Button
-        type="default"
-        icon={<ArrowLeftOutlined />}
+      <button
+        className="btn btn-secondary"
         onClick={() => window.location.pathname = '/'}
         style={{ marginTop: '16px' }}
       >
-        Volver al Inicio
-      </Button>
+        <ArrowLeftOutlined style={{ fontSize: '12px' }} /> Volver al Inicio
+      </button>
     </div>
   )
 }

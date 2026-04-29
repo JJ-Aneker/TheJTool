@@ -65,7 +65,7 @@ export default function Login() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        background: 'linear-gradient(135deg, var(--accent-primary) 0%, #2850d4 100%)'
       }}>
         <Spin size="large" />
       </div>
@@ -78,7 +78,7 @@ export default function Login() {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, var(--accent-primary) 0%, #2850d4 100%)',
       padding: '24px'
     }}>
       <div style={{ width: '100%', maxWidth: '500px' }}>

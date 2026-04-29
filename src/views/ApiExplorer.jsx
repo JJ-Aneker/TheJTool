@@ -193,7 +193,7 @@ export default function ApiExplorer() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '24px', flex: 1, minHeight: 0 }}>
           {/* Sidebar con endpoints */}
-          <div style={{ border: '1px solid #d9d9d9', borderRadius: '4px', padding: '8px' }}>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: '4px', padding: '8px' }}>
             <h4 style={{ marginBottom: '12px' }}>Categorías</h4>
             <Tree
               treeData={treeData}
@@ -216,7 +216,7 @@ export default function ApiExplorer() {
                     children: (
                       <div>
                         <h4 style={{ marginBottom: '12px' }}>{selectedEndpoint.name}</h4>
-                        <p style={{ color: '#8c8c8c', marginBottom: '16px' }}>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>
                           {selectedEndpoint.description}
                         </p>
 
@@ -321,8 +321,8 @@ export default function ApiExplorer() {
                     children: response ? (
                       <div>
                         <div style={{
-                          background: response.status === 200 ? '#f6ffed' : '#fff1f0',
-                          border: `1px solid ${response.status === 200 ? '#b7eb8f' : '#ffccc7'}`,
+                          background: response.status === 200 ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                          border: `1px solid ${response.status === 200 ? 'var(--accent-success)' : '#ef4444'}`,
                           borderRadius: '4px',
                           padding: '12px',
                           marginBottom: '12px'
@@ -334,7 +334,7 @@ export default function ApiExplorer() {
 
                         <h5>Headers</h5>
                         <pre style={{
-                          background: '#f5f5f5',
+                          background: 'var(--bg-hover)',
                           padding: '12px',
                           borderRadius: '4px',
                           fontSize: '12px',

@@ -5,9 +5,9 @@ export const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
-    // Recuperar preferencia guardada
+    // Recuperar preferencia guardada, por defecto tema oscuro
     const saved = localStorage.getItem('theme-mode')
-    return saved ? JSON.parse(saved) : false
+    return saved ? JSON.parse(saved) : true
   })
 
   const toggleTheme = useCallback(() => {

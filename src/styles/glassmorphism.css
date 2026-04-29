@@ -75,8 +75,8 @@
 .ant-input:focus,
 .ant-input-number:focus-within,
 .ant-select-selector:focus {
-  border-color: #1890ff !important;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.2);
 }
 
 [data-theme='dark'] .ant-input:focus,
@@ -94,12 +94,12 @@
 }
 
 .ant-btn-primary {
-  background: linear-gradient(135deg, #1890ff, #0050b3);
+  background: linear-gradient(135deg, var(--accent-primary), #2850d4);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 [data-theme='dark'] .ant-btn-primary {
-  background: linear-gradient(135deg, #177ddc, #0f4c81);
+  background: linear-gradient(135deg, var(--accent-primary), #2850d4);
 }
 
 /* Table con efecto de vidrio */

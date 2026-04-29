@@ -75,7 +75,7 @@ export default function UserManager() {
       dataIndex: 'email',
       key: 'email',
       width: 220,
-      render: (text) => <span style={{ color: '#1890ff' }}>{text || '-'}</span>
+      render: (text) => <span style={{ color: 'var(--accent-primary)' }}>{text || '-'}</span>
     },
     {
       title: 'Rol',
@@ -475,13 +475,13 @@ export default function UserManager() {
                       size={60}
                       src={selectedUser.avatar_url}
                       icon={<UserOutlined />}
-                      style={{ backgroundColor: '#1890ff' }}
+                      style={{ backgroundColor: 'var(--accent-primary)' }}
                     />
                     <div style={{
                       position: 'absolute',
                       bottom: -4,
                       right: -4,
-                      background: '#1890ff',
+                      background: 'var(--accent-primary)',
                       borderRadius: '50%',
                       width: '24px',
                       height: '24px',
@@ -498,12 +498,12 @@ export default function UserManager() {
                 </Upload>
               </div>
               <div>
-                <div style={{ fontSize: '11px', color: '#999', marginBottom: '2px' }}>Email</div>
-                <div style={{ fontSize: '14px', fontWeight: '500', color: '#1890ff' }}>{selectedUser.email}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Email</div>
+                <div style={{ fontSize: '14px', fontWeight: '500', color: 'var(--accent-primary)' }}>{selectedUser.email}</div>
               </div>
               <div>
-                <div style={{ fontSize: '11px', color: '#999', marginBottom: '2px' }}>ID</div>
-                <div style={{ fontSize: '12px', fontFamily: 'monospace', color: '#666' }}>{selectedUser.user_id}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>ID</div>
+                <div style={{ fontSize: '12px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{selectedUser.user_id}</div>
               </div>
             </div>
           </div>

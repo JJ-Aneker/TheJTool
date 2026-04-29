@@ -378,11 +378,11 @@ export default function CategoryBuilder() {
                     </div>
 
                     <div style={{
-                      border: '1px solid #d9d9d9',
+                      border: '1px solid var(--border-default)',
                       borderRadius: '4px',
                       padding: '16px',
                       marginBottom: '16px',
-                      background: '#fafafa'
+                      background: 'var(--bg-hover)'
                     }}>
                       <div style={{
                         display: 'flex',
@@ -401,7 +401,7 @@ export default function CategoryBuilder() {
                       </div>
 
                       {fields.length === 0 ? (
-                        <p style={{ color: '#8c8c8c' }}>No hay campos. Haz clic en "Agregar Campo".</p>
+                        <p style={{ color: 'var(--text-muted)' }}>No hay campos. Haz clic en "Agregar Campo".</p>
                       ) : (
                         <Table
                           columns={fieldColumns}

@@ -13,25 +13,25 @@ import {
 export default function Home() {
   const tools = [
     {
-      icon: <FormOutlined style={{ fontSize: '32px', color: '#1890ff' }} />,
+      icon: <FormOutlined style={{ fontSize: '32px', color: 'var(--kpi-blue)' }} />,
       title: 'Generador de eForms',
       description: 'Crea y gestiona formularios electrónicos',
       path: '/eforms'
     },
     {
-      icon: <CopyOutlined style={{ fontSize: '32px', color: '#52c41a' }} />,
+      icon: <CopyOutlined style={{ fontSize: '32px', color: 'var(--kpi-green)' }} />,
       title: 'Clonador de Categorías',
       description: 'Replica estructuras de categorías existentes',
       path: '/category-cloner'
     },
     {
-      icon: <CloudOutlined style={{ fontSize: '32px', color: '#faad14' }} />,
+      icon: <CloudOutlined style={{ fontSize: '32px', color: 'var(--kpi-amber)' }} />,
       title: 'Gestión de Tenants',
       description: 'Administra instancias de Therefore',
       path: '/tenants'
     },
     {
-      icon: <ApiOutlined style={{ fontSize: '32px', color: '#f5222d' }} />,
+      icon: <ApiOutlined style={{ fontSize: '32px', color: 'var(--kpi-pink)' }} />,
       title: 'Explorador API REST',
       description: 'Explora y prueba endpoints de la API',
       path: '/api-explorer'
@@ -57,7 +57,9 @@ export default function Home() {
             borderTop: '3px solid var(--kpi-blue)',
             borderRadius: 'var(--radius-lg)',
             padding: '16px',
-            textAlign: 'center'
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'all 200ms ease'
           }}>
             <div className="kpi-label">Instancias Activas</div>
             <div className="kpi-value">2</div>
@@ -70,7 +72,9 @@ export default function Home() {
             borderTop: '3px solid var(--kpi-green)',
             borderRadius: 'var(--radius-lg)',
             padding: '16px',
-            textAlign: 'center'
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'all 200ms ease'
           }}>
             <div className="kpi-label">Categorías</div>
             <div className="kpi-value">45</div>
@@ -83,7 +87,9 @@ export default function Home() {
             borderTop: '3px solid var(--kpi-amber)',
             borderRadius: 'var(--radius-lg)',
             padding: '16px',
-            textAlign: 'center'
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'all 200ms ease'
           }}>
             <div className="kpi-label">Formularios</div>
             <div className="kpi-value">128</div>
@@ -96,7 +102,9 @@ export default function Home() {
             borderTop: '3px solid var(--kpi-pink)',
             borderRadius: 'var(--radius-lg)',
             padding: '16px',
-            textAlign: 'center'
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'all 200ms ease'
           }}>
             <div className="kpi-label">Workflows</div>
             <div className="kpi-value">67</div>
@@ -123,10 +131,17 @@ export default function Home() {
                   transition: 'all 200ms ease',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '8px'
+                  gap: '8px',
+                  boxShadow: 'var(--shadow-sm)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-card)'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-hover)'
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-card)'
+                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
+                }}
               >
                 <div style={{ marginBottom: '4px' }}>
                   {tool.icon}
@@ -148,7 +163,9 @@ export default function Home() {
           background: 'var(--bg-card)',
           border: '1px solid var(--border-default)',
           borderRadius: 'var(--radius-lg)',
-          padding: '20px'
+          padding: '20px',
+          boxShadow: 'var(--shadow-sm)',
+          transition: 'all 200ms ease'
         }}>
           <Timeline items={[
             { children: 'Sincronización de categorías completada' },

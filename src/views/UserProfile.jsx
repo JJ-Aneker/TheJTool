@@ -197,13 +197,13 @@ export default function UserProfile() {
                         size={60}
                         src={profile.avatar_url}
                         icon={<UserOutlined />}
-                        style={{ backgroundColor: '#1890ff' }}
+                        style={{ backgroundColor: 'var(--accent-primary)' }}
                       />
                       <div style={{
                         position: 'absolute',
                         bottom: -4,
                         right: -4,
-                        background: '#1890ff',
+                        background: 'var(--accent-primary)',
                         borderRadius: '50%',
                         width: '24px',
                         height: '24px',
@@ -220,12 +220,12 @@ export default function UserProfile() {
                   </Upload>
                 </div>
                 <div>
-                  <div style={{ fontSize: '11px', color: '#999', marginBottom: '2px' }}>Email</div>
-                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#1890ff' }}>{user?.email}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Email</div>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: 'var(--accent-primary)' }}>{user?.email}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '11px', color: '#999', marginBottom: '2px' }}>ID</div>
-                  <div style={{ fontSize: '12px', fontFamily: 'monospace', color: '#666' }}>{user?.id}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>ID</div>
+                  <div style={{ fontSize: '12px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{user?.id}</div>
                 </div>
               </div>
             </div>
@@ -340,7 +340,7 @@ export default function UserProfile() {
             description="Por favor ingresa una contraseña segura con al menos 8 caracteres"
             type="info"
             showIcon
-            style={{ marginBottom: '24px' }}
+            style={{ marginBottom: '24px', borderRadius: 'var(--radius-md)' }}
           />
 
           <Form

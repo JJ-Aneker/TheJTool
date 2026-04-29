@@ -195,7 +195,7 @@ function AppContent() {
   ]
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>
       {/* Sidebar - 100% height with internal header and footer */}
       <div
         style={{
@@ -255,7 +255,8 @@ function AppContent() {
                 color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
                 flex: 1,
-                marginLeft: '12px'
+                marginLeft: '12px',
+                transition: 'color 200ms ease'
               }}>
                 NewLead
               </div>
@@ -273,8 +274,8 @@ function AppContent() {
                   transition: 'color 200ms ease',
                   marginLeft: '8px'
                 }}
-                onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
-                onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
               >
                 <MenuFoldOutlined size={18} />
               </button>
@@ -342,7 +343,8 @@ function AppContent() {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
-                flex: 1
+                flex: 1,
+                transition: 'color 200ms ease'
               }}>
                 {user?.email || 'Usuario'}
               </div>
