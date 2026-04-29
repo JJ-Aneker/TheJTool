@@ -13,10 +13,13 @@ import {
   UserOutlined,
   BgColorsOutlined,
   SunOutlined,
-  MoonOutlined
+  MoonOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './hooks/useTheme'
+import './styles/design-tokens.css'
 
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
@@ -109,11 +112,19 @@ const menuItems = [
 ]
 
 function AppContent() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebar_collapsed')
+    return saved ? JSON.parse(saved) : false
+  })
   const navigate = useNavigate()
   const location = useLocation()
   const { isAuthenticated, user, logout, loading } = useAuth()
   const { isDark, toggleTheme } = useTheme()
+
+  const handleSidebarToggle = (value) => {
+    setCollapsed(value)
+    localStorage.setItem('sidebar_collapsed', JSON.stringify(value))
+  }
 
   // Mostrar login si no está autenticado
   if (!isAuthenticated) {
@@ -150,33 +161,38 @@ function AppContent() {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-canvas)' }}>
       <Sider
         collapsible
         collapsed={collapsed}
-        onCollapse={setCollapsed}
+        onCollapse={handleSidebarToggle}
         theme="dark"
-        width={250}
-        collapsedWidth={64}
+        width={parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-expanded'))}
+        collapsedWidth={parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-collapsed'))}
         style={{
           overflow: 'auto',
-          height: 'calc(100vh - 48px - 20px)',
+          height: 'calc(100vh - 64px)',
           position: 'fixed',
           left: 0,
-          top: 48,
-          bottom: 20,
+          top: 64,
+          bottom: 0,
           zIndex: 100,
-          scrollbarWidth: 'thin'
+          scrollbarWidth: 'thin',
+          background: 'var(--bg-sidebar)',
+          borderRight: '1px solid var(--border-default)',
+          transition: 'var(--sidebar-transition)'
         }}
       >
-
-
         <Menu
           theme="dark"
           mode="inline"
           selectedKeys={getSelectedKey()}
           onClick={handleMenuClick}
           items={menuItems}
+          style={{
+            background: 'var(--bg-sidebar)',
+            borderRight: 'none'
+          }}
         />
 
         {/* User Email Footer */}
@@ -186,10 +202,10 @@ function AppContent() {
           left: 0,
           right: 0,
           padding: '12px 16px',
-          borderTop: '1px solid rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.3)',
+          borderTop: '1px solid var(--border-default)',
+          background: 'var(--bg-sidebar)',
           fontSize: '12px',
-          color: '#b3b3b3',
+          color: 'var(--text-secondary)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -198,44 +214,43 @@ function AppContent() {
           {!collapsed && user?.email}
           {collapsed && user?.email && user.email.substring(0, 1).toUpperCase()}
         </div>
-
       </Sider>
 
       <Header
         className="app-header"
         style={{
-          background: isDark ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          background: 'var(--bg-sidebar)',
           backdropFilter: 'blur(10px)',
-          padding: '0 8px',
+          padding: '0 16px',
           boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: 48,
+          height: 64,
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
           zIndex: 101,
-          transition: 'all 0.3s ease',
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
+          transition: 'all 220ms ease',
+          borderBottom: '1px solid var(--border-default)'
         }}>
 
           {/* Logo y Título */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px'
+            gap: '12px'
           }}>
             <img
               src="/assets/images/logo.png"
               alt="TheJToolbox"
               style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '6px',
+                width: '32px',
+                height: '32px',
+                borderRadius: 'var(--radius-md)',
                 objectFit: 'cover',
-                boxShadow: '0 2px 8px rgba(2, 23, 43, 0.2)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                 flexShrink: 0
               }}
             />
@@ -247,14 +262,13 @@ function AppContent() {
               <div style={{
                 fontSize: '16px',
                 fontWeight: '700',
-                color: isDark ? '#e6e6e6' : '#000',
+                color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
                 TheJToolbox
               </div>
-
             </div>
           </div>
 
@@ -262,39 +276,30 @@ function AppContent() {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '24px',
+            gap: '16px',
             marginLeft: 'auto'
           }}>
-            <Button
-              type="text"
-              icon={isDark ? <SunOutlined /> : <MoonOutlined />}
-              onClick={toggleTheme}
-              title={isDark ? 'Modo claro' : 'Modo oscuro'}
-              style={{
-                fontSize: '18px',
-                color: isDark ? '#e6e6e6' : '#000'
-              }}
-            />
             <UserDropdown />
           </div>
       </Header>
 
       <Layout style={{
-        marginLeft: collapsed ? 64 : 250,
-        marginTop: 0,
-        marginBottom: 0,
-        width: collapsed ? 'calc(100% - 64px)' : 'calc(100% - 250px)',
-        height: 'calc(100vh - 68px)',
-        transition: 'all 0.2s',
+        marginLeft: collapsed ? 48 : 210,
+        marginTop: 64,
+        width: collapsed ? 'calc(100% - 48px)' : 'calc(100% - 210px)',
+        height: 'calc(100vh - 64px)',
+        transition: 'var(--sidebar-transition)',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        background: 'var(--bg-canvas)'
       }}>
         <Content style={{
           margin: 0,
-          padding: 0,
-          background: isDark ? '#000000' : '#f5f5f5',
+          padding: 'var(--content-padding-top) var(--content-padding-x)',
+          background: 'var(--bg-canvas)',
           flex: 1,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          overflowY: 'auto'
         }}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -316,17 +321,17 @@ function AppContent() {
 
       <Footer style={{
         textAlign: 'center',
-        background: isDark ? 'rgba(20, 20, 20, 0.9)' : 'rgba(245, 245, 245, 0.9)',
-        padding: '4px 24px',
-        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+        background: 'var(--bg-sidebar)',
+        padding: '8px 24px',
+        borderTop: '1px solid var(--border-default)',
         fontSize: '11px',
-        color: isDark ? '#8c8c8c' : '#8c8c8c',
+        color: 'var(--text-secondary)',
         backdropFilter: 'blur(5px)',
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
-        height: 20,
+        height: 40,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
