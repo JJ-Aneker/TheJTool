@@ -289,7 +289,9 @@ function AppContent() {
             items={getMenuItems()}
             style={{
               background: 'var(--bg-sidebar)',
-              borderRight: 'none'
+              borderRight: 'none',
+              margin: 0,
+              padding: '4px 0'
             }}
           />
         </div>

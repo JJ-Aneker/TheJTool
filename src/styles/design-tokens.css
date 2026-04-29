@@ -237,6 +237,8 @@ select:focus {
 .ant-menu {
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-default);
+  margin: 0;
+  padding: 4px 0;
 }
 
 .ant-menu-dark .ant-menu-item {
@@ -246,6 +248,7 @@ select:focus {
   margin-block: 2px;
   font-size: 13px;
   font-weight: 500;
+  margin: 0;
 }
 
 .ant-menu-dark .ant-menu-item:hover {
