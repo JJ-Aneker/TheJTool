@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Menu, Spin } from 'antd'
+import { Layout, Menu, Spin, Dropdown } from 'antd'
 import {
   FormOutlined,
   CopyOutlined,
@@ -10,7 +10,11 @@ import {
   FileTextOutlined,
   SettingOutlined,
   HomeOutlined,
-  UserOutlined
+  UserOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  LogoutOutlined,
+  UserSwitchOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './hooks/useTheme'
@@ -36,74 +40,105 @@ import WebServicesManager from './views/WebServicesManager'
 
 const { Sider, Content } = Layout
 
-const menuItems = [
+// Menu items organized by sections
+const getMenuItems = () => [
   {
-    key: 'home',
-    icon: <HomeOutlined />,
-    label: 'Inicio',
-    path: '/'
+    type: 'group',
+    label: 'GENERAL',
+    children: [
+      {
+        key: 'home',
+        icon: <HomeOutlined />,
+        label: 'Inicio',
+        path: '/'
+      },
+      {
+        key: 'users',
+        icon: <UserOutlined />,
+        label: 'Gestión de Usuarios',
+        path: '/users'
+      },
+      {
+        key: 'eforms',
+        icon: <FormOutlined />,
+        label: 'Generador de eForms',
+        path: '/eforms'
+      },
+      {
+        key: 'category-cloner',
+        icon: <CopyOutlined />,
+        label: 'Clonador de Categorías',
+        path: '/category-cloner'
+      },
+      {
+        key: 'tenants',
+        icon: <CloudOutlined />,
+        label: 'Gestión de Tenants',
+        path: '/tenants'
+      }
+    ]
   },
   {
-    key: 'users',
-    icon: <UserOutlined />,
-    label: 'Gestión de Usuarios',
-    path: '/users'
+    type: 'group',
+    label: 'HERRAMIENTAS',
+    children: [
+      {
+        key: 'api-explorer',
+        icon: <ApiOutlined />,
+        label: 'Explorador API REST',
+        path: '/api-explorer'
+      },
+      {
+        key: 'category-builder',
+        icon: <AppstoreOutlined />,
+        label: 'Category Builder',
+        path: '/category-builder'
+      },
+      {
+        key: 'docs',
+        icon: <FileTextOutlined />,
+        label: 'Documentación de Proyectos',
+        path: '/docs'
+      },
+      {
+        key: 'workflows',
+        icon: <SettingOutlined />,
+        label: 'Configuración de Workflows',
+        path: '/workflows'
+      }
+    ]
   },
   {
-    key: 'eforms',
-    icon: <FormOutlined />,
-    label: 'Generador de eForms',
-    path: '/eforms'
-  },
-  {
-    key: 'category-cloner',
-    icon: <CopyOutlined />,
-    label: 'Clonador de Categorías',
-    path: '/category-cloner'
-  },
-  {
-    key: 'tenants',
-    icon: <CloudOutlined />,
-    label: 'Gestión de Tenants',
-    path: '/tenants'
-  },
-  {
-    key: 'api-explorer',
-    icon: <ApiOutlined />,
-    label: 'Explorador API REST',
-    path: '/api-explorer'
-  },
-  {
-    key: 'category-builder',
-    icon: <AppstoreOutlined />,
-    label: 'Category Builder',
-    path: '/category-builder'
-  },
-  {
-    key: 'docs',
-    icon: <FileTextOutlined />,
-    label: 'Documentación de Proyectos',
-    path: '/docs'
-  },
-  {
-    key: 'workflows',
-    icon: <SettingOutlined />,
-    label: 'Configuración de Workflows',
-    path: '/workflows'
-  },
-  {
-    key: 'templates',
-    icon: <FileTextOutlined />,
-    label: 'Templates',
-    path: '/templates'
-  },
-  {
-    key: 'web-services',
-    icon: <CloudOutlined />,
-    label: 'Servicios Web',
-    path: '/web-services'
+    type: 'group',
+    label: 'SOPORTE',
+    children: [
+      {
+        key: 'templates',
+        icon: <FileTextOutlined />,
+        label: 'Templates',
+        path: '/templates'
+      },
+      {
+        key: 'web-services',
+        icon: <CloudOutlined />,
+        label: 'Servicios Web',
+        path: '/web-services'
+      }
+    ]
   }
 ]
+
+// Flatten menu items for finding by path
+const getAllMenuItems = () => {
+  const items = getMenuItems()
+  const flattened = []
+  items.forEach(group => {
+    if (group.children) {
+      flattened.push(...group.children)
+    }
+  })
+  return flattened
+}
 
 function AppContent() {
   const [collapsed, setCollapsed] = useState(() => {
@@ -143,16 +178,40 @@ function AppContent() {
   }
 
   const getSelectedKey = () => {
-    const item = menuItems.find(m => m.path === location.pathname)
+    const items = getAllMenuItems()
+    const item = items.find(m => m.path === location.pathname)
     return item ? [item.key] : ['home']
   }
 
   const handleMenuClick = (e) => {
-    const item = menuItems.find(m => m.key === e.key)
+    const items = getAllMenuItems()
+    const item = items.find(m => m.key === e.key)
     if (item) {
       navigate(item.path)
     }
   }
+
+  const handleProfileClick = () => {
+    navigate('/profile')
+  }
+
+  const userMenuItems = [
+    {
+      key: 'profile',
+      icon: <UserSwitchOutlined />,
+      label: 'Mi Perfil',
+      onClick: handleProfileClick
+    },
+    {
+      type: 'divider'
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Cerrar Sesión',
+      onClick: () => logout()
+    }
+  ]
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)' }}>
@@ -181,11 +240,11 @@ function AppContent() {
       >
         {/* Sidebar Header */}
         <div style={{
-          padding: '12px 16px',
+          padding: '12px',
           borderBottom: '1px solid var(--border-default)',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          justifyContent: collapsed ? 'center' : 'space-between',
           height: 'fit-content',
           minHeight: '48px'
         }}>
@@ -201,14 +260,37 @@ function AppContent() {
             }}
           />
           {!collapsed && (
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: 'var(--text-primary)',
-              whiteSpace: 'nowrap'
-            }}>
-              NewLead
-            </div>
+            <>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'var(--text-primary)',
+                whiteSpace: 'nowrap',
+                flex: 1,
+                marginLeft: '12px'
+              }}>
+                NewLead
+              </div>
+              <button
+                onClick={() => handleSidebarToggle(!collapsed)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '4px',
+                  transition: 'color 200ms ease',
+                  marginLeft: '8px'
+                }}
+                onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
+                onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+              >
+                {collapsed ? <MenuUnfoldOutlined size={18} /> : <MenuFoldOutlined size={18} />}
+              </button>
+            </>
           )}
         </div>
 
@@ -223,7 +305,7 @@ function AppContent() {
             mode="inline"
             selectedKeys={getSelectedKey()}
             onClick={handleMenuClick}
-            items={menuItems}
+            items={getMenuItems()}
             style={{
               background: 'var(--bg-sidebar)',
               borderRight: 'none'
@@ -232,42 +314,50 @@ function AppContent() {
         </div>
 
         {/* Sidebar Footer - User Avatar */}
-        <div style={{
-          padding: '12px 16px',
-          borderTop: '1px solid var(--border-default)',
-          background: 'var(--bg-sidebar)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: collapsed ? 'center' : 'flex-start',
-          gap: '12px'
-        }}>
+        <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
           <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: 'var(--accent-primary)',
+            padding: '12px',
+            borderTop: '1px solid var(--border-default)',
+            background: 'var(--bg-sidebar)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '12px',
-            fontWeight: '600',
-            flexShrink: 0
-          }}>
-            {user?.email ? user.email.substring(0, 1).toUpperCase() : 'U'}
-          </div>
-          {!collapsed && (
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            gap: '12px',
+            cursor: 'pointer',
+            transition: 'background 200ms ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-sidebar)'}
+          >
             <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'var(--accent-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
               fontSize: '12px',
-              color: 'var(--text-secondary)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              fontWeight: '600',
+              flexShrink: 0
             }}>
-              {user?.email || 'Usuario'}
+              {user?.email ? user.email.substring(0, 1).toUpperCase() : 'U'}
             </div>
-          )}
-        </div>
+            {!collapsed && (
+              <div style={{
+                fontSize: '12px',
+                color: 'var(--text-secondary)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: 1
+              }}>
+                {user?.email || 'Usuario'}
+              </div>
+            )}
+          </div>
+        </Dropdown>
       </Sider>
 
       {/* Main Content Area */}
