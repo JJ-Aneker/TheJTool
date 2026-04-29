@@ -292,12 +292,11 @@ export default function CategoryBuilder() {
   }
 
   return (
-    <Card
-      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-      title={<><AppstoreOutlined /> Category Builder Therefore™</>}
-    >
-        <Tabs
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+      <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+        <AppstoreOutlined /> Category Builder Therefore™
+      </h1>
+      <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
           items={[
@@ -441,6 +440,6 @@ export default function CategoryBuilder() {
             }
           ]}
         />
-    </Card>
+    </div>
   )
 }

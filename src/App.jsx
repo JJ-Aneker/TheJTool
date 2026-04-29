@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Menu, Spin, Button } from 'antd'
+import { Layout, Menu, Spin } from 'antd'
 import {
   FormOutlined,
   CopyOutlined,
@@ -10,12 +10,7 @@ import {
   FileTextOutlined,
   SettingOutlined,
   HomeOutlined,
-  UserOutlined,
-  BgColorsOutlined,
-  SunOutlined,
-  MoonOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined
+  UserOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './hooks/useTheme'
@@ -23,7 +18,6 @@ import './styles/design-tokens.css'
 
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
-import UserDropdown from './components/UserDropdown'
 
 // Vistas
 import Home from './views/Home'
@@ -40,7 +34,7 @@ import UserManager from './views/UserManager'
 import TemplateManager from './views/TemplateManager'
 import WebServicesManager from './views/WebServicesManager'
 
-const { Header, Sider, Content, Footer } = Layout
+const { Sider, Content } = Layout
 
 const menuItems = [
   {
@@ -161,7 +155,8 @@ function AppContent() {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-canvas)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)' }}>
+      {/* Sidebar - 100% height with internal header and footer */}
       <Sider
         collapsible
         collapsed={collapsed}
@@ -170,127 +165,118 @@ function AppContent() {
         width={210}
         collapsedWidth={48}
         style={{
-          overflow: 'auto',
-          height: 'calc(100vh - 64px)',
+          overflow: 'hidden',
+          height: '100vh',
           position: 'fixed',
           left: 0,
-          top: 64,
+          top: 0,
           bottom: 0,
           zIndex: 100,
-          scrollbarWidth: 'thin',
           background: 'var(--bg-sidebar)',
           borderRight: '1px solid var(--border-default)',
-          transition: 'var(--sidebar-transition)'
+          transition: 'var(--sidebar-transition)',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={getSelectedKey()}
-          onClick={handleMenuClick}
-          items={menuItems}
-          style={{
-            background: 'var(--bg-sidebar)',
-            borderRight: 'none'
-          }}
-        />
-
-        {/* User Email Footer */}
+        {/* Sidebar Header */}
         <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          padding: '12px 16px',
+          borderBottom: '1px solid var(--border-default)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          height: 'fit-content',
+          minHeight: '48px'
+        }}>
+          <img
+            src="/assets/images/logo.png"
+            alt="NewLead"
+            style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: 'var(--radius-md)',
+              objectFit: 'cover',
+              flexShrink: 0
+            }}
+          />
+          {!collapsed && (
+            <div style={{
+              fontSize: '14px',
+              fontWeight: '600',
+              color: 'var(--text-primary)',
+              whiteSpace: 'nowrap'
+            }}>
+              NewLead
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar Menu - scrollable */}
+        <div style={{
+          flex: 1,
+          overflow: 'auto',
+          scrollbarWidth: 'thin'
+        }}>
+          <Menu
+            theme="dark"
+            mode="inline"
+            selectedKeys={getSelectedKey()}
+            onClick={handleMenuClick}
+            items={menuItems}
+            style={{
+              background: 'var(--bg-sidebar)',
+              borderRight: 'none'
+            }}
+          />
+        </div>
+
+        {/* Sidebar Footer - User Avatar */}
+        <div style={{
           padding: '12px 16px',
           borderTop: '1px solid var(--border-default)',
           background: 'var(--bg-sidebar)',
-          fontSize: '12px',
-          color: 'var(--text-secondary)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          textAlign: collapsed ? 'center' : 'left'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          gap: '12px'
         }}>
-          {!collapsed && user?.email}
-          {collapsed && user?.email && user.email.substring(0, 1).toUpperCase()}
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'var(--accent-primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '12px',
+            fontWeight: '600',
+            flexShrink: 0
+          }}>
+            {user?.email ? user.email.substring(0, 1).toUpperCase() : 'U'}
+          </div>
+          {!collapsed && (
+            <div style={{
+              fontSize: '12px',
+              color: 'var(--text-secondary)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
+              {user?.email || 'Usuario'}
+            </div>
+          )}
         </div>
       </Sider>
 
-      <Header
-        className="app-header"
-        style={{
-          background: 'var(--bg-sidebar)',
-          backdropFilter: 'blur(10px)',
-          padding: '0 16px',
-          boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: 64,
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 101,
-          transition: 'all 220ms ease',
-          borderBottom: '1px solid var(--border-default)'
-        }}>
-
-          {/* Logo y Título */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <img
-              src="/assets/images/logo.png"
-              alt="TheJToolbox"
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: 'var(--radius-md)',
-                objectFit: 'cover',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                flexShrink: 0
-              }}
-            />
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              minWidth: 0
-            }}>
-              <div style={{
-                fontSize: '16px',
-                fontWeight: '700',
-                color: 'var(--text-primary)',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                TheJToolbox
-              </div>
-            </div>
-          </div>
-
-          {/* Controles derecha */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            marginLeft: 'auto'
-          }}>
-            <UserDropdown />
-          </div>
-      </Header>
-
-      <Layout style={{
+      {/* Main Content Area */}
+      <div style={{
         marginLeft: collapsed ? 48 : 210,
-        marginTop: 64,
-        width: collapsed ? 'calc(100% - 48px)' : 'calc(100% - 210px)',
-        height: 'calc(100vh - 64px)',
-        transition: 'var(--sidebar-transition)',
+        flex: 1,
         display: 'flex',
         flexDirection: 'column',
+        transition: 'var(--sidebar-transition)',
         background: 'var(--bg-canvas)'
       }}>
         <Content style={{
@@ -316,30 +302,8 @@ function AppContent() {
             <Route path="/web-services" element={<WebServicesManager />} />
           </Routes>
         </Content>
-
-      </Layout>
-
-      <Footer style={{
-        textAlign: 'center',
-        background: 'var(--bg-sidebar)',
-        padding: '8px 24px',
-        borderTop: '1px solid var(--border-default)',
-        fontSize: '11px',
-        color: 'var(--text-secondary)',
-        backdropFilter: 'blur(5px)',
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 40,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 100
-      }}>
-        TheJToolbox ©2025 | Powered by Aneker · Therefore™ Integration
-      </Footer>
-    </Layout>
+      </div>
+    </div>
   )
 }
 

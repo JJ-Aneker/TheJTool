@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm, Tooltip } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm, Tooltip } from 'antd'
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, LinkOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 
@@ -241,11 +241,11 @@ export default function WebServicesManager() {
 
   return (
     <>
-      <Card
-        style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-        bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-        title={<><CloudOutlined /> Gestión de Servicios Web</>}
-      >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+        <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+          <CloudOutlined /> Gestión de Servicios Web
+        </h1>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, flex: 1 }}>
           <Space>
             <Button
@@ -277,7 +277,7 @@ export default function WebServicesManager() {
             />
           </Spin>
         </div>
-      </Card>
+      </div>
 
       <Modal
         title={selectedService ? 'Editar Servicio Web' : 'Crear Nuevo Servicio Web'}

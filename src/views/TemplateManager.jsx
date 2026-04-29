@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm } from 'antd'
 import { FileTextOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 
@@ -188,11 +188,11 @@ export default function TemplateManager() {
 
   return (
     <>
-      <Card
-        style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-        bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-        title={<><FileTextOutlined /> Gestión de Templates</>}
-      >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+        <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+          <FileTextOutlined /> Gestión de Templates
+        </h1>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, flex: 1 }}>
           <Space>
             <Button
@@ -223,7 +223,7 @@ export default function TemplateManager() {
             />
           </Spin>
         </div>
-      </Card>
+      </div>
 
       <Modal
         title={selectedTemplate ? 'Editar Template' : 'Crear Nuevo Template'}

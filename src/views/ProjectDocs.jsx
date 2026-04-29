@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Tabs, Tree, List, Button, Space, Input, Modal, Form, message, Spin, Upload, Badge, Tag, Collapse, Empty } from 'antd'
+import { Tabs, Tree, List, Button, Space, Input, Modal, Form, message, Spin, Upload, Badge, Tag, Collapse, Empty } from 'antd'
 import { FileTextOutlined, FolderOutlined, DownloadOutlined, UploadOutlined, DeleteOutlined, EditOutlined, PlusOutlined, FileMarkdownOutlined } from '@ant-design/icons'
 
 export default function ProjectDocs() {
@@ -226,12 +226,12 @@ export default function ProjectDocs() {
   )
 
   return (
-    <Card
-      style={{ borderRadius: 0, margin: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}
-      bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
-      title={<><FileTextOutlined /> Documentación de Proyectos Therefore™</>}
-    >
-        <Tabs items={[
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+      <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+        <FileTextOutlined /> Documentación de Proyectos Therefore™
+      </h1>
+
+      <Tabs items={[
           {
             key: 'browser',
             label: 'Explorador',
@@ -397,6 +397,6 @@ export default function ProjectDocs() {
             )
           }
         ]} />
-    </Card>
+    </div>
   )
 }
