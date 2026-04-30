@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react'
-import { Form, Input, Button, message, Spin, Tabs } from 'antd'
+import { Form, Input, Button, message, Spin } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState('login')
+  const [activeView, setActiveView] = useState('login')
   const { login, signup, isAuthenticated, loading: authLoading } = useAuth()
   const navigate = useNavigate()
 
-  // Si ya está autenticado, redirigir al home
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/')
@@ -46,7 +45,7 @@ export default function Login() {
       })
       if (result.success) {
         message.success('Usuario creado exitosamente. Por favor inicia sesión.')
-        setActiveTab('login')
+        setActiveView('login')
         form.resetFields()
       } else {
         message.error(result.error || 'Error al crear usuario')
@@ -63,11 +62,250 @@ export default function Login() {
       await new Promise(resolve => setTimeout(resolve, 1500))
       message.success('Enlace enviado a tu correo electrónico')
       form.resetFields()
-      setActiveTab('login')
+      setActiveView('login')
     } finally {
       setLoading(false)
     }
   }
+
+  const renderLoginView = () => (
+    <Spin spinning={loading}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleLogin}
+        autoComplete="off"
+        style={{ marginTop: '24px' }}
+      >
+        <Form.Item
+          name="email"
+          rules={[
+            { required: true, message: 'Email requerido' },
+            { type: 'email', message: 'Email inválido' }
+          ]}
+        >
+          <Input
+            placeholder="Correo electrónico"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          rules={[{ required: true, message: 'Contraseña requerida' }]}
+        >
+          <Input
+            type="password"
+            placeholder="Contraseña"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item style={{ marginBottom: '16px' }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            block
+            loading={loading}
+            style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
+          >
+            Entrar
+          </Button>
+        </Form.Item>
+
+        <div style={{ textAlign: 'center', fontSize: '13px' }}>
+          <a
+            onClick={() => {
+              setActiveView('recover')
+              form.resetFields()
+            }}
+            style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginRight: '8px' }}
+          >
+            ¿Olvidaste tu contraseña?
+          </a>
+          <span style={{ color: 'var(--text-secondary)' }}>|</span>
+          <a
+            onClick={() => {
+              setActiveView('signup')
+              form.resetFields()
+            }}
+            style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginLeft: '8px' }}
+          >
+            Crear cuenta
+          </a>
+        </div>
+      </Form>
+    </Spin>
+  )
+
+  const renderSignupView = () => (
+    <Spin spinning={loading}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSignup}
+        autoComplete="off"
+        style={{ marginTop: '24px' }}
+      >
+        <Form.Item
+          name="nombre"
+          rules={[{ required: true, message: 'Nombre requerido' }]}
+        >
+          <Input
+            placeholder="Nombre"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="apellidos"
+          rules={[{ required: true, message: 'Apellidos requeridos' }]}
+        >
+          <Input
+            placeholder="Apellidos"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="phone"
+          rules={[{ required: true, message: 'Teléfono requerido' }]}
+        >
+          <Input
+            placeholder="Teléfono"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="email"
+          rules={[
+            { required: true, message: 'Email requerido' },
+            { type: 'email', message: 'Email inválido' }
+          ]}
+        >
+          <Input
+            placeholder="Correo electrónico"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          rules={[
+            { required: true, message: 'Contraseña requerida' },
+            { min: 8, message: 'Mínimo 8 caracteres' }
+          ]}
+        >
+          <Input
+            type="password"
+            placeholder="Contraseña"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="confirmPassword"
+          rules={[{ required: true, message: 'Confirma tu contraseña' }]}
+        >
+          <Input
+            type="password"
+            placeholder="Confirmar contraseña"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item style={{ marginBottom: '16px' }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            block
+            loading={loading}
+            style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
+          >
+            Crear cuenta
+          </Button>
+        </Form.Item>
+
+        <div style={{ textAlign: 'center', fontSize: '13px' }}>
+          <a
+            onClick={() => {
+              setActiveView('login')
+              form.resetFields()
+            }}
+            style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
+          >
+            ¿Ya tienes cuenta? Inicia sesión
+          </a>
+        </div>
+      </Form>
+    </Spin>
+  )
+
+  const renderRecoverView = () => (
+    <Spin spinning={loading}>
+      <div style={{ marginTop: '24px', textAlign: 'center', marginBottom: '24px' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.5' }}>
+          Introduce tu correo y recibirás un enlace para restaurarla.
+        </p>
+      </div>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleRecoverPassword}
+        autoComplete="off"
+      >
+        <Form.Item
+          name="email"
+          rules={[
+            { required: true, message: 'Email requerido' },
+            { type: 'email', message: 'Email inválido' }
+          ]}
+        >
+          <Input
+            placeholder="Correo electrónico"
+            size="large"
+            style={{ height: '40px' }}
+          />
+        </Form.Item>
+
+        <Form.Item style={{ marginBottom: '16px' }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            block
+            loading={loading}
+            style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
+          >
+            Enviar enlace
+          </Button>
+        </Form.Item>
+
+        <div style={{ textAlign: 'center', fontSize: '13px' }}>
+          <a
+            onClick={() => {
+              setActiveView('login')
+              form.resetFields()
+            }}
+            style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
+          >
+            ← Volver al inicio de sesión
+          </a>
+        </div>
+      </Form>
+    </Spin>
+  )
 
   if (authLoading) {
     return (
@@ -115,247 +353,11 @@ export default function Login() {
               }}
             />
           </div>
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            centered
-            style={{ marginBottom: '0' }}
-            items={[
-              {
-                key: 'login',
-                label: 'Iniciar sesión',
-                children: (
-                  <Spin spinning={loading}>
-                    <Form
-                      form={form}
-                      layout="vertical"
-                      onFinish={handleLogin}
-                      autoComplete="off"
-                      style={{ marginTop: '24px' }}
-                    >
-                      <Form.Item
-                        name="email"
-                        rules={[
-                          { required: true, message: 'Email requerido' },
-                          { type: 'email', message: 'Email inválido' }
-                        ]}
-                      >
-                        <Input
-                          placeholder="Correo electrónico"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
 
-                      <Form.Item
-                        name="password"
-                        rules={[{ required: true, message: 'Contraseña requerida' }]}
-                      >
-                        <Input.Password
-                          placeholder="Contraseña"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item style={{ marginBottom: '16px' }}>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          size="large"
-                          block
-                          loading={loading}
-                          style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
-                        >
-                          Entrar
-                        </Button>
-                      </Form.Item>
-
-                      <div style={{ textAlign: 'center', fontSize: '13px' }}>
-                        <a
-                          onClick={() => setActiveTab('recover')}
-                          style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginRight: '8px' }}
-                        >
-                          ¿Olvidaste tu contraseña?
-                        </a>
-                        <span style={{ color: 'var(--text-secondary)' }}>|</span>
-                        <a
-                          onClick={() => setActiveTab('signup')}
-                          style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginLeft: '8px' }}
-                        >
-                          Crear cuenta
-                        </a>
-                      </div>
-                    </Form>
-                  </Spin>
-                )
-              },
-              {
-                key: 'signup',
-                label: 'Crear cuenta',
-                children: (
-                  <Spin spinning={loading}>
-                    <Form
-                      form={form}
-                      layout="vertical"
-                      onFinish={handleSignup}
-                      autoComplete="off"
-                      style={{ marginTop: '24px' }}
-                    >
-                      <Form.Item
-                        name="nombre"
-                        rules={[{ required: true, message: 'Nombre requerido' }]}
-                      >
-                        <Input
-                          placeholder="Nombre"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        name="apellidos"
-                        rules={[{ required: true, message: 'Apellidos requeridos' }]}
-                      >
-                        <Input
-                          placeholder="Apellidos"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        name="phone"
-                        rules={[{ required: true, message: 'Teléfono requerido' }]}
-                      >
-                        <Input
-                          placeholder="Teléfono"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        name="email"
-                        rules={[
-                          { required: true, message: 'Email requerido' },
-                          { type: 'email', message: 'Email inválido' }
-                        ]}
-                      >
-                        <Input
-                          placeholder="Correo electrónico"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        name="password"
-                        rules={[
-                          { required: true, message: 'Contraseña requerida' },
-                          { min: 8, message: 'Mínimo 8 caracteres' }
-                        ]}
-                      >
-                        <Input.Password
-                          placeholder="Contraseña"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        name="confirmPassword"
-                        rules={[{ required: true, message: 'Confirma tu contraseña' }]}
-                      >
-                        <Input.Password
-                          placeholder="Confirmar contraseña"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item style={{ marginBottom: '16px' }}>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          size="large"
-                          block
-                          loading={loading}
-                          style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
-                        >
-                          Crear cuenta
-                        </Button>
-                      </Form.Item>
-
-                      <div style={{ textAlign: 'center', fontSize: '13px' }}>
-                        <a
-                          onClick={() => setActiveTab('login')}
-                          style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
-                        >
-                          ¿Ya tienes cuenta? Inicia sesión
-                        </a>
-                      </div>
-                    </Form>
-                  </Spin>
-                )
-              },
-              {
-                key: 'recover',
-                label: 'Recuperar contraseña',
-                children: (
-                  <Spin spinning={loading}>
-                    <div style={{ marginTop: '24px', textAlign: 'center', marginBottom: '24px' }}>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.5' }}>
-                        Introduce tu correo y recibirás un enlace para restaurarla.
-                      </p>
-                    </div>
-                    <Form
-                      form={form}
-                      layout="vertical"
-                      onFinish={handleRecoverPassword}
-                      autoComplete="off"
-                    >
-                      <Form.Item
-                        name="email"
-                        rules={[
-                          { required: true, message: 'Email requerido' },
-                          { type: 'email', message: 'Email inválido' }
-                        ]}
-                      >
-                        <Input
-                          placeholder="Correo electrónico"
-                          size="large"
-                          style={{ height: '40px' }}
-                        />
-                      </Form.Item>
-
-                      <Form.Item style={{ marginBottom: '16px' }}>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          size="large"
-                          block
-                          loading={loading}
-                          style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
-                        >
-                          Enviar enlace
-                        </Button>
-                      </Form.Item>
-
-                      <div style={{ textAlign: 'center', fontSize: '13px' }}>
-                        <a
-                          onClick={() => setActiveTab('login')}
-                          style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
-                        >
-                          ← Volver al inicio de sesión
-                        </a>
-                      </div>
-                    </Form>
-                  </Spin>
-                )
-              }
-            ]}
-          />
+          {/* Content based on active view */}
+          {activeView === 'login' && renderLoginView()}
+          {activeView === 'signup' && renderSignupView()}
+          {activeView === 'recover' && renderRecoverView()}
         </div>
 
         {/* Footer */}
