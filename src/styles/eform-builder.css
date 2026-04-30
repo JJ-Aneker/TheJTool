@@ -46,7 +46,7 @@
 .eform-panel-title {
   font-size: 11px;
   font-weight: 600;
-  color: var(--accent-primary);
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 14px;
@@ -606,6 +606,109 @@
 .eform-checklist-item span:first-child {
   color: rgba(54, 99, 255, 0.45);
   flex-shrink: 0;
+}
+
+.eform-info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.eform-info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.eform-info-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.eform-info-card code {
+  background: rgba(54, 99, 255, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: var(--accent-success);
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.eform-info-card p {
+  margin: 0;
+}
+
+.eform-info-card strong {
+  color: var(--text-primary);
+}
+
+/* Table Compact Styles */
+.eform-table-compact {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.eform-table-compact thead {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.eform-table-compact th {
+  color: #ffffff;
+  font-weight: 600;
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.eform-table-compact td {
+  color: var(--text-secondary);
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.eform-table-section {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.eform-section-header {
+  color: var(--accent-primary) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 8px !important;
+}
+
+.eform-table-key {
+  color: var(--accent-success);
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.eform-table-type {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+/* XML Modal Content */
+.eform-xml-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eform-xml-textarea {
+  height: 400px !important;
+  font-family: 'Monaco', monospace !important;
+  font-size: 11px !important;
 }
 
 .eform-footer {

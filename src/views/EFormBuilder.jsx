@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import React from 'react'
+import { Modal, Button } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import '../styles/eform-builder.css'
@@ -334,16 +336,31 @@ function CsvImporter({ onImport }) {
                 <>
                   <div className="eform-preview-info">✓ {total} campos · {preview.sections.length} panel(es)</div>
                   <div className="eform-sections-list">
-                    {preview.sections.map((sec, si) => (
-                      <div key={si}>
-                        <div className="eform-section-name">▸ {sec.name}</div>
-                        {sec.fields.map((f, fi) => (
-                          <div key={fi} className="eform-field-item">
-                            {f.nombre} <span>({f.fieldKey} · {f.tipo}{f.required ? ' · ✱' : ''})</span>
-                          </div>
+                    <table className="eform-table-compact">
+                      <thead>
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Key</th>
+                          <th>Tipo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {preview.sections.map((sec, si) => (
+                          <React.Fragment key={si}>
+                            <tr className="eform-table-section">
+                              <td colSpan="3" className="eform-section-header">{sec.name}</td>
+                            </tr>
+                            {sec.fields.map((f, fi) => (
+                              <tr key={fi}>
+                                <td>{f.nombre}</td>
+                                <td className="eform-table-key">{f.fieldKey}</td>
+                                <td className="eform-table-type">{f.tipo}{f.required ? ' ✱' : ''}</td>
+                              </tr>
+                            ))}
+                          </React.Fragment>
                         ))}
-                      </div>
-                    ))}
+                      </tbody>
+                    </table>
                   </div>
                   {preview.warnings?.length > 0 && (
                     <div className="eform-warnings">
@@ -528,6 +545,7 @@ export default function EFormBuilder() {
   const [error, setError] = useState('')
   const [activeView, setActiveView] = useState('editor')
   const [saving, setSaving] = useState(false)
+  const [xmlModalOpen, setXmlModalOpen] = useState(false)
 
   const newField = () => ({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, readOnly: false, placeholder: '', defaultValue: '', maxLength: '', options: '' })
   const newSection = (name = 'GENERAL') => ({ id: newGuid(), name, fields: [newField()] })
@@ -638,6 +656,23 @@ export default function EFormBuilder() {
         </div>
       </div>
 
+      {/* Information Cards - Top */}
+      <div className="eform-info-cards">
+        <div className="eform-info-card">
+          <div className="eform-info-card-title">Estructura del XML</div>
+          <p>Therefore eForms usa <strong>Form.io</strong> como motor de formularios. El XML contiene el JSON dentro de <code>&lt;FDef&gt;</code>.</p>
+        </div>
+        <div className="eform-info-card">
+          <div className="eform-info-card-title">Estructura de Campos</div>
+          <p>Cada <strong>Panel</strong> → componente de Form.io. El <strong>Key</strong> debe coincidir con el <code>FieldID</code> de la categoría en Therefore.</p>
+        </div>
+        <div className="eform-info-card">
+          <div className="eform-info-card-title">Tipos Soportados</div>
+          <p>Texto, Email, Teléfono, Fecha, Fecha-Hora, Número, Dinero, Casilla, Lista desplegable.</p>
+        </div>
+      </div>
+
+      {/* Identity Panel */}
       <div className="eform-panel">
         <div className="eform-panel-title">Identidad del formulario</div>
         <div className="eform-identity-grid">
@@ -672,6 +707,7 @@ export default function EFormBuilder() {
         </div>
       </div>
 
+      {/* Main Content */}
       {activeView === 'preview' ? (
         <div className="eform-panel">
           <div className="eform-panel-title">Preview del formulario web</div>
@@ -709,15 +745,6 @@ export default function EFormBuilder() {
 
           <div className="eform-right">
             <div className="eform-panel">
-              <div className="eform-panel-title">Estructura del XML</div>
-              <div className="eform-info-text">
-                <p>Therefore eForms usa <strong>Form.io</strong> como motor de formularios. El XML contiene el JSON de Form.io dentro del nodo <code>&lt;FDef&gt;</code>.</p>
-                <p>Cada <strong>Panel</strong> → componente <code>panel</code> de Form.io. Cada fila de campos → <code>columns</code>.</p>
-                <p>El <strong>Key</strong> de cada campo debe coincidir con el <code>FieldID</code> de la categoría vinculada en Therefore.</p>
-              </div>
-            </div>
-
-            <div className="eform-panel">
               <div className="eform-panel-header">
                 <span className="eform-panel-title">Generar XML</span>
                 <span className="eform-badge">{totalFields} campos</span>
@@ -725,15 +752,9 @@ export default function EFormBuilder() {
               {error && <div className="eform-error">{error}</div>}
               <button className="eform-btn-primary" onClick={generate}>Generar XML →</button>
               {xml && (
-                <div className="eform-xml-output">
-                  <div className="eform-xml-actions">
-                    <button className="eform-btn-success" onClick={copy}>{copied ? '✓ Copiado' : '📋 Copiar XML'}</button>
-                    <button className="eform-btn" onClick={download}>⬇ Descargar .xml</button>
-                    <button className="eform-btn" onClick={saveToSupabase} disabled={saving}>{saving ? '⏳ Guardando...' : '💾 Guardar en Supabase'}</button>
-                  </div>
-                  <div className="eform-char-count">{xml.length.toLocaleString()} caracteres</div>
-                  <textarea readOnly className="eform-textarea" value={xml} onClick={e => e.target.select()} />
-                </div>
+                <button className="eform-btn-primary" onClick={() => setXmlModalOpen(true)} style={{ marginTop: '8px' }}>
+                  📋 Ver & Descargar
+                </button>
               )}
             </div>
 
@@ -742,11 +763,11 @@ export default function EFormBuilder() {
               <div className="eform-checklist">
                 {[
                   'Importar el XML en Solution Designer',
-                  'Verificar que el Key de cada campo coincide con el FieldID de la categoría',
-                  'Configurar la categoría vinculada si no existe',
-                  'Publicar desde Herramientas → Publicar eForms',
-                  'Verificar la URL de publicación en IIS',
-                  'Probar envío antes de distribuir el enlace',
+                  'Verificar que el Key coincide con FieldID',
+                  'Configurar la categoría vinculada',
+                  'Publicar desde Herramientas',
+                  'Verificar URL en IIS',
+                  'Probar envío antes de distribuir',
                 ].map((item, i) => (
                   <div key={i} className="eform-checklist-item">
                     <span>☐</span>
@@ -758,6 +779,26 @@ export default function EFormBuilder() {
           </div>
         </div>
       )}
+
+      {/* XML Modal */}
+      <Modal
+        title="XML - Therefore™ eForms"
+        open={xmlModalOpen}
+        onCancel={() => setXmlModalOpen(false)}
+        width="90%"
+        style={{ maxWidth: '1200px' }}
+        footer={[
+          <Button key="close" onClick={() => setXmlModalOpen(false)}>Cerrar</Button>,
+          <Button key="copy" type="primary" onClick={copy}>{copied ? '✓ Copiado' : '📋 Copiar XML'}</Button>,
+          <Button key="download" type="primary" onClick={download}>⬇ Descargar .xml</Button>,
+          <Button key="supabase" type="primary" onClick={saveToSupabase} loading={saving}>💾 Guardar en Supabase</Button>,
+        ]}
+      >
+        <div className="eform-xml-modal-content">
+          <div className="eform-char-count">{xml.length.toLocaleString()} caracteres</div>
+          <textarea readOnly className="eform-textarea eform-xml-textarea" value={xml} onClick={e => e.target.select()} />
+        </div>
+      </Modal>
 
       <div className="eform-footer">
         Therefore eForms Builder v2.0 · Aneker · Genera Form.io JSON nativo para Therefore
