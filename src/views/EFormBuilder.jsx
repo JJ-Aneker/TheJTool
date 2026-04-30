@@ -582,6 +582,7 @@ export default function EFormBuilder() {
     const total = sections.flatMap(s => s.fields).filter(f => f.nombre.trim()).length
     if (total === 0) { setError('Añade al menos un campo.'); return }
     setXml(buildEFormXml({ formName: formName.trim(), submitLabel: submitLabel.trim() || 'Enviar', sections, colsPerRow }))
+    setXmlModalOpen(true)
   }
 
   const saveToSupabase = async () => {
@@ -643,32 +644,36 @@ export default function EFormBuilder() {
           <h1 className="eform-title">📋 Therefore™ eForms Builder</h1>
           <p className="eform-subtitle">Genera el XML de importación de eForms para Therefore Solution Designer · Form.io JSON · v2.0</p>
         </div>
-        <div className="eform-view-toggle">
-          {['editor', 'preview'].map(v => (
-            <button
-              key={v}
-              onClick={() => setActiveView(v)}
-              className={`eform-btn ${activeView === v ? 'active' : ''}`}
-            >
-              {v === 'editor' ? '✎ Editor' : '👁 Preview'}
-            </button>
-          ))}
+        <div className="eform-header-actions">
+          <div className="eform-view-toggle">
+            {['editor', 'preview'].map(v => (
+              <button
+                key={v}
+                onClick={() => setActiveView(v)}
+                className={`eform-btn ${activeView === v ? 'active' : ''}`}
+              >
+                {v === 'editor' ? '✎ Editor' : '👁 Preview'}
+              </button>
+            ))}
+          </div>
+          {error && <div className="eform-error-inline">{error}</div>}
+          <button className="eform-btn-primary" onClick={generate}>Generar XML →</button>
         </div>
       </div>
 
       {/* Information Cards - Top */}
       <div className="eform-info-cards">
         <div className="eform-info-card">
-          <div className="eform-info-card-title">Estructura del XML</div>
-          <p>Therefore eForms usa <strong>Form.io</strong> como motor de formularios. El XML contiene el JSON dentro de <code>&lt;FDef&gt;</code>.</p>
+          <div className="eform-info-card-title">1. Estructura</div>
+          <p>Therefore eForms usa <strong>Form.io</strong>. El XML contiene el JSON en <code>&lt;FDef&gt;</code>.</p>
         </div>
         <div className="eform-info-card">
-          <div className="eform-info-card-title">Estructura de Campos</div>
-          <p>Cada <strong>Panel</strong> → componente de Form.io. El <strong>Key</strong> debe coincidir con el <code>FieldID</code> de la categoría en Therefore.</p>
+          <div className="eform-info-card-title">2. Campos</div>
+          <p>Cada <strong>Panel</strong> → componente. El <strong>Key</strong> = <code>FieldID</code> en Therefore.</p>
         </div>
         <div className="eform-info-card">
-          <div className="eform-info-card-title">Tipos Soportados</div>
-          <p>Texto, Email, Teléfono, Fecha, Fecha-Hora, Número, Dinero, Casilla, Lista desplegable.</p>
+          <div className="eform-info-card-title">3. Publicar</div>
+          <p>Importa en Solution Designer → Publica → Verifica URL en IIS.</p>
         </div>
       </div>
 
@@ -714,68 +719,31 @@ export default function EFormBuilder() {
           <FormPreview formName={formName} description={description} submitLabel={submitLabel} sections={sections} colsPerRow={colsPerRow} />
         </div>
       ) : (
-        <div className="eform-grid">
-          <div className="eform-left">
-            <CsvImporter onImport={handleCsvImport} />
-            <div className="eform-panel">
-              <div className="eform-panel-header">
-                <span className="eform-panel-title">Paneles y campos <span className="eform-badge">{totalFields} campos</span></span>
-                <button className="eform-btn" onClick={addSection}>+ Panel</button>
-              </div>
-              {sections.map((sec, si) => (
-                <div key={sec.id} className="eform-section">
-                  <div className="eform-sec-header">
-                    <input
-                      className="eform-input eform-section-name"
-                      value={sec.name}
-                      onChange={e => updateSecName(si, e.target.value)}
-                      placeholder="NOMBRE DEL PANEL"
-                    />
-                    <span className="eform-badge">{sec.fields.filter(f => f.nombre).length} campos</span>
-                    {sections.length > 1 && <button className="eform-btn-danger" onClick={() => removeSection(si)}>✕</button>}
-                  </div>
-                  {sec.fields.map((f, fi) => (
-                    <FieldRow key={f.id} field={f} onChange={v => updateField(si, fi, v)} onRemove={() => removeField(si, fi)} />
-                  ))}
-                  <button className="eform-btn" onClick={() => addField(si)}>+ Campo</button>
+        <div className="eform-full-width">
+          <CsvImporter onImport={handleCsvImport} />
+          <div className="eform-panel">
+            <div className="eform-panel-header">
+              <span className="eform-panel-title">Paneles y campos <span className="eform-badge">{totalFields} campos</span></span>
+              <button className="eform-btn" onClick={addSection}>+ Panel</button>
+            </div>
+            {sections.map((sec, si) => (
+              <div key={sec.id} className="eform-section">
+                <div className="eform-sec-header">
+                  <input
+                    className="eform-input eform-section-name"
+                    value={sec.name}
+                    onChange={e => updateSecName(si, e.target.value)}
+                    placeholder="NOMBRE DEL PANEL"
+                  />
+                  <span className="eform-badge">{sec.fields.filter(f => f.nombre).length} campos</span>
+                  {sections.length > 1 && <button className="eform-btn-danger" onClick={() => removeSection(si)}>✕</button>}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="eform-right">
-            <div className="eform-panel">
-              <div className="eform-panel-header">
-                <span className="eform-panel-title">Generar XML</span>
-                <span className="eform-badge">{totalFields} campos</span>
-              </div>
-              {error && <div className="eform-error">{error}</div>}
-              <button className="eform-btn-primary" onClick={generate}>Generar XML →</button>
-              {xml && (
-                <button className="eform-btn-primary" onClick={() => setXmlModalOpen(true)} style={{ marginTop: '8px' }}>
-                  📋 Ver & Descargar
-                </button>
-              )}
-            </div>
-
-            <div className="eform-panel">
-              <div className="eform-panel-title">Checklist de publicación</div>
-              <div className="eform-checklist">
-                {[
-                  'Importar el XML en Solution Designer',
-                  'Verificar que el Key coincide con FieldID',
-                  'Configurar la categoría vinculada',
-                  'Publicar desde Herramientas',
-                  'Verificar URL en IIS',
-                  'Probar envío antes de distribuir',
-                ].map((item, i) => (
-                  <div key={i} className="eform-checklist-item">
-                    <span>☐</span>
-                    <span>{item}</span>
-                  </div>
+                {sec.fields.map((f, fi) => (
+                  <FieldRow key={f.id} field={f} onChange={v => updateField(si, fi, v)} onRemove={() => removeField(si, fi)} />
                 ))}
+                <button className="eform-btn" onClick={() => addField(si)}>+ Campo</button>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       )}

@@ -7,12 +7,20 @@
 }
 
 .eform-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   border-bottom: 1px solid var(--border-default);
   padding-bottom: 16px;
   margin-bottom: 20px;
+}
+
+.eform-header > div:first-child {
+  margin-bottom: 12px;
+}
+
+.eform-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .eform-title {
@@ -280,19 +288,7 @@
   left: 12px;
 }
 
-.eform-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.eform-left {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.eform-right {
+.eform-full-width {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -339,6 +335,16 @@
   border-radius: var(--radius-md);
   font-size: 12px;
   margin-bottom: 10px;
+}
+
+.eform-error-inline {
+  color: var(--accent-error);
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 .eform-preview-info {
