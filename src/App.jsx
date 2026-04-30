@@ -32,6 +32,7 @@ import UserProfile from './views/UserProfile'
 import UserManager from './views/UserManager'
 import TemplateManager from './views/TemplateManager'
 import WebServicesManager from './views/WebServicesManager'
+import EFormBuilder from './views/EFormBuilder'
 import Placeholder from './views/Placeholder'
 
 const { Sider, Content } = Layout
@@ -369,7 +370,7 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<UserManager />} />
-            <Route path="/eforms" element={<Placeholder icon={<FormOutlined />} title="Generador de eForms" description="Próximamente: Integración de tu eForms Builder mejorado" />} />
+            <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-cloner" element={<Placeholder icon={<CopyOutlined />} title="Clonador de Categorías" description="Próximamente: Integración de tu Category Cloner mejorado" />} />
             <Route path="/tenants" element={<Placeholder icon={<CloudOutlined />} title="Gestión de Tenants" description="Próximamente: Integración de tu Tenant Manager mejorado" />} />
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />

@@ -17,6 +17,8 @@
   /* Acentos */
   --accent-primary: #3663FF;
   --accent-success: #22c55e;
+  --accent-error: #ff5050;
+  --accent-warning: #ffa726;
   --accent-chat: #e879f9;
 
   /* KPI top-borders */
@@ -80,6 +82,8 @@
   /* Acentos */
   --accent-primary: #3663FF;
   --accent-success: #22c55e;
+  --accent-error: #ff5050;
+  --accent-warning: #ffa726;
   --accent-chat: #e879f9;
 
   /* KPI top-borders */
