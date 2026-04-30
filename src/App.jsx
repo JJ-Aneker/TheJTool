@@ -33,6 +33,7 @@ import UserManager from './views/UserManager'
 import TemplateManager from './views/TemplateManager'
 import WebServicesManager from './views/WebServicesManager'
 import EFormBuilder from './views/EFormBuilder'
+import CategoryBuilder from './views/CategoryBuilder'
 import Placeholder from './views/Placeholder'
 
 const { Sider, Content } = Layout
@@ -371,10 +372,10 @@ function AppContent() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<UserManager />} />
             <Route path="/eforms" element={<EFormBuilder />} />
+            <Route path="/category-builder" element={<CategoryBuilder />} />
             <Route path="/category-cloner" element={<Placeholder icon={<CopyOutlined />} title="Clonador de Categorías" description="Próximamente: Integración de tu Category Cloner mejorado" />} />
             <Route path="/tenants" element={<Placeholder icon={<CloudOutlined />} title="Gestión de Tenants" description="Próximamente: Integración de tu Tenant Manager mejorado" />} />
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
-            <Route path="/category-builder" element={<Placeholder icon={<AppstoreOutlined />} title="Category Builder" description="Próximamente: Integración de tu Category Builder mejorado" />} />
             <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" description="Próximamente: Documentación del proyecto" />} />
             <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" description="Próximamente: Integración de tu Workflow Manager mejorado" />} />
             <Route path="/templates" element={<TemplateManager />} />

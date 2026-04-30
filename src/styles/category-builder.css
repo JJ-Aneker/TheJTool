@@ -1,0 +1,207 @@
+/* Category Builder Styling */
+/* Uses CSS variables from design-tokens.css for theming */
+
+.category-builder-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-canvas);
+}
+
+.category-builder-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-canvas);
+}
+
+.category-builder-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+}
+
+.category-builder-header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.category-builder-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Two-column layout */
+.category-builder-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 20px;
+}
+
+/* Editor panel */
+.category-editor-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.category-editor-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+}
+
+.category-editor-field {
+  margin-bottom: 12px;
+}
+
+.category-editor-field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.category-editor-field input,
+.category-editor-field textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.category-editor-field input:focus,
+.category-editor-field textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1);
+}
+
+.category-editor-xml {
+  width: 100%;
+  min-height: 300px;
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.category-editor-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* Sidebar */
+.category-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.category-sidebar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.category-sidebar-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category-sidebar-selected {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.category-sidebar-selected strong {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.category-sidebar-selected-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.category-sidebar-selected-date {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Modal */
+.category-templates-modal {
+  /* Using Ant Design modal styling */
+}
+
+.category-templates-modal-content {
+  margin-bottom: 16px;
+}
+
+/* Table styling (Ant Design) */
+.category-templates-modal .ant-table {
+  background: var(--bg-card);
+}
+
+.category-templates-modal .ant-table-thead > tr > th {
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.category-templates-modal .ant-table-body > tr {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.category-templates-modal .ant-table-body > tr:hover {
+  background: var(--bg-hover);
+}
+
+/* Empty state */
+.category-empty-state {
+  padding: 40px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .category-builder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-sidebar {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .category-sidebar-card {
+    flex: 1;
+  }
+}
