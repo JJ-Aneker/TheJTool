@@ -1,187 +1,174 @@
 import { useState, useEffect } from 'react'
-import { Table, Button, Modal, message, Spin, Space, Tag, Input, Empty, Upload } from 'antd'
-import { DeleteOutlined, EditOutlined, CopyOutlined, DownloadOutlined, ShareOutlined, LockOutlined } from '@ant-design/icons'
+import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin } from 'antd'
+import { DeleteOutlined, DownloadOutlined, CopyOutlined, ShareOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
-import '../styles/category-builder.css'
 
 export default function CategoryBuilder() {
   const { user } = useAuth()
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(false)
-  const [managerOpen, setManagerOpen] = useState(false)
-  const [searchText, setSearchText] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
   const [xmlContent, setXmlContent] = useState('')
   const [templateName, setTemplateName] = useState('')
-  const [templateDescription, setTemplateDescription] = useState('')
+  const [templateDesc, setTemplateDesc] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState(null)
-  const [shareOpen, setShareOpen] = useState(false)
-  const [fileList, setFileList] = useState([])
+  const [searchText, setSearchText] = useState('')
+  const [error, setError] = useState('')
 
-  // Load templates on mount
   useEffect(() => {
-    loadTemplates()
+    if (user?.id) {
+      loadTemplates()
+    }
   }, [user?.id])
 
   const loadTemplates = async () => {
-    if (!user?.id) return
     setLoading(true)
+    setError('')
     try {
-      const { data, error } = await supabase
+      const { data, error: err } = await supabase
         .from('category_templates')
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (err) {
+        setError(`Error loading templates: ${err.message}`)
+        return
+      }
+
       setTemplates(data || [])
     } catch (err) {
-      message.error('Error cargando plantillas: ' + err.message)
+      setError(`Error: ${err.message}`)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDeleteTemplate = async (templateId) => {
-    try {
-      const { error } = await supabase
-        .from('category_templates')
-        .delete()
-        .eq('id', templateId)
-
-      if (error) throw error
-      message.success('Plantilla eliminada')
-      loadTemplates()
-    } catch (err) {
-      message.error('Error eliminando: ' + err.message)
-    }
-  }
-
-  const handleDuplicateTemplate = async (template) => {
-    try {
-      const newXml = template.xml_definition
-      const { error } = await supabase
-        .from('category_templates')
-        .insert({
-          template_id: `${template.template_id}_copy_${Date.now()}`,
-          name: `${template.name} (Copia)`,
-          description: template.description,
-          xml_definition: newXml,
-          csv_data: template.csv_data,
-          created_by: user.id,
-          compartido: false
-        })
-
-      if (error) throw error
-      message.success('Plantilla duplicada')
-      loadTemplates()
-    } catch (err) {
-      message.error('Error duplicando: ' + err.message)
-    }
-  }
-
-  const handleDownloadTemplate = (template) => {
-    const a = document.createElement('a')
-    a.href = 'data:application/xml;charset=utf-8,' + encodeURIComponent(template.xml_definition)
-    a.download = (template.name.replace(/\s+/g, '_') || 'categoria') + '_therefore.xml'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-  }
-
-  const handleShareTemplate = async (template) => {
-    try {
-      const { error } = await supabase
-        .from('category_templates')
-        .update({ compartido: !template.compartido })
-        .eq('id', template.id)
-
-      if (error) throw error
-      message.success(template.compartido ? 'Plantilla privada' : 'Plantilla compartida')
-      loadTemplates()
-    } catch (err) {
-      message.error('Error al compartir: ' + err.message)
-    }
-  }
-
-  const handleLoadTemplate = (template) => {
-    setSelectedTemplate(template)
-    setXmlContent(template.xml_definition)
-    setTemplateName(template.name)
-    setTemplateDescription(template.description)
-    setManagerOpen(false)
-  }
-
   const handleSaveTemplate = async () => {
     if (!templateName.trim()) {
-      message.error('El nombre es obligatorio')
+      message.error('Nombre requerido')
       return
     }
     if (!xmlContent.trim()) {
-      message.error('El contenido XML es obligatorio')
+      message.error('XML requerido')
       return
     }
 
+    setLoading(true)
     try {
       if (selectedTemplate?.id) {
-        // Update existing template
-        const { error } = await supabase
+        // Update
+        const { error: err } = await supabase
           .from('category_templates')
           .update({
             name: templateName,
-            description: templateDescription,
+            description: templateDesc,
             xml_definition: xmlContent,
             updated_at: new Date().toISOString()
           })
           .eq('id', selectedTemplate.id)
 
-        if (error) throw error
+        if (err) throw err
         message.success('Plantilla actualizada')
       } else {
-        // Insert new template
-        const { error } = await supabase
+        // Insert
+        const { error: err } = await supabase
           .from('category_templates')
           .insert({
             template_id: `cat_${Date.now()}`,
             name: templateName,
-            description: templateDescription,
+            description: templateDesc,
             xml_definition: xmlContent,
             created_by: user.id,
             compartido: false
           })
 
-        if (error) throw error
+        if (err) throw err
         message.success('Plantilla guardada')
       }
 
-      // Reset form
       setXmlContent('')
       setTemplateName('')
-      setTemplateDescription('')
+      setTemplateDesc('')
       setSelectedTemplate(null)
-      loadTemplates()
+      await loadTemplates()
     } catch (err) {
-      message.error('Error guardando: ' + err.message)
+      message.error(`Error: ${err.message}`)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleUploadXml = (file) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      try {
-        const content = e.target.result
-        setXmlContent(content)
-        message.success('XML cargado')
-      } catch (err) {
-        message.error('Error leyendo archivo: ' + err.message)
-      }
+  const handleDuplicate = async (template) => {
+    try {
+      const { error: err } = await supabase
+        .from('category_templates')
+        .insert({
+          template_id: `cat_${Date.now()}`,
+          name: `${template.name} (Copia)`,
+          description: template.description,
+          xml_definition: template.xml_definition,
+          created_by: user.id,
+          compartido: false
+        })
+
+      if (err) throw err
+      message.success('Plantilla duplicada')
+      await loadTemplates()
+    } catch (err) {
+      message.error(`Error: ${err.message}`)
     }
-    reader.readAsText(file)
-    return false
+  }
+
+  const handleDownload = (template) => {
+    const a = document.createElement('a')
+    a.href = 'data:application/xml;charset=utf-8,' + encodeURIComponent(template.xml_definition)
+    a.download = `${template.name.replace(/\s+/g, '_')}_therefore.xml`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+
+  const handleToggleShare = async (template) => {
+    try {
+      const { error: err } = await supabase
+        .from('category_templates')
+        .update({ compartido: !template.compartido })
+        .eq('id', template.id)
+
+      if (err) throw err
+      message.success(template.compartido ? 'Privada' : 'Compartida')
+      await loadTemplates()
+    } catch (err) {
+      message.error(`Error: ${err.message}`)
+    }
+  }
+
+  const handleDelete = async (templateId) => {
+    try {
+      const { error: err } = await supabase
+        .from('category_templates')
+        .delete()
+        .eq('id', templateId)
+
+      if (err) throw err
+      message.success('Eliminada')
+      await loadTemplates()
+    } catch (err) {
+      message.error(`Error: ${err.message}`)
+    }
+  }
+
+  const handleLoadTemplate = (template) => {
+    setSelectedTemplate(template)
+    setTemplateName(template.name)
+    setTemplateDesc(template.description || '')
+    setXmlContent(template.xml_definition)
+    setModalOpen(false)
   }
 
   const filteredTemplates = templates.filter(t =>
-    t.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    (t.description && t.description.toLowerCase().includes(searchText.toLowerCase()))
+    t.name.toLowerCase().includes(searchText.toLowerCase())
   )
 
   const columns = [
@@ -189,15 +176,7 @@ export default function CategoryBuilder() {
       title: 'Nombre',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <strong>{text}</strong>,
-      width: '30%'
-    },
-    {
-      title: 'Descripción',
-      dataIndex: 'description',
-      key: 'description',
-      width: '35%',
-      render: (text) => text || <span style={{ color: 'var(--text-muted)' }}>-</span>
+      render: (text) => <strong>{text}</strong>
     },
     {
       title: 'Estado',
@@ -208,68 +187,45 @@ export default function CategoryBuilder() {
           {compartido ? 'Compartida' : 'Privada'}
         </Tag>
       ),
-      width: '15%'
-    },
-    {
-      title: 'Creado',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (date) => new Date(date).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
-      width: '20%'
+      width: 120
     },
     {
       title: 'Acciones',
       key: 'actions',
-      width: '20%',
+      width: 200,
       render: (_, record) => (
         <Space size="small">
           <Button
-            type="primary"
             size="small"
-            icon={<EditOutlined />}
             onClick={() => handleLoadTemplate(record)}
-            title="Cargar"
-          />
+          >
+            Cargar
+          </Button>
           <Button
             size="small"
-            icon={record.compartido ? <LockOutlined /> : <ShareOutlined />}
-            onClick={() => handleShareTemplate(record)}
-            title={record.compartido ? 'Hacer privada' : 'Compartir'}
-          />
+            onClick={() => handleToggleShare(record)}
+          >
+            {record.compartido ? 'Privada' : 'Compartir'}
+          </Button>
           <Button
             size="small"
-            icon={<CopyOutlined />}
-            onClick={() => handleDuplicateTemplate(record)}
-            title="Duplicar"
-          />
+            onClick={() => handleDuplicate(record)}
+          >
+            Copiar
+          </Button>
           <Button
             size="small"
-            icon={<DownloadOutlined />}
-            onClick={() => handleDownloadTemplate(record)}
-            title="Descargar XML"
-          />
+            onClick={() => handleDownload(record)}
+          >
+            Descar
+          </Button>
           <Button
             danger
             size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              Modal.confirm({
-                title: 'Confirmar eliminación',
-                content: `¿Estás seguro de que quieres eliminar "${record.name}"?`,
-                okText: 'Eliminar',
-                cancelText: 'Cancelar',
-                okButtonProps: { danger: true },
-                onOk: () => handleDeleteTemplate(record.id)
-              })
-            }}
-            title="Eliminar"
-          />
+            onClick={() => handleDelete(record.id)}
+          >
+            ✕
+          </Button>
         </Space>
       )
     }
@@ -277,68 +233,64 @@ export default function CategoryBuilder() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <div style={{ marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '20px', fontWeight: '600', margin: '0 0 16px 0' }}>
-          🏗️ Generador de Categorías
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
-          Crea y gestiona plantillas de categorías para Therefore™ Solution Designer
-        </p>
-      </div>
+      <h1 style={{ marginBottom: '20px' }}>🏗️ Generador de Categorías</h1>
+
+      {error && (
+        <div style={{
+          background: 'rgba(255, 100, 100, 0.1)',
+          color: '#ff6464',
+          padding: '12px',
+          borderRadius: '4px',
+          marginBottom: '20px',
+          border: '1px solid #ff6464'
+        }}>
+          {error}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
-        {/* Editor */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: '8px', padding: '20px', border: '1px solid var(--border-default)' }}>
-          <div style={{ marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '14px', fontWeight: '600', margin: '0 0 12px 0' }}>
-              {selectedTemplate ? 'Editar Plantilla' : 'Nueva Plantilla'}
-            </h2>
-          </div>
+        {/* Editor Panel */}
+        <div style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '8px',
+          padding: '20px'
+        }}>
+          <h3 style={{ marginBottom: '16px' }}>
+            {selectedTemplate ? '✏️ Editar' : '➕ Nueva Plantilla'}
+          </h3>
 
           <div style={{ marginBottom: '12px' }}>
-            <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+            <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', color: 'var(--text-secondary)' }}>
               Nombre *
             </label>
             <Input
-              placeholder="Ej. Categoria Legal"
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
-              style={{ marginBottom: '12px' }}
+              placeholder="Ej. Categoría Legal"
             />
           </div>
 
           <div style={{ marginBottom: '12px' }}>
-            <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+            <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', color: 'var(--text-secondary)' }}>
               Descripción
             </label>
             <Input.TextArea
-              placeholder="Descripción de la plantilla..."
-              value={templateDescription}
-              onChange={(e) => setTemplateDescription(e.target.value)}
-              rows={3}
-              style={{ marginBottom: '12px' }}
+              value={templateDesc}
+              onChange={(e) => setTemplateDesc(e.target.value)}
+              placeholder="Descripción..."
+              rows={2}
             />
           </div>
 
           <div style={{ marginBottom: '12px' }}>
-            <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+            <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', color: 'var(--text-secondary)' }}>
               XML Definition *
             </label>
-            <Upload
-              accept=".xml"
-              maxCount={1}
-              beforeUpload={handleUploadXml}
-              style={{ marginBottom: '12px' }}
-            >
-              <Button>Cargar XML</Button>
-            </Upload>
-          </div>
-
-          <div style={{ marginBottom: '12px' }}>
             <textarea
               value={xmlContent}
               onChange={(e) => setXmlContent(e.target.value)}
-              placeholder="O pega el contenido XML aquí..."
+              placeholder="Pega el XML aquí..."
               style={{
                 width: '100%',
                 minHeight: '300px',
@@ -355,17 +307,21 @@ export default function CategoryBuilder() {
           </div>
 
           <div style={{ display: 'flex', gap: '8px' }}>
-            <Button type="primary" onClick={handleSaveTemplate}>
-              {selectedTemplate ? 'Actualizar' : 'Guardar'} Plantilla
+            <Button
+              type="primary"
+              onClick={handleSaveTemplate}
+              loading={loading}
+            >
+              {selectedTemplate ? 'Actualizar' : 'Guardar'}
             </Button>
             {selectedTemplate && (
               <Button onClick={() => {
                 setSelectedTemplate(null)
-                setXmlContent('')
                 setTemplateName('')
-                setTemplateDescription('')
+                setTemplateDesc('')
+                setXmlContent('')
               }}>
-                Limpiar
+                Cancelar
               </Button>
             )}
           </div>
@@ -373,32 +329,37 @@ export default function CategoryBuilder() {
 
         {/* Sidebar */}
         <div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: '8px', padding: '16px', border: '1px solid var(--border-default)', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '12px', fontWeight: '600', margin: '0 0 12px 0', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
-              Mis Plantillas
-            </h3>
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-default)',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '16px'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0' }}>Mis Plantillas</h4>
             <Input.Search
               placeholder="Buscar..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              style={{ marginBottom: '12px' }}
               size="small"
+              style={{ marginBottom: '12px' }}
             />
             <Button
               block
-              onClick={() => setManagerOpen(true)}
-              style={{ marginTop: '8px' }}
+              onClick={() => setModalOpen(true)}
             >
-              Ver todas ({filteredTemplates.length})
+              Ver todas ({templates.length})
             </Button>
           </div>
 
           {selectedTemplate && (
-            <div style={{ background: 'var(--bg-canvas)', borderRadius: '8px', padding: '12px', border: '1px solid var(--border-default)' }}>
-              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                <strong>Editando:</strong>
-              </div>
-              <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+            <div style={{
+              background: 'var(--bg-canvas)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '8px',
+              padding: '12px'
+            }}>
+              <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px' }}>
                 {selectedTemplate.name}
               </div>
               <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
@@ -409,32 +370,20 @@ export default function CategoryBuilder() {
         </div>
       </div>
 
-      {/* Manager Modal */}
+      {/* Templates Modal */}
       <Modal
-        title="Mis Plantillas de Categoría"
-        open={managerOpen}
-        onCancel={() => setManagerOpen(false)}
+        title="Plantillas de Categoría"
+        open={modalOpen}
+        onCancel={() => setModalOpen(false)}
         width={1000}
         footer={null}
       >
-        <div style={{ marginBottom: '16px' }}>
-          <Input.Search
-            placeholder="Buscar por nombre o descripción..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ maxWidth: '400px' }}
-          />
-        </div>
-
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <Spin size="large" />
           </div>
         ) : filteredTemplates.length === 0 ? (
-          <Empty
-            description={searchText ? 'Sin resultados' : 'No hay plantillas creadas'}
-            style={{ padding: '40px' }}
-          />
+          <Empty description="No hay plantillas" />
         ) : (
           <Table
             columns={columns}
