@@ -650,11 +650,16 @@ export default function EFormBuilder() {
   const loadSavedForms = async () => {
     setLoadingForms(true)
     try {
-      const { data, error } = await supabase
-        .from('eforms')
-        .select('*')
-        .eq('created_by', user?.id)
-        .order('created_at', { ascending: false })
+      let query = supabase.from('eforms').select('*')
+
+      // Filtro: usuarios ven suyos + compartidos, admins ven todos
+      const isAdmin = user?.user_metadata?.is_admin || false
+
+      if (!isAdmin) {
+        query = query.or(`created_by.eq.${user?.id},compartido.eq.true`)
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw error
       setSavedForms(data || [])
@@ -662,6 +667,27 @@ export default function EFormBuilder() {
       message.error('Error cargando formularios: ' + err.message)
     } finally {
       setLoadingForms(false)
+    }
+  }
+
+  const duplicateForm = async (form) => {
+    try {
+      const { error } = await supabase
+        .from('eforms')
+        .insert({
+          form_id: `${form.form_id}_copy_${Date.now()}`,
+          name: `${form.name} (Copia)`,
+          definition: form.definition,
+          description: form.description,
+          compartido: false,
+          created_by: user?.id
+        })
+
+      if (error) throw error
+      message.success('Formulario duplicado')
+      loadSavedForms()
+    } catch (err) {
+      message.error('Error duplicando: ' + err.message)
     }
   }
 
@@ -914,8 +940,18 @@ export default function EFormBuilder() {
                   }}
                 >
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                    <div style={{ fontWeight: '600', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {form.name}
+                      {form.compartido && (
+                        <span style={{ fontSize: '10px', background: 'rgba(34,197,94,0.2)', color: 'var(--accent-success)', padding: '2px 6px', borderRadius: '3px' }}>
+                          🔗 Compartido
+                        </span>
+                      )}
+                      {form.created_by !== user?.id && (
+                        <span style={{ fontSize: '10px', background: 'rgba(100,100,100,0.2)', color: 'var(--text-secondary)', padding: '2px 6px', borderRadius: '3px' }}>
+                          Otros
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                       {form.description || 'Sin descripción'}
@@ -924,29 +960,59 @@ export default function EFormBuilder() {
                       {new Date(form.created_at).toLocaleDateString('es-ES')}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     <Button
                       type="primary"
+                      size="small"
                       onClick={() => loadFormToEditor(form)}
                     >
                       ✎ Editar
                     </Button>
                     <Button
-                      danger
-                      onClick={async () => {
-                        if (window.confirm(`¿Eliminar "${form.name}"?`)) {
+                      size="small"
+                      onClick={() => duplicateForm(form)}
+                      title="Duplicar como copia"
+                    >
+                      📋 Duplicar
+                    </Button>
+                    {form.created_by === user?.id && (
+                      <Button
+                        size="small"
+                        onClick={async () => {
                           try {
-                            await supabase.from('eforms').delete().eq('id', form.id)
-                            message.success('Eliminado')
+                            await supabase
+                              .from('eforms')
+                              .update({ compartido: !form.compartido })
+                              .eq('id', form.id)
+                            message.success(form.compartido ? 'No compartido' : 'Compartido')
                             loadSavedForms()
                           } catch (err) {
                             message.error('Error: ' + err.message)
                           }
-                        }
-                      }}
-                    >
-                      ✕
-                    </Button>
+                        }}
+                      >
+                        {form.compartido ? '🔗 Dejar de compartir' : '🔒 Compartir'}
+                      </Button>
+                    )}
+                    {form.created_by === user?.id && (
+                      <Button
+                        danger
+                        size="small"
+                        onClick={async () => {
+                          if (window.confirm(`¿Eliminar "${form.name}"?`)) {
+                            try {
+                              await supabase.from('eforms').delete().eq('id', form.id)
+                              message.success('Eliminado')
+                              loadSavedForms()
+                            } catch (err) {
+                              message.error('Error: ' + err.message)
+                            }
+                          }
+                        }}
+                      >
+                        ✕
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
