@@ -417,31 +417,70 @@
   flex: 1;
 }
 
+.eform-field-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.eform-field-col-etiqueta {
+  grid-column: 1;
+}
+
+.eform-field-col-key {
+  grid-column: 2;
+}
+
+.eform-field-col-tipo {
+  grid-column: 3;
+}
+
+.eform-field-col-opciones {
+  grid-column: 4;
+}
+
 .eform-field-row {
-  background: rgba(0, 0, 0, 0.2);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-md);
-  padding: 10px;
+  padding: 8px;
   margin-bottom: 6px;
 }
 
 .eform-field-main {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.eform-input-compact {
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+  height: auto;
+}
+
+.eform-select-compact {
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+  height: auto;
+}
+
+.eform-field-quick-options {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.eform-field-group {
-  flex: 3 1 160px;
-}
-
-.eform-field-group:nth-child(2) {
-  flex: 2 1 110px;
-}
-
-.eform-field-group:nth-child(3) {
-  flex: 2 1 120px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .eform-field-group-full {
@@ -469,6 +508,7 @@
   gap: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding-top: 10px;
+  grid-column: 1 / -1;
 }
 
 .eform-preview {

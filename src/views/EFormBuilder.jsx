@@ -382,10 +382,9 @@ function FieldRow({ field, onChange, onRemove }) {
   return (
     <div className="eform-field-row">
       <div className="eform-field-main">
-        <div className="eform-field-group">
-          <label className="eform-label">Etiqueta</label>
+        <div className="eform-field-col-etiqueta">
           <input
-            className="eform-input"
+            className="eform-input eform-input-compact"
             value={field.nombre}
             onChange={e => {
               const nombre = e.target.value
@@ -395,37 +394,34 @@ function FieldRow({ field, onChange, onRemove }) {
                 fieldKey: field.fieldKey === toCamelKey(field.nombre) ? autoK : field.fieldKey
               })
             }}
-            placeholder="ej. Nombre completo"
+            placeholder="ej. Nombre"
           />
         </div>
-        <div className="eform-field-group">
-          <label className="eform-label">Key (Form.io)</label>
+        <div className="eform-field-col-key">
           <input
-            className="eform-input"
+            className="eform-input eform-input-compact"
             value={field.fieldKey}
             onChange={e => onChange({ ...field, fieldKey: e.target.value.replace(/\s+/g, '').replace(/[^A-Za-z0-9_]/g, '') })}
             placeholder={autoKey}
           />
         </div>
-        <div className="eform-field-group">
-          <label className="eform-label">Tipo</label>
+        <div className="eform-field-col-tipo">
           <select
-            className="eform-select"
+            className="eform-select eform-select-compact"
             value={field.tipo}
             onChange={e => onChange({ ...field, tipo: e.target.value })}
           >
             {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
-        <div className="eform-toggles">
-          <Toggle on={field.required} onChange={() => onChange({ ...field, required: !field.required })} label="Obligatorio" />
-          <Toggle on={field.readOnly} onChange={() => onChange({ ...field, readOnly: !field.readOnly })} label="Solo lectura" />
-        </div>
-        <div className="eform-field-actions">
-          <button className="eform-btn-small" onClick={() => setExpanded(o => !o)} title="Más opciones">
-            {expanded ? '▲' : '▼'} Más
-          </button>
-          <button className="eform-btn-danger" onClick={onRemove} title="Eliminar">✕</button>
+        <div className="eform-field-col-opciones">
+          <div className="eform-field-quick-options">
+            <Toggle on={field.required} onChange={() => onChange({ ...field, required: !field.required })} label="Oblig." />
+            <button className="eform-btn-small" onClick={() => setExpanded(o => !o)} title="Más opciones">
+              {expanded ? '▲' : '▼'}
+            </button>
+            <button className="eform-btn-danger" onClick={onRemove} title="Eliminar">✕</button>
+          </div>
         </div>
       </div>
 
@@ -730,6 +726,14 @@ export default function EFormBuilder() {
                   <span className="eform-badge">{sec.fields.filter(f => f.nombre).length} campos</span>
                   {sections.length > 1 && <button className="eform-btn-danger" onClick={() => removeSection(si)}>✕</button>}
                 </div>
+                {sec.fields.length > 0 && (
+                  <div className="eform-field-header">
+                    <div className="eform-field-col-etiqueta">Etiqueta</div>
+                    <div className="eform-field-col-key">Key (Form.io)</div>
+                    <div className="eform-field-col-tipo">Tipo</div>
+                    <div className="eform-field-col-opciones"></div>
+                  </div>
+                )}
                 {sec.fields.map((f, fi) => (
                   <FieldRow key={f.id} field={f} onChange={v => updateField(si, fi, v)} onRemove={() => removeField(si, fi)} />
                 ))}
