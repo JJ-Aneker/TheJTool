@@ -197,12 +197,12 @@ function CsvImporter({ onImport }) {
           marginTop: '8px'
         }}>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-            Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Categoría</strong>
+            Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría</strong> (pestaña es opcional)
           </div>
           <textarea
             value={text}
             onChange={e => { setText(e.target.value); setPreview(null) }}
-            placeholder="Nombre;Tipo;Obligatorio;Sección;Categoría"
+            placeholder="Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría"
             style={{
               width: '100%',
               height: '100px',
@@ -258,6 +258,256 @@ function CsvImporter({ onImport }) {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
+  const [activeTab, setActiveTab] = useState(tabs.length > 0 ? tabs[0] : null)
+
+  const controlMap = {
+    text: (f) => <input type="text" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+    email: (f) => <input type="email" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+    phone: (f) => <input type="tel" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+    date: (f) => <input type="date" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+    datetime: (f) => <input type="datetime-local" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+    number: (f) => <input type="number" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+    money: (f) => <input type="number" step="0.01" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+    boolean: (f) => <input type="checkbox" style={{ width: '20px', height: '20px', accentColor: '#185FA5' }} />,
+    lookup: (f) => <select style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }}><option>-- Selecciona --</option></select>
+  }
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <h4 style={{ fontSize: '11px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '.06em', borderBottom: '1px solid #e5e7eb', paddingBottom: '5px', marginBottom: '12px' }}>
+        {sectionName}
+      </h4>
+
+      {baseFields.length > 0 && (
+        <div style={{ marginBottom: tabs.length > 0 ? '16px' : '0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            {baseFields.map((f, fi) => (
+              <div key={fi}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                  {f.nombre}
+                  {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
+                </label>
+                {(controlMap[f.tipo] || controlMap.text)(f)}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tabs.length > 0 && (
+        <>
+          {tabs.length > 1 && (
+            <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', borderBottom: '1px solid #e5e7eb', paddingBottom: '8px' }}>
+              {tabs.map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    fontWeight: activeTab === tab ? '600' : '400',
+                    background: activeTab === tab ? 'rgba(24, 95, 165, 0.1)' : 'transparent',
+                    border: activeTab === tab ? '1px solid #185FA5' : '1px solid #e5e7eb',
+                    color: activeTab === tab ? '#185FA5' : '#6b7280',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {tabs.length === 1 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              {fieldsByTab[tabs[0]]?.map((f, fi) => (
+                <div key={fi}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                    {f.nombre}
+                    {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
+                  </label>
+                  {(controlMap[f.tipo] || controlMap.text)(f)}
+                </div>
+              ))}
+            </div>
+          ) : (
+            activeTab && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                {fieldsByTab[activeTab]?.map((f, fi) => (
+                  <div key={fi}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                      {f.nombre}
+                      {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
+                    </label>
+                    {(controlMap[f.tipo] || controlMap.text)(f)}
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+function SectionEditor({ section, secIdx, updateField, removeField, addField, updateSecName, removeSection, catSectionsCount }) {
+  const [activeTab, setActiveTab] = useState(null)
+
+  // Separate fields: those without pestaña (baseFields) and those with pestaña (fieldsByTab)
+  const baseFields = []
+  const fieldsByTab = {}
+
+  section.fields.forEach((f, idx) => {
+    const tab = f.pestaña?.trim()
+    if (!tab) {
+      baseFields.push({ field: f, idx })
+    } else {
+      if (!fieldsByTab[tab]) fieldsByTab[tab] = []
+      fieldsByTab[tab].push({ field: f, idx })
+    }
+  })
+
+  const tabs = Object.keys(fieldsByTab).sort()
+  const currentActiveTab = activeTab || (tabs.length > 0 ? tabs[0] : null)
+
+  return (
+    <div style={{ background: 'rgba(0, 0, 0, 0.18)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <input
+          value={section.name}
+          onChange={e => updateSecName(secIdx, e.target.value)}
+          style={{
+            flex: 1,
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            borderRadius: '8px',
+            padding: '7px 10px',
+            color: '#9ad1ff',
+            fontSize: '13px',
+            fontWeight: 600,
+            boxSizing: 'border-box',
+            outline: 'none',
+            fontFamily: 'inherit',
+            marginRight: '8px'
+          }}
+        />
+        <span style={{ fontSize: '10px', background: 'rgba(154, 209, 255, 0.12)', color: '#9ad1ff', padding: '2px 7px', borderRadius: '5px', border: '1px solid rgba(154, 209, 255, 0.20)', marginRight: '8px' }}>{section.fields.filter(f => f.nombre).length} campos</span>
+        {catSectionsCount > 1 && (
+          <button
+            onClick={() => removeSection(secIdx)}
+            style={{
+              background: 'rgba(255, 80, 80, 0.10)',
+              border: '1px solid rgba(255, 80, 80, 0.25)',
+              borderRadius: '10px',
+              color: '#fecaca',
+              fontSize: '12px',
+              padding: '6px 12px',
+              cursor: 'pointer'
+            }}
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {baseFields.length > 0 && (
+        <div>
+          {baseFields.map((item, baseFieldIdx) => (
+            <FieldRow
+              key={item.field.id}
+              field={item.field}
+              onChange={v => updateField(secIdx, item.idx, v)}
+              onRemove={() => removeField(secIdx, item.idx)}
+              showHeader={baseFieldIdx === 0 && baseFields.length > 0}
+              fieldIndex={baseFieldIdx}
+            />
+          ))}
+        </div>
+      )}
+
+      {tabs.length > 0 && (
+        <>
+          {tabs.length > 1 && (
+            <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', marginTop: baseFields.length > 0 ? '12px' : '0', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', overflowX: 'auto' }}>
+              {tabs.map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: currentActiveTab === tab ? '600' : '400',
+                    background: currentActiveTab === tab ? 'rgba(154, 209, 255, 0.15)' : 'transparent',
+                    border: currentActiveTab === tab ? '1px solid #9ad1ff' : '1px solid rgba(255, 255, 255, 0.08)',
+                    color: currentActiveTab === tab ? '#9ad1ff' : 'rgba(238, 244, 255, 0.6)',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
+                  }}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {tabs.length === 1 ? (
+            <div>
+              {fieldsByTab[tabs[0]].map((item, tabFieldIdx) => (
+                <FieldRow
+                  key={item.field.id}
+                  field={item.field}
+                  onChange={v => updateField(secIdx, item.idx, v)}
+                  onRemove={() => removeField(secIdx, item.idx)}
+                  showHeader={tabFieldIdx === 0}
+                  fieldIndex={tabFieldIdx}
+                />
+              ))}
+            </div>
+          ) : (
+            currentActiveTab && (
+              <div>
+                {fieldsByTab[currentActiveTab].map((item, tabFieldIdx) => (
+                  <FieldRow
+                    key={item.field.id}
+                    field={item.field}
+                    onChange={v => updateField(secIdx, item.idx, v)}
+                    onRemove={() => removeField(secIdx, item.idx)}
+                    showHeader={tabFieldIdx === 0}
+                    fieldIndex={tabFieldIdx}
+                  />
+                ))}
+              </div>
+            )
+          )}
+        </>
+      )}
+
+      <button
+        onClick={() => addField(secIdx)}
+        style={{
+          width: '100%',
+          background: 'rgba(255, 255, 255, 0.06)',
+          border: '1px solid rgba(255, 255, 255, 0.14)',
+          borderRadius: '10px',
+          color: '#e6e7eb',
+          fontSize: '12px',
+          padding: '6px 12px',
+          cursor: 'pointer',
+          marginTop: '8px'
+        }}
+      >
+        + Campo
+      </button>
     </div>
   )
 }
@@ -347,23 +597,43 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex }) {
         </div>
       </div>
       {expanded && (
-        <div style={{ marginBottom: '8px', paddingLeft: '12px', borderLeft: '2px solid var(--border-default)' }}>
-          <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Key</label>
-          <input
-            value={field.fieldKey}
-            onChange={e => onChange({ ...field, fieldKey: e.target.value.replace(/\s+/g, '').replace(/[^A-Za-z0-9_]/g, '') })}
-            placeholder={autoKey}
-            style={{
-              width: '100%',
-              padding: '6px 8px',
-              border: '1px solid var(--border-default)',
-              borderRadius: '4px',
-              fontSize: '12px',
-              backgroundColor: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              boxSizing: 'border-box'
-            }}
-          />
+        <div style={{ marginBottom: '8px', paddingLeft: '12px', borderLeft: '2px solid var(--border-default)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Key</label>
+            <input
+              value={field.fieldKey}
+              onChange={e => onChange({ ...field, fieldKey: e.target.value.replace(/\s+/g, '').replace(/[^A-Za-z0-9_]/g, '') })}
+              placeholder={autoKey}
+              style={{
+                width: '100%',
+                padding: '6px 8px',
+                border: '1px solid var(--border-default)',
+                borderRadius: '4px',
+                fontSize: '12px',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Pestaña</label>
+            <input
+              value={field.pestaña || 'Datos'}
+              onChange={e => onChange({ ...field, pestaña: e.target.value || 'Datos' })}
+              placeholder="Datos"
+              style={{
+                width: '100%',
+                padding: '6px 8px',
+                border: '1px solid var(--border-default)',
+                borderRadius: '4px',
+                fontSize: '12px',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
         </div>
       )}
     </>
@@ -376,7 +646,7 @@ export default function CategoryBuilder() {
     {
       id: newGuid(),
       name: 'CATEGORÍA 1',
-      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false }] }]
+      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: 'Datos' }] }]
     }
   ])
   const [activeCategory, setActiveCategory] = useState(0)
@@ -544,7 +814,7 @@ export default function CategoryBuilder() {
 
   const addField = (secIdx) => {
     const updated = [...categories]
-    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false })
+    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: 'Datos' })
     setCategories(updated)
   }
 
@@ -573,29 +843,188 @@ export default function CategoryBuilder() {
   }
 
   // Generate XML
+  // Map React field types to Therefore TypeNo
+  const typeToTypeNo = {
+    'text': '1',
+    'email': '1',
+    'date': '3',
+    'datetime': '7',
+    'number': '2',
+    'money': '5',
+    'boolean': '6',
+    'lookup': '15'
+  }
+
+  const bgr = (r, g, b) => b * 65536 + g * 256 + r
+
+  // Escape special XML characters
+  const escapeXml = (str) => {
+    if (!str) return ''
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+  }
+
+  // Sanitize field names and table names
+  const sanitizeName = (str) => {
+    return String(str || '')
+      .replace(/[^A-Za-z0-9_]/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '')
+      .toUpperCase()
+      .slice(0, 30)
+  }
+
+  const xmlCaption = (t) => `<Caption UPT="1"><TStr><T><L>1034</L><S>${escapeXml(t)}</S></T></TStr></Caption>`
+
+  const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width = 160, height = 14, posx = 102, posy = 0, taborder = 1, disporder = 1 }) => {
+    const lengthTag = typeno === '5' ? '<Length>18</Length>' : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '15' && length) ? `<Length>${length}</Length>` : ''
+    const dp = `<BClr>${bgr(255, 255, 255)}</BClr>`
+    const safeColname = escapeXml(colname)
+    const safeFieldid = escapeXml(fieldid)
+    return `<Field><FieldNo>${fieldno}</FieldNo><ColName>${safeColname}</ColName>${xmlCaption(caption)}<TypeNo>${typeno}</TypeNo>${lengthTag}<Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><TabOrderPos>${taborder}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${disporder}</DispOrderPos><RegExHelp UPT="1"><TStr></TStr></RegExHelp><Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+  }
+
+  const makeLabelField = ({ fieldno, fieldid, caption, width = 500, height = 13, posx = 5, posy = 0, fsize = 9, bold = false, tclr = null, bclr = null, al = null, pd = null, tabMeta = "" }) => {
+    let dp = `<Face>Arial</Face><FSize>${fsize}</FSize>`
+    if (bold) dp += `<Bol>1</Bol>`
+    if (tclr !== null) dp += `<TClr>${tclr}</TClr>`
+    if (bclr !== null) dp += `<BClr>${bclr}</BClr>`
+    if (al !== null) dp += `<Al>${al}</Al>`
+    if (pd !== null) dp += `<Pd>${pd}</Pd>`
+    const safeFieldid = escapeXml(fieldid)
+    return `<Field><FieldNo>${fieldno}</FieldNo>${xmlCaption(caption)}<TypeNo>4</TypeNo><Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><FullTextSearch>0</FullTextSearch>${tabMeta}</Field>`
+  }
+
+  const xmlRegEx = () => `<RegExHelp UPT="1"><TStr></TStr></RegExHelp>`
+
+  const tabMetaXml = (tabNo, belongsTo) => `<BelongsToTable>${belongsTo}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${tabNo}</ShowInTabNo>`
+
+  const foreignTableName = (tableName) => {
+    const camel = tableName.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
+    return `TheIxTable_${camel}_Hist`
+  }
+
+  const DIALOG_W = 530
+  const LBL_X1 = 5, LBL_W = 95
+  const FLD_X1 = 102, FLD_W = 160
+  const LBL_X2 = 270, FLD_X2 = 368, FLD_W2 = 152
+  const ROW_H = 14, LBL_H = 12
+  const ROW_GAP = 18, SEC_H = 13, SEC_GAP = 16, HDR_H = 42
+  const TAB_NO = -200, TABLE_NO = -201
+  const TAB_PAD_X = 5, TAB_PAD_Y = 44, TAB_MARGIN = 10
+
   const generateXml = () => {
     setError('')
-    if (!currentCategory.name.trim()) {
-      setError('El nombre de la categoría es obligatorio.')
-      return
-    }
 
-    const totalFields = currentCategory.sections.reduce((a, s) => a + s.fields.filter(f => f.nombre.trim()).length, 0)
-    if (totalFields === 0) {
+    const totalAllFields = categories.reduce((a, cat) => a + cat.sections.reduce((b, s) => b + s.fields.filter(f => f.nombre.trim()).length, 0), 0)
+    if (totalAllFields === 0) {
       setError('Añade al menos un campo.')
       return
     }
 
-    const fieldsXml = currentCategory.sections.map((sec) => {
-      const secFields = sec.fields.filter(f => f.nombre.trim()).map(f => `    <Field><Name>${f.nombre}</Name><Key>${f.fieldKey || toCamelKey(f.nombre)}</Key><Type>${f.tipo}</Type><Required>${f.required ? '1' : '0'}</Required></Field>`).join('\n')
-      return `  <Section name="${sec.name}">\n${secFields}\n  </Section>`
-    }).join('\n')
+    // Generate XML for ALL categories
+    const categoryBlocks = categories.map((cat, catIdx) => {
+      if (!cat.name.trim()) return ''
 
-    const newXml = `<?xml version="1.0" encoding="utf-8"?>
-<Category>
-  <Name>${currentCategory.name}</Name>
-${fieldsXml}
-</Category>`
+      const tableName = sanitizeName(cat.name)
+      const ctgryId = sanitizeName(cat.name)
+
+      // Check if any section has fields with pestaña
+      let hasMultipleTabs = false
+      const tabNames = new Set()
+      cat.sections.forEach(sec => {
+        sec.fields.forEach(f => {
+          const tab = f.pestaña?.trim()
+          if (tab) {
+            tabNames.add(tab)
+            if (tabNames.size > 1) hasMultipleTabs = true
+          }
+        })
+      })
+
+      const tabs = Array.from(tabNames).sort()
+      const hasTabs = hasMultipleTabs && tabs.length > 1
+      const tab1Name = tabs[0] || 'Datos'
+      const tab2Name = 'Historial'
+
+      let colNo = -202, fieldNo = -1, labelNo = -50
+      let fieldsXml = '', dispOrder = 1, tabOrder = 1
+      const tm = n => hasTabs ? tabMetaXml(n, TAB_NO) : ''
+
+      let yPos = hasTabs ? 8 : HDR_H + SEC_GAP
+      const sectionWidth = hasTabs ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
+
+      // Header (only if no tabs)
+      let headerXml = ''
+      if (!hasTabs) {
+        headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Title_${tableName}`, caption: cat.name, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 5 })
+      }
+
+      // Data fields
+      cat.sections.forEach((sec, si) => {
+        const validFields = sec.fields.filter(f => f.nombre.trim())
+        if (validFields.length === 0) return
+
+        // Section header
+        fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: tm(1) })
+        yPos += SEC_GAP
+
+        // Process fields in pairs
+        for (let i = 0; i < validFields.length; i += 2) {
+          const f1 = validFields[i]
+          const f2 = validFields[i + 1]
+
+          if (f1) {
+            const colname = sanitizeName(f1.fieldKey || f1.nombre)
+            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
+            const typeno = typeToTypeNo[f1.tipo] || '1'
+            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<BClr>${bgr(255, 255, 255)}</BClr>`, tabMeta: tm(1) })
+            fieldNo--
+          }
+
+          if (f2) {
+            const colname = sanitizeName(f2.fieldKey || f2.nombre)
+            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
+            const typeno = typeToTypeNo[f2.tipo] || '1'
+            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<BClr>${bgr(255, 255, 255)}</BClr>`, tabMeta: tm(1) })
+            fieldNo--
+          }
+
+          yPos += ROW_GAP
+        }
+        yPos += 6
+      })
+
+      const contentH = yPos + 10
+
+      // Tab Control XML
+      let tabXml = ''
+      if (hasTabs) {
+        const camel = tableName.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
+        const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
+        const tableH = Math.max(contentH, 240) - 30
+        const tabH2 = Math.max(contentH + 20, 260)
+
+        // Table field for Tab 2
+        tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption(tab2Name)}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>${foreignTableName(tableName)}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>2</ShowInTabNo><FieldID>Historial_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+
+        // Tab Control
+        tabXml += `<Field><FieldNo>${TAB_NO}</FieldNo>${xmlCaption('Datos')}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs><T FactoryType="1"><TabNo>1</TabNo><TabPos>1</TabPos><TabCapt><TStr><T><L>1034</L><S>${tab1Name}</S></T></TStr></TabCapt></T><T FactoryType="1"><TabNo>2</TabNo><TabPos>2</TabPos><TabCapt><TStr><T><L>1034</L><S>${tab2Name}</S></T></TStr></TabCapt></T></Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+      }
+
+      const dialogH = hasTabs ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
+      const allFields = cat.sections.flatMap(s => s.fields).filter(f => f.nombre.trim())
+      const titleFlds = [-1, -2, -3].slice(0, Math.min(3, allFields.length)).map(n => `<Fld>${n}</Fld>`).join('')
+      const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
+
+      return `<Category><CtgryNo>-${catIdx + 1}</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(cat.name)}</S></T></TStr></Name><Version>0</Version><Fields>${headerXml}${fieldsXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(cat.name)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${bgr(240, 240, 240)}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgryId}</CtgryID></Category>`
+    }).join('')
+
+    const newXml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${categoryBlocks}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
 
     setXml(newXml)
     setXmlModalOpen(true)
@@ -663,73 +1092,17 @@ ${fieldsXml}
         </div>
 
         {cat.sections.map((sec, secIdx) => (
-          <div key={sec.id} style={{ background: 'rgba(0, 0, 0, 0.18)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <input
-                value={sec.name}
-                onChange={e => updateSecName(secIdx, e.target.value)}
-                style={{
-                  flex: 1,
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
-                  borderRadius: '8px',
-                  padding: '7px 10px',
-                  color: '#9ad1ff',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                  fontFamily: 'inherit',
-                  marginRight: '8px'
-                }}
-              />
-              <span style={{ fontSize: '10px', background: 'rgba(154, 209, 255, 0.12)', color: '#9ad1ff', padding: '2px 7px', borderRadius: '5px', border: '1px solid rgba(154, 209, 255, 0.20)', marginRight: '8px' }}>{sec.fields.filter(f => f.nombre).length} campos</span>
-              {cat.sections.length > 1 && (
-                <button
-                  onClick={() => removeSection(secIdx)}
-                  style={{
-                    background: 'rgba(255, 80, 80, 0.10)',
-                    border: '1px solid rgba(255, 80, 80, 0.25)',
-                    borderRadius: '10px',
-                    color: '#fecaca',
-                    fontSize: '12px',
-                    padding: '6px 12px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-
-            {sec.fields.map((f, fieldIdx) => (
-              <FieldRow
-                key={f.id}
-                field={f}
-                onChange={v => updateField(secIdx, fieldIdx, v)}
-                onRemove={() => removeField(secIdx, fieldIdx)}
-                showHeader={fieldIdx === 0}
-                fieldIndex={fieldIdx}
-              />
-            ))}
-
-            <button
-              onClick={() => addField(secIdx)}
-              style={{
-                width: '100%',
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.14)',
-                borderRadius: '10px',
-                color: '#e6e7eb',
-                fontSize: '12px',
-                padding: '6px 12px',
-                cursor: 'pointer',
-                marginTop: '8px'
-              }}
-            >
-              + Campo
-            </button>
-          </div>
+          <SectionEditor
+            key={sec.id}
+            section={sec}
+            secIdx={secIdx}
+            updateField={updateField}
+            removeField={removeField}
+            addField={addField}
+            updateSecName={updateSecName}
+            removeSection={removeSection}
+            catSectionsCount={cat.sections.length}
+          />
         ))}
 
         <button
@@ -843,37 +1216,28 @@ ${fieldsXml}
                   <div style={{ background: '#185FA5', color: '#fff', borderRadius: '6px 6px 0 0', padding: '16px', marginLeft: '-20px', marginRight: '-20px', marginTop: '-20px', marginBottom: '20px' }}>
                     <div style={{ fontSize: '16px', fontWeight: '700' }}>{categories[parseInt(tab.key)].name}</div>
                   </div>
-                  {categories[parseInt(tab.key)].sections.map((sec, si) => (
-                    <div key={si} style={{ marginBottom: '20px' }}>
-                      <h4 style={{ fontSize: '11px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '.06em', borderBottom: '1px solid #e5e7eb', paddingBottom: '5px', marginBottom: '12px' }}>
-                        {sec.name}
-                      </h4>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                        {sec.fields.filter(f => f.nombre).map((f, fi) => {
-                          const controlMap = {
-                            text: <input type="text" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-                            email: <input type="email" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-                            phone: <input type="tel" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-                            date: <input type="date" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-                            datetime: <input type="datetime-local" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-                            number: <input type="number" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-                            money: <input type="number" step="0.01" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-                            boolean: <input type="checkbox" style={{ width: '20px', height: '20px', accentColor: '#185FA5' }} />,
-                            lookup: <select style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }}><option>-- Selecciona --</option></select>
-                          }
-                          return (
-                            <div key={fi}>
-                              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
-                                {f.nombre}
-                                {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
-                              </label>
-                              {controlMap[f.tipo] || controlMap.text}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                  {categories[parseInt(tab.key)].sections.map((sec, si) => {
+                    // Separate fields: those without pestaña (baseFields) and those with pestaña
+                    const baseFields = []
+                    const fieldsByTab = {}
+
+                    sec.fields.forEach(f => {
+                      if (!f.nombre) return // Skip empty fields
+                      const tabName = f.pestaña?.trim()
+                      if (!tabName) {
+                        baseFields.push(f)
+                      } else {
+                        if (!fieldsByTab[tabName]) fieldsByTab[tabName] = []
+                        fieldsByTab[tabName].push(f)
+                      }
+                    })
+
+                    const secTabs = Object.keys(fieldsByTab).sort()
+
+                    return (
+                      <PreviewSection key={si} sectionName={sec.name} fieldsByTab={fieldsByTab} baseFields={baseFields} tabs={secTabs} />
+                    )
+                  })}
                   <button style={{ background: '#185FA5', color: '#fff', border: 'none', borderRadius: '6px', padding: '10px 24px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginTop: '12px' }}>
                     Enviar
                   </button>
@@ -895,6 +1259,60 @@ ${fieldsXml}
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
           }}>
             <div style={{ fontSize: '11px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Categorías ({categories.length})</div>
+
+            {/* Categories name editor */}
+            <div style={{ marginBottom: '14px', padding: '12px', background: 'rgba(0, 0, 0, 0.2)', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: 'rgba(238, 244, 255, 0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nombres definitivos</div>
+                <button
+                  onClick={() => {
+                    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+                    setCategories(categories.map(cat => ({
+                      ...cat,
+                      name: cat.name.trim() ? `${cat.name} ${timestamp}` : `Categoría ${timestamp}`
+                    })))
+                  }}
+                  style={{
+                    fontSize: '10px',
+                    padding: '4px 8px',
+                    background: 'rgba(154, 209, 255, 0.15)',
+                    border: '1px solid rgba(154, 209, 255, 0.3)',
+                    color: '#9ad1ff',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    whiteSpace: 'nowrap'
+                  }}
+                  title="Agrega la fecha actual a los nombres para hacerlos únicos"
+                >
+                  📅 Agregar fecha
+                </button>
+              </div>
+              <div style={{ display: 'grid', gap: '6px' }}>
+                {categories.map((cat, idx) => (
+                  <input
+                    key={cat.id}
+                    value={cat.name}
+                    onChange={e => updateCategoryName(idx, e.target.value)}
+                    placeholder={`Categoría ${idx + 1}`}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.18)',
+                      borderRadius: '6px',
+                      color: '#9ad1ff',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      boxSizing: 'border-box',
+                      outline: 'none',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 onClick={generateXml}
