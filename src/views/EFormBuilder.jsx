@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import React from 'react'
-import { Modal, Button, message } from 'antd'
+import { Modal, Button, message, Spin } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import '../styles/eform-builder.css'
@@ -536,6 +536,9 @@ export default function EFormBuilder() {
   const [xmlModalOpen, setXmlModalOpen] = useState(false)
   const [formId, setFormId] = useState(null)
   const [isNew, setIsNew] = useState(true)
+  const [managerOpen, setManagerOpen] = useState(false)
+  const [savedForms, setSavedForms] = useState([])
+  const [loadingForms, setLoadingForms] = useState(false)
 
   const newField = () => ({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, readOnly: false, placeholder: '', defaultValue: '', maxLength: '', options: '' })
   const newSection = (name = 'GENERAL') => ({ id: newGuid(), name, fields: [newField()] })
@@ -644,6 +647,118 @@ export default function EFormBuilder() {
     document.body.removeChild(a)
   }
 
+  const loadSavedForms = async () => {
+    setLoadingForms(true)
+    try {
+      const { data, error } = await supabase
+        .from('eforms')
+        .select('*')
+        .eq('created_by', user?.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setSavedForms(data || [])
+    } catch (err) {
+      message.error('Error cargando formularios: ' + err.message)
+    } finally {
+      setLoadingForms(false)
+    }
+  }
+
+  const parseFormioField = (field) => {
+    const tipo = {
+      'textfield': 'text',
+      'email': 'email',
+      'phoneNumber': 'phone',
+      'datetime': field.enableTime ? 'datetime' : 'date',
+      'number': 'number',
+      'currency': 'money',
+      'checkbox': 'checkbox',
+      'select': 'select'
+    }[field.type] || 'text'
+
+    return {
+      id: newGuid(),
+      nombre: field.label || '',
+      fieldKey: field.key || '',
+      tipo: tipo,
+      required: field.validate?.required || false,
+      readOnly: field.disabled || false,
+      placeholder: field.placeholder || '',
+      defaultValue: field.defaultValue || '',
+      maxLength: field.validate?.maxLength?.toString() || '',
+      options: field.data?.values?.map(v => `${v.value}=${v.label}`).join('\n') || ''
+    }
+  }
+
+  const loadFormToEditor = (form) => {
+    try {
+      // Extraer el JSON de Form.io del XML
+      const parser = new DOMParser()
+      const xmlDoc = parser.parseFromString(form.definition, 'text/xml')
+      const fdefNode = xmlDoc.querySelector('FDef')
+
+      if (!fdefNode) throw new Error('No se encontró FDef en el XML')
+
+      const formioJson = JSON.parse(fdefNode.textContent)
+
+      // Cargar datos básicos
+      setFormName(form.name)
+      setDescription(form.description || '')
+      setFormId(form.form_id)
+      setIsNew(false)
+
+      // Reconstruir secciones desde el JSON de Form.io
+      const newSections = []
+      const components = formioJson.components || []
+
+      components.forEach((comp) => {
+        if (comp.type === 'panel') {
+          const section = {
+            id: newGuid(),
+            name: comp.label || 'PANEL',
+            fields: []
+          }
+
+          if (comp.components && Array.isArray(comp.components)) {
+            comp.components.forEach((field) => {
+              if (field.type === 'columns') {
+                // Columna con múltiples campos
+                field.columns?.forEach((col) => {
+                  col.components?.forEach((innerField) => {
+                    section.fields.push(parseFormioField(innerField))
+                  })
+                })
+              } else if (field.type !== 'button') {
+                // Campo individual
+                section.fields.push(parseFormioField(field))
+              }
+            })
+          }
+
+          if (section.fields.length > 0) {
+            newSections.push(section)
+          }
+        }
+      })
+
+      // Si no hay secciones, crear una por defecto
+      if (newSections.length === 0) {
+        newSections.push({
+          id: newGuid(),
+          name: 'GENERAL',
+          fields: []
+        })
+      }
+
+      setSections(newSections)
+      setManagerOpen(false)
+      message.success('Formulario cargado')
+    } catch (err) {
+      message.error('Error cargando formulario: ' + err.message)
+    }
+  }
+
   const totalFields = sections.flatMap(s => s.fields).filter(f => f.nombre.trim()).length
 
   return (
@@ -666,6 +781,7 @@ export default function EFormBuilder() {
             ))}
           </div>
           {error && <div className="eform-error-inline">{error}</div>}
+          <button className="eform-btn" onClick={() => { setManagerOpen(true); loadSavedForms() }}>📚 Mis Formularios</button>
           <button className="eform-btn-primary" onClick={generate}>Generar XML →</button>
         </div>
       </div>
@@ -764,6 +880,80 @@ export default function EFormBuilder() {
           </div>
         </div>
       )}
+
+      {/* Forms Manager Modal */}
+      <Modal
+        title="Mis Formularios"
+        open={managerOpen}
+        onCancel={() => setManagerOpen(false)}
+        width="80%"
+        footer={<Button onClick={() => setManagerOpen(false)}>Cerrar</Button>}
+      >
+        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+          {loadingForms ? (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <Spin size="large" />
+            </div>
+          ) : savedForms.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              No hay formularios guardados
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {savedForms.map((form) => (
+                <div
+                  key={form.id}
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '12px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                      {form.name}
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                      {form.description || 'Sin descripción'}
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                      {new Date(form.created_at).toLocaleDateString('es-ES')}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <Button
+                      type="primary"
+                      onClick={() => loadFormToEditor(form)}
+                    >
+                      ✎ Editar
+                    </Button>
+                    <Button
+                      danger
+                      onClick={async () => {
+                        if (window.confirm(`¿Eliminar "${form.name}"?`)) {
+                          try {
+                            await supabase.from('eforms').delete().eq('id', form.id)
+                            message.success('Eliminado')
+                            loadSavedForms()
+                          } catch (err) {
+                            message.error('Error: ' + err.message)
+                          }
+                        }
+                      }}
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Modal>
 
       {/* XML Modal */}
       <Modal
