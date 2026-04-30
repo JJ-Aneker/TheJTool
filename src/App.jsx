@@ -33,7 +33,6 @@ import UserManager from './views/UserManager'
 import TemplateManager from './views/TemplateManager'
 import WebServicesManager from './views/WebServicesManager'
 import EFormBuilder from './views/EFormBuilder'
-import EFormManager from './views/EFormManager'
 import Placeholder from './views/Placeholder'
 
 const { Sider, Content } = Layout
@@ -57,12 +56,6 @@ const getMenuItems = () => [
     icon: <FormOutlined />,
     label: 'Generador de eForms',
     path: '/eforms'
-  },
-  {
-    key: 'eforms-manager',
-    icon: <FileTextOutlined />,
-    label: 'Mis Formularios',
-    path: '/eforms-manager'
   },
     {
     key: 'category-builder',
@@ -378,7 +371,6 @@ function AppContent() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<UserManager />} />
             <Route path="/eforms" element={<EFormBuilder />} />
-            <Route path="/eforms-manager" element={<EFormManager />} />
             <Route path="/category-cloner" element={<Placeholder icon={<CopyOutlined />} title="Clonador de Categorías" description="Próximamente: Integración de tu Category Cloner mejorado" />} />
             <Route path="/tenants" element={<Placeholder icon={<CloudOutlined />} title="Gestión de Tenants" description="Próximamente: Integración de tu Tenant Manager mejorado" />} />
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
