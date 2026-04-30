@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin } from 'antd'
-import { DeleteOutlined, DownloadOutlined, CopyOutlined, ShareOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 
