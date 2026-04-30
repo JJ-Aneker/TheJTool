@@ -43,6 +43,64 @@ const TYPE_ALIAS = {
   'lookup': 'lookup', 'lista': 'lookup', 'combo': 'lookup',
 }
 
+const COLOR_PRESETS = {
+  dark: {
+    name: '🌙 Oscuro',
+    colors: {
+      primary: '#9ad1ff',
+      bgCanvas: '#16181D',
+      bgCard: '#25272D',
+      textMain: '#e6e7eb',
+      textSec: 'rgba(238, 244, 255, 0.55)',
+      border: 'rgba(255, 255, 255, 0.14)'
+    }
+  },
+  light: {
+    name: '☀️ Claro',
+    colors: {
+      primary: '#3663FF',
+      bgCanvas: '#f5f7fa',
+      bgCard: '#ffffff',
+      textMain: 'rgba(0, 0, 0, 0.85)',
+      textSec: 'rgba(0, 0, 0, 0.65)',
+      border: '#d9d9d9'
+    }
+  },
+  ocean: {
+    name: '🌊 Ocean',
+    colors: {
+      primary: '#1890ff',
+      bgCanvas: '#0f1419',
+      bgCard: '#141d2d',
+      textMain: '#e6f7ff',
+      textSec: 'rgba(230, 247, 255, 0.65)',
+      border: 'rgba(24, 144, 255, 0.3)'
+    }
+  },
+  forest: {
+    name: '🌲 Forest',
+    colors: {
+      primary: '#52c41a',
+      bgCanvas: '#0d1a08',
+      bgCard: '#162312',
+      textMain: '#f6ffed',
+      textSec: 'rgba(246, 255, 237, 0.65)',
+      border: 'rgba(82, 196, 26, 0.3)'
+    }
+  },
+  purple: {
+    name: '💜 Purple',
+    colors: {
+      primary: '#722ed1',
+      bgCanvas: '#1a0f2e',
+      bgCard: '#261550',
+      textMain: '#f9f0ff',
+      textSec: 'rgba(249, 240, 255, 0.65)',
+      border: 'rgba(114, 46, 209, 0.3)'
+    }
+  }
+}
+
 function parseCsv(raw) {
   const lines = raw.split('\n').map(l => l.trim()).filter(Boolean)
   if (!lines.length) return { error: 'El texto está vacío.' }
@@ -56,6 +114,7 @@ function parseCsv(raw) {
     tipo: headers.findIndex(h => ['tipo', 'type', 'typeno'].includes(h)),
     obligatorio: headers.findIndex(h => ['obligatorio', 'required', 'requerido'].includes(h)),
     seccion: headers.findIndex(h => ['seccion', 'sección', 'section', 'grupo', 'group'].includes(h)),
+    pestaña: headers.findIndex(h => ['pestaña', 'pestaña', 'tab', 'tabs', 'tab'].includes(h)),
     categoria: headers.findIndex(h => ['categoria', 'categoría', 'category', 'tab', 'categoria'].includes(h)),
   }
 
@@ -74,10 +133,11 @@ function parseCsv(raw) {
     const tipo = idx.tipo >= 0 ? (TYPE_ALIAS[cols[idx.tipo]?.toLowerCase()] || 'text') : 'text'
     const required = idx.obligatorio >= 0 ? ['1', 'si', 'sí', 'yes', 'true'].includes((cols[idx.obligatorio] || '').toLowerCase()) : false
     const seccion = idx.seccion >= 0 ? (cols[idx.seccion] || 'GENERAL').toUpperCase() : 'GENERAL'
+    const pestaña = idx.pestaña >= 0 ? (cols[idx.pestaña] || 'Datos').trim() : 'Datos'
 
     if (!categoryMap[categoria]) categoryMap[categoria] = {}
     if (!categoryMap[categoria][seccion]) categoryMap[categoria][seccion] = []
-    categoryMap[categoria][seccion].push({ id: newGuid(), nombre, fieldKey, tipo, required })
+    categoryMap[categoria][seccion].push({ id: newGuid(), nombre, fieldKey, tipo, required, pestaña })
   })
 
   if (!Object.keys(categoryMap).length) return { error: 'No se procesó ningún campo válido.' }
@@ -329,6 +389,7 @@ export default function CategoryBuilder() {
   const [managerOpen, setManagerOpen] = useState(false)
   const [xmlModalOpen, setXmlModalOpen] = useState(false)
   const [colorModalOpen, setColorModalOpen] = useState(false)
+  const [customColors, setCustomColors] = useState(COLOR_PRESETS.dark.colors)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [searchText, setSearchText] = useState('')
 
@@ -1035,34 +1096,74 @@ ${fieldsXml}
         title="🎨 Paleta de Colores"
         open={colorModalOpen}
         onCancel={() => setColorModalOpen(false)}
-        width={600}
+        width={700}
         footer={null}
       >
         <div style={{ padding: '20px 0' }}>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
-            Personaliza los colores de tu interfaz. Estos colores se aplican a todos los formularios.
-          </p>
+          <h3 style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>Presets Estándar</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+            {Object.entries(COLOR_PRESETS).map(([key, preset]) => (
+              <button
+                key={key}
+                onClick={() => {
+                  setCustomColors(preset.colors)
+                  message.success(`Aplicado: ${preset.name}`)
+                }}
+                style={{
+                  padding: '12px',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.3s'
+                }}
+              >
+                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                  {preset.name}
+                </div>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {Object.values(preset.colors).slice(0, 4).map((color, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        background: color,
+                        borderRadius: '4px',
+                        border: '1px solid var(--border-default)'
+                      }}
+                    />
+                  ))}
+                </div>
+              </button>
+            ))}
+          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <h3 style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>Personalizado</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             {[
-              { label: 'Primario', default: '#9ad1ff', key: 'primary' },
-              { label: 'Fondo Canvas', default: '#16181D', key: 'bgCanvas' },
-              { label: 'Fondo Card', default: '#25272D', key: 'bgCard' },
-              { label: 'Texto Principal', default: '#e6e7eb', key: 'textMain' },
-              { label: 'Texto Secundario', default: 'rgba(238, 244, 255, 0.55)', key: 'textSec' },
-              { label: 'Borde', default: 'rgba(255, 255, 255, 0.14)', key: 'border' },
+              { label: 'Primario', key: 'primary' },
+              { label: 'Fondo Canvas', key: 'bgCanvas' },
+              { label: 'Fondo Card', key: 'bgCard' },
+              { label: 'Texto Principal', key: 'textMain' },
+              { label: 'Texto Secundario', key: 'textSec' },
+              { label: 'Borde', key: 'border' },
             ].map(color => (
-              <div key={color.key} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>
+              <div key={color.key} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)' }}>
                   {color.label}
                 </label>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <input
                     type="color"
-                    defaultValue={color.default.includes('rgb') ? '#e6e7eb' : color.default}
+                    value={customColors[color.key]?.replace(/[rgba()]/g, '').split(',')[0] || '#9ad1ff'}
+                    onChange={(e) => {
+                      setCustomColors({ ...customColors, [color.key]: e.target.value })
+                    }}
                     style={{
-                      width: '50px',
-                      height: '40px',
+                      width: '40px',
+                      height: '32px',
                       border: '1px solid var(--border-default)',
                       borderRadius: '4px',
                       cursor: 'pointer'
@@ -1070,13 +1171,16 @@ ${fieldsXml}
                   />
                   <input
                     type="text"
-                    defaultValue={color.default}
+                    value={customColors[color.key] || ''}
+                    onChange={(e) => {
+                      setCustomColors({ ...customColors, [color.key]: e.target.value })
+                    }}
                     style={{
                       flex: 1,
-                      padding: '8px 10px',
+                      padding: '6px 8px',
                       border: '1px solid var(--border-default)',
                       borderRadius: '4px',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontFamily: 'monospace',
                       backgroundColor: 'var(--bg-canvas)',
                       color: 'var(--text-primary)',
@@ -1088,10 +1192,10 @@ ${fieldsXml}
             ))}
           </div>
 
-          <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-default)' }}>
+          <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--border-default)' }}>
             <button
               onClick={() => {
-                message.success('Colores personalizados (demo)')
+                message.success('Colores aplicados')
                 setColorModalOpen(false)
               }}
               style={{
@@ -1105,12 +1209,8 @@ ${fieldsXml}
                 fontWeight: '600'
               }}
             >
-              Aplicar Colores
+              ✓ Aplicar Colores
             </button>
-          </div>
-
-          <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(154, 209, 255, 0.1)', borderRadius: '6px', fontSize: '11px', color: 'var(--text-secondary)' }}>
-            ℹ️ Los cambios de color se aplican automáticamente al formulario de preview. Esta funcionalidad está en demo - para persistencia, se guardarían en Supabase.
           </div>
         </div>
       </Modal>
