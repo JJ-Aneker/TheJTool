@@ -29,16 +29,10 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Home from './views/Home'
 import Login from './views/Login'
 import UserProfile from './views/UserProfile'
-import EFormGenerator from './views/EFormGenerator'
-import CategoryCloner from './views/CategoryCloner'
-import TenantManager from './views/TenantManager'
-import ApiExplorer from './views/ApiExplorer'
-import CategoryBuilder from './views/CategoryBuilder'
-import ProjectDocs from './views/ProjectDocs'
-import WorkflowSettings from './views/WorkflowSettings'
 import UserManager from './views/UserManager'
 import TemplateManager from './views/TemplateManager'
 import WebServicesManager from './views/WebServicesManager'
+import Placeholder from './views/Placeholder'
 
 const { Sider, Content } = Layout
 
@@ -375,13 +369,13 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<UserManager />} />
-            <Route path="/eforms" element={<EFormGenerator />} />
-            <Route path="/category-cloner" element={<CategoryCloner />} />
-            <Route path="/tenants" element={<TenantManager />} />
-            <Route path="/api-explorer" element={<ApiExplorer />} />
-            <Route path="/category-builder" element={<CategoryBuilder />} />
-            <Route path="/docs" element={<ProjectDocs />} />
-            <Route path="/workflows" element={<WorkflowSettings />} />
+            <Route path="/eforms" element={<Placeholder icon={<FormOutlined />} title="Generador de eForms" description="Próximamente: Integración de tu eForms Builder mejorado" />} />
+            <Route path="/category-cloner" element={<Placeholder icon={<CopyOutlined />} title="Clonador de Categorías" description="Próximamente: Integración de tu Category Cloner mejorado" />} />
+            <Route path="/tenants" element={<Placeholder icon={<CloudOutlined />} title="Gestión de Tenants" description="Próximamente: Integración de tu Tenant Manager mejorado" />} />
+            <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
+            <Route path="/category-builder" element={<Placeholder icon={<AppstoreOutlined />} title="Category Builder" description="Próximamente: Integración de tu Category Builder mejorado" />} />
+            <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" description="Próximamente: Documentación del proyecto" />} />
+            <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" description="Próximamente: Integración de tu Workflow Manager mejorado" />} />
             <Route path="/templates" element={<TemplateManager />} />
             <Route path="/web-services" element={<WebServicesManager />} />
           </Routes>
