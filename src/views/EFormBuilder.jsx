@@ -335,32 +335,24 @@ function CsvImporter({ onImport }) {
               ) : (
                 <>
                   <div className="eform-preview-info">✓ {total} campos · {preview.sections.length} panel(es)</div>
+                  <div className="eform-table-header">
+                    <div className="eform-table-col">Nombre</div>
+                    <div className="eform-table-col">Key</div>
+                    <div className="eform-table-col">Tipo</div>
+                  </div>
                   <div className="eform-sections-list">
-                    <table className="eform-table-compact">
-                      <thead>
-                        <tr>
-                          <th>Nombre</th>
-                          <th>Key</th>
-                          <th>Tipo</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {preview.sections.map((sec, si) => (
-                          <React.Fragment key={si}>
-                            <tr className="eform-table-section">
-                              <td colSpan="3" className="eform-section-header">{sec.name}</td>
-                            </tr>
-                            {sec.fields.map((f, fi) => (
-                              <tr key={fi}>
-                                <td>{f.nombre}</td>
-                                <td className="eform-table-key">{f.fieldKey}</td>
-                                <td className="eform-table-type">{f.tipo}{f.required ? ' ✱' : ''}</td>
-                              </tr>
-                            ))}
-                          </React.Fragment>
+                    {preview.sections.map((sec, si) => (
+                      <div key={si}>
+                        <div className="eform-section-header-row">{sec.name}</div>
+                        {sec.fields.map((f, fi) => (
+                          <div key={fi} className="eform-table-row">
+                            <div className="eform-table-col">{f.nombre}</div>
+                            <div className="eform-table-col eform-table-key">{f.fieldKey}</div>
+                            <div className="eform-table-col eform-table-type">{f.tipo}{f.required ? ' ✱' : ''}</div>
+                          </div>
                         ))}
-                      </tbody>
-                    </table>
+                      </div>
+                    ))}
                   </div>
                   {preview.warnings?.length > 0 && (
                     <div className="eform-warnings">
