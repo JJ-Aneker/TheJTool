@@ -30,6 +30,7 @@ const FIELD_TYPES = [
   { value: 'money', label: 'Importe (€)' },
   { value: 'boolean', label: 'Sí/No' },
   { value: 'lookup', label: 'Búsqueda' },
+  { value: 'image', label: 'Imagen' },
 ]
 
 const TYPE_ALIAS = {
@@ -41,6 +42,7 @@ const TYPE_ALIAS = {
   'money': 'money', 'importe': 'money', 'decimal': 'money',
   'boolean': 'boolean', 'bool': 'boolean', 'lógico': 'boolean',
   'lookup': 'lookup', 'lista': 'lookup', 'combo': 'lookup',
+  'image': 'image', 'imagen': 'image', 'foto': 'image',
 }
 
 const COLOR_PRESETS = {
@@ -852,7 +854,8 @@ export default function CategoryBuilder() {
     'number': '2',
     'money': '5',
     'boolean': '6',
-    'lookup': '15'
+    'lookup': '15',
+    'image': '12'
   }
 
   const bgr = (r, g, b) => b * 65536 + g * 256 + r
@@ -880,16 +883,17 @@ export default function CategoryBuilder() {
 
   const xmlCaption = (t) => `<Caption UPT="1"><TStr><T><L>1034</L><S>${escapeXml(t)}</S></T></TStr></Caption>`
 
-  const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width = 160, height = 14, posx = 102, posy = 0, taborder = 1, disporder = 1 }) => {
-    const lengthTag = typeno === '5' ? '<Length>18</Length>' : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '15' && length) ? `<Length>${length}</Length>` : ''
-    const dp = `<BClr>${bgr(255, 255, 255)}</BClr>`
+  const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width = 160, height = 14, posx = 102, posy = 0, taborder = 1, disporder = 1, font = 'Segoe UI', fsize = 9, tabMeta = "" }) => {
+    // Boolean (TypeNo 6) and lookups don't have Length, nor do dates/timestamps/images
+    const lengthTag = (typeno === '5') ? '<Length>18</Length>' : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '12' && typeno !== '15' && length) ? `<Length>${length}</Length>` : ''
+    const dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
     const safeColname = escapeXml(colname)
     const safeFieldid = escapeXml(fieldid)
     return `<Field><FieldNo>${fieldno}</FieldNo><ColName>${safeColname}</ColName>${xmlCaption(caption)}<TypeNo>${typeno}</TypeNo>${lengthTag}<Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><TabOrderPos>${taborder}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${disporder}</DispOrderPos><RegExHelp UPT="1"><TStr></TStr></RegExHelp><Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
   }
 
-  const makeLabelField = ({ fieldno, fieldid, caption, width = 500, height = 13, posx = 5, posy = 0, fsize = 9, bold = false, tclr = null, bclr = null, al = null, pd = null, tabMeta = "" }) => {
-    let dp = `<Face>Arial</Face><FSize>${fsize}</FSize>`
+  const makeLabelField = ({ fieldno, fieldid, caption, width = 500, height = 13, posx = 5, posy = 0, font = 'Segoe UI', fsize = 9, bold = false, tclr = null, bclr = null, al = null, pd = null, tabMeta = "" }) => {
+    let dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
     if (bold) dp += `<Bol>1</Bol>`
     if (tclr !== null) dp += `<TClr>${tclr}</TClr>`
     if (bclr !== null) dp += `<BClr>${bclr}</BClr>`
@@ -897,6 +901,11 @@ export default function CategoryBuilder() {
     if (pd !== null) dp += `<Pd>${pd}</Pd>`
     const safeFieldid = escapeXml(fieldid)
     return `<Field><FieldNo>${fieldno}</FieldNo>${xmlCaption(caption)}<TypeNo>4</TypeNo><Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><FullTextSearch>0</FullTextSearch>${tabMeta}</Field>`
+  }
+
+  const makeImageField = ({ fieldno, fieldid, caption, width = 133, height = 27, posx = 0, posy = 0, tabMeta = "" }) => {
+    const safeFieldid = escapeXml(fieldid)
+    return `<Field><FieldNo>${fieldno}</FieldNo>${xmlCaption(caption)}<TypeNo>12</TypeNo><Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><FullTextSearch>0</FullTextSearch>${tabMeta}</Field>`
   }
 
   const xmlRegEx = () => `<RegExHelp UPT="1"><TStr></TStr></RegExHelp>`
@@ -982,7 +991,7 @@ export default function CategoryBuilder() {
             const colname = sanitizeName(f1.fieldKey || f1.nombre)
             fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
             const typeno = typeToTypeNo[f1.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<BClr>${bgr(255, 255, 255)}</BClr>`, tabMeta: tm(1) })
+            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
             fieldNo--
           }
 
@@ -990,7 +999,7 @@ export default function CategoryBuilder() {
             const colname = sanitizeName(f2.fieldKey || f2.nombre)
             fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
             const typeno = typeToTypeNo[f2.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<BClr>${bgr(255, 255, 255)}</BClr>`, tabMeta: tm(1) })
+            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
             fieldNo--
           }
 

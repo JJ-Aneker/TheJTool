@@ -1,0 +1,21 @@
+Nombre;Tipo;Obligatorio;Sección;Categoría
+ID Empleado;text;si;General;Recursos Humanos
+Nombre Completo;text;si;General;Recursos Humanos
+Correo Electrónico;email;si;General;Recursos Humanos
+Fecha Contratación;date;si;General;Recursos Humanos
+Fecha Nacimiento;date;no;General;Recursos Humanos
+Hora Entrada;datetime;no;General;Recursos Humanos
+Salario Base;money;si;Compensación;Recursos Humanos
+Código Postal;number;no;Compensación;Recursos Humanos
+Antigüedad (años);number;no;Compensación;Recursos Humanos
+Activo;boolean;si;Estado;Recursos Humanos
+Tiene Seguro;boolean;no;Estado;Recursos Humanos
+
+Código Proyecto;text;si;General;Proyectos
+Nombre Proyecto;text;si;General;Proyectos
+Responsable;text;no;General;Proyectos
+Fecha Inicio;date;si;General;Proyectos
+Fecha Estimada Fin;date;no;General;Proyectos
+Presupuesto;money;si;Financiero;Proyectos
+Horas Estimadas;number;si;Financiero;Proyectos
+Completado;boolean;si;Estado;Proyectos
