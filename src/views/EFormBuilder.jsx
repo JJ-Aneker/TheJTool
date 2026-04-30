@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import React from 'react'
-import { Modal, Button } from 'antd'
+import { Modal, Button, message } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import '../styles/eform-builder.css'
@@ -534,6 +534,8 @@ export default function EFormBuilder() {
   const [activeView, setActiveView] = useState('editor')
   const [saving, setSaving] = useState(false)
   const [xmlModalOpen, setXmlModalOpen] = useState(false)
+  const [formId, setFormId] = useState(null)
+  const [isNew, setIsNew] = useState(true)
 
   const newField = () => ({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, readOnly: false, placeholder: '', defaultValue: '', maxLength: '', options: '' })
   const newSection = (name = 'GENERAL') => ({ id: newGuid(), name, fields: [newField()] })
@@ -577,18 +579,37 @@ export default function EFormBuilder() {
     if (!xml) return
     setSaving(true)
     try {
-      const { error: err } = await supabase.from('eforms').insert({
-        name: formName,
-        definition: xml,
-        description: description,
-        created_by: user?.id,
-        created_at: new Date().toISOString()
-      })
-      if (err) throw err
-      // TODO: Show success message
-      console.log('eForms guardado exitosamente')
+      const newFormId = formId || newGuid()
+
+      // Si es nuevo, INSERT. Si existe, UPDATE
+      if (isNew) {
+        const { error: err } = await supabase.from('eforms').insert({
+          form_id: newFormId,
+          name: formName,
+          definition: xml,
+          description: description,
+          created_by: user?.id
+        })
+        if (err) throw err
+        setFormId(newFormId)
+        setIsNew(false)
+      } else {
+        const { error: err } = await supabase
+          .from('eforms')
+          .update({
+            name: formName,
+            definition: xml,
+            description: description,
+            updated_at: new Date().toISOString()
+          })
+          .eq('form_id', formId)
+        if (err) throw err
+      }
+
+      message.success(isNew ? '✓ Formulario guardado' : '✓ Formulario actualizado')
+      setXmlModalOpen(false)
     } catch (err) {
-      setError('Error al guardar: ' + err.message)
+      message.error('Error: ' + err.message)
     } finally {
       setSaving(false)
     }
