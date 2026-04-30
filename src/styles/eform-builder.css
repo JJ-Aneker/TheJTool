@@ -665,20 +665,23 @@
 }
 
 .eform-table-compact thead {
-  background: rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
 }
 
 .eform-table-compact th {
   color: #ffffff;
   font-weight: 600;
   text-align: left;
-  padding: 6px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .eform-table-compact td {
   color: var(--text-secondary);
-  padding: 6px 8px;
+  padding: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
