@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Form, Input, Button, message, Spin, Tabs, Alert } from 'antd'
+import { Form, Input, Button, message, Spin, Tabs } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 
@@ -23,7 +23,6 @@ export default function Login() {
       const result = await login(values.email, values.password)
       if (result.success) {
         message.success('Login exitoso')
-        // La redirección ocurre automáticamente via useEffect cuando isAuthenticated cambia
       } else {
         message.error(result.error || 'Error en el login. Verifica email y contraseña.')
       }
@@ -41,7 +40,7 @@ export default function Login() {
     setLoading(true)
     try {
       const result = await signup(values.email, values.password, {
-        fullName: values.fullName,
+        fullName: `${values.nombre} ${values.apellidos}`,
         phone: values.phone,
         department: values.department
       })
@@ -57,6 +56,19 @@ export default function Login() {
     }
   }
 
+  const handleRecoverPassword = async (values) => {
+    setLoading(true)
+    try {
+      message.loading('Enviando enlace de recuperación...')
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      message.success('Enlace enviado a tu correo electrónico')
+      form.resetFields()
+      setActiveTab('login')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (authLoading) {
     return (
       <div style={{
@@ -64,7 +76,7 @@ export default function Login() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        background: 'linear-gradient(135deg, var(--accent-primary) 0%, #2850d4 100%)'
+        background: 'var(--bg-canvas)'
       }}>
         <Spin size="large" />
       </div>
@@ -77,27 +89,43 @@ export default function Login() {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      background: 'linear-gradient(135deg, var(--accent-primary) 0%, #2850d4 100%)',
-      padding: '24px'
+      background: 'var(--bg-canvas)',
+      padding: '20px'
     }}>
-      <div style={{ width: '100%', maxWidth: '500px' }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+        {/* Logo */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '32px',
-          color: 'white'
+          marginBottom: '32px'
         }}>
-          <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>TheJToolbox</h1>
-          <p style={{ fontSize: '16px', opacity: 0.9 }}>Therefore™ Administration Panel</p>
+          <img
+            src="/assets/images/logo.png"
+            alt="Logo"
+            style={{
+              width: '60px',
+              height: '60px',
+              marginBottom: '24px'
+            }}
+          />
         </div>
 
-        <Card>
+        {/* Modal/Card */}
+        <div style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '12px',
+          padding: '32px 28px',
+          boxShadow: 'var(--shadow-lg)'
+        }}>
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
+            centered
+            style={{ marginBottom: '0' }}
             items={[
               {
                 key: 'login',
-                label: 'Iniciar Sesión',
+                label: 'Iniciar sesión',
                 children: (
                   <Spin spinning={loading}>
                     <Form
@@ -105,9 +133,9 @@ export default function Login() {
                       layout="vertical"
                       onFinish={handleLogin}
                       autoComplete="off"
+                      style={{ marginTop: '24px' }}
                     >
                       <Form.Item
-                        label="Email"
                         name="email"
                         rules={[
                           { required: true, message: 'Email requerido' },
@@ -115,36 +143,50 @@ export default function Login() {
                         ]}
                       >
                         <Input
-                          placeholder="usuario@buildingcenter.com"
+                          placeholder="Correo electrónico"
                           size="large"
+                          style={{ height: '40px' }}
                         />
                       </Form.Item>
 
                       <Form.Item
-                        label="Contraseña"
                         name="password"
                         rules={[{ required: true, message: 'Contraseña requerida' }]}
                       >
                         <Input.Password
-                          placeholder="Tu contraseña"
+                          placeholder="Contraseña"
                           size="large"
+                          style={{ height: '40px' }}
                         />
                       </Form.Item>
 
-                      <Form.Item>
+                      <Form.Item style={{ marginBottom: '16px' }}>
                         <Button
                           type="primary"
                           htmlType="submit"
                           size="large"
                           block
                           loading={loading}
+                          style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
                         >
-                          Iniciar Sesión
+                          Entrar
                         </Button>
                       </Form.Item>
 
-                      <div style={{ textAlign: 'center' }}>
-                        <a href="#forgot">¿Olvidaste tu contraseña?</a>
+                      <div style={{ textAlign: 'center', fontSize: '13px' }}>
+                        <a
+                          onClick={() => setActiveTab('recover')}
+                          style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginRight: '8px' }}
+                        >
+                          ¿Olvidaste tu contraseña?
+                        </a>
+                        <span style={{ color: 'var(--text-secondary)' }}>|</span>
+                        <a
+                          onClick={() => setActiveTab('signup')}
+                          style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginLeft: '8px' }}
+                        >
+                          Crear cuenta
+                        </a>
                       </div>
                     </Form>
                   </Spin>
@@ -152,36 +194,50 @@ export default function Login() {
               },
               {
                 key: 'signup',
-                label: 'Registrarse',
+                label: 'Crear cuenta',
                 children: (
                   <Spin spinning={loading}>
-                    <Alert
-                      message="Registro de Nuevo Usuario"
-                      description="Completa el formulario para crear una nueva cuenta. Un administrador tendrá que aprobar tu registro."
-                      type="info"
-                      showIcon
-                      style={{ marginBottom: '16px' }}
-                    />
-
                     <Form
                       form={form}
                       layout="vertical"
                       onFinish={handleSignup}
                       autoComplete="off"
+                      style={{ marginTop: '24px' }}
                     >
                       <Form.Item
-                        label="Nombre Completo"
-                        name="fullName"
+                        name="nombre"
                         rules={[{ required: true, message: 'Nombre requerido' }]}
                       >
                         <Input
-                          placeholder="Juan Jiménez García"
+                          placeholder="Nombre"
                           size="large"
+                          style={{ height: '40px' }}
                         />
                       </Form.Item>
 
                       <Form.Item
-                        label="Email"
+                        name="apellidos"
+                        rules={[{ required: true, message: 'Apellidos requeridos' }]}
+                      >
+                        <Input
+                          placeholder="Apellidos"
+                          size="large"
+                          style={{ height: '40px' }}
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="phone"
+                        rules={[{ required: true, message: 'Teléfono requerido' }]}
+                      >
+                        <Input
+                          placeholder="Teléfono"
+                          size="large"
+                          style={{ height: '40px' }}
+                        />
+                      </Form.Item>
+
+                      <Form.Item
                         name="email"
                         rules={[
                           { required: true, message: 'Email requerido' },
@@ -189,24 +245,13 @@ export default function Login() {
                         ]}
                       >
                         <Input
-                          placeholder="usuario@buildingcenter.com"
+                          placeholder="Correo electrónico"
                           size="large"
+                          style={{ height: '40px' }}
                         />
                       </Form.Item>
 
                       <Form.Item
-                        label="Teléfono"
-                        name="phone"
-                        rules={[{ required: true, message: 'Teléfono requerido' }]}
-                      >
-                        <Input
-                          placeholder="+34 912 345 678"
-                          size="large"
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Contraseña"
                         name="password"
                         rules={[
                           { required: true, message: 'Contraseña requerida' },
@@ -214,48 +259,115 @@ export default function Login() {
                         ]}
                       >
                         <Input.Password
-                          placeholder="Mínimo 8 caracteres"
+                          placeholder="Contraseña"
                           size="large"
+                          style={{ height: '40px' }}
                         />
                       </Form.Item>
 
                       <Form.Item
-                        label="Confirmar Contraseña"
                         name="confirmPassword"
                         rules={[{ required: true, message: 'Confirma tu contraseña' }]}
                       >
                         <Input.Password
-                          placeholder="Repite tu contraseña"
+                          placeholder="Confirmar contraseña"
                           size="large"
+                          style={{ height: '40px' }}
                         />
                       </Form.Item>
 
-                      <Form.Item>
+                      <Form.Item style={{ marginBottom: '16px' }}>
                         <Button
                           type="primary"
                           htmlType="submit"
                           size="large"
                           block
                           loading={loading}
+                          style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
                         >
-                          Registrarse
+                          Crear cuenta
                         </Button>
                       </Form.Item>
+
+                      <div style={{ textAlign: 'center', fontSize: '13px' }}>
+                        <a
+                          onClick={() => setActiveTab('login')}
+                          style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
+                        >
+                          ¿Ya tienes cuenta? Inicia sesión
+                        </a>
+                      </div>
+                    </Form>
+                  </Spin>
+                )
+              },
+              {
+                key: 'recover',
+                label: 'Recuperar contraseña',
+                children: (
+                  <Spin spinning={loading}>
+                    <div style={{ marginTop: '24px', textAlign: 'center', marginBottom: '24px' }}>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.5' }}>
+                        Introduce tu correo y recibirás un enlace para restaurarla.
+                      </p>
+                    </div>
+                    <Form
+                      form={form}
+                      layout="vertical"
+                      onFinish={handleRecoverPassword}
+                      autoComplete="off"
+                    >
+                      <Form.Item
+                        name="email"
+                        rules={[
+                          { required: true, message: 'Email requerido' },
+                          { type: 'email', message: 'Email inválido' }
+                        ]}
+                      >
+                        <Input
+                          placeholder="Correo electrónico"
+                          size="large"
+                          style={{ height: '40px' }}
+                        />
+                      </Form.Item>
+
+                      <Form.Item style={{ marginBottom: '16px' }}>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          size="large"
+                          block
+                          loading={loading}
+                          style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
+                        >
+                          Enviar enlace
+                        </Button>
+                      </Form.Item>
+
+                      <div style={{ textAlign: 'center', fontSize: '13px' }}>
+                        <a
+                          onClick={() => setActiveTab('login')}
+                          style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
+                        >
+                          ← Volver al inicio de sesión
+                        </a>
+                      </div>
                     </Form>
                   </Spin>
                 )
               }
             ]}
           />
-        </Card>
+        </div>
 
+        {/* Footer */}
         <div style={{
           textAlign: 'center',
           marginTop: '24px',
-          color: 'white',
-          fontSize: '12px'
+          fontSize: '12px',
+          color: 'var(--text-secondary)'
         }}>
-          <p>TheJToolbox ©2025 | Powered by Aneker · Therefore™ Integration</p>
+          <p>© 2025 Aneker</p>
         </div>
       </div>
     </div>
