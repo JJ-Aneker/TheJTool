@@ -30,7 +30,6 @@ export default function CategoryBuilder() {
       const { data, error } = await supabase
         .from('category_templates')
         .select('*')
-        .or(`created_by.eq.${user.id},compartido.eq.true`)
         .order('created_at', { ascending: false })
 
       if (error) throw error
