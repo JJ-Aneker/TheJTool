@@ -93,30 +93,28 @@ export default function Login() {
       padding: '20px'
     }}>
       <div style={{ width: '100%', maxWidth: '420px' }}>
-        {/* Logo */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '32px'
-        }}>
-          <img
-            src="/assets/images/logo.png"
-            alt="Logo"
-            style={{
-              width: '60px',
-              height: '60px',
-              marginBottom: '24px'
-            }}
-          />
-        </div>
-
         {/* Modal/Card */}
         <div style={{
           background: 'var(--bg-card)',
           border: '1px solid var(--border-default)',
           borderRadius: '12px',
           padding: '32px 28px',
-          boxShadow: 'var(--shadow-lg)'
+          boxShadow: 'var(--shadow-lg)',
+          textAlign: 'center'
         }}>
+          {/* Logo */}
+          <div style={{
+            marginBottom: '24px'
+          }}>
+            <img
+              src="/assets/images/logo.png"
+              alt="Logo"
+              style={{
+                width: '60px',
+                height: '60px'
+              }}
+            />
+          </div>
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
