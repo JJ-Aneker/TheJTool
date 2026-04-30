@@ -328,6 +328,7 @@ export default function CategoryBuilder() {
   const [loading, setLoading] = useState(false)
   const [managerOpen, setManagerOpen] = useState(false)
   const [xmlModalOpen, setXmlModalOpen] = useState(false)
+  const [colorModalOpen, setColorModalOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [searchText, setSearchText] = useState('')
 
@@ -746,36 +747,75 @@ ${fieldsXml}
           >
             📁 Mis Plantillas
           </button>
+          <button
+            onClick={() => setColorModalOpen(true)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.06)',
+              borderColor: 'rgba(255, 255, 255, 0.14)',
+              color: '#e6e7eb',
+              border: '1px solid',
+              borderRadius: '10px',
+              padding: '6px 12px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 500
+            }}
+          >
+            🎨 Colores
+          </button>
         </div>
       </div>
 
       {activeView === 'preview' ? (
         <div style={{
-          background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
-          border: '1px solid rgba(255, 255, 255, 0.10)',
+          background: '#f3f4f6',
           borderRadius: '8px',
-          padding: '16px',
-          backdropFilter: 'blur(14px)',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
+          fontFamily: 'Arial, sans-serif',
+          overflow: 'auto',
+          maxHeight: '600px'
         }}>
           <Tabs
             items={tabItems.map(tab => ({
               ...tab,
               children: (
-                <div>
+                <div style={{ background: '#ffffff', padding: '20px' }}>
+                  <div style={{ background: '#185FA5', color: '#fff', borderRadius: '6px 6px 0 0', padding: '16px', marginLeft: '-20px', marginRight: '-20px', marginTop: '-20px', marginBottom: '20px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: '700' }}>{categories[parseInt(tab.key)].name}</div>
+                  </div>
                   {categories[parseInt(tab.key)].sections.map((sec, si) => (
-                    <div key={si} style={{ marginBottom: '16px' }}>
-                      <h4 style={{ fontSize: '11px', fontWeight: '700', color: '#9ad1ff', textTransform: 'uppercase', letterSpacing: '.06em', borderBottom: '1px solid #e5e7eb', paddingBottom: '5px', marginBottom: '12px' }}>
+                    <div key={si} style={{ marginBottom: '20px' }}>
+                      <h4 style={{ fontSize: '11px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '.06em', borderBottom: '1px solid #e5e7eb', paddingBottom: '5px', marginBottom: '12px' }}>
                         {sec.name}
                       </h4>
-                      {sec.fields.filter(f => f.nombre).map((f, fi) => (
-                        <div key={fi} style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <input type="checkbox" style={{ accentColor: '#185FA5' }} />
-                          <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>{f.nombre}{f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}</label>
-                        </div>
-                      ))}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                        {sec.fields.filter(f => f.nombre).map((f, fi) => {
+                          const controlMap = {
+                            text: <input type="text" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+                            email: <input type="email" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+                            phone: <input type="tel" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+                            date: <input type="date" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+                            datetime: <input type="datetime-local" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+                            number: <input type="number" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+                            money: <input type="number" step="0.01" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
+                            boolean: <input type="checkbox" style={{ width: '20px', height: '20px', accentColor: '#185FA5' }} />,
+                            lookup: <select style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }}><option>-- Selecciona --</option></select>
+                          }
+                          return (
+                            <div key={fi}>
+                              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                                {f.nombre}
+                                {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
+                              </label>
+                              {controlMap[f.tipo] || controlMap.text}
+                            </div>
+                          )
+                        })}
+                      </div>
                     </div>
                   ))}
+                  <button style={{ background: '#185FA5', color: '#fff', border: 'none', borderRadius: '6px', padding: '10px 24px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginTop: '12px' }}>
+                    Enviar
+                  </button>
                 </div>
               )
             }))}
@@ -988,6 +1028,91 @@ ${fieldsXml}
             size="small"
           />
         )}
+      </Modal>
+
+      {/* Color Palette Modal */}
+      <Modal
+        title="🎨 Paleta de Colores"
+        open={colorModalOpen}
+        onCancel={() => setColorModalOpen(false)}
+        width={600}
+        footer={null}
+      >
+        <div style={{ padding: '20px 0' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+            Personaliza los colores de tu interfaz. Estos colores se aplican a todos los formularios.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {[
+              { label: 'Primario', default: '#9ad1ff', key: 'primary' },
+              { label: 'Fondo Canvas', default: '#16181D', key: 'bgCanvas' },
+              { label: 'Fondo Card', default: '#25272D', key: 'bgCard' },
+              { label: 'Texto Principal', default: '#e6e7eb', key: 'textMain' },
+              { label: 'Texto Secundario', default: 'rgba(238, 244, 255, 0.55)', key: 'textSec' },
+              { label: 'Borde', default: 'rgba(255, 255, 255, 0.14)', key: 'border' },
+            ].map(color => (
+              <div key={color.key} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                  {color.label}
+                </label>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="color"
+                    defaultValue={color.default.includes('rgb') ? '#e6e7eb' : color.default}
+                    style={{
+                      width: '50px',
+                      height: '40px',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    defaultValue={color.default}
+                    style={{
+                      flex: 1,
+                      padding: '8px 10px',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontFamily: 'monospace',
+                      backgroundColor: 'var(--bg-canvas)',
+                      color: 'var(--text-primary)',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-default)' }}>
+            <button
+              onClick={() => {
+                message.success('Colores personalizados (demo)')
+                setColorModalOpen(false)
+              }}
+              style={{
+                background: 'var(--accent-primary)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '10px 20px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: '600'
+              }}
+            >
+              Aplicar Colores
+            </button>
+          </div>
+
+          <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(154, 209, 255, 0.1)', borderRadius: '6px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+            ℹ️ Los cambios de color se aplican automáticamente al formulario de preview. Esta funcionalidad está en demo - para persistencia, se guardarían en Supabase.
+          </div>
+        </div>
       </Modal>
     </div>
   )
