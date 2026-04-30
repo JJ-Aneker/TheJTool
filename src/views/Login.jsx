@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Form, Input, Button, message, Spin, Space, Tabs, Alert } from 'antd'
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
+import { Card, Form, Input, Button, message, Spin, Tabs, Alert } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 
@@ -116,7 +115,6 @@ export default function Login() {
                         ]}
                       >
                         <Input
-                          prefix={<MailOutlined />}
                           placeholder="usuario@buildingcenter.com"
                           size="large"
                         />
@@ -128,7 +126,6 @@ export default function Login() {
                         rules={[{ required: true, message: 'Contraseña requerida' }]}
                       >
                         <Input.Password
-                          prefix={<LockOutlined />}
                           placeholder="Tu contraseña"
                           size="large"
                         />
@@ -178,7 +175,6 @@ export default function Login() {
                         rules={[{ required: true, message: 'Nombre requerido' }]}
                       >
                         <Input
-                          prefix={<UserOutlined />}
                           placeholder="Juan Jiménez García"
                           size="large"
                         />
@@ -193,7 +189,6 @@ export default function Login() {
                         ]}
                       >
                         <Input
-                          prefix={<MailOutlined />}
                           placeholder="usuario@buildingcenter.com"
                           size="large"
                         />
@@ -205,7 +200,6 @@ export default function Login() {
                         rules={[{ required: true, message: 'Teléfono requerido' }]}
                       >
                         <Input
-                          prefix={<PhoneOutlined />}
                           placeholder="+34 912 345 678"
                           size="large"
                         />
@@ -220,7 +214,6 @@ export default function Login() {
                         ]}
                       >
                         <Input.Password
-                          prefix={<LockOutlined />}
                           placeholder="Mínimo 8 caracteres"
                           size="large"
                         />
@@ -232,7 +225,6 @@ export default function Login() {
                         rules={[{ required: true, message: 'Confirma tu contraseña' }]}
                       >
                         <Input.Password
-                          prefix={<LockOutlined />}
                           placeholder="Repite tu contraseña"
                           size="large"
                         />

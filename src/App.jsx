@@ -232,7 +232,7 @@ function AppContent() {
           >
             <img
               src="/assets/images/logo.png"
-              alt="NewLead"
+              alt="TheJ - ToolBox"
               style={{
                 width: '28px',
                 height: '28px',
@@ -253,7 +253,7 @@ function AppContent() {
                 marginLeft: '12px',
                 transition: 'color 200ms ease'
               }}>
-                NewLead
+                TheJ - ToolBox
               </div>
               <button
                 onClick={() => handleSidebarToggle(true)}
