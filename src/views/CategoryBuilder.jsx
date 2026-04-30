@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin, Upload } from 'antd'
+import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
-import '../styles/category-builder.css'
 
 function newGuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -56,11 +55,7 @@ function parseCsv(raw) {
     fieldkey: headers.findIndex(h => ['key', 'fieldkey', 'fieldid', 'colname', 'col'].includes(h)),
     tipo: headers.findIndex(h => ['tipo', 'type', 'typeno'].includes(h)),
     obligatorio: headers.findIndex(h => ['obligatorio', 'required', 'requerido'].includes(h)),
-    placeholder: headers.findIndex(h => ['placeholder', 'ayuda', 'hint'].includes(h)),
-    default: headers.findIndex(h => ['default', 'defecto', 'defaultvalue'].includes(h)),
-    maxlength: headers.findIndex(h => ['maxlength', 'max', 'longitud'].includes(h)),
     seccion: headers.findIndex(h => ['seccion', 'sección', 'section', 'grupo', 'group'].includes(h)),
-    options: headers.findIndex(h => ['options', 'opciones', 'valores'].includes(h)),
   }
 
   if (idx.nombre === -1) return { error: 'No se encontró la columna "Nombre".' }
@@ -133,10 +128,10 @@ function CsvImporter({ onImport }) {
           <textarea
             value={text}
             onChange={e => { setText(e.target.value); setPreview(null) }}
-            placeholder="Nombre;Tipo;Obligatorio;Sección\nNombre completo;Text;Si;DATOS PERSONALES"
+            placeholder="Nombre;Tipo;Obligatorio;Sección"
             style={{
               width: '100%',
-              height: '100px',
+              height: '80px',
               padding: '10px',
               border: '1px solid var(--border-default)',
               borderRadius: '4px',
@@ -271,25 +266,22 @@ function FieldRow({ field, onChange, onRemove }) {
       </div>
       {expanded && (
         <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-default)' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Key</label>
-            <input
-              value={field.fieldKey}
-              onChange={e => onChange({ ...field, fieldKey: e.target.value.replace(/\s+/g, '').replace(/[^A-Za-z0-9_]/g, '') })}
-              placeholder={autoKey}
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid var(--border-default)',
-                borderRadius: '4px',
-                fontSize: '12px',
-                backgroundColor: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                boxSizing: 'border-box',
-                marginBottom: '8px'
-              }}
-            />
-          </div>
+          <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Key</label>
+          <input
+            value={field.fieldKey}
+            onChange={e => onChange({ ...field, fieldKey: e.target.value.replace(/\s+/g, '').replace(/[^A-Za-z0-9_]/g, '') })}
+            placeholder={autoKey}
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              border: '1px solid var(--border-default)',
+              borderRadius: '4px',
+              fontSize: '12px',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              boxSizing: 'border-box'
+            }}
+          />
         </div>
       )}
     </div>
@@ -308,6 +300,7 @@ export default function CategoryBuilder() {
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(false)
   const [managerOpen, setManagerOpen] = useState(false)
+  const [xmlModalOpen, setXmlModalOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [searchText, setSearchText] = useState('')
 
@@ -326,13 +319,13 @@ export default function CategoryBuilder() {
       if (err) throw err
       setTemplates(data || [])
     } catch (err) {
-      console.error('Error cargando plantillas:', err.message)
+      console.error('Error:', err.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const saveTemplateToSupabase = async () => {
+  const saveTemplate = async () => {
     if (!categoryName.trim()) {
       message.error('El nombre de la categoría es obligatorio')
       return
@@ -351,7 +344,7 @@ export default function CategoryBuilder() {
           .eq('id', selectedTemplate.id)
 
         if (err) throw err
-        message.success('Plantilla actualizada')
+        message.success('Actualizada')
       } else {
         const { error: err } = await supabase
           .from('category_templates')
@@ -365,7 +358,7 @@ export default function CategoryBuilder() {
           })
 
         if (err) throw err
-        message.success('Plantilla guardada')
+        message.success('Guardada')
       }
 
       setCategoryName('')
@@ -451,18 +444,20 @@ export default function CategoryBuilder() {
       return
     }
 
-    // Simple XML generation
     const fieldsXml = sections.map((sec, si) => {
       const secFields = sec.fields.filter(f => f.nombre.trim()).map(f => `    <Field><Name>${f.nombre}</Name><Key>${f.fieldKey || toCamelKey(f.nombre)}</Key><Type>${f.tipo}</Type><Required>${f.required ? '1' : '0'}</Required></Field>`).join('\n')
       return `  <Section name="${sec.name}">\n${secFields}\n  </Section>`
     }).join('\n')
 
-    setXml(`<?xml version="1.0" encoding="utf-8"?>
+    const newXml = `<?xml version="1.0" encoding="utf-8"?>
 <Category>
   <Name>${categoryName}</Name>
   <Description>${categoryDesc}</Description>
 ${fieldsXml}
-</Category>`)
+</Category>`
+
+    setXml(newXml)
+    setXmlModalOpen(true)
   }
 
   const copy = () => {
@@ -486,23 +481,25 @@ ${fieldsXml}
 
   return (
     <div style={{ padding: '24px' }}>
-      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* HEADER */}
+      <div style={{ borderBottom: '1px solid var(--border-default)', paddingBottom: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: '600', margin: '0 0 8px 0' }}>🏗️ Generador de Categorías</h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0' }}>Crea plantillas de categorías para Therefore™</p>
+          <h1 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--accent-primary)', letterSpacing: '-0.3px', margin: '0' }}>🏗️ Generador de Categorías</h1>
+          <p style={{ fontSize: '12px', color: 'rgba(238, 244, 255, 0.55)', marginTop: '4px', margin: 0 }}>Crea categorías para Therefore Solution Designer · XML · v2.0</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => setActiveView('editor')}
             style={{
-              padding: '8px 16px',
-              background: activeView === 'editor' ? 'var(--accent-primary)' : 'var(--bg-card)',
-              color: activeView === 'editor' ? 'white' : 'var(--text-primary)',
-              border: '1px solid var(--border-default)',
-              borderRadius: '6px',
+              background: activeView === 'editor' ? 'rgba(154, 209, 255, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+              borderColor: activeView === 'editor' ? '#9ad1ff' : 'rgba(255, 255, 255, 0.14)',
+              color: activeView === 'editor' ? '#9ad1ff' : '#e6e7eb',
+              border: '1px solid',
+              borderRadius: '10px',
+              padding: '6px 12px',
               cursor: 'pointer',
               fontSize: '12px',
-              fontWeight: '600'
+              fontWeight: 500
             }}
           >
             ✎ Editor
@@ -510,71 +507,174 @@ ${fieldsXml}
           <button
             onClick={() => setActiveView('preview')}
             style={{
-              padding: '8px 16px',
-              background: activeView === 'preview' ? 'var(--accent-primary)' : 'var(--bg-card)',
-              color: activeView === 'preview' ? 'white' : 'var(--text-primary)',
-              border: '1px solid var(--border-default)',
-              borderRadius: '6px',
+              background: activeView === 'preview' ? 'rgba(154, 209, 255, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+              borderColor: activeView === 'preview' ? '#9ad1ff' : 'rgba(255, 255, 255, 0.14)',
+              color: activeView === 'preview' ? '#9ad1ff' : '#e6e7eb',
+              border: '1px solid',
+              borderRadius: '10px',
+              padding: '6px 12px',
               cursor: 'pointer',
               fontSize: '12px',
-              fontWeight: '600'
+              fontWeight: 500
             }}
           >
-            👁 Vista previa
+            👁 Preview
           </button>
           <button
             onClick={() => setManagerOpen(true)}
             style={{
-              padding: '8px 16px',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-default)',
-              borderRadius: '6px',
+              background: 'rgba(255, 255, 255, 0.06)',
+              borderColor: 'rgba(255, 255, 255, 0.14)',
+              color: '#e6e7eb',
+              border: '1px solid',
+              borderRadius: '10px',
+              padding: '6px 12px',
               cursor: 'pointer',
               fontSize: '12px',
-              fontWeight: '600'
+              fontWeight: 500
             }}
           >
-            📁 Mis plantillas ({templates.length})
+            📁 Mis Plantillas
           </button>
         </div>
       </div>
 
       {activeView === 'preview' ? (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '20px' }}>
-          <h3>Vista previa: {categoryName || 'Categoría'}</h3>
+        <div style={{
+          background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          borderRadius: '8px',
+          padding: '16px',
+          backdropFilter: 'blur(14px)',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
+        }}>
+          <h3 style={{ fontSize: '11px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Vista previa: {categoryName || 'Categoría'}</h3>
           {sections.map((sec, si) => (
             <div key={si} style={{ marginBottom: '16px' }}>
-              <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', margin: '0 0 12px 0' }}>
+              <h4 style={{ fontSize: '11px', fontWeight: '700', color: '#9ad1ff', textTransform: 'uppercase', letterSpacing: '.06em', borderBottom: '1px solid #e5e7eb', paddingBottom: '5px', marginBottom: '12px' }}>
                 {sec.name}
               </h4>
               {sec.fields.filter(f => f.nombre).map((f, fi) => (
                 <div key={fi} style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input type="checkbox" />
-                  <label>{f.nombre}{f.required && <span style={{ color: '#ff6464' }}>*</span>}</label>
+                  <input type="checkbox" style={{ accentColor: '#185FA5' }} />
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>{f.nombre}{f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}</label>
                 </div>
               ))}
             </div>
           ))}
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          {/* LEFT */}
+        <>
+          {/* INFORMACIÓN */}
+          <div style={{
+            background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
+            border: '1px solid rgba(255, 255, 255, 0.10)',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '16px',
+            backdropFilter: 'blur(14px)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
+          }}>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Información de la categoría</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', color: 'rgba(238, 244, 255, 0.65)', marginBottom: '4px' }}>Nombre *</label>
+                <input
+                  value={categoryName}
+                  onChange={e => setCategoryName(e.target.value)}
+                  placeholder="Ej. Documentos Legales"
+                  style={{
+                    width: '100%',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.18)',
+                    borderRadius: '8px',
+                    padding: '7px 10px',
+                    color: '#e6e7eb',
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', color: 'rgba(238, 244, 255, 0.65)', marginBottom: '4px' }}>Descripción</label>
+                <input
+                  value={categoryDesc}
+                  onChange={e => setCategoryDesc(e.target.value)}
+                  placeholder="Descripción de la categoría"
+                  style={{
+                    width: '100%',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.18)',
+                    borderRadius: '8px',
+                    padding: '7px 10px',
+                    color: '#e6e7eb',
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={generateXml}
+                style={{
+                  background: '#9ad1ff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  color: '#000',
+                  fontSize: '13px',
+                  padding: '9px 18px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                Generar XML →
+              </button>
+              <button
+                onClick={saveTemplate}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  borderRadius: '10px',
+                  color: '#e6e7eb',
+                  fontSize: '13px',
+                  padding: '9px 18px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                💾 Guardar Plantilla
+              </button>
+            </div>
+          </div>
+
+          {/* EDITOR */}
           <div>
             <CsvImporter onImport={handleCsvImport} />
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 style={{ margin: '0', fontSize: '14px', fontWeight: '600' }}>Secciones y campos ({totalFields})</h3>
+            <div style={{
+              background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+              borderRadius: '8px',
+              padding: '16px',
+              backdropFilter: 'blur(14px)',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Secciones y campos <span style={{ fontSize: '10px', background: 'rgba(154, 209, 255, 0.12)', color: '#9ad1ff', padding: '2px 7px', borderRadius: '5px', border: '1px solid rgba(154, 209, 255, 0.20)', marginLeft: '6px' }}>{totalFields} campos</span></span>
                 <button
                   onClick={addSection}
                   style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    borderRadius: '10px',
+                    color: '#e6e7eb',
+                    fontSize: '12px',
                     padding: '6px 12px',
-                    background: 'var(--accent-primary)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '12px'
+                    cursor: 'pointer'
                   }}
                 >
                   + Sección
@@ -582,34 +682,38 @@ ${fieldsXml}
               </div>
 
               {sections.map((sec, si) => (
-                <div key={sec.id} style={{ background: 'var(--bg-canvas)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
+                <div key={sec.id} style={{ background: 'rgba(0, 0, 0, 0.18)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                     <input
                       value={sec.name}
                       onChange={e => updateSecName(si, e.target.value)}
                       style={{
                         flex: 1,
-                        padding: '6px 8px',
-                        border: '1px solid var(--border-default)',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        backgroundColor: 'var(--bg-card)',
-                        color: 'var(--text-primary)',
-                        boxSizing: 'border-box'
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.18)',
+                        borderRadius: '8px',
+                        padding: '7px 10px',
+                        color: '#9ad1ff',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                        marginRight: '8px'
                       }}
                     />
-                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>({sec.fields.filter(f => f.nombre).length})</span>
+                    <span style={{ fontSize: '10px', background: 'rgba(154, 209, 255, 0.12)', color: '#9ad1ff', padding: '2px 7px', borderRadius: '5px', border: '1px solid rgba(154, 209, 255, 0.20)', marginRight: '8px' }}>{sec.fields.filter(f => f.nombre).length} campos</span>
                     {sections.length > 1 && (
                       <button
                         onClick={() => removeSection(si)}
                         style={{
-                          padding: '4px 8px',
-                          background: 'rgba(255, 100, 100, 0.1)',
-                          border: '1px solid rgba(255, 100, 100, 0.3)',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          color: '#ff6464'
+                          background: 'rgba(255, 80, 80, 0.10)',
+                          border: '1px solid rgba(255, 80, 80, 0.25)',
+                          borderRadius: '10px',
+                          color: '#fecaca',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
                         }}
                       >
                         ✕
@@ -630,14 +734,14 @@ ${fieldsXml}
                     onClick={() => addField(si)}
                     style={{
                       width: '100%',
-                      padding: '8px 12px',
-                      background: 'var(--bg-card)',
-                      border: '1px solid var(--border-default)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)',
-                      cursor: 'pointer',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.14)',
+                      borderRadius: '10px',
+                      color: '#e6e7eb',
                       fontSize: '12px',
-                      marginTop: '8px'
+                      padding: '6px 12px',
+                      cursor: 'pointer',
+                      marginTop: '4px'
                     }}
                   >
                     + Campo
@@ -646,149 +750,81 @@ ${fieldsXml}
               ))}
             </div>
           </div>
-
-          {/* RIGHT */}
-          <div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
-              <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>Información</h3>
-              <div style={{ marginBottom: '12px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Nombre de la categoría</label>
-                <input
-                  value={categoryName}
-                  onChange={e => setCategoryName(e.target.value)}
-                  placeholder="Ej. Documentos Legales"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid var(--border-default)',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    backgroundColor: 'var(--bg-canvas)',
-                    color: 'var(--text-primary)',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-              <div style={{ marginBottom: '12px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Descripción</label>
-                <textarea
-                  value={categoryDesc}
-                  onChange={e => setCategoryDesc(e.target.value)}
-                  placeholder="Descripción de la categoría..."
-                  style={{
-                    width: '100%',
-                    height: '60px',
-                    padding: '8px 10px',
-                    border: '1px solid var(--border-default)',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    backgroundColor: 'var(--bg-canvas)',
-                    color: 'var(--text-primary)',
-                    boxSizing: 'border-box',
-                    resize: 'vertical'
-                  }}
-                />
-              </div>
-              <button
-                onClick={saveTemplateToSupabase}
-                style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  background: 'var(--accent-primary)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  fontWeight: '600'
-                }}
-              >
-                {selectedTemplate ? '💾 Actualizar plantilla' : '💾 Guardar plantilla'}
-              </button>
-            </div>
-
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px', padding: '16px' }}>
-              <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>Generar XML</h3>
-              {error && (
-                <div style={{ background: 'rgba(255, 100, 100, 0.1)', color: '#ff6464', padding: '8px 12px', borderRadius: '4px', marginBottom: '12px', fontSize: '12px' }}>
-                  ⚠ {error}
-                </div>
-              )}
-              <button
-                onClick={generateXml}
-                style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  background: 'var(--accent-primary)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  marginBottom: '12px'
-                }}
-              >
-                Generar XML →
-              </button>
-              {xml && (
-                <div>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                    <button
-                      onClick={copy}
-                      style={{
-                        flex: 1,
-                        padding: '8px 12px',
-                        background: 'var(--bg-canvas)',
-                        border: '1px solid var(--border-default)',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        color: 'var(--text-primary)'
-                      }}
-                    >
-                      {copied ? '✓ Copiado' : '📋 Copiar'}
-                    </button>
-                    <button
-                      onClick={download}
-                      style={{
-                        flex: 1,
-                        padding: '8px 12px',
-                        background: 'var(--bg-canvas)',
-                        border: '1px solid var(--border-default)',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        color: 'var(--text-primary)'
-                      }}
-                    >
-                      ⬇ Descargar
-                    </button>
-                  </div>
-                  <textarea
-                    readOnly
-                    value={xml}
-                    style={{
-                      width: '100%',
-                      height: '200px',
-                      padding: '10px',
-                      border: '1px solid var(--border-default)',
-                      borderRadius: '4px',
-                      fontFamily: 'monospace',
-                      fontSize: '10px',
-                      backgroundColor: 'var(--bg-canvas)',
-                      color: 'var(--accent-primary)',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        </>
       )}
 
-      {/* Manager Modal */}
+      {/* XML Modal */}
+      <Modal
+        title="Generar XML"
+        open={xmlModalOpen}
+        onCancel={() => setXmlModalOpen(false)}
+        width={800}
+        footer={null}
+      >
+        {error && (
+          <div style={{ color: '#fecaca', fontSize: '12px', marginBottom: '10px', background: 'rgba(255, 80, 80, 0.12)', border: '1px solid rgba(255, 80, 80, 0.25)', padding: '8px 12px', borderRadius: '8px' }}>
+            ⚠ {error}
+          </div>
+        )}
+        {xml && (
+          <div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+              <button
+                onClick={copy}
+                style={{
+                  background: '#9ad1ff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  color: '#000',
+                  fontSize: '13px',
+                  padding: '8px 16px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                {copied ? '✓ Copiado' : '📋 Copiar XML'}
+              </button>
+              <button
+                onClick={download}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  borderRadius: '10px',
+                  color: '#e6e7eb',
+                  fontSize: '13px',
+                  padding: '8px 16px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                ⬇ Descargar .xml
+              </button>
+            </div>
+            <div style={{ fontSize: '11px', color: 'rgba(238, 244, 255, 0.40)', marginBottom: '6px' }}>
+              {xml.length.toLocaleString()} caracteres
+            </div>
+            <textarea
+              readOnly
+              value={xml}
+              style={{
+                width: '100%',
+                height: '300px',
+                padding: '10px',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                borderRadius: '8px',
+                fontFamily: 'monospace',
+                fontSize: '11px',
+                backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                color: '#a7f3d0',
+                boxSizing: 'border-box',
+                resize: 'vertical'
+              }}
+            />
+          </div>
+        )}
+      </Modal>
+
+      {/* Templates Manager Modal */}
       <Modal
         title="Mis Plantillas de Categoría"
         open={managerOpen}
@@ -798,30 +834,39 @@ ${fieldsXml}
       >
         <div style={{ marginBottom: '16px' }}>
           <Input.Search
-            placeholder="Buscar..."
+            placeholder="Buscar por nombre..."
             value={searchText}
             onChange={e => setSearchText(e.target.value)}
+            style={{ maxWidth: '400px' }}
           />
         </div>
         {loading ? (
-          <Spin />
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <Spin size="large" />
+          </div>
         ) : filteredTemplates.length === 0 ? (
-          <Empty description="No hay plantillas" />
+          <Empty description={searchText ? 'Sin resultados' : 'No hay plantillas creadas'} style={{ padding: '40px' }} />
         ) : (
           <Table
             columns={[
-              { title: 'Nombre', dataIndex: 'name', key: 'name' },
+              { title: 'Nombre', dataIndex: 'name', key: 'name', render: (text) => <strong>{text}</strong>, width: '35%' },
+              { title: 'Descripción', dataIndex: 'description', key: 'description', width: '35%', render: (text) => text || <span style={{ color: 'var(--text-muted)' }}>-</span> },
               {
                 title: 'Estado', dataIndex: 'compartido', key: 'compartido',
-                render: c => <Tag color={c ? 'blue' : 'default'}>{c ? 'Compartida' : 'Privada'}</Tag>
+                render: (compartido) => (
+                  <Tag color={compartido ? 'blue' : 'default'}>
+                    {compartido ? 'Compartida' : 'Privada'}
+                  </Tag>
+                ),
+                width: '15%'
               },
               {
-                title: 'Acciones', key: 'actions', width: 200,
-                render: (_, r) => (
+                title: 'Acciones', key: 'actions', width: '15%',
+                render: (_, record) => (
                   <Space size="small">
-                    <Button size="small" onClick={() => loadTemplate(r)}>Cargar</Button>
-                    <Button size="small" onClick={() => downloadTemplate(r)}>Descar</Button>
-                    <Button danger size="small" onClick={() => deleteTemplate(r.id)}>✕</Button>
+                    <Button size="small" onClick={() => loadTemplate(record)}>Cargar</Button>
+                    <Button size="small" onClick={() => downloadTemplate(record)}>Descar</Button>
+                    <Button danger size="small" onClick={() => deleteTemplate(record.id)}>✕</Button>
                   </Space>
                 )
               }
