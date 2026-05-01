@@ -1077,6 +1077,17 @@ export default function CategoryBuilder() {
 
   const xmlCaption = (t) => `<Caption UPT="1"><TStr><T><L>1034</L><S>${escapeXml(t)}</S></T></TStr></Caption>`
 
+  const calculateFieldWidth = (fieldLength, fieldType) => {
+    // Tipos con ancho visual fijo
+    if (['5', '3', '7'].includes(fieldType)) return 160  // money, date, datetime
+    if (['6'].includes(fieldType)) return 120  // boolean
+
+    const maxLength = parseInt(fieldLength) || 100
+    // Escala: 1.5px por carácter (fuente Segoe UI 9pt)
+    const scaledWidth = Math.max(maxLength * 1.5, 80)
+    return Math.round(Math.min(scaledWidth, 400))  // máximo 400px
+  }
+
   const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width = 160, height = 14, posx = 102, posy = 0, taborder = 1, disporder = 1, font = 'Segoe UI', fsize = 9, tabMeta = "" }) => {
     // Boolean (TypeNo 6) and lookups don't have Length, nor do dates/timestamps/images
     const lengthTag = (typeno === '5') ? '<Length>18</Length>' : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '12' && typeno !== '15' && length) ? `<Length>${length}</Length>` : ''
@@ -1236,14 +1247,16 @@ export default function CategoryBuilder() {
             const colname = sanitizeName(f1.fieldKey || f1.nombre)
             fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f1.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
+            const fieldWidth = calculateFieldWidth(f1.length || '100', typeno)
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: fieldWidth, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
 
           if (f2) {
             const colname = sanitizeName(f2.fieldKey || f2.nombre)
             fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f2.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
+            const fieldWidth = calculateFieldWidth(f2.length || '100', typeno)
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: fieldWidth, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
 
           yPos += ROW_GAP
@@ -1323,10 +1336,11 @@ export default function CategoryBuilder() {
                   fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
                 })
                 const typeno = typeToTypeNo[f1.tipo] || '1'
+                const fieldWidth = Math.min(calculateFieldWidth(f1.length || '100', typeno), 155)
                 fieldsWithTabsXml += makeDataField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre,
                   typeno, length: f1.length || '100',
-                  width: FLD_W, height: ROW_H, posx: TAB_FLD_X1, posy: tabYPos,
+                  width: fieldWidth, height: ROW_H, posx: TAB_FLD_X1, posy: tabYPos,
                   taborder: tabOrder++, disporder: dispOrder++, tabMeta: mkTabMeta()
                 })
               }
@@ -1339,10 +1353,11 @@ export default function CategoryBuilder() {
                   fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
                 })
                 const typeno = typeToTypeNo[f2.tipo] || '1'
+                const fieldWidth = Math.min(calculateFieldWidth(f2.length || '100', typeno), 98)
                 fieldsWithTabsXml += makeDataField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre,
                   typeno, length: f2.length || '100',
-                  width: TAB_FLD_W2, height: ROW_H, posx: TAB_FLD_X2, posy: tabYPos,
+                  width: fieldWidth, height: ROW_H, posx: TAB_FLD_X2, posy: tabYPos,
                   taborder: tabOrder++, disporder: dispOrder++, tabMeta: mkTabMeta()
                 })
               }
