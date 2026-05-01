@@ -1412,18 +1412,9 @@ export default function CategoryBuilder() {
           <input
             value={cat.name}
             onChange={e => updateCategoryName(idx, e.target.value)}
+            className="form-input"
             style={{
               flex: 1,
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border-default)',
-              borderRadius: '8px',
-              padding: '7px 10px',
-              color: 'var(--accent-primary)',
-              fontSize: '13px',
-              fontWeight: 600,
-              boxSizing: 'border-box',
-              outline: 'none',
-              fontFamily: 'inherit',
               marginRight: '8px'
             }}
           />
@@ -1453,7 +1444,7 @@ export default function CategoryBuilder() {
             <>
               {/* Tab buttons (only show if there are multiple pestañas) */}
               {uniquePestañas.length > 1 && (
-                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', overflowX: 'auto' }}>
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', borderBottom: `1px solid var(--border-default)`, paddingBottom: '8px', overflowX: 'auto' }}>
                   {uniquePestañas.map(tab => (
                     <button
                       key={tab}
@@ -1462,9 +1453,9 @@ export default function CategoryBuilder() {
                         padding: '8px 14px',
                         fontSize: '12px',
                         fontWeight: selectedTab === tab ? '600' : '400',
-                        background: selectedTab === tab ? 'rgba(154, 209, 255, 0.15)' : 'transparent',
-                        border: selectedTab === tab ? '1px solid #9ad1ff' : '1px solid rgba(255, 255, 255, 0.08)',
-                        color: selectedTab === tab ? '#9ad1ff' : 'rgba(238, 244, 255, 0.6)',
+                        background: selectedTab === tab ? 'var(--bg-hover)' : 'transparent',
+                        border: selectedTab === tab ? `1px solid var(--border-default)` : `1px solid var(--border-default)`,
+                        color: selectedTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
                         borderRadius: '6px',
                         cursor: 'pointer',
                         transition: 'all 200ms ease',
@@ -1564,7 +1555,7 @@ export default function CategoryBuilder() {
           </button>
           <button
             onClick={generateXml}
-            className="btn-primary"
+            className="btn-default"
           >
             ⚡ Generar XML
           </button>
@@ -1704,7 +1695,7 @@ export default function CategoryBuilder() {
         {xml && (
           <div>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-              <button onClick={copy} className="btn-primary">
+              <button onClick={copy} className="btn-default">
                 {copied ? '✓ Copiado' : '📋 Copiar XML'}
               </button>
               <button onClick={download} className="btn-default">

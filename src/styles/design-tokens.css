@@ -654,11 +654,11 @@ select:focus {
 }
 
 .ant-tabs-tab-active {
-  color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 .ant-tabs-tab:hover {
-  color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 .ant-tabs-ink-bar {
