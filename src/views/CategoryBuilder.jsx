@@ -1205,64 +1205,123 @@ export default function CategoryBuilder() {
         headerXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Hdr_Title_${tableName}`, caption: cat.name, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 5 })
       }
 
-      // Data fields
+      // Data fields - PHASE 1: Generate fields WITHOUT pestaña (before TabControl)
       cat.sections.forEach((sec, si) => {
-        const validFields = sec.fields.filter(f => f.nombre.trim() && f.tipo !== 'table')
+        const baseFields = sec.fields.filter(f => f.nombre.trim() && f.tipo !== 'table' && (!f.pestaña || !f.pestaña.trim()))
+        const fieldsWithTabs = sec.fields.filter(f => f.nombre.trim() && f.tipo !== 'table' && f.pestaña && f.pestaña.trim())
         const tableFields = sec.fields.filter(f => f.nombre.trim() && f.tipo === 'table')
 
-        if (validFields.length === 0 && tableFields.length === 0) return
+        // Only show section header if no tabs or has base fields
+        if ((baseFields.length > 0 || tableFields.length > 0) && (!hasTabs || baseFields.length > 0)) {
+          fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6 })
+          yPos += SEC_GAP
+        }
 
-        // Section header (goes to Tab 1 always, or no tab if no tabs)
-        fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: hasTabs ? getTabMeta('') : '' })
-        yPos += SEC_GAP
-
-        // Process regular fields in pairs
-        for (let i = 0; i < validFields.length; i += 2) {
-          const f1 = validFields[i]
-          const f2 = validFields[i + 1]
+        // Process regular fields WITHOUT pestaña
+        for (let i = 0; i < baseFields.length; i += 2) {
+          const f1 = baseFields[i]
+          const f2 = baseFields[i + 1]
 
           if (f1) {
             const colname = sanitizeName(f1.fieldKey || f1.nombre)
-            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f1.pestaña) })
+            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f1.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f1.pestaña) })
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
 
           if (f2) {
             const colname = sanitizeName(f2.fieldKey || f2.nombre)
-            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f2.pestaña) })
+            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f2.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f2.pestaña) })
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
 
           yPos += ROW_GAP
         }
 
-        // Process table fields
+        // Process table fields (NOT in tabs)
         tableFields.forEach((tableField) => {
-          const tableFieldNo = globalFieldNo--
-          fieldsXml += makeTableField({ fieldno: tableFieldNo, fieldid: sanitizeName(tableField.nombre), caption: tableField.nombre, posy: yPos, tabMeta: getTabMeta(tableField.pestaña) })
-          yPos += 100 // Space for table field
-          tabOrder++
-          dispOrder++
+          if (!tableField.pestaña || !tableField.pestaña.trim()) {
+            const tableFieldNo = globalFieldNo--
+            fieldsXml += makeTableField({ fieldno: tableFieldNo, fieldid: sanitizeName(tableField.nombre), caption: tableField.nombre, posy: yPos })
+            yPos += 100
+            tabOrder++
+            dispOrder++
 
-          // Emit table columns
-          const columns = tableField.columnas || []
-          columns.forEach((col, colIdx) => {
-            const colname = sanitizeName(col.nombre)
-            const colTypeno = typeToTypeNo[col.tipo] || '1'
-            fieldsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: col.length || '100', parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
-          })
+            const columns = tableField.columnas || []
+            columns.forEach((col) => {
+              const colname = sanitizeName(col.nombre)
+              const colTypeno = typeToTypeNo[col.tipo] || '1'
+              fieldsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: col.length || '100', parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
+            })
+          }
         })
 
         yPos += 6
       })
 
-      const contentH = yPos + 10
+      const baseContentH = yPos + 10  // Height of content BEFORE tabs
 
       // Tab Control XML
       let tabXml = ''
+      let fieldsWithTabsXml = ''  // Fields INSIDE the tab (Phase 2)
+
       if (hasTabs) {
+        // PHASE 2: Generate fields WITH pestaña with relative coordinates INSIDE the TabControl
+        let tabYPos = 8  // Start inside the tab (small padding)
+        cat.sections.forEach((sec, si) => {
+          const fieldsWithTabs = sec.fields.filter(f => f.nombre.trim() && f.tipo !== 'table' && f.pestaña && f.pestaña.trim())
+          const tableFieldsWithTabs = sec.fields.filter(f => f.nombre.trim() && f.tipo === 'table' && f.pestaña && f.pestaña.trim())
+
+          if (fieldsWithTabs.length === 0 && tableFieldsWithTabs.length === 0) return
+
+          // Section header inside tabs
+          fieldsWithTabsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_Tab_${tableName}`, caption: sec.name, width: sectionWidth - 10, height: SEC_H, posx: 5, posy: tabYPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: getTabMeta('') })
+          tabYPos += SEC_GAP
+
+          // Process fields WITH pestaña in pairs (with RELATIVE coordinates)
+          for (let i = 0; i < fieldsWithTabs.length; i += 2) {
+            const f1 = fieldsWithTabs[i]
+            const f2 = fieldsWithTabs[i + 1]
+
+            if (f1) {
+              const colname = sanitizeName(f1.fieldKey || f1.nombre)
+              fieldsWithTabsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f1.pestaña) })
+              const typeno = typeToTypeNo[f1.tipo] || '1'
+              fieldsWithTabsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: FLD_X1 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f1.pestaña) })
+            }
+
+            if (f2) {
+              const colname = sanitizeName(f2.fieldKey || f2.nombre)
+              fieldsWithTabsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f2.pestaña) })
+              const typeno = typeToTypeNo[f2.tipo] || '1'
+              fieldsWithTabsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: FLD_X2 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f2.pestaña) })
+            }
+
+            tabYPos += ROW_GAP
+          }
+
+          // Table fields WITH pestaña
+          tableFieldsWithTabs.forEach((tableField) => {
+            const tableFieldNo = globalFieldNo--
+            fieldsWithTabsXml += makeTableField({ fieldno: tableFieldNo, fieldid: sanitizeName(tableField.nombre), caption: tableField.nombre, posy: tabYPos, tabMeta: getTabMeta(tableField.pestaña) })
+            tabYPos += 100
+            tabOrder++
+            dispOrder++
+
+            const columns = tableField.columnas || []
+            columns.forEach((col) => {
+              const colname = sanitizeName(col.nombre)
+              const colTypeno = typeToTypeNo[col.tipo] || '1'
+              fieldsWithTabsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: col.length || '100', parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
+            })
+          })
+
+          tabYPos += 6
+        })
+      }
+
+      const contentH = Math.max(baseContentH, hasTabs ? (tabYPos + 10) : 0)
         const camel = tableName.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
         const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
         const tableH = Math.max(contentH, 240) - 30
@@ -1292,7 +1351,7 @@ export default function CategoryBuilder() {
       const titleFlds = [catStartFieldNo, catStartFieldNo - 1, catStartFieldNo - 2].slice(0, Math.min(3, allFields.length)).map(n => `<Fld>${n}</Fld>`).join('')
       const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
 
-      return `<Category><CtgryNo>-${catIdx + 1}</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(cat.name)}</S></T></TStr></Name><Version>0</Version><Fields>${headerXml}${fieldsXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(cat.name)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${bgr(240, 240, 240)}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgryId}</CtgryID></Category>`
+      return `<Category><CtgryNo>-${catIdx + 1}</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(cat.name)}</S></T></TStr></Name><Version>0</Version><Fields>${headerXml}${fieldsXml}${fieldsWithTabsXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(cat.name)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${bgr(240, 240, 240)}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgryId}</CtgryID></Category>`
     }).join('')
 
     const newXml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${categoryBlocks}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
