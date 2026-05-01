@@ -1577,41 +1577,41 @@ export default function CategoryBuilder() {
   }))
 
   return (
-    <div className="category-container">
+    <div className="container-main">
       {/* HEADER */}
-      <div className="category-header">
+      <div className="header-main">
         <div>
-          <h1 className="category-title">🏗️ Generador de Categorías</h1>
-          <p className="category-subtitle">Crea múltiples categorías con secciones y campos · XML · v2.0</p>
+          <h1 className="header-title">🏗️ Generador de Categorías</h1>
+          <p className="header-subtitle">Crea múltiples categorías con secciones y campos · XML · v2.0</p>
         </div>
-        <div className="category-header-actions">
+        <div className="header-actions">
           <button
             onClick={() => setActiveView('editor')}
-            className={`category-btn ${activeView === 'editor' ? 'active' : ''}`}
+            className={activeView === 'editor' ? 'btn-primary' : 'btn-default'}
           >
             ✎ Editor
           </button>
           <button
             onClick={() => setActiveView('preview')}
-            className={`category-btn ${activeView === 'preview' ? 'active' : ''}`}
+            className={activeView === 'preview' ? 'btn-primary' : 'btn-default'}
           >
             👁 Preview
           </button>
           <button
             onClick={() => setManagerOpen(true)}
-            className="category-btn"
+            className="btn-default"
           >
             📁 Mis Plantillas
           </button>
           <button
             onClick={() => setColorModalOpen(true)}
-            className="category-btn"
+            className="btn-default"
           >
             🎨 Colores
           </button>
           <button
             onClick={generateXml}
-            className="category-btn-primary"
+            className="btn-primary"
           >
             ⚡ Generar XML
           </button>
@@ -1667,19 +1667,11 @@ export default function CategoryBuilder() {
       ) : (
         <>
           {/* INFORMACIÓN */}
-          <div style={{
-            background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
-            border: '1px solid var(--border-default)',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '16px',
-            backdropFilter: 'blur(14px)',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
-          }}>
+          <div className="card-glass">
             <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Categorías ({categories.length})</div>
 
             {/* Categories name editor */}
-            <div style={{ marginBottom: '14px', padding: '12px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)' }}>
+            <div className="section" style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nombres definitivos</div>
                 <button
@@ -1732,34 +1724,10 @@ export default function CategoryBuilder() {
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={addCategory}
-                style={{
-                  background: 'var(--bg-hover)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: '10px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  padding: '9px 18px',
-                  cursor: 'pointer',
-                  fontWeight: 600
-                }}
-              >
+              <button onClick={addCategory} className="btn-default">
                 + Nueva Categoría
               </button>
-              <button
-                onClick={saveTemplate}
-                style={{
-                  background: 'var(--bg-hover)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: '10px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  padding: '9px 18px',
-                  cursor: 'pointer',
-                  fontWeight: 600
-                }}
-              >
+              <button onClick={saveTemplate} className="btn-default">
                 💾 Guardar Plantilla
               </button>
             </div>
@@ -1795,23 +1763,17 @@ export default function CategoryBuilder() {
         footer={null}
       >
         {error && (
-          <div style={{ color: 'var(--accent-error)', fontSize: '12px', marginBottom: '10px', background: 'rgba(255, 80, 80, 0.12)', border: '1px solid rgba(255, 80, 80, 0.25)', padding: '8px 12px', borderRadius: '8px' }}>
+          <div className="alert alert-error">
             ⚠ {error}
           </div>
         )}
         {xml && (
           <div>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-              <button
-                onClick={copy}
-                className="category-btn-primary"
-              >
+              <button onClick={copy} className="btn-primary">
                 {copied ? '✓ Copiado' : '📋 Copiar XML'}
               </button>
-              <button
-                onClick={download}
-                className="category-btn"
-              >
+              <button onClick={download} className="btn-default">
                 ⬇ Descargar .xml
               </button>
             </div>

@@ -1,4 +1,6 @@
 ﻿/* Therefore Category Builder Styles - Consistent with eForms Builder */
+/* NOTE: These classes are deprecated. Use generic classes from design-tokens.css instead */
+/* Examples: .category-container → .container-main, .category-btn → .btn-default, etc. */
 
 .category-container {
   font-family: 'Inter', system-ui, sans-serif;
