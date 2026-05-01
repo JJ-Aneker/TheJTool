@@ -465,7 +465,41 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
         </div>
       )}
 
-      {baseFields.length > 0 && (
+      {/* When hideTabManager is true, show fields for selected tab + base fields without pestaña */}
+      {hideTabManager && selectedTab ? (
+        <div>
+          {/* Fields without pestaña appear outside tabs */}
+          {baseFields.map((item, idx) => (
+            <FieldRow
+              key={item.field.id}
+              field={item.field}
+              onChange={v => updateField(secIdx, item.idx, v)}
+              onRemove={() => removeField(secIdx, item.idx)}
+              showHeader={idx === 0}
+              fieldIndex={idx}
+              pestañas={pestañas}
+              updateFieldPestaña={updateFieldPestaña}
+              secIdx={secIdx}
+              fieldIdx={item.idx}
+            />
+          ))}
+          {/* Fields with selected tab */}
+          {(fieldsByTab[selectedTab] || []).map((item, idx) => (
+            <FieldRow
+              key={item.field.id}
+              field={item.field}
+              onChange={v => updateField(secIdx, item.idx, v)}
+              onRemove={() => removeField(secIdx, item.idx)}
+              showHeader={idx === 0 && baseFields.length === 0}
+              fieldIndex={baseFields.length + idx}
+              pestañas={pestañas}
+              updateFieldPestaña={updateFieldPestaña}
+              secIdx={secIdx}
+              fieldIdx={item.idx}
+            />
+          ))}
+        </div>
+      ) : baseFields.length > 0 && (
         <div>
           {baseFields.map((item, baseFieldIdx) => (
             <FieldRow
