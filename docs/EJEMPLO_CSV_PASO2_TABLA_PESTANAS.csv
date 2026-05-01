@@ -1,0 +1,31 @@
+Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría
+ID Empleado;text;si;General;Datos;Recursos Humanos
+Nombre Completo;text;si;General;Datos;Recursos Humanos
+Correo Electrónico;email;si;General;Datos;Recursos Humanos
+Fecha Contratación;date;si;General;Datos;Recursos Humanos
+Fecha Nacimiento;date;no;General;Datos;Recursos Humanos
+
+Salario Base;money;si;Compensación;Compensación;Recursos Humanos
+Salario Mensual;money;si;Compensación;Compensación;Recursos Humanos
+Código Postal;number;no;Compensación;Compensación;Recursos Humanos
+Antigüedad (años);number;no;Compensación;Compensación;Recursos Humanos
+
+Activo;boolean;si;Estado;Estado;Recursos Humanos
+Tiene Seguro;boolean;no;Estado;Estado;Recursos Humanos
+Última Actualización;datetime;no;Estado;Estado;Recursos Humanos
+
+Código Proyecto;text;si;General;Datos;Proyectos
+Nombre Proyecto;text;si;General;Datos;Proyectos
+Responsable;text;no;General;Datos;Proyectos
+Descripción;text;no;General;Datos;Proyectos
+
+Fecha Inicio;date;si;Planificación;Planificación;Proyectos
+Fecha Estimada Fin;date;no;Planificación;Planificación;Proyectos
+Prioridad;number;si;Planificación;Planificación;Proyectos
+
+Presupuesto;money;si;Financiero;Financiero;Proyectos
+Horas Estimadas;number;si;Financiero;Financiero;Proyectos
+Horas Ejecutadas;number;no;Financiero;Financiero;Proyectos
+
+Completado;boolean;si;Estado;Estado;Proyectos
+Fecha Conclusión;date;no;Estado;Estado;Proyectos

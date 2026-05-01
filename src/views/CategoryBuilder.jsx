@@ -1188,8 +1188,12 @@ export default function CategoryBuilder() {
         const trimmedPestaña = fieldPestaña?.trim()
         if (!trimmedPestaña || !pestañaToTabNo[trimmedPestaña]) return ''
         const tabNo = pestañaToTabNo[trimmedPestaña]
-        return tabMetaXml(tabNo, TAB_NO)
+        return `<BelongsToTable>${categoryTabNo}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${tabNo}</ShowInTabNo>`
       }
+
+      // Use unique Tab and Table FieldNo per category (decreasing from -200, -201, etc.)
+      const categoryTabNo = globalFieldNo--
+      const categoryTableNo = globalFieldNo--
 
       let yPos = hasTabs ? 8 : HDR_H + SEC_GAP
       const sectionWidth = hasTabs ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
@@ -1267,7 +1271,7 @@ export default function CategoryBuilder() {
 
         // Table field for history tab (always the last tab)
         const historyTabNo = sortedPestañas.length + 1
-        tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption(tab2Name)}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>${foreignTableName(tableName)}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>${historyTabNo}</ShowInTabNo><FieldID>Historial_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        tabXml += `<Field><FieldNo>${categoryTableNo}</FieldNo>${xmlCaption(tab2Name)}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${categoryTabNo}</BelongsToTable><ForeignTable>${foreignTableName(tableName)}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>${historyTabNo}</ShowInTabNo><FieldID>Historial_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
 
         // Build tab entries dynamically
         const tabEntries = sortedPestañas.map((p, idx) => {
@@ -1279,7 +1283,7 @@ export default function CategoryBuilder() {
         const historyTabEntry = `<T FactoryType="1"><TabNo>${historyTabNo}</TabNo><TabPos>${historyTabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>Historial</S></T></TStr></TabCapt></T>`
 
         // Tab Control
-        tabXml += `<Field><FieldNo>${TAB_NO}</FieldNo>${xmlCaption(tab1Name)}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs>${tabEntries}${historyTabEntry}</Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        tabXml += `<Field><FieldNo>${categoryTabNo}</FieldNo>${xmlCaption(tab1Name)}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs>${tabEntries}${historyTabEntry}</Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
       }
 
       const dialogH = hasTabs ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
