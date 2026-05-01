@@ -372,9 +372,6 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
 function SectionEditor({ section, secIdx, updateField, removeField, addField, updateSecName, removeSection, catSectionsCount, addPestaña, removePestaña, updateFieldPestaña, selectedTab, hideTabManager }) {
   const [newPestañaInput, setNewPestañaInput] = useState('')
 
-  // Use selectedTab if provided, otherwise manage internally (for backward compatibility)
-  const currentActiveTab = selectedTab || null
-
   // Separate fields: those without pestaña (baseFields) and those with pestaña (fieldsByTab)
   const baseFields = []
   const fieldsByTab = {}
