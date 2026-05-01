@@ -1407,7 +1407,7 @@ export default function CategoryBuilder() {
     key: idx.toString(),
     label: cat.name,
     children: (
-      <div>
+      <div className="eform-panel">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <input
             value={cat.name}
