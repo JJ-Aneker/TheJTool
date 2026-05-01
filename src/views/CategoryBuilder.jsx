@@ -249,7 +249,7 @@ function CsvImporter({ onImport }) {
           {preview && (
             <div style={{ marginTop: '10px' }}>
               {preview.error ? (
-                <div style={{ color: '#ff6464', background: 'rgba(255, 100, 100, 0.1)', padding: '8px 12px', borderRadius: '4px', fontSize: '12px' }}>
+                <div style={{ color: 'var(--accent-error)', background: 'rgba(255, 80, 80, 0.1)', padding: '8px 12px', borderRadius: '4px', fontSize: '12px' }}>
                   ⚠ {preview.error}
                 </div>
               ) : (
@@ -572,7 +572,7 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
           background: 'rgba(255, 255, 255, 0.06)',
           border: '1px solid rgba(255, 255, 255, 0.14)',
           borderRadius: '10px',
-          color: '#e6e7eb',
+          color: 'var(--text-primary)',
           fontSize: '12px',
           padding: '6px 12px',
           cursor: 'pointer',
@@ -699,8 +699,8 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
             />
           </div>
           {field.tipo === 'table' && (
-            <div style={{ gridColumn: '1 / -1', marginTop: '8px', padding: '8px', background: 'rgba(0, 0, 0, 0.2)', borderRadius: '4px' }}>
-              <div style={{ fontSize: '10px', fontWeight: '600', color: '#9ad1ff', marginBottom: '6px', textTransform: 'uppercase' }}>Columnas de tabla</div>
+            <div style={{ gridColumn: '1 / -1', marginTop: '8px', padding: '8px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--accent-primary)', marginBottom: '6px', textTransform: 'uppercase' }}>Columnas de tabla</div>
               {!field.columnas && (onChange({ ...field, columnas: [] }))}
               {(field.columnas || []).map((col, colIdx) => (
                 <div key={col.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '6px', marginBottom: '6px', alignItems: 'center' }}>
@@ -768,7 +768,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
                       const newCols = (field.columnas || []).filter((_, i) => i !== colIdx)
                       onChange({ ...field, columnas: newCols })
                     }}
-                    style={{ padding: '2px 6px', background: 'rgba(255, 100, 100, 0.1)', border: '1px solid rgba(255, 100, 100, 0.3)', borderRadius: '3px', cursor: 'pointer', fontSize: '10px', color: '#ff6464' }}
+                    style={{ padding: '2px 6px', background: 'rgba(255, 80, 80, 0.1)', border: '1px solid rgba(255, 100, 100, 0.3)', borderRadius: '3px', cursor: 'pointer', fontSize: '10px', color: 'var(--accent-error)' }}
                   >
                     ✕
                   </button>
@@ -780,7 +780,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
                   newCols.push({ id: newGuid(), nombre: '', tipo: 'text', length: 100 })
                   onChange({ ...field, columnas: newCols })
                 }}
-                style={{ width: '100%', padding: '4px 6px', marginTop: '6px', background: 'rgba(154, 209, 255, 0.1)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '3px', cursor: 'pointer', fontSize: '11px', color: '#9ad1ff', fontWeight: '600' }}
+                style={{ width: '100%', padding: '4px 6px', marginTop: '6px', background: 'rgba(154, 209, 255, 0.1)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '3px', cursor: 'pointer', fontSize: '11px', color: 'var(--accent-primary)', fontWeight: '600' }}
               >
                 + Columna
               </button>
@@ -1457,7 +1457,7 @@ export default function CategoryBuilder() {
               border: '1px solid rgba(255, 255, 255, 0.18)',
               borderRadius: '8px',
               padding: '7px 10px',
-              color: '#9ad1ff',
+              color: 'var(--accent-primary)',
               fontSize: '13px',
               fontWeight: 600,
               boxSizing: 'border-box',
@@ -1473,7 +1473,7 @@ export default function CategoryBuilder() {
                 background: 'rgba(255, 80, 80, 0.10)',
                 border: '1px solid rgba(255, 80, 80, 0.25)',
                 borderRadius: '10px',
-                color: '#fecaca',
+                color: 'var(--accent-error)',
                 fontSize: '12px',
                 padding: '6px 12px',
                 cursor: 'pointer'
@@ -1563,7 +1563,7 @@ export default function CategoryBuilder() {
             background: 'rgba(255, 255, 255, 0.06)',
             border: '1px solid rgba(255, 255, 255, 0.14)',
             borderRadius: '10px',
-            color: '#e6e7eb',
+            color: 'var(--text-primary)',
             fontSize: '12px',
             padding: '6px 12px',
             cursor: 'pointer',
@@ -1670,12 +1670,12 @@ export default function CategoryBuilder() {
             backdropFilter: 'blur(14px)',
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
           }}>
-            <div style={{ fontSize: '11px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Categorías ({categories.length})</div>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Categorías ({categories.length})</div>
 
             {/* Categories name editor */}
-            <div style={{ marginBottom: '14px', padding: '12px', background: 'rgba(0, 0, 0, 0.2)', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div style={{ marginBottom: '14px', padding: '12px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <div style={{ fontSize: '10px', fontWeight: '600', color: 'rgba(238, 244, 255, 0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nombres definitivos</div>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nombres definitivos</div>
                 <button
                   onClick={() => {
                     const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
@@ -1689,7 +1689,7 @@ export default function CategoryBuilder() {
                     padding: '4px 8px',
                     background: 'rgba(154, 209, 255, 0.15)',
                     border: '1px solid rgba(154, 209, 255, 0.3)',
-                    color: '#9ad1ff',
+                    color: 'var(--accent-primary)',
                     borderRadius: '4px',
                     cursor: 'pointer',
                     fontWeight: '600',
@@ -1713,7 +1713,7 @@ export default function CategoryBuilder() {
                       background: 'rgba(255, 255, 255, 0.06)',
                       border: '1px solid rgba(255, 255, 255, 0.18)',
                       borderRadius: '6px',
-                      color: '#9ad1ff',
+                      color: 'var(--accent-primary)',
                       fontSize: '12px',
                       fontWeight: '500',
                       boxSizing: 'border-box',
@@ -1747,7 +1747,7 @@ export default function CategoryBuilder() {
                   background: 'rgba(255, 255, 255, 0.06)',
                   border: '1px solid rgba(255, 255, 255, 0.14)',
                   borderRadius: '10px',
-                  color: '#e6e7eb',
+                  color: 'var(--text-primary)',
                   fontSize: '13px',
                   padding: '9px 18px',
                   cursor: 'pointer',
@@ -1762,7 +1762,7 @@ export default function CategoryBuilder() {
                   background: 'rgba(255, 255, 255, 0.06)',
                   border: '1px solid rgba(255, 255, 255, 0.14)',
                   borderRadius: '10px',
-                  color: '#e6e7eb',
+                  color: 'var(--text-primary)',
                   fontSize: '13px',
                   padding: '9px 18px',
                   cursor: 'pointer',
@@ -1804,7 +1804,7 @@ export default function CategoryBuilder() {
         footer={null}
       >
         {error && (
-          <div style={{ color: '#fecaca', fontSize: '12px', marginBottom: '10px', background: 'rgba(255, 80, 80, 0.12)', border: '1px solid rgba(255, 80, 80, 0.25)', padding: '8px 12px', borderRadius: '8px' }}>
+          <div style={{ color: 'var(--accent-error)', fontSize: '12px', marginBottom: '10px', background: 'rgba(255, 80, 80, 0.12)', border: '1px solid rgba(255, 80, 80, 0.25)', padding: '8px 12px', borderRadius: '8px' }}>
             ⚠ {error}
           </div>
         )}
@@ -1832,7 +1832,7 @@ export default function CategoryBuilder() {
                   background: 'rgba(255, 255, 255, 0.06)',
                   border: '1px solid rgba(255, 255, 255, 0.14)',
                   borderRadius: '10px',
-                  color: '#e6e7eb',
+                  color: 'var(--text-primary)',
                   fontSize: '13px',
                   padding: '8px 16px',
                   cursor: 'pointer',
