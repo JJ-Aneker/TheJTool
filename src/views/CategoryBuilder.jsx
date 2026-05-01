@@ -1265,10 +1265,11 @@ export default function CategoryBuilder() {
       // Tab Control XML
       let tabXml = ''
       let fieldsWithTabsXml = ''  // Fields INSIDE the tab (Phase 2)
+      let tabYPos = 0  // Track vertical position for tab content height calculation
 
       if (hasTabs) {
         // PHASE 2: Generate fields WITH pestaña with relative coordinates INSIDE the TabControl
-        let tabYPos = 8  // Start inside the tab (small padding)
+        tabYPos = 8  // Start inside the tab (small padding)
         cat.sections.forEach((sec, si) => {
           const fieldsWithTabs = sec.fields.filter(f => f.nombre.trim() && f.tipo !== 'table' && f.pestaña && f.pestaña.trim())
           const tableFieldsWithTabs = sec.fields.filter(f => f.nombre.trim() && f.tipo === 'table' && f.pestaña && f.pestaña.trim())
