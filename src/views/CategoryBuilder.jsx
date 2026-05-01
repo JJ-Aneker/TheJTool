@@ -1322,11 +1322,12 @@ export default function CategoryBuilder() {
       }
 
       const contentH = Math.max(baseContentH, hasTabs ? (tabYPos + 10) : 0)
-        const camel = tableName.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
-        const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
-        const tableH = Math.max(contentH, 240) - 30
-        const tabH2 = Math.max(contentH + 20, 260)
+      const camel = tableName.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
+      const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
+      const tableH = Math.max(contentH, 240) - 30
+      const tabH2 = Math.max(contentH + 20, 260)
 
+      if (hasTabs) {
         // Table field for history tab (always the last tab)
         const historyTabNo = sortedPestañas.length + 1
         tabXml += `<Field><FieldNo>${categoryTableNo}</FieldNo>${xmlCaption(tab2Name)}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${categoryTabNo}</BelongsToTable><ForeignTable>${foreignTableName(tableName)}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>${historyTabNo}</ShowInTabNo><FieldID>Historial_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
