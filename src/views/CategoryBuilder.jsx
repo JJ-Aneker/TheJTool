@@ -439,7 +439,7 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
                 }
               }}
               placeholder="+ Nueva pestaña"
-              style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: 'var(--text-secondary)', outline: 'none', minWidth: '120px' }}
+              style={{ background: 'var(--bg-input)', border: '1px solid var(--border-default)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: 'var(--text-secondary)', outline: 'none', minWidth: '120px' }}
             />
           </div>
         </div>
@@ -569,8 +569,8 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
         onClick={() => addField(secIdx)}
         style={{
           width: '100%',
-          background: 'rgba(255, 255, 255, 0.06)',
-          border: '1px solid rgba(255, 255, 255, 0.14)',
+          background: 'var(--bg-hover)',
+          border: '1px solid var(--border-default)',
           borderRadius: '10px',
           color: 'var(--text-primary)',
           fontSize: '12px',
@@ -768,7 +768,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
                       const newCols = (field.columnas || []).filter((_, i) => i !== colIdx)
                       onChange({ ...field, columnas: newCols })
                     }}
-                    style={{ padding: '2px 6px', background: 'rgba(255, 80, 80, 0.1)', border: '1px solid rgba(255, 100, 100, 0.3)', borderRadius: '3px', cursor: 'pointer', fontSize: '10px', color: 'var(--accent-error)' }}
+                    style={{ padding: '2px 6px', background: 'rgba(255, 80, 80, 0.1)', border: '1px solid rgba(255, 80, 80, 0.25)', borderRadius: '3px', cursor: 'pointer', fontSize: '10px', color: 'var(--accent-error)' }}
                   >
                     ✕
                   </button>
@@ -1453,8 +1453,8 @@ export default function CategoryBuilder() {
             onChange={e => updateCategoryName(idx, e.target.value)}
             style={{
               flex: 1,
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.18)',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border-default)',
               borderRadius: '8px',
               padding: '7px 10px',
               color: 'var(--accent-primary)',
@@ -1560,8 +1560,8 @@ export default function CategoryBuilder() {
         <button
           onClick={addSection}
           style={{
-            background: 'rgba(255, 255, 255, 0.06)',
-            border: '1px solid rgba(255, 255, 255, 0.14)',
+            background: 'var(--bg-hover)',
+            border: '1px solid var(--border-default)',
             borderRadius: '10px',
             color: 'var(--text-primary)',
             fontSize: '12px',
@@ -1663,7 +1663,7 @@ export default function CategoryBuilder() {
           {/* INFORMACIÓN */}
           <div style={{
             background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
-            border: '1px solid rgba(255, 255, 255, 0.10)',
+            border: '1px solid var(--border-default)',
             borderRadius: '8px',
             padding: '16px',
             marginBottom: '16px',
@@ -1710,8 +1710,8 @@ export default function CategoryBuilder() {
                     style={{
                       width: '100%',
                       padding: '8px 10px',
-                      background: 'rgba(255, 255, 255, 0.06)',
-                      border: '1px solid rgba(255, 255, 255, 0.18)',
+                      background: 'var(--bg-hover)',
+                      border: '1px solid var(--border-default)',
                       borderRadius: '6px',
                       color: 'var(--accent-primary)',
                       fontSize: '12px',
@@ -1744,8 +1744,8 @@ export default function CategoryBuilder() {
               <button
                 onClick={addCategory}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  background: 'var(--bg-hover)',
+                  border: '1px solid var(--border-default)',
                   borderRadius: '10px',
                   color: 'var(--text-primary)',
                   fontSize: '13px',
@@ -1759,8 +1759,8 @@ export default function CategoryBuilder() {
               <button
                 onClick={saveTemplate}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  background: 'var(--bg-hover)',
+                  border: '1px solid var(--border-default)',
                   borderRadius: '10px',
                   color: 'var(--text-primary)',
                   fontSize: '13px',
@@ -1779,7 +1779,7 @@ export default function CategoryBuilder() {
             <CsvImporter onImport={handleCsvImport} />
             <div style={{
               background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
-              border: '1px solid rgba(255, 255, 255, 0.10)',
+              border: '1px solid var(--border-default)',
               borderRadius: '8px',
               padding: '16px',
               backdropFilter: 'blur(14px)',
@@ -1829,8 +1829,8 @@ export default function CategoryBuilder() {
               <button
                 onClick={download}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  background: 'var(--bg-hover)',
+                  border: '1px solid var(--border-default)',
                   borderRadius: '10px',
                   color: 'var(--text-primary)',
                   fontSize: '13px',
@@ -1852,7 +1852,7 @@ export default function CategoryBuilder() {
                 width: '100%',
                 height: '300px',
                 padding: '10px',
-                border: '1px solid rgba(255, 255, 255, 0.14)',
+                border: '1px solid var(--border-default)',
                 borderRadius: '8px',
                 fontFamily: 'monospace',
                 fontSize: '11px',
