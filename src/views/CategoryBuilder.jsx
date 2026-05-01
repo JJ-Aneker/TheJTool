@@ -351,7 +351,7 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
   const currentActiveTab = selectedTab || (pestañas.length > 0 ? pestañas[0] : null)
 
   return (
-    <div className="category-section">
+    <div className="eforms-panel">
       <div className="category-section-header">
         <input
           value={section.name}

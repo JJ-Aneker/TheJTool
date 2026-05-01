@@ -611,11 +611,13 @@ select:focus {
 .ant-modal-content {
   background: var(--bg-card) !important;
   color: var(--text-primary);
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .ant-modal-header {
   background: var(--bg-card) !important;
   border-color: var(--border-default) !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 .ant-modal-body {
@@ -1033,6 +1035,7 @@ label {
   border-radius: var(--radius-md) !important;
   padding: 16px !important;
   margin-bottom: 16px !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 /* Aliases for backwards compatibility and consistency */
@@ -1048,10 +1051,10 @@ label {
   border-radius: var(--radius-md) !important;
   padding: 16px !important;
   margin-bottom: 16px !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 /* Card with backdrop blur effect - also uses standard panel */
-.card-glass,
 .panel-glass,
 .eform-panel-glass {
   background: var(--bg-card) !important;
