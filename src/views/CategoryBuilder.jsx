@@ -391,39 +391,19 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
   const currentActiveTab = selectedTab || (pestañas.length > 0 ? pestañas[0] : null)
 
   return (
-    <div style={{ background: 'rgba(0, 0, 0, 0.18)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+    <div className="category-section">
+      <div className="category-section-header">
         <input
           value={section.name}
           onChange={e => updateSecName(secIdx, e.target.value)}
-          style={{
-            flex: 1,
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            borderRadius: '8px',
-            padding: '7px 10px',
-            color: '#9ad1ff',
-            fontSize: '13px',
-            fontWeight: 600,
-            boxSizing: 'border-box',
-            outline: 'none',
-            fontFamily: 'inherit',
-            marginRight: '8px'
-          }}
+          className="category-input-compact"
+          style={{ flex: 1 }}
         />
-        <span style={{ fontSize: '10px', background: 'rgba(154, 209, 255, 0.12)', color: '#9ad1ff', padding: '2px 7px', borderRadius: '5px', border: '1px solid rgba(154, 209, 255, 0.20)', marginRight: '8px' }}>{section.fields.filter(f => f.nombre).length} campos</span>
+        <span className="category-badge">{section.fields.filter(f => f.nombre).length} campos</span>
         {catSectionsCount > 1 && (
           <button
             onClick={() => removeSection(secIdx)}
-            style={{
-              background: 'rgba(255, 80, 80, 0.10)',
-              border: '1px solid rgba(255, 80, 80, 0.25)',
-              borderRadius: '10px',
-              color: '#fecaca',
-              fontSize: '12px',
-              padding: '6px 12px',
-              cursor: 'pointer'
-            }}
+            className="category-btn-danger"
           >
             ✕
           </button>
@@ -432,16 +412,15 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
 
       {/* Tab Manager - only show if not hidden by parent */}
       {!hideTabManager && (
-        <div style={{ background: 'rgba(154, 209, 255, 0.08)', border: '1px solid rgba(154, 209, 255, 0.15)', borderRadius: '6px', padding: '10px', marginBottom: '12px' }}>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', marginBottom: '8px' }}>📑 Pestañas</div>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="category-pestana-manager">
+          <div className="category-pestana-title">📑 Pestañas</div>
+          <div className="category-pestana-list">
             {pestañas.map((p) => (
-              <div key={p} style={{ display: 'flex', alignItems: 'center', background: 'rgba(154, 209, 255, 0.12)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: '#9ad1ff' }}>
+              <div key={p} className="category-pestana-tag">
                 {p}
                 {pestañas.length > 1 && (
                   <button
                     onClick={() => removePestaña(secIdx, p)}
-                    style={{ background: 'none', border: 'none', color: '#fecaca', cursor: 'pointer', marginLeft: '6px', fontSize: '12px', padding: '0' }}
                     title="Eliminar pestaña"
                   >
                     ×
@@ -613,13 +592,13 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
   return (
     <>
       {showHeader && (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.8fr auto', gap: '8px', marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid var(--border-default)' }}>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Nombre</div>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Tipo</div>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Obligatorio</div>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Pestaña</div>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}></div>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}></div>
+        <div className="category-field-header">
+          <div>Nombre</div>
+          <div>Tipo</div>
+          <div>Obligatorio</div>
+          <div>Pestaña</div>
+          <div></div>
+          <div></div>
         </div>
       )}
       <div className="category-field-main">
