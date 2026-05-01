@@ -1135,6 +1135,16 @@ export default function CategoryBuilder() {
   const TAB_NO = -200, TABLE_NO = -201
   const TAB_PAD_X = 5, TAB_PAD_Y = 44, TAB_MARGIN = 10
 
+  // Layout inside tab control (relative coordinates, 20px margins)
+  const TAB_INNER = 20
+  const TAB_LBL_X1 = TAB_INNER                    // 20
+  const TAB_FLD_X1 = TAB_INNER + LBL_W + 7        // 122
+  const TAB_LBL_X2 = TAB_FLD_X1 + FLD_W + 8       // 290
+  const TAB_FLD_X2 = TAB_LBL_X2 + LBL_W + 7       // 392
+  const TAB_INNER_W = DIALOG_W - TAB_MARGIN * 2    // 510
+  const TAB_FLD_W2 = TAB_INNER_W - TAB_INNER - TAB_FLD_X2  // 98
+  const TAB_SEC_W = TAB_INNER_W - TAB_INNER * 2   // 470
+
   const generateXml = () => {
     setError('')
 
@@ -1268,58 +1278,107 @@ export default function CategoryBuilder() {
       let tabYPos = 0  // Track vertical position for tab content height calculation
 
       if (hasTabs) {
-        // PHASE 2: Generate fields WITH pestaña with relative coordinates INSIDE the TabControl
-        tabYPos = 8  // Start inside the tab (small padding)
-        cat.sections.forEach((sec, si) => {
-          const fieldsWithTabs = sec.fields.filter(f => f.nombre.trim() && f.tipo !== 'table' && f.pestaña && f.pestaña.trim())
-          const tableFieldsWithTabs = sec.fields.filter(f => f.nombre.trim() && f.tipo === 'table' && f.pestaña && f.pestaña.trim())
+        // PHASE 2: Generate fields WITH pestaña inside tabs - loop by tab, then by section
+        let maxTabH = 0
 
-          if (fieldsWithTabs.length === 0 && tableFieldsWithTabs.length === 0) return
+        sortedPestañas.forEach((tabName, tabIdx) => {
+          const tabNo = tabIdx + 1
+          let tabYPos = TAB_INNER  // reset to 20 for every tab
 
-          // Section header inside tabs
-          fieldsWithTabsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_Tab_${tableName}`, caption: sec.name, width: sectionWidth - 10, height: SEC_H, posx: 5, posy: tabYPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: getTabMeta('') })
-          tabYPos += SEC_GAP
+          const mkTabMeta = () =>
+            `<BelongsToTable>${categoryTabNo}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${tabNo}</ShowInTabNo>`
 
-          // Process fields WITH pestaña in pairs (with RELATIVE coordinates)
-          for (let i = 0; i < fieldsWithTabs.length; i += 2) {
-            const f1 = fieldsWithTabs[i]
-            const f2 = fieldsWithTabs[i + 1]
+          cat.sections.forEach((sec, si) => {
+            const fieldsForTab = sec.fields.filter(f =>
+              f.nombre.trim() && f.tipo !== 'table' && f.pestaña?.trim() === tabName
+            )
+            const tableFieldsForTab = sec.fields.filter(f =>
+              f.nombre.trim() && f.tipo === 'table' && f.pestaña?.trim() === tabName
+            )
 
-            if (f1) {
-              const colname = sanitizeName(f1.fieldKey || f1.nombre)
-              fieldsWithTabsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f1.pestaña) })
-              const typeno = typeToTypeNo[f1.tipo] || '1'
-              fieldsWithTabsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: FLD_X1 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f1.pestaña) })
-            }
+            if (fieldsForTab.length === 0 && tableFieldsForTab.length === 0) return
 
-            if (f2) {
-              const colname = sanitizeName(f2.fieldKey || f2.nombre)
-              fieldsWithTabsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f2.pestaña) })
-              const typeno = typeToTypeNo[f2.tipo] || '1'
-              fieldsWithTabsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: FLD_X2 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f2.pestaña) })
-            }
-
-            tabYPos += ROW_GAP
-          }
-
-          // Table fields WITH pestaña
-          tableFieldsWithTabs.forEach((tableField) => {
-            const tableFieldNo = globalFieldNo--
-            fieldsWithTabsXml += makeTableField({ fieldno: tableFieldNo, fieldid: sanitizeName(tableField.nombre), caption: tableField.nombre, posy: tabYPos, tabMeta: getTabMeta(tableField.pestaña) })
-            tabYPos += 100
-            tabOrder++
-            dispOrder++
-
-            const columns = tableField.columnas || []
-            columns.forEach((col) => {
-              const colname = sanitizeName(col.nombre)
-              const colTypeno = typeToTypeNo[col.tipo] || '1'
-              fieldsWithTabsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: col.length || '100', parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
+            // Section header INSIDE this tab with correct ShowInTabNo
+            fieldsWithTabsXml += makeLabelField({
+              fieldno: globalLabelNo--,
+              fieldid: `Sec_${si}_T${tabNo}_${tableName}`,
+              caption: sec.name,
+              width: TAB_SEC_W, height: SEC_H,
+              posx: TAB_INNER, posy: tabYPos,
+              bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6,
+              tabMeta: mkTabMeta()
             })
+            tabYPos += SEC_GAP
+
+            // Regular fields in pairs with relative tab coordinates
+            for (let i = 0; i < fieldsForTab.length; i += 2) {
+              const f1 = fieldsForTab[i]
+              const f2 = fieldsForTab[i + 1]
+
+              if (f1) {
+                const colname = sanitizeName(f1.fieldKey || f1.nombre)
+                fieldsWithTabsXml += makeLabelField({
+                  fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre,
+                  width: LBL_W, height: LBL_H, posx: TAB_LBL_X1, posy: tabYPos + 1,
+                  fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
+                })
+                const typeno = typeToTypeNo[f1.tipo] || '1'
+                fieldsWithTabsXml += makeDataField({
+                  fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre,
+                  typeno, length: f1.length || '100',
+                  width: FLD_W, height: ROW_H, posx: TAB_FLD_X1, posy: tabYPos,
+                  taborder: tabOrder++, disporder: dispOrder++, tabMeta: mkTabMeta()
+                })
+              }
+
+              if (f2) {
+                const colname = sanitizeName(f2.fieldKey || f2.nombre)
+                fieldsWithTabsXml += makeLabelField({
+                  fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre,
+                  width: LBL_W, height: LBL_H, posx: TAB_LBL_X2, posy: tabYPos + 1,
+                  fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
+                })
+                const typeno = typeToTypeNo[f2.tipo] || '1'
+                fieldsWithTabsXml += makeDataField({
+                  fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre,
+                  typeno, length: f2.length || '100',
+                  width: TAB_FLD_W2, height: ROW_H, posx: TAB_FLD_X2, posy: tabYPos,
+                  taborder: tabOrder++, disporder: dispOrder++, tabMeta: mkTabMeta()
+                })
+              }
+
+              tabYPos += ROW_GAP
+            }
+
+            // Table fields inside this tab
+            tableFieldsForTab.forEach((tableField) => {
+              const tableFieldNo = globalFieldNo--
+              fieldsWithTabsXml += makeTableField({
+                fieldno: tableFieldNo, fieldid: sanitizeName(tableField.nombre),
+                caption: tableField.nombre, posy: tabYPos, tabMeta: mkTabMeta()
+              })
+              tabYPos += 100
+              tabOrder++; dispOrder++
+
+              const columns = tableField.columnas || []
+              columns.forEach((col) => {
+                const colname = sanitizeName(col.nombre)
+                const colTypeno = typeToTypeNo[col.tipo] || '1'
+                fieldsWithTabsXml += makeTableColumnField({
+                  fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre,
+                  typeno: colTypeno, length: col.length || '100',
+                  parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++
+                })
+              })
+            })
+
+            tabYPos += 6
           })
 
-          tabYPos += 6
+          maxTabH = Math.max(maxTabH, tabYPos + TAB_INNER)  // bottom margin 20px
         })
+
+        tabYPos = maxTabH  // expose for contentH calculation below
       }
 
       const contentH = Math.max(baseContentH, hasTabs ? (tabYPos + 10) : 0)
