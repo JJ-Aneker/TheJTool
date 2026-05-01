@@ -183,7 +183,7 @@ export default function UserProfile() {
         {profile && (
           <Spin spinning={loading}>
             <div style={{ marginBottom: '16px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr', gap: '24px', alignItems: 'start' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr', gap: 'var(--gap-2xl)', alignItems: 'start' }}>
                 <div style={{ textAlign: 'center' }}>
                   <Upload
                     name="avatar"
@@ -210,8 +210,8 @@ export default function UserProfile() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'white',
-                        border: '2px solid white',
+                        color: '#ffffff',
+                        border: '2px solid var(--bg-canvas)',
                         opacity: avatarLoading ? 0.6 : 1
                       }}>
                         {avatarLoading ? <Spin size="small" /> : <CameraOutlined style={{ fontSize: '12px' }} />}

@@ -283,7 +283,7 @@ export default function UserManager() {
   const stats = getStatistics()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%' }}>
       <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
         <UserOutlined /> Gestión de Usuarios
       </h1>
@@ -488,8 +488,8 @@ export default function UserManager() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'white',
-                      border: '2px solid white',
+                      color: '#ffffff',
+                      border: '2px solid var(--bg-canvas)',
                       opacity: avatarLoading ? 0.6 : 1
                     }}>
                       {avatarLoading ? <Spin size="small" /> : <CameraOutlined style={{ fontSize: '12px' }} />}
@@ -514,7 +514,7 @@ export default function UserManager() {
           onFinish={handleModalOk}
           style={{ marginTop: '-8px' }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-xl)' }}>
             <Form.Item
               label="Nombre"
               name="name"
@@ -562,7 +562,7 @@ export default function UserManager() {
             <Input placeholder="Calle principal, 123" />
           </Form.Item>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-xl)' }}>
             <Form.Item
               label="Ciudad"
               name="city"

@@ -87,7 +87,7 @@ export default function Login() {
           <Input
             placeholder="Correo electrónico"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -99,7 +99,7 @@ export default function Login() {
             type="password"
             placeholder="Contraseña"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -157,7 +157,7 @@ export default function Login() {
           <Input
             placeholder="Nombre"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -168,7 +168,7 @@ export default function Login() {
           <Input
             placeholder="Apellidos"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -179,7 +179,7 @@ export default function Login() {
           <Input
             placeholder="Teléfono"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -193,7 +193,7 @@ export default function Login() {
           <Input
             placeholder="Correo electrónico"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -208,7 +208,7 @@ export default function Login() {
             type="password"
             placeholder="Contraseña"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -220,7 +220,7 @@ export default function Login() {
             type="password"
             placeholder="Confirmar contraseña"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
@@ -275,7 +275,7 @@ export default function Login() {
           <Input
             placeholder="Correo electrónico"
             size="large"
-            style={{ height: '40px' }}
+            style={{ height: 'var(--height-input)' }}
           />
         </Form.Item>
 
