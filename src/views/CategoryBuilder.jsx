@@ -369,9 +369,11 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
   )
 }
 
-function SectionEditor({ section, secIdx, updateField, removeField, addField, updateSecName, removeSection, catSectionsCount, addPestaña, removePestaña, updateFieldPestaña }) {
-  const [activeTab, setActiveTab] = useState(null)
+function SectionEditor({ section, secIdx, updateField, removeField, addField, updateSecName, removeSection, catSectionsCount, addPestaña, removePestaña, updateFieldPestaña, selectedTab, hideTabManager }) {
   const [newPestañaInput, setNewPestañaInput] = useState('')
+
+  // Use selectedTab if provided, otherwise manage internally (for backward compatibility)
+  const currentActiveTab = selectedTab || null
 
   // Separate fields: those without pestaña (baseFields) and those with pestaña (fieldsByTab)
   const baseFields = []
@@ -388,7 +390,7 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
   })
 
   const pestañas = section.pestañas || ['Datos']
-  const currentActiveTab = activeTab || (pestañas.length > 0 ? pestañas[0] : null)
+  const currentActiveTab = selectedTab || (pestañas.length > 0 ? pestañas[0] : null)
 
   return (
     <div style={{ background: 'rgba(0, 0, 0, 0.18)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
@@ -430,39 +432,41 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
         )}
       </div>
 
-      {/* Tab Manager */}
-      <div style={{ background: 'rgba(154, 209, 255, 0.08)', border: '1px solid rgba(154, 209, 255, 0.15)', borderRadius: '6px', padding: '10px', marginBottom: '12px' }}>
-        <div style={{ fontSize: '10px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', marginBottom: '8px' }}>📑 Pestañas</div>
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-          {pestañas.map((p) => (
-            <div key={p} style={{ display: 'flex', alignItems: 'center', background: 'rgba(154, 209, 255, 0.12)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: '#9ad1ff' }}>
-              {p}
-              {pestañas.length > 1 && (
-                <button
-                  onClick={() => removePestaña(secIdx, p)}
-                  style={{ background: 'none', border: 'none', color: '#fecaca', cursor: 'pointer', marginLeft: '6px', fontSize: '12px', padding: '0' }}
-                  title="Eliminar pestaña"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          ))}
-          <input
-            type="text"
-            value={newPestañaInput}
-            onChange={(e) => setNewPestañaInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && newPestañaInput.trim()) {
-                addPestaña(secIdx, newPestañaInput)
-                setNewPestañaInput('')
-              }
-            }}
-            placeholder="+ Nueva pestaña"
-            style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: 'var(--text-secondary)', outline: 'none', minWidth: '120px' }}
-          />
+      {/* Tab Manager - only show if not hidden by parent */}
+      {!hideTabManager && (
+        <div style={{ background: 'rgba(154, 209, 255, 0.08)', border: '1px solid rgba(154, 209, 255, 0.15)', borderRadius: '6px', padding: '10px', marginBottom: '12px' }}>
+          <div style={{ fontSize: '10px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', marginBottom: '8px' }}>📑 Pestañas</div>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {pestañas.map((p) => (
+              <div key={p} style={{ display: 'flex', alignItems: 'center', background: 'rgba(154, 209, 255, 0.12)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: '#9ad1ff' }}>
+                {p}
+                {pestañas.length > 1 && (
+                  <button
+                    onClick={() => removePestaña(secIdx, p)}
+                    style={{ background: 'none', border: 'none', color: '#fecaca', cursor: 'pointer', marginLeft: '6px', fontSize: '12px', padding: '0' }}
+                    title="Eliminar pestaña"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+            <input
+              type="text"
+              value={newPestañaInput}
+              onChange={(e) => setNewPestañaInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newPestañaInput.trim()) {
+                  addPestaña(secIdx, newPestañaInput)
+                  setNewPestañaInput('')
+                }
+              }}
+              placeholder="+ Nueva pestaña"
+              style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: 'var(--text-secondary)', outline: 'none', minWidth: '120px' }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {baseFields.length > 0 && (
         <div>
@@ -483,14 +487,13 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
         </div>
       )}
 
-      {pestañas.length > 0 && Object.keys(fieldsByTab).length > 0 && (
+      {pestañas.length > 0 && Object.keys(fieldsByTab).length > 0 && !hideTabManager && (
         <>
           {pestañas.length > 1 && (
             <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', marginTop: baseFields.length > 0 ? '12px' : '0', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', overflowX: 'auto' }}>
               {pestañas.map(tab => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
                   style={{
                     padding: '6px 12px',
                     fontSize: '11px',
@@ -822,6 +825,7 @@ export default function CategoryBuilder() {
     }
   ])
   const [activeCategory, setActiveCategory] = useState(0)
+  const [selectedTabByCategory, setSelectedTabByCategory] = useState({})  // Maps catIdx -> tabName
   const [xml, setXml] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
@@ -1503,22 +1507,78 @@ export default function CategoryBuilder() {
           )}
         </div>
 
-        {cat.sections.map((sec, secIdx) => (
-          <SectionEditor
-            key={sec.id}
-            section={sec}
-            secIdx={secIdx}
-            updateField={updateField}
-            removeField={removeField}
-            addField={addField}
-            updateSecName={updateSecName}
-            removeSection={removeSection}
-            catSectionsCount={cat.sections.length}
-            addPestaña={addPestaña}
-            removePestaña={removePestaña}
-            updateFieldPestaña={updateFieldPestaña}
-          />
-        ))}
+        {/* Category-level tab management */}
+        {(() => {
+          // Collect all unique pestañas from all sections
+          const allPestañas = new Set()
+          cat.sections.forEach(sec => {
+            if (sec.pestañas) sec.pestañas.forEach(p => allPestañas.add(p))
+          })
+          const uniquePestañas = Array.from(allPestañas)
+
+          // Get selected tab for this category
+          const selectedTab = selectedTabByCategory[idx] || (uniquePestañas.length > 0 ? uniquePestañas[0] : null)
+
+          return (
+            <>
+              {/* Tab buttons (only show if there are multiple pestañas) */}
+              {uniquePestañas.length > 1 && (
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', overflowX: 'auto' }}>
+                  {uniquePestañas.map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => setSelectedTabByCategory({...selectedTabByCategory, [idx]: tab})}
+                      style={{
+                        padding: '8px 14px',
+                        fontSize: '12px',
+                        fontWeight: selectedTab === tab ? '600' : '400',
+                        background: selectedTab === tab ? 'rgba(154, 209, 255, 0.15)' : 'transparent',
+                        border: selectedTab === tab ? '1px solid #9ad1ff' : '1px solid rgba(255, 255, 255, 0.08)',
+                        color: selectedTab === tab ? '#9ad1ff' : 'rgba(238, 244, 255, 0.6)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        transition: 'all 200ms ease',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Render sections filtered by selected tab */}
+              {cat.sections.map((sec, secIdx) => {
+                // Only show section if it has fields in the selected tab (or any pestaña if single tab)
+                const hasFieldsInSelectedTab = selectedTab && sec.fields.some(f => f.pestaña?.trim() === selectedTab)
+                const hasNoTabFields = sec.fields.some(f => !f.pestaña || !f.pestaña.trim())
+                const shouldShow = !selectedTab || hasFieldsInSelectedTab || hasNoTabFields
+
+                if (!shouldShow) return null
+
+                return (
+                  <SectionEditor
+                    key={sec.id}
+                    section={sec}
+                    secIdx={secIdx}
+                    updateField={updateField}
+                    removeField={removeField}
+                    addField={addField}
+                    updateSecName={updateSecName}
+                    removeSection={removeSection}
+                    catSectionsCount={cat.sections.length}
+                    addPestaña={addPestaña}
+                    removePestaña={removePestaña}
+                    updateFieldPestaña={updateFieldPestaña}
+                    selectedTab={selectedTab}
+                    hideTabManager={uniquePestañas.length > 1}
+                  />
+                )
+              })}
+            </>
+          )
+        })()}
 
         <button
           onClick={addSection}
