@@ -168,8 +168,7 @@ function parseCsv(raw) {
   return { categories, warnings }
 }
 
-function CsvImporter({ onImport }) {
-  const [open, setOpen] = useState(false)
+function CsvImporter({ isOpen, onClose, onImport }) {
   const [text, setText] = useState('')
   const [preview, setPreview] = useState(null)
 
@@ -179,68 +178,63 @@ function CsvImporter({ onImport }) {
     onImport(preview, mode)
     setText('')
     setPreview(null)
-    setOpen(false)
+    onClose()
   }
   const total = preview && !preview.error ? preview.categories.reduce((a, c) => a + c.sections.reduce((sa, s) => sa + s.fields.length, 0), 0) : 0
 
   return (
-    <div className="mb-lg">
+    <Modal
+      title="📤 Importar campos desde CSV"
+      open={isOpen}
+      onCancel={onClose}
+      footer={null}
+      width={700}
+    >
+      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+        Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría</strong> (pestaña es opcional)
+      </div>
+      <textarea
+        value={text}
+        onChange={e => { setText(e.target.value); setPreview(null) }}
+        placeholder="Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría"
+        className="form-textarea"
+        style={{
+          height: '120px',
+          fontFamily: 'monospace',
+          marginBottom: '16px'
+        }}
+      />
       <button
-        onClick={() => setOpen(o => !o)}
-        className="btn-default"
-        style={{ width: '100%', fontSize: '14px' }}
+        onClick={handleParse}
+        disabled={!text.trim()}
+        className="btn-default btn-sm"
       >
-        {open ? '▲' : '▼'} Importar campos desde CSV
+        Analizar →
       </button>
-      {open && (
-        <div className="eform-panel" style={{ marginTop: '8px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-            Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría</strong> (pestaña es opcional)
-          </div>
-          <textarea
-            value={text}
-            onChange={e => { setText(e.target.value); setPreview(null) }}
-            placeholder="Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría"
-            className="form-textarea"
-            style={{
-              height: '100px',
-              fontFamily: 'monospace',
-              marginBottom: '10px'
-            }}
-          />
-          <button
-            onClick={handleParse}
-            disabled={!text.trim()}
-            className="btn-default btn-sm"
-          >
-            Analizar →
-          </button>
-          {preview && (
-            <div style={{ marginTop: '10px' }}>
-              {preview.error ? (
-                <div className="alert-error" style={{ padding: '8px 12px' }}>
-                  ⚠ {preview.error}
-                </div>
-              ) : (
-                <>
-                  <div style={{ fontSize: '12px', color: 'var(--accent-primary)', marginBottom: '8px' }}>
-                    ✓ {total} campos · {preview.categories.length} categoría(s)
-                  </div>
-                  <div style={{ display: 'flex', gap: 'var(--gap-md)' }}>
-                    <button onClick={() => handleApply('replace')} className="btn-default btn-sm">
-                      Reemplazar
-                    </button>
-                    <button onClick={() => handleApply('append')} className="btn-default btn-sm">
-                      Añadir
-                    </button>
-                  </div>
-                </>
-              )}
+      {preview && (
+        <div style={{ marginTop: '16px' }}>
+          {preview.error ? (
+            <div className="alert-error" style={{ padding: '12px' }}>
+              ⚠ {preview.error}
             </div>
+          ) : (
+            <>
+              <div style={{ fontSize: '12px', color: 'var(--accent-primary)', marginBottom: '12px' }}>
+                ✓ {total} campos · {preview.categories.length} categoría(s)
+              </div>
+              <div style={{ display: 'flex', gap: 'var(--gap-md)' }}>
+                <button onClick={() => handleApply('replace')} className="btn-default btn-sm">
+                  Reemplazar
+                </button>
+                <button onClick={() => handleApply('append')} className="btn-default btn-sm">
+                  Añadir
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}
-    </div>
+    </Modal>
   )
 }
 
@@ -773,6 +767,7 @@ export default function CategoryBuilder() {
   const [managerOpen, setManagerOpen] = useState(false)
   const [xmlModalOpen, setXmlModalOpen] = useState(false)
   const [colorModalOpen, setColorModalOpen] = useState(false)
+  const [csvModalOpen, setCsvModalOpen] = useState(false)
   const [customColors, setCustomColors] = useState(COLOR_PRESETS.dark.colors)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [searchText, setSearchText] = useState('')
@@ -1542,6 +1537,12 @@ export default function CategoryBuilder() {
             👁 Preview
           </button>
           <button
+            onClick={() => setCsvModalOpen(true)}
+            className="btn-default"
+          >
+            📤 Importar CSV
+          </button>
+          <button
             onClick={() => setManagerOpen(true)}
             className="btn-default"
           >
@@ -1660,7 +1661,6 @@ export default function CategoryBuilder() {
 
           {/* EDITOR */}
           <div>
-            <CsvImporter onImport={handleCsvImport} />
             <div style={{
               background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
               border: '1px solid var(--border-default)',
@@ -1904,6 +1904,9 @@ export default function CategoryBuilder() {
           </div>
         </div>
       </Modal>
+
+      {/* CSV Importer Modal */}
+      <CsvImporter isOpen={csvModalOpen} onClose={() => setCsvModalOpen(false)} onImport={handleCsvImport} />
     </div>
   )
 }
