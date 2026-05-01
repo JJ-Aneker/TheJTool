@@ -1428,9 +1428,16 @@ export default function CategoryBuilder() {
   }
 
   const download = () => {
+    const now = new Date()
+    const timestamp = now.getFullYear() +
+      String(now.getMonth() + 1).padStart(2, '0') +
+      String(now.getDate()).padStart(2, '0') +
+      String(now.getHours()).padStart(2, '0') +
+      String(now.getMinutes()).padStart(2, '0')
+
     const a = document.createElement('a')
     a.href = 'data:application/xml;charset=utf-8,' + encodeURIComponent(xml)
-    a.download = (currentCategory.name.trim().replace(/\s+/g, '_').replace(/[^A-Za-z0-9_]/g, '') || 'categoria') + '_therefore.xml'
+    a.download = `TheConfiguration_${timestamp}.xml`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
