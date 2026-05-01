@@ -42,9 +42,9 @@
   --chart-label: rgba(255, 255, 255, 0.3);
 
   /* Sombras - Dark */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(54, 99, 255, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(54, 99, 255, 0.15);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(54, 99, 255, 0.2);
 
   /* Border radius */
   --radius-sm: 6px;
@@ -126,9 +126,9 @@
   --chart-label: rgba(0, 0, 0, 0.35);
 
   /* Sombras - Light */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.18);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.25);
 }
 
 /* Reset body */
