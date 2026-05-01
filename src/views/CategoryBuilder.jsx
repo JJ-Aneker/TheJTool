@@ -314,9 +314,9 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-lg)' }}>
                 {fieldsByTab[activeTab]?.map((f, fi) => (
                   <div key={fi}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '4px' }}>
                       {f.nombre}
-                      {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
+                      {f.required && <span style={{ color: 'var(--accent-error)', marginLeft: '3px' }}>*</span>}
                     </label>
                     {(controlMap[f.tipo] || controlMap.text)(f)}
                   </div>
