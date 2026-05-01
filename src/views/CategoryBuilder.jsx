@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin, Tabs } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
+import '../styles/category-builder.css'
 
 function newGuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -621,7 +622,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
           <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}></div>
         </div>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.8fr auto', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
+      <div className="category-field-main">
         <div>
           <input
             value={field.nombre}
@@ -634,32 +635,14 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
               })
             }}
             placeholder="Nombre"
-            style={{
-              width: '100%',
-              padding: '6px 8px',
-              border: '1px solid var(--border-default)',
-              borderRadius: '4px',
-              fontSize: '12px',
-              backgroundColor: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              boxSizing: 'border-box'
-            }}
+            className="category-input-compact"
           />
         </div>
         <div>
           <select
             value={field.tipo}
             onChange={e => onChange({ ...field, tipo: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '6px 8px',
-              border: '1px solid var(--border-default)',
-              borderRadius: '4px',
-              fontSize: '12px',
-              backgroundColor: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              boxSizing: 'border-box'
-            }}
+            className="category-select-compact"
           >
             {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
@@ -700,7 +683,8 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
         <div>
           <button
             onClick={() => setExpanded(o => !o)}
-            style={{ padding: '4px 8px', background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '4px', cursor: 'pointer', fontSize: '10px', color: 'var(--text-primary)', width: '100%' }}
+            className="category-btn-small"
+            style={{ width: '100%' }}
           >
             {expanded ? '▲' : '▼'}
           </button>
@@ -708,48 +692,31 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
         <div>
           <button
             onClick={onRemove}
-            style={{ padding: '4px 8px', background: 'rgba(255, 100, 100, 0.1)', border: '1px solid rgba(255, 100, 100, 0.3)', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', color: '#ff6464', width: '100%' }}
+            className="category-btn-danger"
+            style={{ width: '100%' }}
           >
             ✕
           </button>
         </div>
       </div>
       {expanded && (
-        <div style={{ marginBottom: '8px', paddingLeft: '12px', borderLeft: '2px solid var(--border-default)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+        <div className="category-field-expanded">
           <div>
-            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Key</label>
+            <label className="category-label">Key</label>
             <input
               value={field.fieldKey}
               onChange={e => onChange({ ...field, fieldKey: e.target.value.replace(/\s+/g, '').replace(/[^A-Za-z0-9_]/g, '') })}
               placeholder={autoKey}
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid var(--border-default)',
-                borderRadius: '4px',
-                fontSize: '12px',
-                backgroundColor: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                boxSizing: 'border-box'
-              }}
+              className="category-input-compact"
             />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Pestaña</label>
+            <label className="category-label">Pestaña</label>
             <input
               value={field.pestaña || ''}
               onChange={e => onChange({ ...field, pestaña: e.target.value })}
               placeholder="Dejar vacío para Sin pestaña"
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid var(--border-default)',
-                borderRadius: '4px',
-                fontSize: '12px',
-                backgroundColor: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                boxSizing: 'border-box'
-              }}
+              className="category-input-compact"
             />
           </div>
           {field.tipo === 'table' && (
@@ -1631,75 +1598,35 @@ export default function CategoryBuilder() {
   }))
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="category-container">
       {/* HEADER */}
-      <div style={{ borderBottom: '1px solid var(--border-default)', paddingBottom: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="category-header">
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--accent-primary)', letterSpacing: '-0.3px', margin: '0' }}>🏗️ Generador de Categorías</h1>
-          <p style={{ fontSize: '12px', color: 'rgba(238, 244, 255, 0.55)', marginTop: '4px', margin: 0 }}>Crea múltiples categorías con secciones y campos · XML · v2.0</p>
+          <h1 className="category-title">🏗️ Generador de Categorías</h1>
+          <p className="category-subtitle">Crea múltiples categorías con secciones y campos · XML · v2.0</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="category-header-actions">
           <button
             onClick={() => setActiveView('editor')}
-            style={{
-              background: activeView === 'editor' ? 'rgba(154, 209, 255, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-              borderColor: activeView === 'editor' ? '#9ad1ff' : 'rgba(255, 255, 255, 0.14)',
-              color: activeView === 'editor' ? '#9ad1ff' : '#e6e7eb',
-              border: '1px solid',
-              borderRadius: '10px',
-              padding: '6px 12px',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: 500
-            }}
+            className={`category-btn ${activeView === 'editor' ? 'active' : ''}`}
           >
             ✎ Editor
           </button>
           <button
             onClick={() => setActiveView('preview')}
-            style={{
-              background: activeView === 'preview' ? 'rgba(154, 209, 255, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-              borderColor: activeView === 'preview' ? '#9ad1ff' : 'rgba(255, 255, 255, 0.14)',
-              color: activeView === 'preview' ? '#9ad1ff' : '#e6e7eb',
-              border: '1px solid',
-              borderRadius: '10px',
-              padding: '6px 12px',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: 500
-            }}
+            className={`category-btn ${activeView === 'preview' ? 'active' : ''}`}
           >
             👁 Preview
           </button>
           <button
             onClick={() => setManagerOpen(true)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              borderColor: 'rgba(255, 255, 255, 0.14)',
-              color: '#e6e7eb',
-              border: '1px solid',
-              borderRadius: '10px',
-              padding: '6px 12px',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: 500
-            }}
+            className="category-btn"
           >
             📁 Mis Plantillas
           </button>
           <button
             onClick={() => setColorModalOpen(true)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              borderColor: 'rgba(255, 255, 255, 0.14)',
-              color: '#e6e7eb',
-              border: '1px solid',
-              borderRadius: '10px',
-              padding: '6px 12px',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: 500
-            }}
+            className="category-btn"
           >
             🎨 Colores
           </button>
