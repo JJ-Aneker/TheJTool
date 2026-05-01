@@ -54,7 +54,7 @@
 .eform-panel-title {
   font-size: 11px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary) !important;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 14px;
@@ -423,12 +423,12 @@
   gap: 8px;
   padding: 8px 0;
   margin-bottom: 8px;
-  color: #ffffff;
+  color: var(--text-primary) !important;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .eform-field-col-etiqueta {
@@ -448,11 +448,11 @@
 }
 
 .eform-field-row {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: var(--radius-md);
-  padding: 8px;
-  margin-bottom: 6px;
+  background: transparent !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px !important;
+  margin-bottom: 6px !important;
 }
 
 .eform-field-main {
@@ -506,23 +506,24 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-default);
   padding-top: 10px;
   grid-column: 1 / -1;
 }
 
 .eform-preview {
-  background: #f3f4f6;
+  background: var(--bg-canvas) !important;
   border-radius: var(--radius-md);
   font-family: Arial, sans-serif;
   max-height: 560px;
   overflow-y: auto;
-  color: #1f2937;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-default);
 }
 
 .eform-preview-header {
-  background: #185fa5;
-  color: #fff;
+  background: var(--accent-primary) !important;
+  color: #fff !important;
   border-radius: 6px 6px 0 0;
   padding: 14px 18px;
 }
@@ -539,8 +540,8 @@
 }
 
 .eform-preview-body {
-  background: #fff;
-  border: 1px solid #d1d5db;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
   border-top: none;
   border-radius: 0 0 6px 6px;
   padding: 18px;
@@ -549,10 +550,10 @@
 .eform-preview-section {
   font-size: 11px;
   font-weight: 700;
-  color: #374151;
+  color: var(--text-secondary) !important;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-default) !important;
   padding-bottom: 5px;
   margin-bottom: 12px;
 }
@@ -568,18 +569,18 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary) !important;
   margin-bottom: 4px;
 }
 
 .eform-preview-button {
-  background: #185fa5;
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 9px 22px;
-  font-size: 13px;
-  font-weight: 600;
+  background: var(--accent-primary) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  padding: 9px 22px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
   cursor: pointer;
   margin-top: 4px;
 }
@@ -674,7 +675,7 @@
 .eform-info-card-title {
   font-size: 11px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary) !important;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;
@@ -702,17 +703,17 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0;
-  background: rgba(0, 0, 0, 0.4);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--bg-hover) !important;
+  border-bottom: 1px solid var(--border-default) !important;
   margin-bottom: 0;
   font-size: 11px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary) !important;
 }
 
 .eform-table-header .eform-table-col {
   padding: 8px;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid var(--border-default);
 }
 
 .eform-table-header .eform-table-col:last-child {
