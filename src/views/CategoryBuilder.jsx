@@ -936,6 +936,10 @@ export default function CategoryBuilder() {
     }
 
     // Generate XML for ALL categories
+    // Use global counters so FieldNo is unique across all categories
+    let globalFieldNo = -1
+    let globalLabelNo = -50
+
     const categoryBlocks = categories.map((cat, catIdx) => {
       if (!cat.name.trim()) return ''
 
@@ -960,17 +964,18 @@ export default function CategoryBuilder() {
       const tab1Name = tabs[0] || 'Datos'
       const tab2Name = 'Historial'
 
-      let colNo = -202, fieldNo = -1, labelNo = -50
+      let colNo = -202
       let fieldsXml = '', dispOrder = 1, tabOrder = 1
       const tm = n => hasTabs ? tabMetaXml(n, TAB_NO) : ''
 
       let yPos = hasTabs ? 8 : HDR_H + SEC_GAP
       const sectionWidth = hasTabs ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
+      const catStartFieldNo = globalFieldNo  // Remember where this category's data fields start
 
       // Header (only if no tabs)
       let headerXml = ''
       if (!hasTabs) {
-        headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Title_${tableName}`, caption: cat.name, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 5 })
+        headerXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Hdr_Title_${tableName}`, caption: cat.name, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 5 })
       }
 
       // Data fields
@@ -979,7 +984,7 @@ export default function CategoryBuilder() {
         if (validFields.length === 0) return
 
         // Section header
-        fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: tm(1) })
+        fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: tm(1) })
         yPos += SEC_GAP
 
         // Process fields in pairs
@@ -989,18 +994,16 @@ export default function CategoryBuilder() {
 
           if (f1) {
             const colname = sanitizeName(f1.fieldKey || f1.nombre)
-            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
+            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
             const typeno = typeToTypeNo[f1.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
-            fieldNo--
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
           }
 
           if (f2) {
             const colname = sanitizeName(f2.fieldKey || f2.nombre)
-            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
+            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
             const typeno = typeToTypeNo[f2.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: fieldNo, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
-            fieldNo--
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
           }
 
           yPos += ROW_GAP
@@ -1027,7 +1030,8 @@ export default function CategoryBuilder() {
 
       const dialogH = hasTabs ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
       const allFields = cat.sections.flatMap(s => s.fields).filter(f => f.nombre.trim())
-      const titleFlds = [-1, -2, -3].slice(0, Math.min(3, allFields.length)).map(n => `<Fld>${n}</Fld>`).join('')
+      // Reference the first 3 data fields that were created for this category
+      const titleFlds = [catStartFieldNo, catStartFieldNo - 1, catStartFieldNo - 2].slice(0, Math.min(3, allFields.length)).map(n => `<Fld>${n}</Fld>`).join('')
       const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
 
       return `<Category><CtgryNo>-${catIdx + 1}</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(cat.name)}</S></T></TStr></Name><Version>0</Version><Fields>${headerXml}${fieldsXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(cat.name)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${bgr(240, 240, 240)}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgryId}</CtgryID></Category>`
