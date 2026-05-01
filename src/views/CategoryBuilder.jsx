@@ -356,14 +356,14 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
         <input
           value={section.name}
           onChange={e => updateSecName(secIdx, e.target.value)}
-          className="category-input-compact"
+          className="form-input"
           style={{ flex: 1 }}
         />
         <span className="category-badge">{section.fields.filter(f => f.nombre).length} campos</span>
         {catSectionsCount > 1 && (
           <button
             onClick={() => removeSection(secIdx)}
-            className="category-btn-danger"
+            className="btn-error btn-sm"
           >
             ✕
           </button>
@@ -622,7 +622,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
         <div>
           <button
             onClick={() => setExpanded(o => !o)}
-            className="category-btn-small"
+            className="btn-default btn-sm"
             style={{ width: '100%' }}
           >
             {expanded ? '▲' : '▼'}
@@ -631,7 +631,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
         <div>
           <button
             onClick={onRemove}
-            className="category-btn-danger"
+            className="btn-error btn-sm"
             style={{ width: '100%' }}
           >
             ✕
@@ -1620,11 +1620,11 @@ export default function CategoryBuilder() {
       ) : (
         <>
           {/* INFORMACIÓN */}
-          <div className="card-glass">
-            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Categorías ({categories.length})</div>
+          <div className="eform-panel">
+            <div className="eform-panel-title">Categorías ({categories.length})</div>
 
             {/* Categories name editor */}
-            <div className="section" style={{ marginBottom: '14px' }}>
+            <div className="eform-panel" style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nombres definitivos</div>
                 <button
@@ -1648,18 +1648,9 @@ export default function CategoryBuilder() {
                     value={cat.name}
                     onChange={e => updateCategoryName(idx, e.target.value)}
                     placeholder={`Categoría ${idx + 1}`}
+                    className="form-input"
                     style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      background: 'var(--bg-hover)',
-                      border: '1px solid var(--border-default)',
-                      borderRadius: '6px',
-                      color: 'var(--accent-primary)',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      boxSizing: 'border-box',
-                      outline: 'none',
-                      fontFamily: 'inherit'
+                      flex: 1
                     }}
                   />
                 ))}

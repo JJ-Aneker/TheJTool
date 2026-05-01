@@ -65,7 +65,7 @@
 
 .category-section-name {
   font-weight: 600;
-  color: var(--accent-primary);
+  color: var(--text-primary);
   flex: 1;
   font-size: 13px;
 }
@@ -211,11 +211,11 @@
 /* Badges */
 .category-badge {
   font-size: 10px;
-  background: rgba(54, 99, 255, 0.12) !important;
-  color: var(--accent-primary) !important;
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
   padding: 2px 7px !important;
   border-radius: var(--radius-sm) !important;
-  border: 1px solid rgba(54, 99, 255, 0.2) !important;
+  border: 1px solid var(--border-default) !important;
   display: inline-block;
 }
 
@@ -285,7 +285,7 @@
 .category-pestana-title {
   font-size: 10px;
   font-weight: 600;
-  color: var(--accent-primary);
+  color: var(--text-secondary);
   text-transform: uppercase;
   margin-bottom: 8px;
 }
@@ -300,12 +300,12 @@
 .category-pestana-tag {
   display: flex;
   align-items: center;
-  background: rgba(154, 209, 255, 0.12) !important;
-  border: 1px solid rgba(154, 209, 255, 0.25) !important;
+  background: var(--bg-hover) !important;
+  border: 1px solid var(--border-default) !important;
   border-radius: 4px !important;
   padding: 4px 8px !important;
   font-size: 12px;
-  color: var(--accent-primary);
+  color: var(--text-secondary);
 }
 
 .category-pestana-tag button {
