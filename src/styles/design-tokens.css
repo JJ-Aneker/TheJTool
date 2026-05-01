@@ -1025,10 +1025,9 @@ label {
 
 /* ===== GENERIC REUSABLE CLASSES FOR CONSISTENT STYLING ===== */
 
-/* Card / Panel - Generic */
-.card,
-.panel,
-.card-panel {
+/* ===== STANDARD CARD/PANEL CLASS ===== */
+/* All card/panel classes now use .eform-panel for consistency */
+.eform-panel {
   background: var(--bg-card) !important;
   border: 1px solid var(--border-default) !important;
   border-radius: var(--radius-md) !important;
@@ -1036,9 +1035,25 @@ label {
   margin-bottom: 16px !important;
 }
 
-/* Card with backdrop blur effect */
+/* Aliases for backwards compatibility and consistency */
+.card,
+.panel,
+.card-panel,
+.category-panel,
+.category-section,
+.section,
+.section-box {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Card with backdrop blur effect - also uses standard panel */
 .card-glass,
-.panel-glass {
+.panel-glass,
+.eform-panel-glass {
   background: var(--bg-card) !important;
   border: 1px solid var(--border-default) !important;
   border-radius: var(--radius-md) !important;
@@ -1047,22 +1062,35 @@ label {
   backdrop-filter: blur(14px) !important;
 }
 
-/* Section container */
-.section,
-.section-box {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border-default) !important;
-  border-radius: var(--radius-md) !important;
-  padding: 12px !important;
-  margin-bottom: 12px !important;
-}
-
 /* Container / Wrapper */
 .container-main {
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--text-primary);
   padding: 24px;
   min-height: calc(100vh - 100px);
+}
+
+/* ===== STANDARD PANEL TITLE CLASS ===== */
+/* All panel/card titles use this class for consistency */
+.eform-panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
+}
+
+/* Alias for backwards compatibility */
+.category-panel-title,
+.panel-title,
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
 }
 
 /* Header */
@@ -1152,15 +1180,32 @@ button:disabled {
   background: rgba(34, 197, 94, 0.25) !important;
 }
 
-/* Button - Danger */
-.btn-danger {
+/* Button - Danger / Error / Delete */
+.btn-danger,
+.btn-error,
+.btn-delete {
   background: rgba(255, 80, 80, 0.1) !important;
   border: 1px solid rgba(255, 80, 80, 0.25) !important;
   color: var(--accent-error) !important;
 }
 
-.btn-danger:hover {
+.btn-danger:hover,
+.btn-error:hover,
+.btn-delete:hover {
   background: rgba(255, 80, 80, 0.15) !important;
+}
+
+/* Button - Add / Light Primary */
+.btn-add,
+.btn-primary-light {
+  background: rgba(54, 99, 255, 0.1) !important;
+  border: 1px solid rgba(54, 99, 255, 0.25) !important;
+  color: var(--accent-primary) !important;
+}
+
+.btn-add:hover,
+.btn-primary-light:hover {
+  background: rgba(54, 99, 255, 0.15) !important;
 }
 
 /* Button - Small */
@@ -1222,6 +1267,27 @@ button:disabled {
   padding: 2px 7px !important;
   border-radius: var(--radius-sm) !important;
   border: 1px solid rgba(54, 99, 255, 0.2) !important;
+  display: inline-block;
+}
+
+/* Badge variants */
+.badge-success {
+  font-size: 10px;
+  background: rgba(34, 197, 94, 0.12) !important;
+  color: var(--accent-success) !important;
+  padding: 2px 7px !important;
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid rgba(34, 197, 94, 0.2) !important;
+  display: inline-block;
+}
+
+.badge-secondary {
+  font-size: 10px;
+  background: rgba(100, 100, 100, 0.12) !important;
+  color: var(--text-secondary) !important;
+  padding: 2px 7px !important;
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid rgba(100, 100, 100, 0.2) !important;
   display: inline-block;
 }
 

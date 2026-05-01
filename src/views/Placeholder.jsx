@@ -15,7 +15,7 @@ export default function Placeholder({ icon: Icon, title, description, status = '
         padding: '8px 16px',
         background: 'var(--kpi-amber)',
         borderRadius: '4px',
-        color: '#fff',
+        color: 'var(--text-inverse)',
         marginBottom: '24px',
         fontSize: '12px'
       }}>

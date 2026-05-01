@@ -488,7 +488,7 @@ export default function UserManager() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#ffffff',
+                      color: 'var(--text-inverse)',
                       border: '2px solid var(--bg-canvas)',
                       opacity: avatarLoading ? 0.6 : 1
                     }}>

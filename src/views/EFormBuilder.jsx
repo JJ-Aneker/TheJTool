@@ -943,14 +943,10 @@ export default function EFormBuilder() {
                     <div style={{ fontWeight: '600', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {form.name}
                       {form.compartido && (
-                        <span style={{ fontSize: '10px', background: 'rgba(34,197,94,0.2)', color: 'var(--accent-success)', padding: '2px 6px', borderRadius: '3px' }}>
-                          🔗 Compartido
-                        </span>
+                        <span className="badge-success">🔗 Compartido</span>
                       )}
                       {form.created_by !== user?.id && (
-                        <span style={{ fontSize: '10px', background: 'rgba(100,100,100,0.2)', color: 'var(--text-secondary)', padding: '2px 6px', borderRadius: '3px' }}>
-                          Otros
-                        </span>
+                        <span className="badge-secondary">Otros</span>
                       )}
                     </div>
                     <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>

@@ -218,7 +218,7 @@ function CsvImporter({ onImport }) {
           {preview && (
             <div style={{ marginTop: '10px' }}>
               {preview.error ? (
-                <div style={{ color: 'var(--accent-error)', background: 'rgba(255, 80, 80, 0.1)', padding: '8px 12px', borderRadius: '4px', fontSize: '12px' }}>
+                <div className="alert-error" style={{ padding: '8px 12px' }}>
                   ⚠ {preview.error}
                 </div>
               ) : (
@@ -301,9 +301,9 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-lg)' }}>
               {fieldsByTab[tabs[0]]?.map((f, fi) => (
                 <div key={fi}>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '4px' }}>
                     {f.nombre}
-                    {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
+                    {f.required && <span style={{ color: 'var(--accent-error)', marginLeft: '3px' }}>*</span>}
                   </label>
                   {(controlMap[f.tipo] || controlMap.text)(f)}
                 </div>
@@ -728,7 +728,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
                       const newCols = (field.columnas || []).filter((_, i) => i !== colIdx)
                       onChange({ ...field, columnas: newCols })
                     }}
-                    style={{ padding: '2px 6px', background: 'rgba(255, 80, 80, 0.1)', border: '1px solid rgba(255, 80, 80, 0.25)', borderRadius: '3px', cursor: 'pointer', fontSize: '10px', color: 'var(--accent-error)' }}
+                    className="btn-error btn-sm"
                   >
                     ✕
                   </button>
@@ -740,7 +740,8 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
                   newCols.push({ id: newGuid(), nombre: '', tipo: 'text', length: 100 })
                   onChange({ ...field, columnas: newCols })
                 }}
-                style={{ width: '100%', padding: '4px 6px', marginTop: '6px', background: 'rgba(154, 209, 255, 0.1)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '3px', cursor: 'pointer', fontSize: '11px', color: 'var(--accent-primary)', fontWeight: '600' }}
+                className="btn-add"
+                style={{ width: '100%', marginTop: '6px' }}
               >
                 + Columna
               </button>
@@ -1429,15 +1430,7 @@ export default function CategoryBuilder() {
           {categories.length > 1 && (
             <button
               onClick={() => removeCategory(idx)}
-              style={{
-                background: 'rgba(255, 80, 80, 0.10)',
-                border: '1px solid rgba(255, 80, 80, 0.25)',
-                borderRadius: '10px',
-                color: 'var(--accent-error)',
-                fontSize: '12px',
-                padding: '6px 12px',
-                cursor: 'pointer'
-              }}
+              className="btn-error"
             >
               ✕ Eliminar
             </button>
@@ -1580,7 +1573,7 @@ export default function CategoryBuilder() {
 
       {activeView === 'preview' ? (
         <div style={{
-          background: '#f3f4f6',
+          background: 'var(--bg-hover)',
           borderRadius: '8px',
           fontFamily: 'Arial, sans-serif',
           overflow: 'auto',
@@ -1590,8 +1583,8 @@ export default function CategoryBuilder() {
             items={tabItems.map(tab => ({
               ...tab,
               children: (
-                <div style={{ background: '#ffffff', padding: '20px' }}>
-                  <div style={{ background: '#185FA5', color: '#fff', borderRadius: '6px 6px 0 0', padding: '16px', marginLeft: '-20px', marginRight: '-20px', marginTop: '-20px', marginBottom: '20px' }}>
+                <div style={{ background: 'var(--bg-canvas)', padding: '20px' }}>
+                  <div style={{ background: 'var(--accent-primary)', color: 'var(--text-inverse)', borderRadius: '6px 6px 0 0', padding: '16px', marginLeft: '-20px', marginRight: '-20px', marginTop: '-20px', marginBottom: '20px' }}>
                     <div style={{ fontSize: '16px', fontWeight: '700' }}>{categories[parseInt(tab.key)].name}</div>
                   </div>
                   {categories[parseInt(tab.key)].sections.map((sec, si) => {
@@ -1616,7 +1609,7 @@ export default function CategoryBuilder() {
                       <PreviewSection key={si} sectionName={sec.name} fieldsByTab={fieldsByTab} baseFields={baseFields} tabs={secTabs} />
                     )
                   })}
-                  <button style={{ background: '#185FA5', color: '#fff', border: 'none', borderRadius: '6px', padding: '10px 24px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginTop: '12px' }}>
+                  <button style={{ background: 'var(--accent-primary)', color: 'var(--text-inverse)', border: 'none', borderRadius: '6px', padding: '10px 24px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginTop: '12px' }}>
                     Enviar
                   </button>
                 </div>
@@ -1642,17 +1635,7 @@ export default function CategoryBuilder() {
                       name: cat.name.trim() ? `${cat.name} ${timestamp}` : `Categoría ${timestamp}`
                     })))
                   }}
-                  style={{
-                    fontSize: '10px',
-                    padding: '4px 8px',
-                    background: 'rgba(154, 209, 255, 0.15)',
-                    border: '1px solid rgba(154, 209, 255, 0.3)',
-                    color: 'var(--accent-primary)',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    whiteSpace: 'nowrap'
-                  }}
+                  className="btn-sm btn-default"
                   title="Agrega la fecha actual a los nombres para hacerlos únicos"
                 >
                   📅 Agregar fecha
@@ -1737,7 +1720,7 @@ export default function CategoryBuilder() {
                 ⬇ Descargar .xml
               </button>
             </div>
-            <div style={{ fontSize: '11px', color: 'rgba(238, 244, 255, 0.40)', marginBottom: '6px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px' }}>
               {xml.length.toLocaleString()} caracteres
             </div>
             <textarea
@@ -1751,8 +1734,8 @@ export default function CategoryBuilder() {
                 borderRadius: '8px',
                 fontFamily: 'monospace',
                 fontSize: '11px',
-                backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                color: '#a7f3d0',
+                backgroundColor: 'var(--bg-dark)',
+                color: 'var(--accent-success)',
                 boxSizing: 'border-box',
                 resize: 'vertical'
               }}
