@@ -64,6 +64,25 @@
 
   /* Tabla */
   --table-row-height: 48px;
+
+  /* Espaciados estándar */
+  --gap-xs: 4px;
+  --gap-sm: 6px;
+  --gap-md: 8px;
+  --gap-lg: 12px;
+  --gap-xl: 16px;
+  --gap-2xl: 24px;
+
+  /* Heights estándar */
+  --height-input: 36px;
+  --height-button: 36px;
+  --height-button-sm: 32px;
+
+  /* Input specific */
+  --input-border: var(--border-default);
+  --label-color: var(--text-secondary);
+  --required-color: var(--accent-error);
+  --placeholder-color: var(--text-muted);
 }
 
 /* Light Theme */

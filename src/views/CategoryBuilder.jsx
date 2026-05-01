@@ -184,31 +184,16 @@ function CsvImporter({ onImport }) {
   const total = preview && !preview.error ? preview.categories.reduce((a, c) => a + c.sections.reduce((sa, s) => sa + s.fields.length, 0), 0) : 0
 
   return (
-    <div style={{ marginBottom: '16px' }}>
+    <div className="mb-lg">
       <button
         onClick={() => setOpen(o => !o)}
-        style={{
-          width: '100%',
-          padding: '10px 16px',
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-default)',
-          borderRadius: '6px',
-          color: 'var(--text-primary)',
-          cursor: 'pointer',
-          fontSize: '14px',
-          fontWeight: '500'
-        }}
+        className="btn-default"
+        style={{ width: '100%', fontSize: '14px' }}
       >
         {open ? '▲' : '▼'} Importar campos desde CSV
       </button>
       {open && (
-        <div style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-default)',
-          borderRadius: '6px',
-          padding: '16px',
-          marginTop: '8px'
-        }}>
+        <div className="card" style={{ marginTop: '8px' }}>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
             Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría</strong> (pestaña es opcional)
           </div>
@@ -216,33 +201,17 @@ function CsvImporter({ onImport }) {
             value={text}
             onChange={e => { setText(e.target.value); setPreview(null) }}
             placeholder="Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría"
+            className="form-textarea"
             style={{
-              width: '100%',
               height: '100px',
-              padding: '10px',
-              border: '1px solid var(--border-default)',
-              borderRadius: '4px',
               fontFamily: 'monospace',
-              fontSize: '12px',
-              backgroundColor: 'var(--bg-canvas)',
-              color: 'var(--text-primary)',
-              boxSizing: 'border-box',
               marginBottom: '10px'
             }}
           />
           <button
             onClick={handleParse}
             disabled={!text.trim()}
-            style={{
-              padding: '8px 16px',
-              background: 'var(--accent-primary)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: '600'
-            }}
+            className="btn-primary btn-sm"
           >
             Analizar →
           </button>
@@ -257,11 +226,11 @@ function CsvImporter({ onImport }) {
                   <div style={{ fontSize: '12px', color: 'var(--accent-primary)', marginBottom: '8px' }}>
                     ✓ {total} campos · {preview.categories.length} categoría(s)
                   </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={() => handleApply('replace')} style={{ padding: '6px 12px', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>
+                  <div style={{ display: 'flex', gap: 'var(--gap-md)' }}>
+                    <button onClick={() => handleApply('replace')} className="btn-primary btn-sm">
                       Reemplazar
                     </button>
-                    <button onClick={() => handleApply('append')} style={{ padding: '6px 12px', background: 'var(--bg-canvas)', border: '1px solid var(--border-default)', color: 'var(--text-primary)', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>
+                    <button onClick={() => handleApply('append')} className="btn-default btn-sm">
                       Añadir
                     </button>
                   </div>
@@ -279,20 +248,20 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
   const [activeTab, setActiveTab] = useState(tabs.length > 0 ? tabs[0] : null)
 
   const controlMap = {
-    text: (f) => <input type="text" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-    email: (f) => <input type="email" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-    phone: (f) => <input type="tel" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-    date: (f) => <input type="date" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-    datetime: (f) => <input type="datetime-local" style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-    number: (f) => <input type="number" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-    money: (f) => <input type="number" step="0.01" placeholder={f.nombre} style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }} />,
-    boolean: (f) => <input type="checkbox" style={{ width: '20px', height: '20px', accentColor: '#185FA5' }} />,
-    lookup: (f) => <select style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px 10px', fontSize: '13px' }}><option>-- Selecciona --</option></select>
+    text: (f) => <input type="text" placeholder={f.nombre} className="form-input" />,
+    email: (f) => <input type="email" placeholder={f.nombre} className="form-input" />,
+    phone: (f) => <input type="tel" placeholder={f.nombre} className="form-input" />,
+    date: (f) => <input type="date" className="form-input" />,
+    datetime: (f) => <input type="datetime-local" className="form-input" />,
+    number: (f) => <input type="number" placeholder={f.nombre} className="form-input" />,
+    money: (f) => <input type="number" step="0.01" placeholder={f.nombre} className="form-input" />,
+    boolean: (f) => <input type="checkbox" style={{ width: '20px', height: '20px', accentColor: 'var(--accent-primary)' }} />,
+    lookup: (f) => <select className="form-select"><option>-- Selecciona --</option></select>
   }
 
   return (
-    <div style={{ marginBottom: '20px' }}>
-      <h4 style={{ fontSize: '11px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '.06em', borderBottom: '1px solid #e5e7eb', paddingBottom: '5px', marginBottom: '12px' }}>
+    <div className="mb-lg">
+      <h4 className="field-header" style={{ marginBottom: 0 }}>
         {sectionName}
       </h4>
 
@@ -301,9 +270,9 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             {baseFields.map((f, fi) => (
               <div key={fi}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                <label className="form-label">
                   {f.nombre}
-                  {f.required && <span style={{ color: '#dc2626', marginLeft: '3px' }}>*</span>}
+                  {f.required && <span style={{ color: 'var(--accent-error)', marginLeft: '3px' }}>*</span>}
                 </label>
                 {(controlMap[f.tipo] || controlMap.text)(f)}
               </div>
@@ -315,21 +284,12 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
       {tabs.length > 0 && (
         <>
           {tabs.length > 1 && (
-            <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', borderBottom: '1px solid #e5e7eb', paddingBottom: '8px' }}>
+            <div style={{ display: 'flex', gap: 'var(--gap-sm)', marginBottom: 'var(--gap-lg)', borderBottom: '1px solid var(--border-default)', paddingBottom: '8px' }}>
               {tabs.map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  style={{
-                    padding: '6px 12px',
-                    fontSize: '12px',
-                    fontWeight: activeTab === tab ? '600' : '400',
-                    background: activeTab === tab ? 'rgba(24, 95, 165, 0.1)' : 'transparent',
-                    border: activeTab === tab ? '1px solid #185FA5' : '1px solid #e5e7eb',
-                    color: activeTab === tab ? '#185FA5' : '#6b7280',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
+                  className={activeTab === tab ? 'btn-primary btn-sm' : 'btn-default btn-sm'}
                 >
                   {tab}
                 </button>
@@ -338,7 +298,7 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
           )}
 
           {tabs.length === 1 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-lg)' }}>
               {fieldsByTab[tabs[0]]?.map((f, fi) => (
                 <div key={fi}>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
@@ -351,7 +311,7 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
             </div>
           ) : (
             activeTab && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-lg)' }}>
                 {fieldsByTab[activeTab]?.map((f, fi) => (
                   <div key={fi}>
                     <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
