@@ -64,9 +64,9 @@ const getTabMeta = (fieldPestaña) => {
 ## Testing Your Implementation
 
 ### Quick Start (5 minutes)
-1. Open http://localhost:5180/category-builder
+1. Open http://localhost:5181/category-builder (note: may use 5181+ if other ports in use)
 2. Click "▼ Importar campos desde CSV"
-3. Paste the test CSV from `PASO2_TEST_GUIDE.md`
+3. Paste the test CSV from `PASO2_TEST_GUIDE.md` or `docs/EJEMPLO_CSV_PASO2_TABLA_PESTANAS.csv`
 4. Click "Generar XML"
 5. Copy the generated XML and save it
 
@@ -146,3 +146,34 @@ Generated XML should contain:
 **PASO 2 Complete and Ready for Testing** 🚀
 
 All critical bugs fixed, features implemented, and documentation provided.
+
+---
+
+## Updates from Latest Session (2026-05-01)
+
+### Additional Bugs Fixed
+
+#### Bug 4: Fields Not Appearing When Switching Tabs
+**Status**: ✅ FIXED
+**Commit**: `38f2c8d`
+- Issue: Category-level tab switching didn't render fields
+- Root cause: `fieldsByTab[selectedTab]` was undefined for sections without that tab
+- Solution: Always render baseFields + fieldsByTab[selectedTab] when hideTabManager is true
+
+#### Bug 5: "Sin Pestaña" Assignment Broken  
+**Status**: ✅ FIXED
+**Commit**: `af66c12`
+- Issue: Selecting "Sin Pestaña" forced field to 'Datos' instead
+- Root cause: Default values in dropdown and onChange forced 'Datos'
+- Solution: Changed `value={field.pestaña || 'Datos'}` to `value={field.pestaña || ''}` and removed forced 'Datos' in onChange
+
+### Port Assignment Note
+- Dev server may use ports 5181+ if 5173-5180 are in use
+- Use `npm run dev` to start (Vite assigns automatically)
+
+### Current Implementation Status
+- ✅ UI category-level tab management implemented
+- ✅ Fields correctly assigned to tabs or "Sin Pestaña"
+- ✅ Tab switching renders correct fields
+- ✅ XML generation with dynamic tab entries
+- ⏳ Full integration testing pending (scheduled for next session)
