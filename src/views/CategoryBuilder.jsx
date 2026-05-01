@@ -1609,6 +1609,12 @@ export default function CategoryBuilder() {
           >
             🎨 Colores
           </button>
+          <button
+            onClick={generateXml}
+            className="category-btn-primary"
+          >
+            ⚡ Generar XML
+          </button>
         </div>
       </div>
 
@@ -1727,21 +1733,6 @@ export default function CategoryBuilder() {
 
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
-                onClick={generateXml}
-                style={{
-                  background: '#9ad1ff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  color: '#000',
-                  fontSize: '13px',
-                  padding: '9px 18px',
-                  cursor: 'pointer',
-                  fontWeight: 600
-                }}
-              >
-                Generar XML →
-              </button>
-              <button
                 onClick={addCategory}
                 style={{
                   background: 'var(--bg-hover)',
@@ -1813,31 +1804,13 @@ export default function CategoryBuilder() {
             <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
               <button
                 onClick={copy}
-                style={{
-                  background: '#9ad1ff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  color: '#000',
-                  fontSize: '13px',
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  fontWeight: 600
-                }}
+                className="category-btn-primary"
               >
                 {copied ? '✓ Copiado' : '📋 Copiar XML'}
               </button>
               <button
                 onClick={download}
-                style={{
-                  background: 'var(--bg-hover)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: '10px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  fontWeight: 600
-                }}
+                className="category-btn"
               >
                 ⬇ Descargar .xml
               </button>

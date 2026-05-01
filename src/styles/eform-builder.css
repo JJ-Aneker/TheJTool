@@ -43,12 +43,12 @@
 }
 
 .eform-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  margin-bottom: 16px;
-  backdrop-filter: blur(14px);
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 16px !important;
+  margin-bottom: 16px !important;
+  backdrop-filter: blur(14px) !important;
 }
 
 .eform-panel-title {
@@ -78,12 +78,12 @@
 .eform-select,
 .eform-textarea {
   width: 100%;
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  padding: 8px 10px;
-  color: var(--text-primary);
-  font-size: 13px;
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px 10px !important;
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
   box-sizing: border-box;
   font-family: inherit;
   outline: none;
@@ -93,8 +93,8 @@
 .eform-input:focus,
 .eform-select:focus,
 .eform-textarea:focus {
-  border-color: var(--accent-primary);
-  background: var(--bg-input);
+  border-color: var(--accent-primary) !important;
+  background: var(--bg-input) !important;
 }
 
 .eform-textarea {
@@ -103,12 +103,12 @@
 }
 
 .eform-btn {
-  background: transparent;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 12px;
-  padding: 6px 12px;
+  background: transparent !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  font-size: 12px !important;
+  padding: 6px 12px !important;
   cursor: pointer;
   white-space: nowrap;
   font-weight: 500;
@@ -116,23 +116,23 @@
 }
 
 .eform-btn:hover {
-  border-color: var(--border-hover);
-  background: var(--bg-hover);
+  border-color: var(--border-hover) !important;
+  background: var(--bg-hover) !important;
 }
 
 .eform-btn.active {
-  border-color: var(--accent-primary);
-  background: rgba(54, 99, 255, 0.15);
-  color: var(--accent-primary);
+  border-color: var(--accent-primary) !important;
+  background: rgba(54, 99, 255, 0.15) !important;
+  color: var(--accent-primary) !important;
 }
 
 .eform-btn-primary {
-  background: var(--accent-primary);
-  border: none;
-  border-radius: var(--radius-md);
-  color: #000;
-  font-size: 13px;
-  padding: 9px 18px;
+  background: var(--accent-primary) !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  padding: 9px 18px !important;
   cursor: pointer;
   font-weight: 600;
   transition: all 200ms ease;
