@@ -193,7 +193,7 @@ function CsvImporter({ onImport }) {
         {open ? '▲' : '▼'} Importar campos desde CSV
       </button>
       {open && (
-        <div className="card" style={{ marginTop: '8px' }}>
+        <div className="eform-panel" style={{ marginTop: '8px' }}>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
             Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría</strong> (pestaña es opcional)
           </div>
@@ -351,7 +351,7 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
   const currentActiveTab = selectedTab || (pestañas.length > 0 ? pestañas[0] : null)
 
   return (
-    <div className="eforms-panel">
+    <div className="eform-panel">
       <div className="category-section-header">
         <input
           value={section.name}

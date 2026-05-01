@@ -315,7 +315,7 @@ function CsvImporter({ onImport }) {
         {open ? '▲' : '▼'} Importar campos desde CSV
       </button>
       {open && (
-        <div className="eform-csv-panel">
+        <div className="eform-panel">
           <div className="eform-panel-title">Importar CSV</div>
           <div className="eform-csv-help">
             Columnas: <code>Nombre ; Key ; Tipo ; Obligatorio ; Placeholder ; Default ; MaxLength ; Seccion ; Options</code><br />
