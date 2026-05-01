@@ -676,7 +676,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
         <div>
           {pestañas && pestañas.length > 0 && (
             <select
-              value={field.pestaña || 'Datos'}
+              value={field.pestaña || ''}
               onChange={e => {
                 onChange({ ...field, pestaña: e.target.value })
                 updateFieldPestaña && updateFieldPestaña(secIdx, fieldIdx, e.target.value)
@@ -737,9 +737,9 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
           <div>
             <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>Pestaña</label>
             <input
-              value={field.pestaña || 'Datos'}
-              onChange={e => onChange({ ...field, pestaña: e.target.value || 'Datos' })}
-              placeholder="Datos"
+              value={field.pestaña || ''}
+              onChange={e => onChange({ ...field, pestaña: e.target.value })}
+              placeholder="Dejar vacío para Sin pestaña"
               style={{
                 width: '100%',
                 padding: '6px 8px',
