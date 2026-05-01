@@ -211,7 +211,7 @@ function CsvImporter({ onImport }) {
           <button
             onClick={handleParse}
             disabled={!text.trim()}
-            className="btn-primary btn-sm"
+            className="btn-default btn-sm"
           >
             Analizar →
           </button>
@@ -227,7 +227,7 @@ function CsvImporter({ onImport }) {
                     ✓ {total} campos · {preview.categories.length} categoría(s)
                   </div>
                   <div style={{ display: 'flex', gap: 'var(--gap-md)' }}>
-                    <button onClick={() => handleApply('replace')} className="btn-primary btn-sm">
+                    <button onClick={() => handleApply('replace')} className="btn-default btn-sm">
                       Reemplazar
                     </button>
                     <button onClick={() => handleApply('append')} className="btn-default btn-sm">
@@ -363,7 +363,7 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
         {catSectionsCount > 1 && (
           <button
             onClick={() => removeSection(secIdx)}
-            className="btn-error btn-sm"
+            className="btn-default btn-sm"
           >
             ✕
           </button>
@@ -631,7 +631,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
         <div>
           <button
             onClick={onRemove}
-            className="btn-error btn-sm"
+            className="btn-default btn-sm"
             style={{ width: '100%' }}
           >
             ✕
@@ -728,7 +728,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
                       const newCols = (field.columnas || []).filter((_, i) => i !== colIdx)
                       onChange({ ...field, columnas: newCols })
                     }}
-                    className="btn-error btn-sm"
+                    className="btn-default btn-sm"
                   >
                     ✕
                   </button>
@@ -740,7 +740,7 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
                   newCols.push({ id: newGuid(), nombre: '', tipo: 'text', length: 100 })
                   onChange({ ...field, columnas: newCols })
                 }}
-                className="btn-add"
+                className="btn-default"
                 style={{ width: '100%', marginTop: '6px' }}
               >
                 + Columna
@@ -1421,7 +1421,7 @@ export default function CategoryBuilder() {
           {categories.length > 1 && (
             <button
               onClick={() => removeCategory(idx)}
-              className="btn-error"
+              className="btn-default"
             >
               ✕ Eliminar
             </button>

@@ -22,7 +22,7 @@ export default function Placeholder({ icon: Icon, title, description, status = '
         Estado: {status === 'development' ? '🔨 En Desarrollo' : status}
       </div>
       <button
-        className="btn btn-secondary"
+        className="btn-default"
         onClick={() => window.location.pathname = '/'}
         style={{ marginTop: '16px' }}
       >
