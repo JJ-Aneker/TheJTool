@@ -1326,7 +1326,6 @@ export default function CategoryBuilder() {
         const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
         const tableH = Math.max(contentH, 240) - 30
         const tabH2 = Math.max(contentH + 20, 260)
-        const tab2Name = 'Historial'
 
         // Table field for history tab (always the last tab)
         const historyTabNo = sortedPestañas.length + 1
