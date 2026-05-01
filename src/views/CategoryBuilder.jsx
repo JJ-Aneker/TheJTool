@@ -31,6 +31,7 @@ const FIELD_TYPES = [
   { value: 'boolean', label: 'Sí/No' },
   { value: 'lookup', label: 'Búsqueda' },
   { value: 'image', label: 'Imagen' },
+  { value: 'table', label: '🗃 Tabla' },
 ]
 
 const TYPE_ALIAS = {
@@ -43,6 +44,7 @@ const TYPE_ALIAS = {
   'boolean': 'boolean', 'bool': 'boolean', 'lógico': 'boolean',
   'lookup': 'lookup', 'lista': 'lookup', 'combo': 'lookup',
   'image': 'image', 'imagen': 'image', 'foto': 'image',
+  'table': 'table', 'tabla': 'table', 'grid': 'table',
 }
 
 const COLOR_PRESETS = {
@@ -147,11 +149,19 @@ function parseCsv(raw) {
   const categories = Object.entries(categoryMap).map(([catName, sections]) => ({
     id: newGuid(),
     name: catName,
-    sections: Object.entries(sections).map(([secName, fields]) => ({
-      id: newGuid(),
-      name: secName,
-      fields
-    }))
+    sections: Object.entries(sections).map(([secName, fields]) => {
+      // Extract unique pestaña values from fields for this section
+      const pestañasSet = new Set(fields.map(f => f.pestaña).filter(Boolean))
+      pestañasSet.add('Datos') // Ensure 'Datos' is always present
+      const pestañas = Array.from(pestañasSet).sort()
+
+      return {
+        id: newGuid(),
+        name: secName,
+        fields,
+        pestañas
+      }
+    })
   }))
 
   return { categories, warnings }
@@ -359,8 +369,9 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
   )
 }
 
-function SectionEditor({ section, secIdx, updateField, removeField, addField, updateSecName, removeSection, catSectionsCount }) {
+function SectionEditor({ section, secIdx, updateField, removeField, addField, updateSecName, removeSection, catSectionsCount, addPestaña, removePestaña, updateFieldPestaña }) {
   const [activeTab, setActiveTab] = useState(null)
+  const [newPestañaInput, setNewPestañaInput] = useState('')
 
   // Separate fields: those without pestaña (baseFields) and those with pestaña (fieldsByTab)
   const baseFields = []
@@ -376,8 +387,8 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
     }
   })
 
-  const tabs = Object.keys(fieldsByTab).sort()
-  const currentActiveTab = activeTab || (tabs.length > 0 ? tabs[0] : null)
+  const pestañas = section.pestañas || ['Datos']
+  const currentActiveTab = activeTab || (pestañas.length > 0 ? pestañas[0] : null)
 
   return (
     <div style={{ background: 'rgba(0, 0, 0, 0.18)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
@@ -419,6 +430,40 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
         )}
       </div>
 
+      {/* Tab Manager */}
+      <div style={{ background: 'rgba(154, 209, 255, 0.08)', border: '1px solid rgba(154, 209, 255, 0.15)', borderRadius: '6px', padding: '10px', marginBottom: '12px' }}>
+        <div style={{ fontSize: '10px', fontWeight: '600', color: '#9ad1ff', textTransform: 'uppercase', marginBottom: '8px' }}>📑 Pestañas</div>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {pestañas.map((p) => (
+            <div key={p} style={{ display: 'flex', alignItems: 'center', background: 'rgba(154, 209, 255, 0.12)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: '#9ad1ff' }}>
+              {p}
+              {pestañas.length > 1 && (
+                <button
+                  onClick={() => removePestaña(secIdx, p)}
+                  style={{ background: 'none', border: 'none', color: '#fecaca', cursor: 'pointer', marginLeft: '6px', fontSize: '12px', padding: '0' }}
+                  title="Eliminar pestaña"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          <input
+            type="text"
+            value={newPestañaInput}
+            onChange={(e) => setNewPestañaInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && newPestañaInput.trim()) {
+                addPestaña(secIdx, newPestañaInput)
+                setNewPestañaInput('')
+              }
+            }}
+            placeholder="+ Nueva pestaña"
+            style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '4px', padding: '4px 8px', fontSize: '12px', color: 'var(--text-secondary)', outline: 'none', minWidth: '120px' }}
+          />
+        </div>
+      </div>
+
       {baseFields.length > 0 && (
         <div>
           {baseFields.map((item, baseFieldIdx) => (
@@ -429,16 +474,20 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
               onRemove={() => removeField(secIdx, item.idx)}
               showHeader={baseFieldIdx === 0 && baseFields.length > 0}
               fieldIndex={baseFieldIdx}
+              pestañas={pestañas}
+              updateFieldPestaña={updateFieldPestaña}
+              secIdx={secIdx}
+              fieldIdx={item.idx}
             />
           ))}
         </div>
       )}
 
-      {tabs.length > 0 && (
+      {pestañas.length > 0 && Object.keys(fieldsByTab).length > 0 && (
         <>
-          {tabs.length > 1 && (
+          {pestañas.length > 1 && (
             <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', marginTop: baseFields.length > 0 ? '12px' : '0', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', overflowX: 'auto' }}>
-              {tabs.map(tab => (
+              {pestañas.map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -462,9 +511,9 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
             </div>
           )}
 
-          {tabs.length === 1 ? (
+          {pestañas.length === 1 ? (
             <div>
-              {fieldsByTab[tabs[0]].map((item, tabFieldIdx) => (
+              {fieldsByTab[pestañas[0]]?.map((item, tabFieldIdx) => (
                 <FieldRow
                   key={item.field.id}
                   field={item.field}
@@ -472,13 +521,17 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
                   onRemove={() => removeField(secIdx, item.idx)}
                   showHeader={tabFieldIdx === 0}
                   fieldIndex={tabFieldIdx}
+                  pestañas={pestañas}
+                  updateFieldPestaña={updateFieldPestaña}
+                  secIdx={secIdx}
+                  fieldIdx={item.idx}
                 />
               ))}
             </div>
           ) : (
             currentActiveTab && (
               <div>
-                {fieldsByTab[currentActiveTab].map((item, tabFieldIdx) => (
+                {fieldsByTab[currentActiveTab]?.map((item, tabFieldIdx) => (
                   <FieldRow
                     key={item.field.id}
                     field={item.field}
@@ -486,6 +539,10 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
                     onRemove={() => removeField(secIdx, item.idx)}
                     showHeader={tabFieldIdx === 0}
                     fieldIndex={tabFieldIdx}
+                    pestañas={pestañas}
+                    updateFieldPestaña={updateFieldPestaña}
+                    secIdx={secIdx}
+                    fieldIdx={item.idx}
                   />
                 ))}
               </div>
@@ -514,22 +571,23 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
   )
 }
 
-function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex }) {
+function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas, updateFieldPestaña, secIdx, fieldIdx }) {
   const [expanded, setExpanded] = useState(false)
   const autoKey = toCamelKey(field.nombre)
 
   return (
     <>
       {showHeader && (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 0.8fr auto', gap: '8px', marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid var(--border-default)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.8fr auto', gap: '8px', marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid var(--border-default)' }}>
           <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Nombre</div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Tipo</div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Obligatorio</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Pestaña</div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}></div>
           <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase' }}></div>
         </div>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 0.8fr auto', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.8fr auto', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
         <div>
           <input
             value={field.nombre}
@@ -580,6 +638,30 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex }) {
               onChange={e => onChange({ ...field, required: e.target.checked })}
             />
           </label>
+        </div>
+        <div>
+          {pestañas && pestañas.length > 0 && (
+            <select
+              value={field.pestaña || 'Datos'}
+              onChange={e => {
+                onChange({ ...field, pestaña: e.target.value })
+                updateFieldPestaña && updateFieldPestaña(secIdx, fieldIdx, e.target.value)
+              }}
+              style={{
+                width: '100%',
+                padding: '6px 8px',
+                border: '1px solid var(--border-default)',
+                borderRadius: '4px',
+                fontSize: '12px',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">-- Sin pestaña --</option>
+              {pestañas.map(p => <option key={p} value={p}>{p}</option>)}
+            </select>
+          )}
         </div>
         <div>
           <button
@@ -636,6 +718,94 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex }) {
               }}
             />
           </div>
+          {field.tipo === 'table' && (
+            <div style={{ gridColumn: '1 / -1', marginTop: '8px', padding: '8px', background: 'rgba(0, 0, 0, 0.2)', borderRadius: '4px' }}>
+              <div style={{ fontSize: '10px', fontWeight: '600', color: '#9ad1ff', marginBottom: '6px', textTransform: 'uppercase' }}>Columnas de tabla</div>
+              {!field.columnas && (onChange({ ...field, columnas: [] }))}
+              {(field.columnas || []).map((col, colIdx) => (
+                <div key={col.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '6px', marginBottom: '6px', alignItems: 'center' }}>
+                  <input
+                    value={col.nombre}
+                    onChange={e => {
+                      const newCols = [...(field.columnas || [])]
+                      newCols[colIdx].nombre = e.target.value
+                      onChange({ ...field, columnas: newCols })
+                    }}
+                    placeholder="Nombre columna"
+                    style={{
+                      width: '100%',
+                      padding: '4px 6px',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: '3px',
+                      fontSize: '11px',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-primary)',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <select
+                    value={col.tipo || 'text'}
+                    onChange={e => {
+                      const newCols = [...(field.columnas || [])]
+                      newCols[colIdx].tipo = e.target.value
+                      onChange({ ...field, columnas: newCols })
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '4px 6px',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: '3px',
+                      fontSize: '11px',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-primary)',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    {FIELD_TYPES.filter(t => t.value !== 'table').map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                  <input
+                    type="number"
+                    value={col.length || 100}
+                    onChange={e => {
+                      const newCols = [...(field.columnas || [])]
+                      newCols[colIdx].length = parseInt(e.target.value)
+                      onChange({ ...field, columnas: newCols })
+                    }}
+                    placeholder="Longitud"
+                    style={{
+                      width: '100%',
+                      padding: '4px 6px',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: '3px',
+                      fontSize: '11px',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-primary)',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      const newCols = (field.columnas || []).filter((_, i) => i !== colIdx)
+                      onChange({ ...field, columnas: newCols })
+                    }}
+                    style={{ padding: '2px 6px', background: 'rgba(255, 100, 100, 0.1)', border: '1px solid rgba(255, 100, 100, 0.3)', borderRadius: '3px', cursor: 'pointer', fontSize: '10px', color: '#ff6464' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => {
+                  const newCols = [...(field.columnas || [])]
+                  newCols.push({ id: newGuid(), nombre: '', tipo: 'text', length: 100 })
+                  onChange({ ...field, columnas: newCols })
+                }}
+                style={{ width: '100%', padding: '4px 6px', marginTop: '6px', background: 'rgba(154, 209, 255, 0.1)', border: '1px solid rgba(154, 209, 255, 0.25)', borderRadius: '3px', cursor: 'pointer', fontSize: '11px', color: '#9ad1ff', fontWeight: '600' }}
+              >
+                + Columna
+              </button>
+            </div>
+          )}
         </div>
       )}
     </>
@@ -648,7 +818,7 @@ export default function CategoryBuilder() {
     {
       id: newGuid(),
       name: 'CATEGORÍA 1',
-      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: 'Datos' }] }]
+      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: 'Datos' }], pestañas: ['Datos'] }]
     }
   ])
   const [activeCategory, setActiveCategory] = useState(0)
@@ -832,6 +1002,29 @@ export default function CategoryBuilder() {
     setCategories(updated)
   }
 
+  const addPestaña = (secIdx, newPestañaName) => {
+    if (!newPestañaName.trim()) return
+    const updated = [...categories]
+    const sec = updated[activeCategory].sections[secIdx]
+    if (!sec.pestañas.includes(newPestañaName)) {
+      sec.pestañas = [...sec.pestañas, newPestañaName].sort()
+    }
+    setCategories(updated)
+  }
+
+  const removePestaña = (secIdx, pestañaName) => {
+    const updated = [...categories]
+    const sec = updated[activeCategory].sections[secIdx]
+    sec.pestañas = sec.pestañas.filter(p => p !== pestañaName)
+    setCategories(updated)
+  }
+
+  const updateFieldPestaña = (secIdx, fieldIdx, pestaña) => {
+    const updated = [...categories]
+    updated[activeCategory].sections[secIdx].fields[fieldIdx].pestaña = pestaña
+    setCategories(updated)
+  }
+
   // CSV import
   const handleCsvImport = ({ categories: newCats }, mode) => {
     if (mode === 'replace') {
@@ -855,7 +1048,8 @@ export default function CategoryBuilder() {
     'money': '5',
     'boolean': '6',
     'lookup': '15',
-    'image': '12'
+    'image': '12',
+    'table': '10'
   }
 
   const bgr = (r, g, b) => b * 65536 + g * 256 + r
@@ -908,6 +1102,21 @@ export default function CategoryBuilder() {
     return `<Field><FieldNo>${fieldno}</FieldNo>${xmlCaption(caption)}<TypeNo>12</TypeNo><Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><FullTextSearch>0</FullTextSearch>${tabMeta}</Field>`
   }
 
+  const makeTableField = ({ fieldno, fieldid, caption, width = 580, height = 92, posx = 20, posy = 0, tabMeta = "" }) => {
+    const tableName = sanitizeName(caption)
+    const foreignTable = `TheIxTable_${tableName}_Hist`
+    const safeFieldid = escapeXml(fieldid)
+    return `<Field><FieldNo>${fieldno}</FieldNo>${xmlCaption(caption)}<TypeNo>10</TypeNo><Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><DontLoadValues>1</DontLoadValues><RegExHelp UPT="1"><TStr></TStr></RegExHelp><Links></Links><ForeignTable>${foreignTable}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+  }
+
+  const makeTableColumnField = ({ fieldno, colname, fieldid, caption, typeno, length, taborder = 1, disporder = 1, parentTableNo, font = 'Segoe UI', fsize = 9 }) => {
+    const lengthTag = (typeno === '5') ? '<Length>18</Length>' : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '12' && typeno !== '15' && length) ? `<Length>${length}</Length>` : ''
+    const dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
+    const safeColname = escapeXml(colname)
+    const safeFieldid = escapeXml(fieldid)
+    return `<Field><FieldNo>${fieldno}</FieldNo><ColName>${safeColname}</ColName>${xmlCaption(caption)}<TypeNo>${typeno}</TypeNo>${lengthTag}<Width>150</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><TabOrderPos>${taborder}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${disporder}</DispOrderPos><RegExHelp UPT="1"><TStr></TStr></RegExHelp><Links></Links><BelongsToTable>${parentTableNo}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+  }
+
   const xmlRegEx = () => `<RegExHelp UPT="1"><TStr></TStr></RegExHelp>`
 
   const tabMetaXml = (tabNo, belongsTo) => `<BelongsToTable>${belongsTo}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${tabNo}</ShowInTabNo>`
@@ -946,27 +1155,41 @@ export default function CategoryBuilder() {
       const tableName = sanitizeName(cat.name)
       const ctgryId = sanitizeName(cat.name)
 
-      // Check if any section has fields with pestaña
-      let hasMultipleTabs = false
-      const tabNames = new Set()
+      // Build tab mapping from section's defined pestañas
+      const sectionPestañas = []
       cat.sections.forEach(sec => {
-        sec.fields.forEach(f => {
-          const tab = f.pestaña?.trim()
-          if (tab) {
-            tabNames.add(tab)
-            if (tabNames.size > 1) hasMultipleTabs = true
-          }
-        })
+        if (sec.pestañas && Array.isArray(sec.pestañas)) {
+          sec.pestañas.forEach(p => {
+            if (!sectionPestañas.includes(p)) sectionPestañas.push(p)
+          })
+        }
       })
 
-      const tabs = Array.from(tabNames).sort()
-      const hasTabs = hasMultipleTabs && tabs.length > 1
-      const tab1Name = tabs[0] || 'Datos'
+      // Check if we have multiple tabs (more than just 'Datos')
+      const hasMultipleTabs = sectionPestañas.length > 1
+      const hasTabs = hasMultipleTabs
+
+      // Create map of pestaña name to tab number (1-indexed, reserved 1 for data)
+      const pestañaToTabNo = {}
+      const sortedPestañas = sectionPestañas.sort()
+      sortedPestañas.forEach((p, idx) => {
+        pestañaToTabNo[p] = idx + 1
+      })
+
+      const tab1Name = sortedPestañas[0] || 'Datos'
       const tab2Name = 'Historial'
 
       let colNo = -202
       let fieldsXml = '', dispOrder = 1, tabOrder = 1
-      const tm = n => hasTabs ? tabMetaXml(n, TAB_NO) : ''
+
+      // Helper function to get tab metadata for a field
+      const getTabMeta = (fieldPestaña) => {
+        if (!hasTabs) return ''
+        const trimmedPestaña = fieldPestaña?.trim()
+        if (!trimmedPestaña || !pestañaToTabNo[trimmedPestaña]) return ''
+        const tabNo = pestañaToTabNo[trimmedPestaña]
+        return tabMetaXml(tabNo, TAB_NO)
+      }
 
       let yPos = hasTabs ? 8 : HDR_H + SEC_GAP
       const sectionWidth = hasTabs ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
@@ -980,34 +1203,54 @@ export default function CategoryBuilder() {
 
       // Data fields
       cat.sections.forEach((sec, si) => {
-        const validFields = sec.fields.filter(f => f.nombre.trim())
-        if (validFields.length === 0) return
+        const validFields = sec.fields.filter(f => f.nombre.trim() && f.tipo !== 'table')
+        const tableFields = sec.fields.filter(f => f.nombre.trim() && f.tipo === 'table')
 
-        // Section header
-        fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: tm(1) })
+        if (validFields.length === 0 && tableFields.length === 0) return
+
+        // Section header (goes to Tab 1 always, or no tab if no tabs)
+        fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: bgr(255, 255, 255), bclr: bgr(55, 65, 81), al: 4, pd: 6, tabMeta: hasTabs ? getTabMeta('') : '' })
         yPos += SEC_GAP
 
-        // Process fields in pairs
+        // Process regular fields in pairs
         for (let i = 0; i < validFields.length; i += 2) {
           const f1 = validFields[i]
           const f2 = validFields[i + 1]
 
           if (f1) {
             const colname = sanitizeName(f1.fieldKey || f1.nombre)
-            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
+            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f1.pestaña) })
             const typeno = typeToTypeNo[f1.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: FLD_W, height: ROW_H, posx: hasTabs ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f1.pestaña) })
           }
 
           if (f2) {
             const colname = sanitizeName(f2.fieldKey || f2.nombre)
-            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: tm(1) })
+            fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTabs ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: getTabMeta(f2.pestaña) })
             const typeno = typeToTypeNo[f2.tipo] || '1'
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: tm(1) })
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: FLD_W2, height: ROW_H, posx: hasTabs ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, tabMeta: getTabMeta(f2.pestaña) })
           }
 
           yPos += ROW_GAP
         }
+
+        // Process table fields
+        tableFields.forEach((tableField) => {
+          const tableFieldNo = globalFieldNo--
+          fieldsXml += makeTableField({ fieldno: tableFieldNo, fieldid: sanitizeName(tableField.nombre), caption: tableField.nombre, posy: yPos, tabMeta: getTabMeta(tableField.pestaña) })
+          yPos += 100 // Space for table field
+          tabOrder++
+          dispOrder++
+
+          // Emit table columns
+          const columns = tableField.columnas || []
+          columns.forEach((col, colIdx) => {
+            const colname = sanitizeName(col.nombre)
+            const colTypeno = typeToTypeNo[col.tipo] || '1'
+            fieldsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: col.length || '100', parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
+          })
+        })
+
         yPos += 6
       })
 
@@ -1020,12 +1263,23 @@ export default function CategoryBuilder() {
         const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
         const tableH = Math.max(contentH, 240) - 30
         const tabH2 = Math.max(contentH + 20, 260)
+        const tab2Name = 'Historial'
 
-        // Table field for Tab 2
-        tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption(tab2Name)}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>${foreignTableName(tableName)}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>2</ShowInTabNo><FieldID>Historial_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        // Table field for history tab (always the last tab)
+        const historyTabNo = sortedPestañas.length + 1
+        tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption(tab2Name)}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>${foreignTableName(tableName)}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>${historyTabNo}</ShowInTabNo><FieldID>Historial_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+
+        // Build tab entries dynamically
+        const tabEntries = sortedPestañas.map((p, idx) => {
+          const tabNo = idx + 1
+          return `<T FactoryType="1"><TabNo>${tabNo}</TabNo><TabPos>${tabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>${escapeXml(p)}</S></T></TStr></TabCapt></T>`
+        }).join('')
+
+        // Add history tab
+        const historyTabEntry = `<T FactoryType="1"><TabNo>${historyTabNo}</TabNo><TabPos>${historyTabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>Historial</S></T></TStr></TabCapt></T>`
 
         // Tab Control
-        tabXml += `<Field><FieldNo>${TAB_NO}</FieldNo>${xmlCaption('Datos')}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs><T FactoryType="1"><TabNo>1</TabNo><TabPos>1</TabPos><TabCapt><TStr><T><L>1034</L><S>${tab1Name}</S></T></TStr></TabCapt></T><T FactoryType="1"><TabNo>2</TabNo><TabPos>2</TabPos><TabCapt><TStr><T><L>1034</L><S>${tab2Name}</S></T></TStr></TabCapt></T></Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        tabXml += `<Field><FieldNo>${TAB_NO}</FieldNo>${xmlCaption(tab1Name)}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs>${tabEntries}${historyTabEntry}</Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
       }
 
       const dialogH = hasTabs ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
@@ -1115,6 +1369,9 @@ export default function CategoryBuilder() {
             updateSecName={updateSecName}
             removeSection={removeSection}
             catSectionsCount={cat.sections.length}
+            addPestaña={addPestaña}
+            removePestaña={removePestaña}
+            updateFieldPestaña={updateFieldPestaña}
           />
         ))}
 
