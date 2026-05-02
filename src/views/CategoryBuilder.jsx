@@ -1194,14 +1194,15 @@ export default function CategoryBuilder() {
       const tableName = sanitizeName(cat.name)
       const ctgryId = sanitizeName(cat.name)
 
-      // Build tab mapping from section's defined pestañas
+      // Build tab mapping from fields' pestaña property
       const sectionPestañas = []
       cat.sections.forEach(sec => {
-        if (sec.pestañas && Array.isArray(sec.pestañas)) {
-          sec.pestañas.forEach(p => {
-            if (!sectionPestañas.includes(p)) sectionPestañas.push(p)
-          })
-        }
+        sec.fields.forEach(f => {
+          if (f.pestaña && f.pestaña.trim()) {
+            const trimmed = f.pestaña.trim()
+            if (!sectionPestañas.includes(trimmed)) sectionPestañas.push(trimmed)
+          }
+        })
       })
 
       // Check if we have multiple tabs (more than just 'Datos')
