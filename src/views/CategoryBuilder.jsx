@@ -1200,10 +1200,7 @@ export default function CategoryBuilder() {
         sec.fields.forEach(f => {
           if (f.pestaña && f.pestaña.trim()) {
             const trimmed = f.pestaña.trim()
-            // Filter out "Historial" - it's reserved for the system history tab
-            if (trimmed.toLowerCase() !== 'historial' && !sectionPestañas.includes(trimmed)) {
-              sectionPestañas.push(trimmed)
-            }
+            if (!sectionPestañas.includes(trimmed)) sectionPestañas.push(trimmed)
           }
         })
       })
@@ -1431,21 +1428,14 @@ export default function CategoryBuilder() {
       const tabH2 = Math.max(contentH + 20, 260)
 
       if (hasTabs) {
-        // Table field for history tab (always the last tab)
-        const historyTabNo = sortedPestañas.length + 1
-        tabXml += `<Field><FieldNo>${categoryTableNo}</FieldNo>${xmlCaption(tab2Name)}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${categoryTabNo}</BelongsToTable><ForeignTable>${foreignTableName(tableName)}</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>${historyTabNo}</ShowInTabNo><FieldID>Historial_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
-
-        // Build tab entries dynamically
+        // Build tab entries dynamically from user-defined tabs
         const tabEntries = sortedPestañas.map((p, idx) => {
           const tabNo = idx + 1
           return `<T FactoryType="1"><TabNo>${tabNo}</TabNo><TabPos>${tabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>${escapeXml(p)}</S></T></TStr></TabCapt></T>`
         }).join('')
 
-        // Add history tab
-        const historyTabEntry = `<T FactoryType="1"><TabNo>${historyTabNo}</TabNo><TabPos>${historyTabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>Historial</S></T></TStr></TabCapt></T>`
-
         // Tab Control
-        tabXml += `<Field><FieldNo>${categoryTabNo}</FieldNo>${xmlCaption(tab1Name)}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs>${tabEntries}${historyTabEntry}</Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        tabXml += `<Field><FieldNo>${categoryTabNo}</FieldNo>${xmlCaption(tab1Name)}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs>${tabEntries}</Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
       }
 
       const dialogH = hasTabs ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
