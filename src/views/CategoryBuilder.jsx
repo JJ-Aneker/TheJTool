@@ -763,7 +763,7 @@ export default function CategoryBuilder() {
     {
       id: newGuid(),
       name: 'CATEGORÍA 1',
-      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: 'Datos' }], pestañas: ['Datos'] }]
+      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: '' }], pestañas: [] }]
     }
   ])
   const [activeCategory, setActiveCategory] = useState(0)
@@ -933,7 +933,7 @@ export default function CategoryBuilder() {
 
   const addField = (secIdx) => {
     const updated = [...categories]
-    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: 'Datos' })
+    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: '' })
     setCategories(updated)
   }
 
