@@ -1231,9 +1231,8 @@ export default function CategoryBuilder() {
         return `<BelongsToTable>${categoryTabNo}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${tabNo}</ShowInTabNo>`
       }
 
-      // Use unique Tab and Table FieldNo per category (decreasing from -200, -201, etc.)
+      // Use unique Tab FieldNo per category (decreasing from -200, -201, etc.)
       const categoryTabNo = globalFieldNo--
-      const categoryTableNo = globalFieldNo--
 
       let yPos = hasTabs ? 8 : HDR_H + SEC_GAP
       const sectionWidth = hasTabs ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
