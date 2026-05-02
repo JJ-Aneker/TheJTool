@@ -121,6 +121,7 @@ function parseCsv(raw) {
     seccion: headers.findIndex(h => ['seccion', 'sección', 'section', 'grupo', 'group'].includes(h)),
     pestaña: headers.findIndex(h => ['pestaña', 'pestaña', 'tab', 'tabs', 'tab'].includes(h)),
     categoria: headers.findIndex(h => ['categoria', 'categoría', 'category', 'tab', 'categoria'].includes(h)),
+    length: headers.findIndex(h => ['length', 'longitud', 'tamaño', 'size', 'largo'].includes(h)),
   }
 
   if (idx.nombre === -1) return { error: 'No se encontró la columna "Nombre".' }
@@ -139,10 +140,11 @@ function parseCsv(raw) {
     const required = idx.obligatorio >= 0 ? ['1', 'si', 'sí', 'yes', 'true'].includes((cols[idx.obligatorio] || '').toLowerCase()) : false
     const seccion = idx.seccion >= 0 ? (cols[idx.seccion] || 'GENERAL').toUpperCase() : 'GENERAL'
     const pestaña = idx.pestaña >= 0 ? (cols[idx.pestaña] || 'Datos').trim() : 'Datos'
+    const length = idx.length >= 0 ? (cols[idx.length] || '').trim() : ''
 
     if (!categoryMap[categoria]) categoryMap[categoria] = {}
     if (!categoryMap[categoria][seccion]) categoryMap[categoria][seccion] = []
-    categoryMap[categoria][seccion].push({ id: newGuid(), nombre, fieldKey, tipo, required, pestaña })
+    categoryMap[categoria][seccion].push({ id: newGuid(), nombre, fieldKey, tipo, required, pestaña, length })
   })
 
   if (!Object.keys(categoryMap).length) return { error: 'No se procesó ningún campo válido.' }
@@ -191,12 +193,15 @@ function CsvImporter({ isOpen, onClose, onImport }) {
       width={700}
     >
       <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-        Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría</strong> (pestaña es opcional)
+        <div style={{ marginBottom: '8px' }}>Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría ; Longitud</strong></div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+          Pestaña y Longitud son opcionales. Máx texto: 4000 caracteres. Tipos: text, email, date, datetime, number, money, boolean, lookup
+        </div>
       </div>
       <textarea
         value={text}
         onChange={e => { setText(e.target.value); setPreview(null) }}
-        placeholder="Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría"
+        placeholder="Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría;Longitud"
         className="form-textarea"
         style={{
           height: '120px',
@@ -989,6 +994,34 @@ export default function CategoryBuilder() {
     'table': '10'
   }
 
+  // Field length defaults by type (max 4000 for text types)
+  const defaultFieldLength = {
+    'text': 100,
+    'email': 100,
+    'date': 10,
+    'datetime': 19,
+    'number': 18,
+    'money': 18,
+    'boolean': 1,
+    'lookup': 100,
+    'image': 4000,
+    'table': 4000,
+    'phone': 20
+  }
+
+  // Validate and normalize field length
+  const normalizeFieldLength = (fieldType, providedLength) => {
+    const typeNorm = fieldType?.toLowerCase() || 'text'
+    const maxLength = typeNorm === 'text' || typeNorm === 'email' || typeNorm === 'lookup' ? 4000 :
+                      typeNorm === 'datetime' ? 19 :
+                      typeNorm === 'date' ? 10 :
+                      typeNorm === 'number' || typeNorm === 'money' ? 18 :
+                      typeNorm === 'phone' ? 20 : 4000
+
+    const length = parseInt(providedLength) || defaultFieldLength[typeNorm] || 100
+    return Math.min(Math.max(length, 1), maxLength)
+  }
+
   const bgr = (r, g, b) => b * 65536 + g * 256 + r
 
   // Escape special XML characters
@@ -1184,16 +1217,18 @@ export default function CategoryBuilder() {
             const colname = sanitizeName(f1.fieldKey || f1.nombre)
             fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f1.tipo] || '1'
-            const fieldWidth = calculateFieldWidth(f1.length || '100', typeno)
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: f1.length || '100', width: fieldWidth, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
+            const normalizedLength = normalizeFieldLength(f1.tipo, f1.length)
+            const fieldWidth = calculateFieldWidth(normalizedLength.toString(), typeno)
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: normalizedLength.toString(), width: fieldWidth, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
 
           if (f2) {
             const colname = sanitizeName(f2.fieldKey || f2.nombre)
             fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f2.tipo] || '1'
-            const fieldWidth = calculateFieldWidth(f2.length || '100', typeno)
-            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: f2.length || '100', width: fieldWidth, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
+            const normalizedLength = normalizeFieldLength(f2.tipo, f2.length)
+            const fieldWidth = calculateFieldWidth(normalizedLength.toString(), typeno)
+            fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: normalizedLength.toString(), width: fieldWidth, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
 
           yPos += ROW_GAP
@@ -1212,7 +1247,8 @@ export default function CategoryBuilder() {
             columns.forEach((col) => {
               const colname = sanitizeName(col.nombre)
               const colTypeno = typeToTypeNo[col.tipo] || '1'
-              fieldsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: col.length || '100', parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
+              const normalizedLength = normalizeFieldLength(col.tipo, col.length)
+              fieldsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: normalizedLength.toString(), parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
             })
           }
         })
@@ -1273,10 +1309,11 @@ export default function CategoryBuilder() {
                   fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
                 })
                 const typeno = typeToTypeNo[f1.tipo] || '1'
-                const fieldWidth = Math.min(calculateFieldWidth(f1.length || '100', typeno), 155)
+                const normalizedLength = normalizeFieldLength(f1.tipo, f1.length)
+                const fieldWidth = Math.min(calculateFieldWidth(normalizedLength.toString(), typeno), 155)
                 fieldsWithTabsXml += makeDataField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre,
-                  typeno, length: f1.length || '100',
+                  typeno, length: normalizedLength.toString(),
                   width: fieldWidth, height: ROW_H, posx: TAB_FLD_X1, posy: tabYPos,
                   taborder: tabOrder++, disporder: dispOrder++, tabMeta: mkTabMeta()
                 })
@@ -1290,10 +1327,11 @@ export default function CategoryBuilder() {
                   fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
                 })
                 const typeno = typeToTypeNo[f2.tipo] || '1'
-                const fieldWidth = Math.min(calculateFieldWidth(f2.length || '100', typeno), 98)
+                const normalizedLength = normalizeFieldLength(f2.tipo, f2.length)
+                const fieldWidth = Math.min(calculateFieldWidth(normalizedLength.toString(), typeno), 98)
                 fieldsWithTabsXml += makeDataField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre,
-                  typeno, length: f2.length || '100',
+                  typeno, length: normalizedLength.toString(),
                   width: fieldWidth, height: ROW_H, posx: TAB_FLD_X2, posy: tabYPos,
                   taborder: tabOrder++, disporder: dispOrder++, tabMeta: mkTabMeta()
                 })
@@ -1316,9 +1354,10 @@ export default function CategoryBuilder() {
               columns.forEach((col) => {
                 const colname = sanitizeName(col.nombre)
                 const colTypeno = typeToTypeNo[col.tipo] || '1'
+                const normalizedLength = normalizeFieldLength(col.tipo, col.length)
                 fieldsWithTabsXml += makeTableColumnField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre,
-                  typeno: colTypeno, length: col.length || '100',
+                  typeno: colTypeno, length: normalizedLength.toString(),
                   parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++
                 })
               })
