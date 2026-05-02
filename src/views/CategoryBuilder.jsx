@@ -193,9 +193,9 @@ function CsvImporter({ isOpen, onClose, onImport }) {
       width={700}
     >
       <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-        <div style={{ marginBottom: '8px' }}>Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría ; Longitud</strong></div>
+        <div style={{ marginBottom: '8px' }}>Columnas: <strong>Categoría ; Pestaña ; Sección ; Nombre ; Tipo ; Longitud ; Obligatorio</strong></div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-          Pestaña y Longitud son opcionales. Máx texto: 4000 caracteres.
+          Pestaña, Longitud y Obligatorio son opcionales. Máx texto: 4000 caracteres.
         </div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
           Tipos Therefore: <strong>text</strong> (1-4000), <strong>email</strong> (1-4000), <strong>phone</strong> (texto),
@@ -206,7 +206,7 @@ function CsvImporter({ isOpen, onClose, onImport }) {
       <textarea
         value={text}
         onChange={e => { setText(e.target.value); setPreview(null) }}
-        placeholder="Nombre;Tipo;Obligatorio;Sección;Pestaña;Categoría;Longitud"
+        placeholder="Categoría;Pestaña;Sección;Nombre;Tipo;Longitud;Obligatorio"
         className="form-textarea"
         style={{
           height: '120px',
