@@ -1200,7 +1200,10 @@ export default function CategoryBuilder() {
         sec.fields.forEach(f => {
           if (f.pestaña && f.pestaña.trim()) {
             const trimmed = f.pestaña.trim()
-            if (!sectionPestañas.includes(trimmed)) sectionPestañas.push(trimmed)
+            // Filter out "Historial" - it's reserved for the system history tab
+            if (trimmed.toLowerCase() !== 'historial' && !sectionPestañas.includes(trimmed)) {
+              sectionPestañas.push(trimmed)
+            }
           }
         })
       })
