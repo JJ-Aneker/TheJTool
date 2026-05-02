@@ -194,8 +194,13 @@ function CsvImporter({ isOpen, onClose, onImport }) {
     >
       <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
         <div style={{ marginBottom: '8px' }}>Columnas: <strong>Nombre ; Tipo ; Obligatorio ; Sección ; Pestaña ; Categoría ; Longitud</strong></div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+          Pestaña y Longitud son opcionales. Máx texto: 4000 caracteres.
+        </div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-          Pestaña y Longitud son opcionales. Máx texto: 4000 caracteres. Tipos: text, email, date, datetime, number, money, boolean, lookup
+          Tipos Therefore: <strong>text</strong> (1-4000), <strong>email</strong> (1-4000), <strong>phone</strong> (texto),
+          <strong>number</strong> (entero), <strong>date</strong> (YYYY-MM-DD), <strong>money</strong>, <strong>boolean</strong>,
+          <strong>lookup</strong>, <strong>datetime</strong>, <strong>image</strong>, <strong>table</strong>
         </div>
       </div>
       <textarea
@@ -980,44 +985,53 @@ export default function CategoryBuilder() {
   }
 
   // Generate XML
-  // Map React field types to Therefore TypeNo
+  // Map field types to Therefore TypeNo per official documentation
+  // StringField(1), IntField(2), DateField(3), LabelField(4), MoneyField(5),
+  // LogicalField(6), NumericCounter(8), TextCounter(9), TableField(10), CustomField(99)
   const typeToTypeNo = {
-    'text': '1',
-    'email': '1',
-    'date': '3',
-    'datetime': '7',
-    'number': '2',
-    'money': '5',
-    'boolean': '6',
-    'lookup': '15',
-    'image': '12',
-    'table': '10'
+    'text': '1',      // StringField
+    'email': '1',     // StringField
+    'phone': '1',     // StringField (no phone type in Therefore)
+    'number': '2',    // IntField
+    'date': '3',      // DateField
+    'money': '5',     // MoneyField
+    'boolean': '6',   // LogicalField
+    'table': '10',    // TableField
+    'datetime': '99', // CustomField (timestamp)
+    'lookup': '99',   // CustomField
+    'image': '99'     // CustomField
   }
 
-  // Field length defaults by type (max 4000 for text types)
+  // Field length defaults by type. Some types (boolean, money, table, image) don't use Length tag
   const defaultFieldLength = {
-    'text': 100,
-    'email': 100,
-    'date': 10,
-    'datetime': 19,
-    'number': 18,
-    'money': 18,
-    'boolean': 1,
-    'lookup': 100,
-    'image': 4000,
-    'table': 4000,
-    'phone': 20
+    'text': 100,      // StringField: 1-4000 chars
+    'email': 100,     // StringField: 1-4000 chars
+    'phone': 20,      // StringField: typical phone length
+    'number': 18,     // IntField: display width (no Length tag)
+    'date': 10,       // DateField: YYYY-MM-DD (no Length tag)
+    'money': 18,      // MoneyField: display width (no Length tag)
+    'boolean': 1,     // LogicalField (no Length tag)
+    'table': 0,       // TableField (no Length tag)
+    'datetime': 19,   // CustomField/timestamp (no Length tag in XML)
+    'lookup': 100,    // CustomField: typically StringField-like
+    'image': 0        // CustomField/image (no Length tag)
+  }
+
+  // Check if field type should have Length tag in XML
+  const hasLengthTag = (fieldType) => {
+    const typeNorm = fieldType?.toLowerCase() || 'text'
+    // Only StringField (1) types have Length tags
+    return typeToTypeNo[typeNorm] === '1'
   }
 
   // Validate and normalize field length
   const normalizeFieldLength = (fieldType, providedLength) => {
     const typeNorm = fieldType?.toLowerCase() || 'text'
-    const maxLength = typeNorm === 'text' || typeNorm === 'email' || typeNorm === 'lookup' ? 4000 :
-                      typeNorm === 'datetime' ? 19 :
-                      typeNorm === 'date' ? 10 :
-                      typeNorm === 'number' || typeNorm === 'money' ? 18 :
-                      typeNorm === 'phone' ? 20 : 4000
 
+    // Only apply length to StringField types
+    if (!hasLengthTag(typeNorm)) return 0
+
+    const maxLength = 4000 // StringField max
     const length = parseInt(providedLength) || defaultFieldLength[typeNorm] || 100
     return Math.min(Math.max(length, 1), maxLength)
   }
@@ -1059,8 +1073,8 @@ export default function CategoryBuilder() {
   }
 
   const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width = 160, height = 14, posx = 102, posy = 0, taborder = 1, disporder = 1, font = 'Segoe UI', fsize = 9, tabMeta = "" }) => {
-    // Boolean (TypeNo 6) and lookups don't have Length, nor do dates/timestamps/images
-    const lengthTag = (typeno === '5') ? '<Length>18</Length>' : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '12' && typeno !== '15' && length) ? `<Length>${length}</Length>` : ''
+    // Only StringField (TypeNo 1) has Length tag. Money (5) has fixed Length 18.
+    const lengthTag = (typeno === '1' && length) ? `<Length>${length}</Length>` : (typeno === '5') ? '<Length>18</Length>' : ''
     const dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
     const safeColname = escapeXml(colname)
     const safeFieldid = escapeXml(fieldid)
@@ -1091,7 +1105,8 @@ export default function CategoryBuilder() {
   }
 
   const makeTableColumnField = ({ fieldno, colname, fieldid, caption, typeno, length, taborder = 1, disporder = 1, parentTableNo, font = 'Segoe UI', fsize = 9 }) => {
-    const lengthTag = (typeno === '5') ? '<Length>18</Length>' : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '12' && typeno !== '15' && length) ? `<Length>${length}</Length>` : ''
+    // Only StringField (TypeNo 1) has Length tag. Money (5) has fixed Length 18.
+    const lengthTag = (typeno === '1' && length) ? `<Length>${length}</Length>` : (typeno === '5') ? '<Length>18</Length>' : ''
     const dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
     const safeColname = escapeXml(colname)
     const safeFieldid = escapeXml(fieldid)
