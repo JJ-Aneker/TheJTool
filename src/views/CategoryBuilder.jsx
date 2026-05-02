@@ -334,6 +334,36 @@ function PreviewSection({ sectionName, fieldsByTab, baseFields, tabs }) {
   )
 }
 
+function SectionBlock({ section, secIdx, fields, allPestañas, updateField, removeField, updateSecName, removeSection, catSectionsCount, updateFieldPestaña }) {
+  return (
+    <div className="category-section-block">
+      <div className="category-section-row">
+        <span className="category-section-tag">Sección</span>
+        <input
+          value={section.name}
+          onChange={e => updateSecName(secIdx, e.target.value)}
+          className="category-input-compact"
+          style={{ flex: 1 }}
+        />
+        <span className="category-badge">{section.fields.filter(f => f.nombre).length} campos</span>
+        {catSectionsCount > 1 && (
+          <button onClick={() => removeSection(secIdx)} className="btn-default btn-sm">✕</button>
+        )}
+      </div>
+      {fields.map(({ field, fieldIdx }) => (
+        <FieldRow
+          key={field.id}
+          field={field}
+          onChange={v => updateField(secIdx, fieldIdx, v)}
+          onRemove={() => removeField(secIdx, fieldIdx)}
+          allPestañas={allPestañas}
+          onPestañaChange={newTab => updateFieldPestaña(secIdx, fieldIdx, newTab)}
+        />
+      ))}
+    </div>
+  )
+}
+
 function SectionEditor({ section, secIdx, updateField, removeField, addField, updateSecName, removeSection, catSectionsCount, addPestaña, removePestaña, updateFieldPestaña, selectedTab, hideTabManager }) {
   const [newPestañaInput, setNewPestañaInput] = useState('')
 
@@ -549,22 +579,13 @@ function SectionEditor({ section, secIdx, updateField, removeField, addField, up
   )
 }
 
-function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas, updateFieldPestaña, secIdx, fieldIdx }) {
+function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange }) {
   const [expanded, setExpanded] = useState(false)
   const autoKey = toCamelKey(field.nombre)
+  const isStringField = ['text', 'email', 'phone'].includes(field.tipo)
 
   return (
     <>
-      {showHeader && (
-        <div className="category-field-header">
-          <div>Nombre</div>
-          <div>Tipo</div>
-          <div>Obligatorio</div>
-          <div>Pestaña</div>
-          <div></div>
-          <div></div>
-        </div>
-      )}
       <div className="category-field-main">
         <div>
           <input
@@ -590,6 +611,19 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
             {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
+        <div>
+          <input
+            type="number"
+            value={isStringField ? (field.length || '') : ''}
+            disabled={!isStringField}
+            onChange={e => onChange({ ...field, length: e.target.value })}
+            placeholder={isStringField ? '100' : '—'}
+            min="1"
+            max="4000"
+            className="category-input-compact"
+            style={{ textAlign: 'right', opacity: isStringField ? 1 : 0.3 }}
+          />
+        </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
             <input
@@ -600,28 +634,27 @@ function FieldRow({ field, onChange, onRemove, showHeader, fieldIndex, pestañas
           </label>
         </div>
         <div>
-          {pestañas && pestañas.length > 0 && (
-            <select
-              value={field.pestaña || ''}
-              onChange={e => {
-                onChange({ ...field, pestaña: e.target.value })
-                updateFieldPestaña && updateFieldPestaña(secIdx, fieldIdx, e.target.value)
-              }}
-              style={{
-                width: '100%',
-                padding: '6px 8px',
-                border: '1px solid var(--border-default)',
-                borderRadius: '4px',
-                fontSize: '12px',
-                backgroundColor: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                boxSizing: 'border-box'
-              }}
-            >
-              <option value="">-- Sin pestaña --</option>
-              {pestañas.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-          )}
+          <select
+            value={field.pestaña || ''}
+            onChange={e => {
+              const newTab = e.target.value
+              onChange({ ...field, pestaña: newTab })
+              onPestañaChange && onPestañaChange(newTab)
+            }}
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              border: '1px solid var(--border-default)',
+              borderRadius: '4px',
+              fontSize: '12px',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              boxSizing: 'border-box'
+            }}
+          >
+            <option value="">-- Sin pestaña --</option>
+            {allPestañas && allPestañas.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
         </div>
         <div>
           <button
@@ -1477,75 +1510,91 @@ export default function CategoryBuilder() {
           )}
         </div>
 
-        {/* Category-level tab management */}
+        {/* Refactored field editor with unified header */}
         {(() => {
-          // Collect all unique pestañas from all sections
-          const allPestañas = new Set()
-          cat.sections.forEach(sec => {
-            if (sec.pestañas) sec.pestañas.forEach(p => allPestañas.add(p))
-          })
-          const uniquePestañas = Array.from(allPestañas)
+          // Compute field groups: baseFields (no pestaña) and tabFields (grouped by pestaña)
+          const baseGroups = []
+          const tabGroups = {}
+          const tabOrder = []
 
-          // Get selected tab for this category
-          const selectedTab = selectedTabByCategory[idx] || (uniquePestañas.length > 0 ? uniquePestañas[0] : null)
+          cat.sections.forEach((sec, secIdx) => {
+            const baseFields = []
+            const tabFields = {}
+
+            sec.fields.forEach((field, fieldIdx) => {
+              const tab = field.pestaña?.trim()
+              if (!tab) {
+                baseFields.push({ field, fieldIdx })
+              } else {
+                if (!tabFields[tab]) tabFields[tab] = []
+                tabFields[tab].push({ field, fieldIdx })
+                if (!tabOrder.includes(tab)) tabOrder.push(tab)
+              }
+            })
+
+            if (baseFields.length > 0) baseGroups.push({ sec, secIdx, fields: baseFields })
+            Object.entries(tabFields).forEach(([tab, fields]) => {
+              if (!tabGroups[tab]) tabGroups[tab] = []
+              tabGroups[tab].push({ sec, secIdx, fields })
+            })
+          })
 
           return (
             <>
-              {/* Tab buttons (only show if there are multiple pestañas) */}
-              {uniquePestañas.length > 1 && (
-                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', borderBottom: `1px solid var(--border-default)`, paddingBottom: '8px', overflowX: 'auto' }}>
-                  {uniquePestañas.map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setSelectedTabByCategory({...selectedTabByCategory, [idx]: tab})}
-                      style={{
-                        padding: '8px 14px',
-                        fontSize: '12px',
-                        fontWeight: selectedTab === tab ? '600' : '400',
-                        background: selectedTab === tab ? 'var(--bg-hover)' : 'transparent',
-                        border: selectedTab === tab ? `1px solid var(--border-default)` : `1px solid var(--border-default)`,
-                        color: selectedTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        transition: 'all 200ms ease',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0
-                      }}
-                    >
-                      {tab}
-                    </button>
+              {/* Single header for all fields */}
+              <div className="category-table-header">
+                <span>Nombre</span>
+                <span>Tipo</span>
+                <span>Long</span>
+                <span style={{ textAlign: 'center' }}>Req</span>
+                <span>Pestaña</span>
+                <span />
+                <span />
+              </div>
+
+              {/* Fields without pestaña */}
+              {baseGroups.length > 0 && (
+                <div className="category-group">
+                  <div className="category-group-label">📌 Sin pestaña</div>
+                  {baseGroups.map(({ sec, secIdx, fields }) => (
+                    <SectionBlock
+                      key={sec.id}
+                      section={sec}
+                      secIdx={secIdx}
+                      fields={fields}
+                      allPestañas={tabOrder}
+                      updateField={updateField}
+                      removeField={removeField}
+                      updateSecName={updateSecName}
+                      removeSection={removeSection}
+                      catSectionsCount={cat.sections.length}
+                      updateFieldPestaña={updateFieldPestaña}
+                    />
                   ))}
                 </div>
               )}
 
-              {/* Render sections filtered by selected tab */}
-              {cat.sections.map((sec, secIdx) => {
-                // Only show section if it has fields in the selected tab (or any pestaña if single tab)
-                const hasFieldsInSelectedTab = selectedTab && sec.fields.some(f => f.pestaña?.trim() === selectedTab)
-                const hasNoTabFields = sec.fields.some(f => !f.pestaña || !f.pestaña.trim())
-                const shouldShow = !selectedTab || hasFieldsInSelectedTab || hasNoTabFields
-
-                if (!shouldShow) return null
-
-                return (
-                  <SectionEditor
-                    key={sec.id}
-                    section={sec}
-                    secIdx={secIdx}
-                    updateField={updateField}
-                    removeField={removeField}
-                    addField={addField}
-                    updateSecName={updateSecName}
-                    removeSection={removeSection}
-                    catSectionsCount={cat.sections.length}
-                    addPestaña={addPestaña}
-                    removePestaña={removePestaña}
-                    updateFieldPestaña={updateFieldPestaña}
-                    selectedTab={selectedTab}
-                    hideTabManager={uniquePestañas.length > 1}
-                  />
-                )
-              })}
+              {/* Fields grouped by pestaña */}
+              {tabOrder.map(tabName => (
+                <div key={tabName} className="category-group">
+                  <div className="category-group-label">📑 {tabName}</div>
+                  {tabGroups[tabName].map(({ sec, secIdx, fields }) => (
+                    <SectionBlock
+                      key={sec.id}
+                      section={sec}
+                      secIdx={secIdx}
+                      fields={fields}
+                      allPestañas={tabOrder}
+                      updateField={updateField}
+                      removeField={removeField}
+                      updateSecName={updateSecName}
+                      removeSection={removeSection}
+                      catSectionsCount={cat.sections.length}
+                      updateFieldPestaña={updateFieldPestaña}
+                    />
+                  ))}
+                </div>
+              ))}
             </>
           )
         })()}
