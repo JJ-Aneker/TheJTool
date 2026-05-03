@@ -991,9 +991,9 @@ export default function CategoryBuilder() {
         })
       })
 
-      // Check if we have multiple tabs (more than just 'Datos')
-      const hasMultipleTabs = sectionPestañas.length > 1
-      const hasTabs = hasMultipleTabs
+      // Check if we have any fields with pestaña assigned
+      // Create TabControl if there's at least one field with pestaña (even if it's the same pestaña for all fields)
+      const hasTabs = sectionPestañas.length > 0
 
       // Create map of pestaña name to tab number (1-indexed, reserved 1 for data)
       const pestañaToTabNo = {}
@@ -1225,7 +1225,7 @@ export default function CategoryBuilder() {
       const titleFlds = [catStartFieldNo, catStartFieldNo - 1, catStartFieldNo - 2].slice(0, Math.min(3, allFields.length)).map(n => `<Fld>${n}</Fld>`).join('')
       const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
 
-      return `<Category><CtgryNo>-${catIdx + 1}</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(cat.name)}</S></T></TStr></Name><Version>0</Version><Fields>${headerXml}${fieldsXml}${fieldsWithTabsXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(cat.name)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${bgr(240, 240, 240)}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgryId}</CtgryID></Category>`
+      return `<Category><CtgryNo>-${catIdx + 1}</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(cat.name)}</S></T></TStr></Name><Version>0</Version><Fields>${headerXml}${fieldsXml}${tabXml}${fieldsWithTabsXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(cat.name)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${bgr(240, 240, 240)}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgryId}</CtgryID></Category>`
     }).join('')
 
     const newXml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${categoryBlocks}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
