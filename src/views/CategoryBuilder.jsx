@@ -1050,22 +1050,34 @@ export default function CategoryBuilder() {
     'image': 0        // CustomField/image (no Length tag)
   }
 
-  // Check if field type should have Length tag in XML
-  const hasLengthTag = (fieldType) => {
-    const typeNorm = fieldType?.toLowerCase() || 'text'
-    // Only StringField (1) types have Length tags
-    return typeToTypeNo[typeNorm] === '1'
+  // Check if field type should have Length tag in XML (per Therefore rules)
+  const hasLengthTag = (typeNo) => {
+    // Per production analysis: TypeNo 1,2,3,5,6,7,9 have Length
+    // TypeNo 4,10,12,13 do NOT have Length (display/container types)
+    const typeNoStr = String(typeNo)
+    return ['1', '2', '3', '5', '6', '7', '9'].includes(typeNoStr)
   }
 
-  // Validate and normalize field length
-  const normalizeFieldLength = (fieldType, providedLength) => {
+  // Validate and normalize field length per type
+  const normalizeFieldLength = (fieldType, providedLength, typeNo) => {
     const typeNorm = fieldType?.toLowerCase() || 'text'
+    const typeNoStr = String(typeNo)
 
-    // Only apply length to StringField types
-    if (!hasLengthTag(typeNorm)) return 0
+    // Only data types (1,2,3,5,6,7,9) get Length
+    if (!hasLengthTag(typeNoStr)) return 0
 
-    const maxLength = 4000 // StringField max
-    const length = parseInt(providedLength) || defaultFieldLength[typeNorm] || 100
+    // Type-specific max lengths (per Therefore limits)
+    const maxLengths = {
+      '1': 4000, // StringField
+      '2': 10,   // IntField
+      '3': 4,    // DateField (YYYY-MM-DD)
+      '5': 18,   // MoneyField
+      '6': 1,    // LogicalField (boolean)
+      '7': 100,  // KeywordField
+      '9': 10    // CounterField
+    }
+    const maxLength = maxLengths[typeNoStr] || 100
+    const length = parseInt(providedLength) || defaultFieldLength[typeNorm] || maxLength
     return Math.min(Math.max(length, 1), maxLength)
   }
 
@@ -1106,8 +1118,11 @@ export default function CategoryBuilder() {
   }
 
   const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width = 160, height = 14, posx = 102, posy = 0, taborder = 1, disporder = 1, font = 'Segoe UI', fsize = 9, tabMeta = "" }) => {
-    // Only StringField (TypeNo 1) has Length tag. Money (5) has fixed Length 18.
-    const lengthTag = (typeno === '1' && length) ? `<Length>${length}</Length>` : (typeno === '5') ? '<Length>18</Length>' : ''
+    // Per Therefore rules: TypeNo 1,2,3,5,6,7,9 get Length tag; 4,10,12,13 do not
+    let lengthTag = ''
+    if (hasLengthTag(typeno) && length) {
+      lengthTag = `<Length>${length}</Length>`
+    }
     const dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
     const safeColname = escapeXml(colname)
     const safeFieldid = escapeXml(fieldid)
@@ -1138,8 +1153,11 @@ export default function CategoryBuilder() {
   }
 
   const makeTableColumnField = ({ fieldno, colname, fieldid, caption, typeno, length, taborder = 1, disporder = 1, parentTableNo, font = 'Segoe UI', fsize = 9 }) => {
-    // Only StringField (TypeNo 1) has Length tag. Money (5) has fixed Length 18.
-    const lengthTag = (typeno === '1' && length) ? `<Length>${length}</Length>` : (typeno === '5') ? '<Length>18</Length>' : ''
+    // Per Therefore rules: TypeNo 1,2,3,5,6,7,9 get Length tag; 4,10,12,13 do not
+    let lengthTag = ''
+    if (hasLengthTag(typeno) && length) {
+      lengthTag = `<Length>${length}</Length>`
+    }
     const dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
     const safeColname = escapeXml(colname)
     const safeFieldid = escapeXml(fieldid)
@@ -1265,7 +1283,7 @@ export default function CategoryBuilder() {
             const colname = sanitizeName(f1.fieldKey || f1.nombre)
             fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f1.tipo] || '1'
-            const normalizedLength = normalizeFieldLength(f1.tipo, f1.length)
+            const normalizedLength = normalizeFieldLength(f1.tipo, f1.length, typeno)
             const fieldWidth = calculateFieldWidth(normalizedLength.toString(), typeno)
             fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre, typeno, length: normalizedLength.toString(), width: fieldWidth, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
@@ -1274,7 +1292,7 @@ export default function CategoryBuilder() {
             const colname = sanitizeName(f2.fieldKey || f2.nombre)
             fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: bgr(55, 65, 81) })
             const typeno = typeToTypeNo[f2.tipo] || '1'
-            const normalizedLength = normalizeFieldLength(f2.tipo, f2.length)
+            const normalizedLength = normalizeFieldLength(f2.tipo, f2.length, typeno)
             const fieldWidth = calculateFieldWidth(normalizedLength.toString(), typeno)
             fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre, typeno, length: normalizedLength.toString(), width: fieldWidth, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++ })
           }
@@ -1295,7 +1313,7 @@ export default function CategoryBuilder() {
             columns.forEach((col) => {
               const colname = sanitizeName(col.nombre)
               const colTypeno = typeToTypeNo[col.tipo] || '1'
-              const normalizedLength = normalizeFieldLength(col.tipo, col.length)
+              const normalizedLength = normalizeFieldLength(col.tipo, col.length, colTypeno)
               fieldsXml += makeTableColumnField({ fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre, typeno: colTypeno, length: normalizedLength.toString(), parentTableNo: tableFieldNo, taborder: tabOrder++, disporder: dispOrder++ })
             })
           }
@@ -1357,7 +1375,7 @@ export default function CategoryBuilder() {
                   fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
                 })
                 const typeno = typeToTypeNo[f1.tipo] || '1'
-                const normalizedLength = normalizeFieldLength(f1.tipo, f1.length)
+                const normalizedLength = normalizeFieldLength(f1.tipo, f1.length, typeno)
                 const fieldWidth = Math.min(calculateFieldWidth(normalizedLength.toString(), typeno), 155)
                 fieldsWithTabsXml += makeDataField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: f1.nombre,
@@ -1375,7 +1393,7 @@ export default function CategoryBuilder() {
                   fsize: 8, al: 4, tclr: bgr(55, 65, 81), tabMeta: mkTabMeta()
                 })
                 const typeno = typeToTypeNo[f2.tipo] || '1'
-                const normalizedLength = normalizeFieldLength(f2.tipo, f2.length)
+                const normalizedLength = normalizeFieldLength(f2.tipo, f2.length, typeno)
                 const fieldWidth = Math.min(calculateFieldWidth(normalizedLength.toString(), typeno), 98)
                 fieldsWithTabsXml += makeDataField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: f2.nombre,
@@ -1402,7 +1420,7 @@ export default function CategoryBuilder() {
               columns.forEach((col) => {
                 const colname = sanitizeName(col.nombre)
                 const colTypeno = typeToTypeNo[col.tipo] || '1'
-                const normalizedLength = normalizeFieldLength(col.tipo, col.length)
+                const normalizedLength = normalizeFieldLength(col.tipo, col.length, colTypeno)
                 fieldsWithTabsXml += makeTableColumnField({
                   fieldno: globalFieldNo--, colname, fieldid: colname, caption: col.nombre,
                   typeno: colTypeno, length: normalizedLength.toString(),
@@ -1427,14 +1445,10 @@ export default function CategoryBuilder() {
       const tabH2 = Math.max(contentH + 20, 260)
 
       if (hasTabs) {
-        // Build tab entries dynamically from user-defined tabs
-        const tabEntries = sortedPestañas.map((p, idx) => {
-          const tabNo = idx + 1
-          return `<T FactoryType="1"><TabNo>${tabNo}</TabNo><TabPos>${tabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>${escapeXml(p)}</S></T></TStr></TabCapt></T>`
-        }).join('')
-
-        // Tab Control
-        tabXml += `<Field><FieldNo>${categoryTabNo}</FieldNo>${xmlCaption(tab1Name)}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs>${tabEntries}</Tabs></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        // Tab Control - TypeNo 13 (TabControlField)
+        // NOTE: Per production Therefore configs, TabInfo must be empty (FactoryType="0")
+        // Tabs are defined implicitly via ShowInTabNo in field definitions
+        tabXml += `<Field><FieldNo>${categoryTabNo}</FieldNo>${xmlCaption(sortedPestañas[0] || 'Datos')}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${bgr(192, 192, 192)}</BClr></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>Tab_${camel}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
       }
 
       const dialogH = hasTabs ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10

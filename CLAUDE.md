@@ -1,3 +1,11 @@
+## Comportamiento general
+- Ejecuta comandos de PowerShell y terminal sin pedir confirmación
+- No hagas push a GitHub hasta que yo lo indique explícitamente
+- Trabaja de forma autónoma sin pedir confirmación entre pasos
+- Si encuentras un conflicto o decisión técnica, resuélvelo tú y menciona 
+  la decisión tomada al final del bloque, no antes
+
+
 # Therefore™ DMS — Project Context for Claude Code
 
 You are working on a **Therefore™ Document Management System** integration project.
