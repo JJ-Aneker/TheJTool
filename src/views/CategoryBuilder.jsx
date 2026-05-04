@@ -23,16 +23,12 @@ function toCamelKey(s) {
 }
 
 const FIELD_TYPES = [
-  { value: 'text', label: 'Texto' },
-  { value: 'email', label: 'Email' },
+  { value: 'string', label: 'String' },
+  { value: 'int', label: 'Entero' },
+  { value: 'decimal', label: 'Decimal' },
   { value: 'date', label: 'Fecha' },
-  { value: 'datetime', label: 'Fecha y hora' },
-  { value: 'number', label: 'Número' },
-  { value: 'money', label: 'Importe (€)' },
-  { value: 'boolean', label: 'Sí/No' },
-  { value: 'lookup', label: 'Búsqueda' },
-  { value: 'image', label: 'Imagen' },
-  { value: 'table', label: '🗃 Tabla' },
+  { value: 'datetime', label: 'Fecha-Hora' },
+  { value: 'boolean', label: 'Booleano' },
 ]
 
 const TYPE_ALIAS = {
@@ -715,7 +711,7 @@ export default function CategoryBuilder() {
 
   const updateCategoryName = (idx, name) => {
     const updated = [...categories]
-    updated[idx].name = name.toUpperCase()
+    updated[idx].name = name
     setCategories(updated)
   }
 
@@ -787,66 +783,39 @@ export default function CategoryBuilder() {
 
   // Generate XML
   // Map field types to Therefore TypeNo per official documentation
-  // StringField(1), IntField(2), DateField(3), LabelField(4), MoneyField(5),
-  // LogicalField(6), NumericCounter(8), TextCounter(9), TableField(10), CustomField(99)
+  // StringField(1), IntField(2), DateField(3), MoneyField(5), LogicalField(6), CustomField(99)
   const typeToTypeNo = {
-    'text': '1',      // StringField
-    'email': '1',     // StringField
-    'phone': '1',     // StringField (no phone type in Therefore)
-    'number': '2',    // IntField
-    'date': '3',      // DateField
-    'money': '5',     // MoneyField
-    'boolean': '6',   // LogicalField
-    'table': '10',    // TableField
-    'datetime': '99', // CustomField (timestamp)
-    'lookup': '99',   // CustomField
-    'image': '99'     // CustomField
+    'string': '1',     // StringField
+    'int': '2',        // IntField
+    'date': '3',       // DateField
+    'decimal': '5',    // MoneyField
+    'boolean': '6',    // LogicalField
+    'datetime': '99'   // CustomField (timestamp)
   }
 
-  // Field length defaults by type. Some types (boolean, money, table, image) don't use Length tag
+  // Field length defaults by type
   const defaultFieldLength = {
-    'text': 100,      // StringField: 1-4000 chars
-    'email': 100,     // StringField: 1-4000 chars
-    'phone': 20,      // StringField: typical phone length
-    'number': 18,     // IntField: display width (no Length tag)
-    'date': 10,       // DateField: YYYY-MM-DD (no Length tag)
-    'money': 18,      // MoneyField: display width (no Length tag)
-    'boolean': 1,     // LogicalField (no Length tag)
-    'table': 0,       // TableField (no Length tag)
-    'datetime': 19,   // CustomField/timestamp (no Length tag in XML)
-    'lookup': 100,    // CustomField: typically StringField-like
-    'image': 0        // CustomField/image (no Length tag)
+    'string': 100,     // StringField: 1-4000 chars
+    'int': 18,         // IntField: display width
+    'date': 10,        // DateField: YYYY-MM-DD
+    'decimal': 18,     // MoneyField: display width
+    'boolean': 1,      // LogicalField: 1 byte
+    'datetime': 19     // CustomField/timestamp
   }
 
-  // Check if field type should have Length tag in XML (per Therefore rules)
-  const hasLengthTag = (typeNo) => {
-    // Per production analysis: TypeNo 1,2,3,5,6,7,9 have Length
-    // TypeNo 4,10,12,13 do NOT have Length (display/container types)
-    const typeNoStr = String(typeNo)
-    return ['1', '2', '3', '5', '6', '7', '9'].includes(typeNoStr)
-  }
-
-  // Validate and normalize field length per type
+  // Validate and normalize field length per Therefore type
   const normalizeFieldLength = (fieldType, providedLength, typeNo) => {
-    const typeNorm = fieldType?.toLowerCase() || 'text'
     const typeNoStr = String(typeNo)
 
-    // Only data types (1,2,3,5,6,7,9) get Length
-    if (!hasLengthTag(typeNoStr)) return 0
-
-    // Type-specific max lengths (per Therefore limits)
-    const maxLengths = {
-      '1': 4000, // StringField
-      '2': 10,   // IntField
-      '3': 4,    // DateField (YYYY-MM-DD)
-      '5': 18,   // MoneyField
-      '6': 1,    // LogicalField (boolean)
-      '7': 100,  // KeywordField
-      '9': 10    // CounterField
+    // Only StringField (TypeNo 1) accepts variable length (1-4000)
+    if (typeNoStr === '1') {
+      const length = parseInt(providedLength) || defaultFieldLength[fieldType] || 100
+      return Math.min(Math.max(length, 1), 4000)
     }
-    const maxLength = maxLengths[typeNoStr] || 100
-    const length = parseInt(providedLength) || defaultFieldLength[typeNorm] || maxLength
-    return Math.min(Math.max(length, 1), maxLength)
+
+    // Other types use system-defined fixed lengths
+    // IntField(2), DateField(3), MoneyField(5), LogicalField(6), CustomField(99) - no Length tag
+    return 0
   }
 
   const bgr = (r, g, b) => b * 65536 + g * 256 + r
@@ -1572,73 +1541,250 @@ export default function CategoryBuilder() {
           />
         </div>
       ) : (
-        <>
-          {/* INFORMACIÓN */}
-          <div className="eform-panel">
-            <div className="eform-panel-title">Categorías ({categories.length})</div>
+        <div style={{ display: 'flex', gap: '16px', minHeight: 'calc(100vh - 200px)' }}>
+          {/* LEFT PANEL: Category List */}
+          <div style={{
+            width: '220px',
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px'
+          }}>
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={addCategory} className="btn-default" style={{ flex: 1 }}>
+                + Nueva
+              </button>
+              <button onClick={saveTemplate} className="btn-default" style={{ flex: 1 }}>
+                💾 Guardar
+              </button>
+            </div>
 
-            {/* Categories name editor */}
-            <div className="eform-panel" style={{ marginBottom: '14px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nombres definitivos</div>
-                <button
-                  onClick={() => {
-                    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-                    setCategories(categories.map(cat => ({
-                      ...cat,
-                      name: cat.name.trim() ? `${cat.name} ${timestamp}` : `Categoría ${timestamp}`
-                    })))
+            {/* Category list */}
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              overflow: 'auto',
+              borderTop: '1px solid var(--border-default)',
+              paddingTop: '12px'
+            }}>
+              {categories.map((cat, idx) => (
+                <div
+                  key={cat.id}
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'center',
+                    padding: '8px',
+                    borderRadius: '6px',
+                    background: activeCategory === idx ? 'var(--bg-hover)' : 'transparent',
+                    border: activeCategory === idx ? '1px solid var(--accent-primary)' : 'none',
+                    cursor: 'pointer',
+                    transition: 'all 200ms'
                   }}
-                  className="btn-sm btn-default"
-                  title="Agrega la fecha actual a los nombres para hacerlos únicos"
+                  onClick={() => setActiveCategory(idx)}
                 >
-                  📅 Agregar fecha
-                </button>
-              </div>
-              <div style={{ display: 'grid', gap: '6px' }}>
-                {categories.map((cat, idx) => (
                   <input
-                    key={cat.id}
                     value={cat.name}
-                    onChange={e => updateCategoryName(idx, e.target.value)}
+                    onChange={e => { e.stopPropagation(); updateCategoryName(idx, e.target.value) }}
+                    onClick={e => e.stopPropagation()}
                     placeholder={`Categoría ${idx + 1}`}
                     className="form-input"
                     style={{
-                      flex: 1
+                      flex: 1,
+                      fontSize: '12px',
+                      padding: '4px 8px'
                     }}
                   />
-                ))}
+                  {categories.length > 1 && (
+                    <button
+                      onClick={e => { e.stopPropagation(); removeCategory(idx) }}
+                      className="btn-icon"
+                      style={{
+                        fontSize: '16px',
+                        padding: '2px 6px',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--text-secondary)'
+                      }}
+                      title="Eliminar categoría"
+                    >
+                      🗑
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT PANEL: Category Editor */}
+          {activeCategory < categories.length && (() => {
+            const cat = categories[activeCategory]
+
+            // Separate all fields into "sin pestaña" and by pestaña
+            const allFields = cat.sections.flatMap((sec, secIdx) =>
+              sec.fields.map((field, fieldIdx) => ({ field, secIdx, fieldIdx, section: sec }))
+            )
+
+            const baseFields = allFields.filter(f => !f.field.pestaña?.trim())
+            const tabNames = new Set(allFields.filter(f => f.field.pestaña?.trim()).map(f => f.field.pestaña?.trim()))
+            const tabs = Array.from(tabNames).sort()
+
+            const getFieldsForTab = (tabName) => {
+              if (!tabName) return baseFields
+              return allFields.filter(f => f.field.pestaña?.trim() === tabName)
+            }
+
+            const FieldTable = ({ fields, isBaseTab = false }) => {
+              const columns = [
+                {
+                  title: 'Nombre',
+                  key: 'nombre',
+                  width: '25%',
+                  render: (_, record) => (
+                    <input
+                      value={record.field.nombre}
+                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, nombre: e.target.value })}
+                      className="form-input"
+                      style={{ fontSize: '12px', padding: '4px' }}
+                    />
+                  )
+                },
+                {
+                  title: 'Tipo',
+                  key: 'tipo',
+                  width: '15%',
+                  render: (_, record) => (
+                    <select
+                      value={record.field.tipo}
+                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, tipo: e.target.value })}
+                      className="form-select"
+                      style={{ fontSize: '12px', padding: '4px' }}
+                    >
+                      {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    </select>
+                  )
+                },
+                {
+                  title: 'Longitud',
+                  key: 'length',
+                  width: '12%',
+                  render: (_, record) => (
+                    <input
+                      type="number"
+                      value={record.field.length || ''}
+                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, length: e.target.value })}
+                      placeholder={record.field.tipo === 'string' ? '100' : '-'}
+                      disabled={record.field.tipo !== 'string'}
+                      className="form-input"
+                      style={{ fontSize: '12px', padding: '4px' }}
+                    />
+                  )
+                },
+                {
+                  title: 'Sección',
+                  key: 'section',
+                  width: '18%',
+                  render: (_, record) => (
+                    <input
+                      value={record.section.name}
+                      onChange={e => { const updated = [...categories]; updated[activeCategory].sections[record.secIdx].name = e.target.value; setCategories(updated) }}
+                      className="form-input"
+                      style={{ fontSize: '12px', padding: '4px' }}
+                    />
+                  )
+                },
+                {
+                  title: 'Req',
+                  key: 'required',
+                  width: '8%',
+                  render: (_, record) => (
+                    <input
+                      type="checkbox"
+                      checked={record.field.required}
+                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, required: e.target.checked })}
+                      style={{ width: '16px', height: '16px' }}
+                    />
+                  )
+                },
+                {
+                  title: 'Acciones',
+                  key: 'actions',
+                  width: '10%',
+                  render: (_, record) => (
+                    <button
+                      onClick={() => removeField(record.secIdx, record.fieldIdx)}
+                      className="btn-icon"
+                      style={{
+                        fontSize: '14px',
+                        padding: '2px 4px',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--text-secondary)'
+                      }}
+                    >
+                      🗑
+                    </button>
+                  )
+                }
+              ]
+
+              return (
+                <Table
+                  columns={columns}
+                  dataSource={fields.map((f, i) => ({ ...f, key: `${f.secIdx}-${f.fieldIdx}` }))}
+                  pagination={false}
+                  size="small"
+                  style={{ marginBottom: '12px' }}
+                />
+              )
+            }
+
+            return (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {/* Category header */}
+                <div style={{
+                  padding: '16px',
+                  background: 'var(--accent-primary)',
+                  color: 'white',
+                  borderRadius: '6px',
+                  marginBottom: '16px'
+                }}>
+                  <div style={{ fontSize: '18px', fontWeight: '600' }}>
+                    {cat.name || 'Sin nombre'}
+                  </div>
+                </div>
+
+                {/* Base fields table */}
+                {baseFields.length > 0 && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-secondary)' }}>
+                      CAMPOS SIN PESTAÑA
+                    </h4>
+                    <FieldTable fields={baseFields} isBaseTab={true} />
+                  </div>
+                )}
+
+                {/* Tabs for fields with pestaña */}
+                {tabs.length > 0 && (
+                  <div>
+                    <Tabs
+                      items={tabs.map(tabName => ({
+                        key: tabName,
+                        label: tabName,
+                        children: <FieldTable fields={getFieldsForTab(tabName)} />
+                      }))}
+                    />
+                  </div>
+                )}
               </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={addCategory} className="btn-default">
-                + Nueva Categoría
-              </button>
-              <button onClick={saveTemplate} className="btn-default">
-                💾 Guardar Plantilla
-              </button>
-            </div>
-          </div>
-
-          {/* EDITOR */}
-          <div>
-            <div style={{
-              background: 'linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06)',
-              border: '1px solid var(--border-default)',
-              borderRadius: '8px',
-              padding: '16px',
-              backdropFilter: 'blur(14px)',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
-            }}>
-              <Tabs
-                activeKey={activeCategory.toString()}
-                onChange={(key) => setActiveCategory(parseInt(key))}
-                items={tabItems}
-              />
-            </div>
-          </div>
-        </>
+            )
+          })()}
+        </div>
       )}
 
       {/* XML Modal */}
