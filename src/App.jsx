@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import { Layout, Menu, Spin, Dropdown } from 'antd'
 import {
   FormOutlined,
-  CopyOutlined,
   CloudOutlined,
   ApiOutlined,
   AppstoreOutlined,
@@ -63,12 +62,6 @@ const getMenuItems = () => [
     icon: <AppstoreOutlined />,
     label: 'Category Builder',
     path: '/category-builder'
-  },
-  {
-    key: 'category-cloner',
-    icon: <CopyOutlined />,
-    label: 'Clonador de Categorías',
-    path: '/category-cloner'
   },
   {
     key: 'tenants',
@@ -373,7 +366,6 @@ function AppContent() {
             <Route path="/users" element={<UserManager />} />
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
-            <Route path="/category-cloner" element={<Placeholder icon={<CopyOutlined />} title="Clonador de Categorías" description="Próximamente: Integración de tu Category Cloner mejorado" />} />
             <Route path="/tenants" element={<Placeholder icon={<CloudOutlined />} title="Gestión de Tenants" description="Próximamente: Integración de tu Tenant Manager mejorado" />} />
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
             <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" description="Próximamente: Documentación del proyecto" />} />
