@@ -717,9 +717,18 @@ export default function CategoryBuilder() {
 
   const removeCategory = (idx) => {
     if (categories.length > 1) {
-      const updated = categories.filter((_, i) => i !== idx)
-      setCategories(updated)
-      if (activeCategory >= updated.length) setActiveCategory(updated.length - 1)
+      Modal.confirm({
+        title: 'Eliminar Categoría',
+        content: `¿Está seguro que desea eliminar la categoría "${categories[idx].name}"? Esta acción no se puede deshacer.`,
+        okText: 'Eliminar',
+        okType: 'danger',
+        cancelText: 'Cancelar',
+        onOk() {
+          const updated = categories.filter((_, i) => i !== idx)
+          setCategories(updated)
+          if (activeCategory >= updated.length) setActiveCategory(updated.length - 1)
+        }
+      })
     }
   }
 
@@ -1573,19 +1582,37 @@ export default function CategoryBuilder() {
               {categories.map((cat, idx) => (
                 <div
                   key={cat.id}
+                  onClick={() => setActiveCategory(idx)}
                   style={{
                     display: 'flex',
                     gap: '8px',
                     alignItems: 'center',
-                    padding: '8px',
+                    padding: '10px 12px',
                     borderRadius: '6px',
-                    background: activeCategory === idx ? 'var(--bg-hover)' : 'transparent',
-                    border: activeCategory === idx ? '1px solid var(--accent-primary)' : 'none',
+                    background: activeCategory === idx
+                      ? 'var(--accent-primary)'
+                      : 'var(--bg-card)',
+                    border: activeCategory === idx
+                      ? '2px solid var(--accent-primary)'
+                      : '1px solid var(--border-default)',
                     cursor: 'pointer',
-                    transition: 'all 200ms'
+                    transition: 'all 200ms',
+                    boxShadow: activeCategory === idx
+                      ? '0 4px 12px rgba(102, 102, 255, 0.25)'
+                      : 'none'
                   }}
-                  onClick={() => setActiveCategory(idx)}
                 >
+                  {/* Active indicator */}
+                  {activeCategory === idx && (
+                    <div style={{
+                      width: '4px',
+                      height: '16px',
+                      background: 'white',
+                      borderRadius: '2px',
+                      flexShrink: 0
+                    }} />
+                  )}
+
                   <input
                     value={cat.name}
                     onChange={e => { e.stopPropagation(); updateCategoryName(idx, e.target.value) }}
@@ -1595,24 +1622,42 @@ export default function CategoryBuilder() {
                     style={{
                       flex: 1,
                       fontSize: '12px',
-                      padding: '4px 8px'
+                      padding: '4px 8px',
+                      background: activeCategory === idx ? 'rgba(255,255,255,0.15)' : 'transparent',
+                      color: activeCategory === idx ? 'white' : 'var(--text-primary)',
+                      border: activeCategory === idx ? '1px solid rgba(255,255,255,0.3)' : 'none'
                     }}
                   />
+
                   {categories.length > 1 && (
                     <button
                       onClick={e => { e.stopPropagation(); removeCategory(idx) }}
-                      className="btn-icon"
                       style={{
                         fontSize: '16px',
-                        padding: '2px 6px',
-                        background: 'transparent',
+                        padding: '4px 8px',
+                        background: 'var(--accent-error)',
                         border: 'none',
+                        borderRadius: '4px',
                         cursor: 'pointer',
-                        color: 'var(--text-secondary)'
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 200ms',
+                        opacity: activeCategory === idx ? 1 : 0.5,
+                        transform: activeCategory === idx ? 'scale(1)' : 'scale(0.9)'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.opacity = '1'
+                        e.currentTarget.style.transform = 'scale(1.1)'
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.opacity = activeCategory === idx ? '1' : '0.5'
+                        e.currentTarget.style.transform = activeCategory === idx ? 'scale(1)' : 'scale(0.9)'
                       }}
                       title="Eliminar categoría"
                     >
-                      🗑
+                      ✕
                     </button>
                   )}
                 </div>
