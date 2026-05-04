@@ -960,7 +960,61 @@ export default function CategoryBuilder() {
   const TAB_FLD_W2 = TAB_INNER_W - TAB_INNER - TAB_FLD_X2  // 98
   const TAB_SEC_W = TAB_INNER_W - TAB_INNER * 2   // 470
 
-  const generateXml = () => {
+  const generateXml = async () => {
+    setError('')
+
+    if (categories.length === 0) {
+      setError('Añade al menos una categoría.')
+      return
+    }
+
+    const totalAllFields = categories.reduce((a, cat) => a + cat.sections.reduce((b, s) => b + s.fields.filter(f => f.nombre.trim()).length, 0), 0)
+    if (totalAllFields === 0) {
+      setError('Añade al menos un campo.')
+      return
+    }
+
+    try {
+      // Generar XML para la primera categoría usando el endpoint backend
+      const cat = categories[0]
+      const nombre = cat.name.trim()
+      const ctgry_id = sanitizeName(cat.name)
+
+      if (!nombre) {
+        setError('La categoría debe tener un nombre.')
+        return
+      }
+
+      // Llamar al endpoint
+      const response = await fetch('http://localhost:3001/api/category-xml/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre,
+          ctgry_id
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        setError(`Error al generar XML: ${error.error || error.message || 'Error desconocido'}`)
+        return
+      }
+
+      const data = await response.json()
+      setXml(data.xml)
+      setXmlModalOpen(true)
+      message.success('✅ XML generado correctamente desde plantilla nativa')
+      return
+    } catch (err) {
+      setError(`Error: ${err.message}`)
+      console.error('Error generando XML:', err)
+      return
+    }
+  }
+
+  // Legacy version - no longer used
+  const generateXmlLegacy = () => {
     setError('')
 
     const totalAllFields = categories.reduce((a, cat) => a + cat.sections.reduce((b, s) => b + s.fields.filter(f => f.nombre.trim()).length, 0), 0)

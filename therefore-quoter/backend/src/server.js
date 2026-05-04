@@ -95,6 +95,7 @@ app.use('/api/analyze', require('./routes/analyze')(db));
 app.use('/api/generate', require('./routes/generate')(db));
 app.use('/api/quotes', require('./routes/quotes')(db));
 app.use('/api/knowledge', require('./routes/knowledge')(db));
+app.use('/api/category-xml', require('./routes/category-xml')(db));
 
 // Health check
 app.get('/health', (req, res) => {
