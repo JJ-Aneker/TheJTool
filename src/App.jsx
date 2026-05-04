@@ -29,7 +29,6 @@ import Home from './views/Home'
 import Login from './views/Login'
 import UserProfile from './views/UserProfile'
 import UserManager from './views/UserManager'
-import TemplateManager from './views/TemplateManager'
 import WebServicesManager from './views/WebServicesManager'
 import EFormBuilder from './views/EFormBuilder'
 import CategoryBuilder from './views/CategoryBuilder'
@@ -87,12 +86,6 @@ const getMenuItems = () => [
     icon: <SettingOutlined />,
     label: 'Configuración de Workflows',
     path: '/workflows'
-  },
-  {
-    key: 'templates',
-    icon: <FileTextOutlined />,
-    label: 'Templates',
-    path: '/templates'
   },
   {
     key: 'web-services',
@@ -370,7 +363,6 @@ function AppContent() {
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
             <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" description="Próximamente: Documentación del proyecto" />} />
             <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" description="Próximamente: Integración de tu Workflow Manager mejorado" />} />
-            <Route path="/templates" element={<TemplateManager />} />
             <Route path="/web-services" element={<WebServicesManager />} />
           </Routes>
         </Content>

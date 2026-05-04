@@ -574,25 +574,14 @@ fetch(BASE + '/GetConnectionToken', { ... })
 
 ## 10. Generación del XML de Importación del eForm
 
-**Usar siempre el script `generar_eform.py` y la plantilla `TheConfiguration_eformMatriculas_PLANTILLA.xml`.**
-Ver `JJ_-_eform-import-export-guide.md` para la guía completa de importación/exportación.
+Al generar el XML programáticamente para importar en Therefore, el encoding del FDef
+es el punto más crítico. El patrón correcto es:
 
-El método correcto es el **reemplazo quirúrgico** sobre el XML nativo exportado por Therefore.
-Nunca construir el XML desde cero — falla de forma consistente aunque el contenido sea correcto.
+1. **Partir siempre del XML exportado por Therefore** — nunca construir el XML desde cero.
+   Therefore incluye metadatos específicos de la instancia (`DefSubmNo`, `FCreUs`, `FFold`, etc.)
+   que si faltan causan error SQL 547 al importar.
 
-### Cuándo usar este patrón vs. generar_eform.py
-
-- **`generar_eform.py`** → para crear un eForm nuevo desde cero (define los componentes en Python).
-- **Reemplazo directo sobre el XML** → para modificar un eForm existente que ya tiene
-  `customDefaultValue` complejos con HTML, scripts JS, o lógica de modal como la de esta guía.
-
-### Patrón para modificar un eForm existente con htmlelement
-
-Cuando el eForm ya existe y contiene `htmlelement` con HTML/JS en `content`:
-
-1. **Exportar** el eForm desde Solution Designer.
-
-2. **Parsear el FDef** decodificando las entidades XML para obtener JSON válido:
+2. **Parsear el FDef** decodificando primero las entidades XML:
    ```python
    fdef_decoded = fdef_raw.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
    fdef = json.loads(fdef_decoded)
@@ -600,19 +589,33 @@ Cuando el eForm ya existe y contiene `htmlelement` con HTML/JS en `content`:
 
 3. **Modificar** el objeto Python (añadir componentes, actualizar `customDefaultValue`, etc.)
 
-4. **Serializar de vuelta** — el JSON resultante va RAW en el XML, sin escapar:
+4. **Serializar de vuelta** y XML-encodear el resultado completo:
    ```python
-   new_fdef = json.dumps(fdef, ensure_ascii=False, indent=2).replace('\n', '\r\n')
+   new_fdef_json = json.dumps(fdef, ensure_ascii=False)
+   fdef_for_xml = new_fdef_json.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
    ```
-   > ⚠️ Solo si el FDef contiene `htmlelement` con HTML en `content`, aplicar XML-encoding
-   > únicamente a esos strings. Ver `JJ_-_eform-import-export-guide.md` sección 3.3.
 
-5. **Reemplazar solo el bloque `<FDef>`** en el XML original — todo lo demás queda intacto:
-   ```python
-   fdef_start = result.index('<FDef>') + 6
-   fdef_end   = result.index('</FDef>')
-   result = result[:fdef_start] + new_fdef + result[fdef_end:]
-   ```
+5. **Reemplazar solo el bloque `<EForm>`** en el XML original — todo lo demás queda intacto.
+
+**Por qué este orden importa:** el HTML del content de los `htmlelement` originales
+ya tenía `<` como `<` en Python (tras json.loads). Al hacer el XML-encode final,
+esos `<` se convierten en `&lt;` correctamente. Si se hace el encode antes del json.loads,
+se produce doble codificación (`&amp;lt;`) y el HTML se muestra como texto en el eForm.
+
+**Metadatos obligatorios del `<EForm>` en Therefore On-Premise:**
+
+| Tag | Descripción | Notas |
+|-----|-------------|-------|
+| `<FNo>` | Número del form | Negativo = placeholder |
+| `<FVer>` | Versión | Siempre 1 para nuevos |
+| `<FName>` | Nombre visible | |
+| `<FDef>` | JSON form.io con XML-encoding | |
+| `<DCrea>` | Timestamp creación | Formato `YYYYMMDDHHmmssSSS` |
+| `<FCreUs>` | UserNo del creador | Específico de la instancia |
+| `<FCreUsNam>` | Username del creador | |
+| `<IxProfNo>` | Perfil de indexación | -1 si ninguno |
+| `<DefSubmNo>` | Nº submission por defecto | **Obligatorio** — causa SQL 547 si falta |
+| `<Id>` | GUID único del eForm | |
 
 ---
 
@@ -647,3 +650,53 @@ Cuando el eForm ya existe y contiene `htmlelement` con HTML/JS en `content`:
 - Los apóstrofes y acentos en valores de campos (ej. `"Avinguda Dama d'Elx"`) **no causan problemas** — `JSON.stringify` los maneja correctamente.
 - `SaveDocumentIndexDataQuick` **no funciona** correctamente en instancias Canon/Therefore On-Premise — usar siempre `SaveDocumentIndexData` con el patrón GET→SAVE.
 - El token obtenido con `GetConnectionToken` es válido durante la sesión — se puede reutilizar para múltiples llamadas sin necesidad de obtener uno nuevo cada vez.
+
+---
+
+## 13. Campos Dependientes en Therefore — Patrón Correcto
+
+### Concepto clave
+
+En Therefore, los campos dependientes funcionan a través de un **campo ID maestro** (lookup). Siempre hay que distinguir:
+
+- **Campo ID (maestro)** — contiene el identificador único del registro en la tabla referenciada. Es el que tiene la relación de dependencia configurada. Al setearlo, Therefore resuelve automáticamente todos los campos dependientes.
+- **Campos dependientes** — se rellenan automáticamente a partir del ID maestro. Setearlos directamente no dispara ninguna actualización.
+
+**Ejemplo en Naturgy (Cat. 78):**
+- `CP` (FieldNo 28120, Int) → campo ID maestro del código postal
+- `CodigoPostal` (FieldNo 28129, String) → campo dependiente (texto del CP)
+- `Localidad`, `Provincia`, `PaisISOCode` → campos dependientes resueltos a partir del ID
+
+### Regla de implementación
+
+**Siempre setear el campo ID primero.** Los dependientes se resuelven solos.
+
+```javascript
+// CORRECTO — setear el ID dispara la resolución de dependientes
+setField('recogidaPostalCodeID', vals[3]);  // CP (ID numérico) → dispara dependientes
+setField('cpRemitente',          vals[4]);  // CodigoPostal (texto) → solo visual
+
+// INCORRECTO — setear solo el texto no dispara nada
+setField('cpRemitente', vals[4]);  // Localidad, Provincia, País quedan vacíos
+```
+
+### El botón `...` (lookup)
+
+Cuando hay múltiples registros para un mismo valor de texto (ej. dos CPs con el mismo literal), el botón `...` permite al usuario elegir el registro correcto. Therefore asigna el ID único del registro elegido y resuelve los dependientes sin ambigüedad.
+
+En la carga automática desde el Maestro, usamos el ID almacenado directamente — evitando la ambigüedad porque el Maestro ya tiene el ID correcto resuelto previamente.
+
+### Búsqueda en el Maestro
+
+Aunque la búsqueda se haga por un campo dependiente (ej. buscar por `CodigoPostal` el texto), el resultado debe recuperar también el **ID maestro** para poder setearlo en el formulario:
+
+```javascript
+SelectedFieldsNoOrNames: [
+  'Usuario_Nombre',   // vals[0]
+  'Direccion',        // vals[1]
+  'Direccion2',       // vals[2]
+  'CP',               // vals[3] ← ID maestro → setField('recogidaPostalCodeID')
+  'CodigoPostal',     // vals[4] ← texto dependiente → setField('cpRemitente')
+  'Telefono'          // vals[5]
+]
+```
