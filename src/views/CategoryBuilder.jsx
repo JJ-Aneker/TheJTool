@@ -975,7 +975,15 @@ export default function CategoryBuilder() {
     }
 
     try {
-      // Generar XML para la primera categoría usando el endpoint backend
+      // Descargar plantilla XML nativa
+      const response = await fetch('/TheConfiguration_categoria_PLANTILLA.xml')
+      if (!response.ok) {
+        throw new Error('No se pudo cargar la plantilla XML. Asegúrate de estar en /category-builder')
+      }
+
+      let template = await response.text()
+
+      // Generar para la primera categoría
       const cat = categories[0]
       const nombre = cat.name.trim()
       const ctgry_id = sanitizeName(cat.name)
@@ -985,24 +993,62 @@ export default function CategoryBuilder() {
         return
       }
 
-      // Llamar al endpoint
-      const response = await fetch('http://localhost:3001/api/category-xml/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre,
-          ctgry_id
-        })
-      })
+      // Hacer los reemplazos quirúrgicos (como lo hace clonar_categoria.py)
+      // 1. Reemplazar nombre visible
+      template = template.replace(
+        /<Name UPT="1"><TStr><T><L>1034<\/L><S>[^<]+<\/S>/,
+        `<Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S>`
+      )
 
-      if (!response.ok) {
-        const error = await response.json()
-        setError(`Error al generar XML: ${error.error || error.message || 'Error desconocido'}`)
-        return
+      // 2. Reemplazar título
+      template = template.replace(
+        /<Title>[^<]+<\/Title>/,
+        `<Title>${escapeXml(nombre)}</Title>`
+      )
+
+      // 3. Reemplazar CtgryID
+      template = template.replace(
+        /<CtgryID>[^<]+<\/CtgryID>/,
+        `<CtgryID>${ctgry_id}</CtgryID>`
+      )
+
+      // 4. Regenerar GUIDs de categoría, campos, counters, templates
+      // Función para generar GUID
+      const genGuid = () => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = Math.random() * 16 | 0
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16).toUpperCase()
+        })
       }
 
-      const data = await response.json()
-      setXml(data.xml)
+      // Regenerar GUID de campos (Field)
+      template = template.replace(/<Field>.*?<\/Field>/gs, (fieldBlock) => {
+        return fieldBlock.replace(/<Id>[^<]+<\/Id>/, `<Id>${genGuid()}</Id>`)
+      })
+
+      // Regenerar GUID de counters (Counter)
+      template = template.replace(/<Counter>.*?<\/Counter>/gs, (counterBlock) => {
+        return counterBlock.replace(/<Id>[^<]+<\/Id>/, `<Id>${genGuid()}</Id>`)
+            .replace(/<Next>\d+<\/Next>/, '<Next>1</Next>')
+      })
+
+      // Regenerar GUID de templates (Template)
+      template = template.replace(/<Template>.*?<\/Template>/gs, (templateBlock) => {
+        return templateBlock.replace(/<Id>[^<]+<\/Id>/, `<Id>${genGuid()}</Id>`)
+      })
+
+      // Regenerar GUID de categoría (el único <Id> en el bloque <Category> sin sub-elementos)
+      const catIdRegex = /<Category>.*?<Id>([^<]+)<\/Id>.*?<\/Category>/s
+      const catIdMatch = template.match(catIdRegex)
+      if (catIdMatch) {
+        const oldCatId = catIdMatch[1]
+        const newCatId = genGuid()
+        // Hacer esto más cuidadosamente para no reemplazar los otros IDs
+        template = template.replace(new RegExp(`<Category>([^<]*)<Id>${oldCatId}<\/Id>`, 's'),
+          `<Category>$1<Id>${newCatId}</Id>`)
+      }
+
+      setXml(template)
       setXmlModalOpen(true)
       message.success('✅ XML generado correctamente desde plantilla nativa')
       return
