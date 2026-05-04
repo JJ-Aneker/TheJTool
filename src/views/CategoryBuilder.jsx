@@ -960,7 +960,7 @@ export default function CategoryBuilder() {
   const TAB_FLD_W2 = TAB_INNER_W - TAB_INNER - TAB_FLD_X2  // 98
   const TAB_SEC_W = TAB_INNER_W - TAB_INNER * 2   // 470
 
-  const generateXml = async () => {
+  const generateXml = () => {
     setError('')
 
     if (categories.length === 0) {
@@ -975,15 +975,7 @@ export default function CategoryBuilder() {
     }
 
     try {
-      // Descargar plantilla XML nativa
-      const response = await fetch('/TheConfiguration_categoria_PLANTILLA.xml')
-      if (!response.ok) {
-        throw new Error('No se pudo cargar la plantilla XML. Asegúrate de estar en /category-builder')
-      }
-
-      let template = await response.text()
-
-      // Generar para la primera categoría
+      // Generar XML MÍNIMO desde cero - sin depender de plantillas
       const cat = categories[0]
       const nombre = cat.name.trim()
       const ctgry_id = sanitizeName(cat.name)
@@ -993,26 +985,6 @@ export default function CategoryBuilder() {
         return
       }
 
-      // Hacer los reemplazos quirúrgicos (como lo hace clonar_categoria.py)
-      // 1. Reemplazar nombre visible
-      template = template.replace(
-        /<Name UPT="1"><TStr><T><L>1034<\/L><S>[^<]+<\/S>/,
-        `<Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S>`
-      )
-
-      // 2. Reemplazar título
-      template = template.replace(
-        /<Title>[^<]+<\/Title>/,
-        `<Title>${escapeXml(nombre)}</Title>`
-      )
-
-      // 3. Reemplazar CtgryID
-      template = template.replace(
-        /<CtgryID>[^<]+<\/CtgryID>/,
-        `<CtgryID>${ctgry_id}</CtgryID>`
-      )
-
-      // 4. Regenerar GUIDs de categoría, campos, counters, templates
       // Función para generar GUID
       const genGuid = () => {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -1021,36 +993,48 @@ export default function CategoryBuilder() {
         })
       }
 
-      // Regenerar GUID de campos (Field)
-      template = template.replace(/<Field>.*?<\/Field>/gs, (fieldBlock) => {
-        return fieldBlock.replace(/<Id>[^<]+<\/Id>/, `<Id>${genGuid()}</Id>`)
+      // Generar campos XML
+      let fieldsXml = ''
+      let fieldNo = -1
+      let dispOrder = 1
+
+      cat.sections.forEach((sec) => {
+        sec.fields.filter(f => f.nombre.trim()).forEach((field) => {
+          const colname = sanitizeName(field.fieldKey || field.nombre)
+          const typeno = typeToTypeNo[field.tipo] || '1'
+
+          fieldsXml += `<Field>`
+          fieldsXml += `<FieldNo>${fieldNo--}</FieldNo>`
+          fieldsXml += `<Caption UPT="1"><TStr><T><L>1034</L><S>${escapeXml(field.nombre)}</S></T></TStr></Caption>`
+          fieldsXml += `<TypeNo>${typeno}</TypeNo>`
+          if (normalizeFieldLength(field.tipo, field.length, typeno) > 0) {
+            fieldsXml += `<Length>${normalizeFieldLength(field.tipo, field.length, typeno)}</Length>`
+          }
+          fieldsXml += `<Width>100</Width>`
+          fieldsXml += `<Height>12</Height>`
+          fieldsXml += `<PosX>10</PosX>`
+          fieldsXml += `<PosY>${dispOrder * 20}</PosY>`
+          fieldsXml += `<Visible>1</Visible>`
+          fieldsXml += `<RegExHelp UPT="1"><TStr></TStr></RegExHelp>`
+          fieldsXml += `<Links></Links>`
+          fieldsXml += `<Id>${genGuid()}</Id>`
+          fieldsXml += `<DisplayProp></DisplayProp>`
+          fieldsXml += `<TabInfo FactoryType="0"></TabInfo>`
+          fieldsXml += `<FieldID>${colname}</FieldID>`
+          fieldsXml += `<DisplayPropCond></DisplayPropCond>`
+          fieldsXml += `<Filter></Filter>`
+          fieldsXml += `</Field>`
+
+          dispOrder++
+        })
       })
 
-      // Regenerar GUID de counters (Counter)
-      template = template.replace(/<Counter>.*?<\/Counter>/gs, (counterBlock) => {
-        return counterBlock.replace(/<Id>[^<]+<\/Id>/, `<Id>${genGuid()}</Id>`)
-            .replace(/<Next>\d+<\/Next>/, '<Next>1</Next>')
-      })
+      // Construir XML completo - estructura mínima pero válida
+      const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories><Category><CtgryNo>-1</CtgryNo><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${fieldsXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>800</Width><Height>400</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>15921906</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode><DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos></FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos></FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles><CtgryID>${ctgry_id}</CtgryID></Category></Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
 
-      // Regenerar GUID de templates (Template)
-      template = template.replace(/<Template>.*?<\/Template>/gs, (templateBlock) => {
-        return templateBlock.replace(/<Id>[^<]+<\/Id>/, `<Id>${genGuid()}</Id>`)
-      })
-
-      // Regenerar GUID de categoría (el único <Id> en el bloque <Category> sin sub-elementos)
-      const catIdRegex = /<Category>.*?<Id>([^<]+)<\/Id>.*?<\/Category>/s
-      const catIdMatch = template.match(catIdRegex)
-      if (catIdMatch) {
-        const oldCatId = catIdMatch[1]
-        const newCatId = genGuid()
-        // Hacer esto más cuidadosamente para no reemplazar los otros IDs
-        template = template.replace(new RegExp(`<Category>([^<]*)<Id>${oldCatId}<\/Id>`, 's'),
-          `<Category>$1<Id>${newCatId}</Id>`)
-      }
-
-      setXml(template)
+      setXml(xml)
       setXmlModalOpen(true)
-      message.success('✅ XML generado correctamente desde plantilla nativa')
+      message.success('✅ XML generado - estructura mínima')
       return
     } catch (err) {
       setError(`Error: ${err.message}`)
