@@ -681,35 +681,39 @@ function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange })
   )
 }
 
-// Dialog Preview Component (visualiza cómo se vería en Therefore)
+// Dialog Preview Component - exact graphic representation of Therefore appearance
 function DialogPreview({ catName, sections, hasTable, palette }) {
   const [activeTab, setActiveTab] = useState(1)
   const pal = palette || COLOR_PALETTES['Therefore Azul']
 
+  // Convert BGR colors to hex for CSS
   const secBgHex = bgrToHex(pal.secBg)
   const secTextHex = bgrToHex(pal.secText)
   const dlgBgHex = bgrToHex(pal.dlgBg)
   const hdrBgHex = bgrToHex(pal.hdrBg)
   const hdrTextHex = bgrToHex(pal.hdrText)
   const hdrSubHex = bgrToHex(pal.hdrSub)
+  const hdrMedHex = bgrToHex(pal.hdrMed || pal.hdrSub) // fallback to hdrSub if hdrMed not available
   const fieldBgHex = bgrToHex(pal.fieldBg || bgr(255, 255, 255))
   const fieldTextHex = bgrToHex(pal.fieldText || bgr(0, 0, 0))
   const labelColorHex = bgrToHex(pal.labelColor || bgr(55, 65, 81))
   const tabBgHex = bgrToHex(pal.tabBg || bgr(192, 192, 192))
 
-  const SCALE = 0.8
+  // Use 0.85 scale for better visual fidelity (matching old implementation)
+  const SCALE = 0.85
   const DW = 530
   const LX1 = 5, LW = 95, FX1 = 102, FW = 160, LX2 = 270, FX2 = 368, FW2 = 152
   const ROW_Hp = 14, LBL_Hp = 12, ROW_GAPp = 18, SEC_Hp = 13, SEC_GAPp = 16, HDR_Hp = 42, TAB_PAD_Yp = 44
 
   const TYPE_ICON = { '1': 'abc', '2': '123', '3': '📅', '5': '€', '6': '✓', '7': '🕐', '15': '▾', '10': '📋' }
 
-  // Build rows
+  // Build visualization rows (excluding table fields from display)
   const rows = []
   let yPos = hasTable ? 8 : HDR_Hp + SEC_GAPp
   sections.filter(s => s.fields.some(f => f.nombre)).forEach((sec) => {
     rows.push({ type: 'sec', y: yPos, label: sec.name })
     yPos += SEC_GAPp
+    // Filter out table fields (TypeNo 10) from preview rows
     const fields = sec.fields.filter(f => f.nombre && f.tipo !== '10')
     for (let i = 0; i < fields.length; i += 2) {
       rows.push({ type: 'row', y: yPos, f1: fields[i], f2: fields[i + 1] })
@@ -722,23 +726,80 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
   const dialogH = hasTable ? TAB_PAD_Yp + Math.max(contentH + 20, 260) + 10 : HDR_Hp + contentH + 10
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ width: DW * SCALE, background: '#e5e7eb', border: '1px solid #9ca3af', borderBottom: 'none', borderRadius: '4px 4px 0 0', display: 'flex', alignItems: 'center', gap: 5, padding: `${3 * SCALE}px ${8 * SCALE}px`, fontFamily: 'Arial' }}>
-        {['#ef4444', '#f59e0b', '#22c55e'].map((c, i) => <span key={i} style={{ width: 8 * SCALE, height: 8 * SCALE, borderRadius: '50%', background: c, display: 'inline-block' }} />)}
-        <span style={{ marginLeft: 6, fontSize: 8 * SCALE, color: '#6b7280' }}>{catName || 'Sin nombre'} · Therefore</span>
+    <div style={{ overflowX: 'auto', fontFamily: 'Arial, sans-serif' }}>
+      {/* Title bar - grey with colored dots */}
+      <div style={{
+        width: DW * SCALE,
+        background: '#e5e7eb',
+        border: '1px solid #9ca3af',
+        borderBottom: 'none',
+        borderRadius: `${4 * SCALE}px ${4 * SCALE}px 0 0`,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: `${3 * SCALE}px ${8 * SCALE}px`,
+        fontFamily: 'Arial'
+      }}>
+        {['#ef4444', '#f59e0b', '#22c55e'].map((c, i) => (
+          <span key={i} style={{
+            width: 8 * SCALE,
+            height: 8 * SCALE,
+            borderRadius: '50%',
+            background: c,
+            display: 'inline-block'
+          }} />
+        ))}
+        <span style={{ marginLeft: 6, fontSize: 8 * SCALE, color: '#6b7280', fontFamily: 'sans-serif' }}>
+          {catName || 'Sin nombre'} · Therefore
+        </span>
       </div>
-      <div style={{ width: DW * SCALE, height: Math.min(dialogH, 520) * SCALE, background: dlgBgHex, border: '1px solid #9ca3af', borderRadius: '0 0 4px 4px', position: 'relative', overflow: 'hidden', fontFamily: 'Arial,sans-serif' }}>
+
+      {/* Dialog body */}
+      <div style={{
+        width: DW * SCALE,
+        height: Math.min(dialogH, 520) * SCALE,
+        background: dlgBgHex,
+        border: '1px solid #9ca3af',
+        borderRadius: `0 0 ${4 * SCALE}px ${4 * SCALE}px`,
+        position: 'relative',
+        overflow: 'hidden',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        {/* Header - flat (when no table) */}
         {!hasTable && (
           <>
-            <div style={{ position: 'absolute', left: 5 * SCALE, top: 6 * SCALE, width: (DW - 10) * SCALE, height: 18 * SCALE, background: hdrBgHex, display: 'flex', alignItems: 'center', paddingLeft: 5 * SCALE }}>
-              <span style={{ fontSize: 11 * SCALE, fontWeight: 700, color: hdrTextHex }}>{catName || 'Categoría'}</span>
+            <div style={{
+              position: 'absolute',
+              left: 5 * SCALE,
+              top: 6 * SCALE,
+              width: (DW - 10) * SCALE,
+              height: 18 * SCALE,
+              background: hdrBgHex,
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: 5 * SCALE
+            }}>
+              <span style={{ fontSize: 11 * SCALE, fontWeight: 700, color: hdrTextHex }}>
+                {catName || 'Categoría'}
+              </span>
             </div>
-            <div style={{ position: 'absolute', left: 5 * SCALE, top: 26 * SCALE, width: (DW - 10) * SCALE, height: 12 * SCALE, background: hdrBgHex, display: 'flex', alignItems: 'center', paddingLeft: 5 * SCALE }}>
+            <div style={{
+              position: 'absolute',
+              left: 5 * SCALE,
+              top: 26 * SCALE,
+              width: (DW - 10) * SCALE,
+              height: 12 * SCALE,
+              background: hdrBgHex,
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: 5 * SCALE
+            }}>
               <span style={{ fontSize: 7 * SCALE, color: hdrSubHex }}>DATOS</span>
             </div>
           </>
         )}
 
+        {/* Tab control (when table exists) */}
         {hasTable && (
           <div style={{ position: 'absolute', left: 5 * SCALE, top: 4 * SCALE, display: 'flex', gap: 2 }}>
             {[{ n: 1, l: 'Datos' }, { n: 2, l: 'Historial' }].map(t => (
@@ -753,8 +814,9 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                   background: activeTab === t.n ? dlgBgHex : tabBgHex,
                   color: activeTab === t.n ? '#1e293b' : '#6b7280',
                   border: '1px solid #9ca3af',
+                  borderBottom: activeTab === t.n ? `1px solid ${dlgBgHex}` : '1px solid #9ca3af',
                   fontWeight: activeTab === t.n ? 700 : 400,
-                  fontFamily: 'Arial,sans-serif'
+                  fontFamily: 'Arial, sans-serif'
                 }}
               >
                 {t.l}
@@ -763,15 +825,163 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
           </div>
         )}
 
-        {rows.map((row, ri) =>
+        {/* Tab content container */}
+        {hasTable && (
+          <div style={{
+            position: 'absolute',
+            left: 5 * SCALE,
+            top: TAB_PAD_Yp * SCALE,
+            width: (DW - 10) * SCALE,
+            bottom: 5 * SCALE,
+            background: '#f3f4f6',
+            border: '1px solid #9ca3af',
+            borderRadius: 3 * SCALE,
+            overflow: 'hidden'
+          }}>
+            {activeTab === 1 && (
+              <div style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
+                {rows.map((row, ri) =>
+                  row.type === 'sec' ? (
+                    <div
+                      key={ri}
+                      style={{
+                        position: 'absolute',
+                        left: (LX1 + 5) * SCALE,
+                        top: row.y * SCALE,
+                        width: (DW - 10 - 20 - 10) * SCALE,
+                        height: SEC_Hp * SCALE,
+                        background: secBgHex,
+                        display: 'flex',
+                        alignItems: 'center',
+                        paddingLeft: 6 * SCALE
+                      }}
+                    >
+                      <span style={{ fontSize: 7 * SCALE, fontWeight: 700, color: secTextHex }}>
+                        {row.label}
+                      </span>
+                    </div>
+                  ) : (
+                    <div key={ri}>
+                      {row.f1 && (
+                        <div style={{
+                          position: 'absolute',
+                          left: (LX1 + 5) * SCALE,
+                          top: row.y * SCALE,
+                          width: (LW + FW + 5) * SCALE,
+                          height: ROW_Hp * SCALE
+                        }}>
+                          <div style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 1 * SCALE,
+                            width: LW * SCALE,
+                            height: LBL_Hp * SCALE,
+                            fontSize: 7 * SCALE,
+                            color: labelColorHex,
+                            textAlign: 'right',
+                            lineHeight: `${LBL_Hp * SCALE}px`,
+                            paddingRight: 3,
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis'
+                          }}>
+                            {row.f1.nombre}
+                          </div>
+                          <div style={{
+                            position: 'absolute',
+                            left: (FX1 - LX1 + 5) * SCALE,
+                            top: 0,
+                            width: FW * SCALE,
+                            height: ROW_Hp * SCALE,
+                            background: fieldBgHex,
+                            border: '1px solid #9ca3af',
+                            fontSize: 7 * SCALE,
+                            color: fieldTextHex,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            paddingRight: 3
+                          }}>
+                            {TYPE_ICON[row.f1.tipo] || '?'}
+                          </div>
+                        </div>
+                      )}
+                      {row.f2 && (
+                        <div style={{
+                          position: 'absolute',
+                          left: (LX2 + 5) * SCALE,
+                          top: row.y * SCALE,
+                          width: (LW + FW2 + 5) * SCALE,
+                          height: ROW_Hp * SCALE
+                        }}>
+                          <div style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 1 * SCALE,
+                            width: LW * SCALE,
+                            height: LBL_Hp * SCALE,
+                            fontSize: 7 * SCALE,
+                            color: labelColorHex,
+                            textAlign: 'right',
+                            lineHeight: `${LBL_Hp * SCALE}px`,
+                            paddingRight: 3,
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis'
+                          }}>
+                            {row.f2.nombre}
+                          </div>
+                          <div style={{
+                            position: 'absolute',
+                            left: (FX2 - LX2 + 5) * SCALE,
+                            top: 0,
+                            width: FW2 * SCALE,
+                            height: ROW_Hp * SCALE,
+                            background: fieldBgHex,
+                            border: '1px solid #9ca3af',
+                            fontSize: 7 * SCALE,
+                            color: fieldTextHex,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            paddingRight: 3
+                          }}>
+                            {TYPE_ICON[row.f2.tipo] || '?'}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+            {activeTab === 2 && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#9ca3af',
+                fontSize: 9 * SCALE,
+                fontFamily: 'Arial'
+              }}>
+                📋 Historial
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Regular content (when no table) */}
+        {!hasTable && rows.map((row, ri) =>
           row.type === 'sec' ? (
             <div
               key={ri}
               style={{
                 position: 'absolute',
-                left: (hasTable ? LX1 + 5 : LX1) * SCALE,
+                left: 5 * SCALE,
                 top: row.y * SCALE,
-                width: (DW - 10 - (hasTable ? 20 : 0)) * SCALE,
+                width: (DW - 10) * SCALE,
                 height: SEC_Hp * SCALE,
                 background: secBgHex,
                 display: 'flex',
@@ -779,20 +989,98 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                 paddingLeft: 6 * SCALE
               }}
             >
-              <span style={{ fontSize: 7 * SCALE, fontWeight: 700, color: secTextHex }}>{row.label}</span>
+              <span style={{ fontSize: 7 * SCALE, fontWeight: 700, color: secTextHex }}>
+                {row.label}
+              </span>
             </div>
           ) : (
             <div key={ri}>
               {row.f1 && (
-                <div style={{ position: 'absolute', left: (hasTable ? LX1 + 5 : LX1) * SCALE, top: row.y * SCALE, width: (LW + FW + 5) * SCALE, height: ROW_Hp * SCALE }}>
-                  <div style={{ position: 'absolute', left: 0, top: 1 * SCALE, width: LW * SCALE, height: LBL_Hp * SCALE, fontSize: 7 * SCALE, color: labelColorHex, textAlign: 'right', lineHeight: `${LBL_Hp * SCALE}px`, paddingRight: 3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{row.f1.nombre}</div>
-                  <div style={{ position: 'absolute', left: (FX1 - LX1 + (hasTable ? 5 : 0)) * SCALE, top: 0, width: FW * SCALE, height: ROW_Hp * SCALE, background: fieldBgHex, border: '1px solid #9ca3af', fontSize: 7 * SCALE, color: fieldTextHex, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 3 }}>{TYPE_ICON[row.f1.tipo] || '?'}</div>
+                <div style={{
+                  position: 'absolute',
+                  left: LX1 * SCALE,
+                  top: row.y * SCALE,
+                  width: (LW + FW + 5) * SCALE,
+                  height: ROW_Hp * SCALE
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 1 * SCALE,
+                    width: LW * SCALE,
+                    height: LBL_Hp * SCALE,
+                    fontSize: 7 * SCALE,
+                    color: labelColorHex,
+                    textAlign: 'right',
+                    lineHeight: `${LBL_Hp * SCALE}px`,
+                    paddingRight: 3,
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {row.f1.nombre}
+                  </div>
+                  <div style={{
+                    position: 'absolute',
+                    left: (FX1 - LX1) * SCALE,
+                    top: 0,
+                    width: FW * SCALE,
+                    height: ROW_Hp * SCALE,
+                    background: fieldBgHex,
+                    border: '1px solid #9ca3af',
+                    fontSize: 7 * SCALE,
+                    color: fieldTextHex,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    paddingRight: 3
+                  }}>
+                    {TYPE_ICON[row.f1.tipo] || '?'}
+                  </div>
                 </div>
               )}
               {row.f2 && (
-                <div style={{ position: 'absolute', left: (hasTable ? LX2 + 5 : LX2) * SCALE, top: row.y * SCALE, width: (LW + FW2 + 5) * SCALE, height: ROW_Hp * SCALE }}>
-                  <div style={{ position: 'absolute', left: 0, top: 1 * SCALE, width: LW * SCALE, height: LBL_Hp * SCALE, fontSize: 7 * SCALE, color: labelColorHex, textAlign: 'right', lineHeight: `${LBL_Hp * SCALE}px`, paddingRight: 3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{row.f2.nombre}</div>
-                  <div style={{ position: 'absolute', left: (FX2 - LX2 + (hasTable ? 5 : 0)) * SCALE, top: 0, width: FW2 * SCALE, height: ROW_Hp * SCALE, background: fieldBgHex, border: '1px solid #9ca3af', fontSize: 7 * SCALE, color: fieldTextHex, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 3 }}>{TYPE_ICON[row.f2.tipo] || '?'}</div>
+                <div style={{
+                  position: 'absolute',
+                  left: LX2 * SCALE,
+                  top: row.y * SCALE,
+                  width: (LW + FW2 + 5) * SCALE,
+                  height: ROW_Hp * SCALE
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 1 * SCALE,
+                    width: LW * SCALE,
+                    height: LBL_Hp * SCALE,
+                    fontSize: 7 * SCALE,
+                    color: labelColorHex,
+                    textAlign: 'right',
+                    lineHeight: `${LBL_Hp * SCALE}px`,
+                    paddingRight: 3,
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {row.f2.nombre}
+                  </div>
+                  <div style={{
+                    position: 'absolute',
+                    left: (FX2 - LX2) * SCALE,
+                    top: 0,
+                    width: FW2 * SCALE,
+                    height: ROW_Hp * SCALE,
+                    background: fieldBgHex,
+                    border: '1px solid #9ca3af',
+                    fontSize: 7 * SCALE,
+                    color: fieldTextHex,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    paddingRight: 3
+                  }}>
+                    {TYPE_ICON[row.f2.tipo] || '?'}
+                  </div>
                 </div>
               )}
             </div>
