@@ -968,27 +968,22 @@ export default function CategoryBuilder() {
     return Math.round(Math.min(scaledWidth, 400))  // máximo 400px
   }
 
-  const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width = 160, height = 14, posx = 102, posy = 0, taborder = 1, disporder = 1, font = 'Segoe UI', fsize = 9, tabMeta = "" }) => {
-    // Per Therefore rules: TypeNo 1,2,3,5,6,7,9 get Length tag; 4,10,12,13 do not
-    let lengthTag = ''
-    if (hasLengthTag(typeno) && length) {
-      lengthTag = `<Length>${length}</Length>`
-    }
-    const dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
-    const safeColname = escapeXml(colname)
-    const safeFieldid = escapeXml(fieldid)
-    return `<Field><FieldNo>${fieldno}</FieldNo><ColName>${safeColname}</ColName>${xmlCaption(caption)}<TypeNo>${typeno}</TypeNo>${lengthTag}<Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><TabOrderPos>${taborder}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${disporder}</DispOrderPos><RegExHelp UPT="1"><TStr></TStr></RegExHelp><Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter>${tabMeta}</Field>`
+  const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width, height, posx, posy, taborder, disporder, displayprop = '', tabMeta = '' }) => {
+    const lengthTag = typeno === '5' ? '<Length>18</Length>'
+      : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '15' && length)
+      ? `<Length>${length}</Length>` : ''
+    const dp = displayprop || `<BClr>${bgr(255, 255, 255)}</BClr>`
+    return `<Field><FieldNo>${fieldno}</FieldNo><ColName>${colname}</ColName>${xmlCaption(caption)}<TypeNo>${typeno}</TypeNo>${lengthTag}<Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><TabOrderPos>${taborder}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${disporder}</DispOrderPos>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${fieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter>${tabMeta}</Field>`
   }
 
-  const makeLabelField = ({ fieldno, fieldid, caption, width = 500, height = 13, posx = 5, posy = 0, font = 'Segoe UI', fsize = 9, bold = false, tclr = null, bclr = null, al = null, pd = null, tabMeta = "" }) => {
-    let dp = `<Face>${font}</Face><FSize>${fsize}</FSize>`
-    if (bold) dp += `<Bol>1</Bol>`
+  const makeLabelField = ({ fieldno, fieldid, caption, width, height, posx, posy, face = 'Arial', fsize = 9, bold = false, tclr = null, bclr = null, al = null, pd = null, tabMeta = '' }) => {
+    let dp = `<Face>${face}</Face><FSize>${fsize}</FSize>`
+    if (bold) dp += '<Bol>1</Bol>'
     if (tclr !== null) dp += `<TClr>${tclr}</TClr>`
     if (bclr !== null) dp += `<BClr>${bclr}</BClr>`
     if (al !== null) dp += `<Al>${al}</Al>`
     if (pd !== null) dp += `<Pd>${pd}</Pd>`
-    const safeFieldid = escapeXml(fieldid)
-    return `<Field><FieldNo>${fieldno}</FieldNo>${xmlCaption(caption)}<TypeNo>4</TypeNo><Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${safeFieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><FullTextSearch>0</FullTextSearch>${tabMeta}</Field>`
+    return `<Field><FieldNo>${fieldno}</FieldNo>${xmlCaption(caption)}<TypeNo>4</TypeNo><Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${fieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><FullTextSearch>0</FullTextSearch>${tabMeta}</Field>`
   }
 
   const makeImageField = ({ fieldno, fieldid, caption, width = 133, height = 27, posx = 0, posy = 0, tabMeta = "" }) => {
@@ -1024,14 +1019,16 @@ export default function CategoryBuilder() {
     return `TheIxTable_${camel}_Hist`
   }
 
-  const DIALOG_W = 530
-  const LBL_X1 = 5, LBL_W = 95
-  const FLD_X1 = 102, FLD_W = 160
-  const LBL_X2 = 270, FLD_X2 = 368, FLD_W2 = 152
-  const ROW_H = 14, LBL_H = 12
-  const ROW_GAP = 18, SEC_H = 13, SEC_GAP = 16, HDR_H = 42
-  const TAB_NO = -200, TABLE_NO = -201
-  const TAB_PAD_X = 5, TAB_PAD_Y = 44, TAB_MARGIN = 10
+  // Layout constants (Therefore standard positioning)
+  const DIALOG_W  = 530
+  const LBL_X1    = 5,  LBL_W  = 95
+  const FLD_X1    = 102, FLD_W  = 160
+  const LBL_X2    = 270
+  const FLD_X2    = 368, FLD_W2 = 152
+  const ROW_H     = 14,  LBL_H  = 12
+  const ROW_GAP   = 18,  SEC_H  = 13, SEC_GAP = 16, HDR_H = 42
+  const TAB_NO    = -200, TABLE_NO = -201
+  const TAB_PAD_X = 5,   TAB_PAD_Y = 44, TAB_MARGIN = 10
 
   // Layout inside tab control (relative coordinates, 20px margins)
   const TAB_INNER = 20
@@ -1056,103 +1053,134 @@ export default function CategoryBuilder() {
       return
     }
 
-    const totalAllFields = categories.reduce((a, cat) => a + cat.sections.reduce((b, s) => b + s.fields.filter(f => f.nombre.trim()).length, 0), 0)
-    if (totalAllFields === 0) {
-      setError('Añade al menos un campo.')
-      return
-    }
-
     try {
       const cat = categories[0]
       const nombre = cat.name.trim()
       const ctgry_id = sanitizeName(cat.name)
+      const tableName = sanitizeName(nombre)
 
       if (!nombre) {
         setError('La categoría debe tener un nombre.')
         return
       }
 
-      // Generar campos XML con manejo de tablas
-      let fieldsXml = ''
-      let fieldNo = -1
-      let dispOrder = 1
-      let parentTableFieldNo = null
+      // Preparar secciones con campos válidos
+      const sections = cat.sections
+        .filter(sec => sec.fields.some(f => f.nombre.trim()))
+        .map(sec => ({
+          name: sec.name,
+          fields: sec.fields.filter(f => f.nombre.trim())
+        }))
 
-      cat.sections.forEach((sec) => {
-        sec.fields.filter(f => f.nombre.trim()).forEach((field) => {
-          const colname = sanitizeName(field.fieldKey || field.nombre)
-          const typeno = field.tipo // Ya es el TypeNo
-          const width = calculateFieldWidth(field.length, typeno)
+      if (sections.length === 0) {
+        setError('Añade al menos un campo.')
+        return
+      }
 
-          // Si es una tabla, primero generar el campo tabla, luego sus columnas
-          if (typeno === '10') {
-            parentTableFieldNo = fieldNo
-            fieldsXml += makeTableField({
-              fieldno: fieldNo--,
-              fieldid: colname,
-              caption: field.nombre,
-              width: Math.min(width, 580),
-              height: 92,
-              posx: 20,
-              posy: dispOrder * 20,
-              tabMeta: ''
-            })
+      // Get palette
+      const pal = COLOR_PALETTES[cat.palette || 'Therefore Azul']
 
-            // Generar columnas de la tabla
-            if (field.columnas && field.columnas.length > 0) {
-              field.columnas.forEach((col, colIdx) => {
-                const colColname = sanitizeName(col.nombre || `Col${colIdx + 1}`)
-                fieldsXml += makeTableColumnField({
-                  fieldno: fieldNo--,
-                  colname: colColname,
-                  fieldid: `${colname}_${colColname}`,
-                  caption: col.nombre,
-                  typeno: col.tipo,
-                  length: col.length,
-                  taborder: colIdx + 1,
-                  disporder: colIdx + 1,
-                  parentTableNo: parentTableFieldNo
-                })
-              })
-            }
-          } else {
-            // Campo normal
-            fieldsXml += makeDataField({
-              fieldno: fieldNo--,
-              colname: colname,
-              fieldid: colname,
-              caption: field.nombre,
-              typeno: typeno,
-              length: hasLengthTag(typeno) ? field.length : '',
-              width: width,
-              height: 14,
-              posx: 102,
-              posy: dispOrder * 20,
-              taborder: 1,
-              disporder: dispOrder,
-              tabMeta: ''
+      // ── BUILD CATEGORY XML ──────────────────────────────────────────
+      const TAB_NO = -200, TABLE_NO = -201
+      let colNo = -202, fieldNo = -1, labelNo = -50
+      let fieldsXml = '', dispOrder = 1, tabOrder = 1
+      const tm = n => `<BelongsToTable>${n}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>1</ShowInTabNo>`
+
+      // Table column fields (if any table exists)
+      let tableColFields = ''
+      let hasTable = false
+      const allTableCols = []
+
+      sections.forEach(sec => {
+        sec.fields.forEach(field => {
+          if (field.tipo === '10' && field.columnas && field.columnas.length > 0) {
+            hasTable = true
+            field.columnas.forEach(col => {
+              if (!col.nombre.trim()) return
+              const lt = col.tipo === '5' ? '<Length>18</Length>' : (col.tipo !== '3' && col.tipo !== '6' && col.tipo !== '7') ? `<Length>${col.length || 50}</Length>` : ''
+              const colname = sanitizeName(col.nombre)
+              tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${col.tipo}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+              colNo--
+              allTableCols.push(col)
             })
           }
-
-          dispOrder++
         })
       })
 
-      // Get palette colors
-      const palette = COLOR_PALETTES[cat.palette || 'Therefore Azul'] || COLOR_PALETTES['Therefore Azul']
+      // Data fields
+      let yPos = hasTable ? 8 : HDR_H + SEC_GAP
+      const sectionWidth = hasTable ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
 
-      // Construir XML completo con colores de paleta
-      const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories><Category><CtgryNo>-1</CtgryNo><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${fieldsXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>800</Width><Height>400</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${palette.dlgBg}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode><DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos></FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos></FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles><CtgryID>${ctgry_id}</CtgryID></Category></Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
+      sections.forEach((sec, si) => {
+        fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: pal.secText, bclr: pal.secBg, al: 4, pd: 6, tabMeta: hasTable ? tm(1) : '' })
+        yPos += SEC_GAP
+
+        for (let i = 0; i < sec.fields.length; i += 2) {
+          const f1 = sec.fields[i]
+          const f2 = sec.fields[i + 1]
+
+          if (f1 && f1.tipo !== '10') {
+            const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
+            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
+            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: f1.tipo, length: f1.length, width: FLD_W, height: ROW_H, posx: hasTable ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+          }
+          if (f2 && f2.tipo !== '10') {
+            const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
+            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
+            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: f2.tipo, length: f2.length, width: FLD_W2, height: ROW_H, posx: hasTable ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+          }
+          yPos += ROW_GAP
+        }
+        yPos += 6
+      })
+
+      const contentH = yPos + 10
+
+      // Header (flat, no tabs)
+      let headerXml = ''
+      if (!hasTable) {
+        headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Title_${tableName}`, caption: nombre, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: pal.hdrText, bclr: pal.hdrBg, al: 4, pd: 5 })
+        headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Sub_${tableName}`, caption: tableName, width: DIALOG_W - 10, height: 12, posx: 5, posy: 26, fsize: 9, tclr: pal.hdrSub, bclr: pal.hdrBg, al: 4, pd: 5 })
+      }
+
+      // Tab + Table control fields (if table exists)
+      let tabXml = ''
+      if (hasTable) {
+        const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
+        const tableH = Math.max(contentH, 240) - 30
+        const tabH2 = Math.max(contentH + 20, 260)
+
+        // Table field
+        tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption('Historial')}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>TheIxTable_${toCamel(tableName)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>2</ShowInTabNo><FieldID>Historial_${toCamel(tableName)}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+
+        // Tab control field
+        tabXml += `<Field><FieldNo>${TAB_NO}</FieldNo>${xmlCaption('Datos')}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${pal.tabBg}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs><T FactoryType="1"><TabNo>1</TabNo><TabPos>1</TabPos><TabCapt><TStr><T><L>1034</L><S>Datos</S></T></TStr></TabCapt></T><T FactoryType="1"><TabNo>2</TabNo><TabPos>2</TabPos><TabCapt><TStr><T><L>1034</L><S>Historial</S></T></TStr></TabCapt></T></Tabs></TabInfo><FieldID>Tab_${toCamel(tableName)}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+      }
+
+      const dialogH = hasTable ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
+      const titleFlds = [-1, -2, -3].slice(0, Math.min(3, sections.flatMap(s => s.fields).length)).map(n => `<Fld>${n}</Fld>`).join('')
+      const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
+
+      const categoryXml = `<Category><CtgryNo>-1</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${tableColFields}${fieldsXml}${headerXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${pal.dlgBg}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgry_id}</CtgryID></Category>`
+
+      // Build complete XML
+      const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${categoryXml}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
 
       setXml(xml)
       setXmlModalOpen(true)
-      message.success('✅ XML generado con soporte para tablas')
+      message.success('✅ XML generado (Therefore Native Format)')
       return
     } catch (err) {
       setError(`Error: ${err.message}`)
       console.error('Error generando XML:', err)
       return
     }
+  }
+
+  const toCamel = (str) => {
+    return (str || '').split('_')
+      .map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join('') || 'categoria'
   }
 
   // Legacy version - no longer used
