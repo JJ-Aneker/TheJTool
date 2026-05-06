@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneClinic — Software de Gestión para Clínicas con IA</title>
+<meta name="description" content="OneClinic unifica la gestión de pacientes, agenda, historial clínico y facturación. Con un asistente de IA que agenda citas por ti, 24/7.">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="oneclinic.css">
+</head>
+<body>
+
+<!-- ══════════════════ NAV ══════════════════ -->
+<nav id="mainNav">
+  <div class="nav-i">
+    <a href="#" class="logo">One<em>Clinic</em></a>
+    <ul class="nav-links">
+      <li><a href="#funciones">Funciones</a></li>
+      <li><a href="#ia">Asistente IA</a></li>
+      <li><a href="#precios">Precios</a></li>
+      <li><a href="#testimonios">Casos de éxito</a></li>
+    </ul>
+    <div class="nav-btns">
+      <a href="https://demo.oneclinic.app/dashboard" target="_blank" class="btn-outline-w">▶ Demo en vivo</a>
+      <a href="#precios" class="btn-teal">Empezar gratis</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menú de navegación">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge"><span class="hero-dot"></span>Software clínico con IA · 2025</div>
+      <h1>Gestiona tu clínica.<br><span class="accent">Sin límites.</span><span class="line2">Sin papel. Sin caos.</span></h1>
+      <p class="hero-sub">OneClinic unifica la gestión completa de tu clínica: historial clínico, planes de tratamiento, agenda y facturación. Con un asistente de IA que atiende llamadas, gestiona citas y consulta historiales, sin parar.</p>
+      <div class="hero-cta">
+        <a href="#precios" class="btn-hero-main">Empezar 14 días gratis →</a>
+        <a href="https://demo.oneclinic.app/dashboard" target="_blank" class="btn-hero-ghost">▶ Ver la demo</a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-stars">★★★★★</div>
+        <div class="trust-text">Valorado con <strong>4.9/5</strong> por más de <strong>500 clínicas</strong> en toda España</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="stats-float">
+        <div class="stat-box"><div class="stat-n">+500</div><div class="stat-l">Clínicas activas en España</div></div>
+        <div class="stat-box"><div class="stat-n">-40%</div><div class="stat-l">Tiempo en tareas administrativas</div></div>
+        <div class="stat-box"><div class="stat-n">98%</div><div class="stat-l">Tasa de satisfacción de clientes</div></div>
+        <div class="stat-box"><div class="stat-n">24/7</div><div class="stat-l">Asistente IA siempre disponible</div></div>
+        <div class="stat-box wide">
+          <div><div class="stat-n">99.9%</div><div class="stat-l">Uptime garantizado</div></div>
+          <div class="uptime-bar"><div class="uptime-fill"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ LOGOS BAND ══════════════════ -->
+<div class="logos-band">
+  <div class="logos-inner">
+    <div class="logos-label">Confían en OneClinic</div>
+    <div class="logos-items">
+      <div class="logo-pill">Dental Roca</div>
+      <div class="logo-pill">Clínica ML Valencia</div>
+      <div class="logo-pill">Salud Integral Madrid</div>
+      <div class="logo-pill">DermaCenter</div>
+      <div class="logo-pill">FisioPlus</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PHOTO FEATURES ══════════════════ -->
+<section id="funciones">
+  <div class="wrap">
+    <div class="tag">La plataforma completa</div>
+    <div class="sec-h">Todo lo que tu clínica<br>necesita, en un solo lugar</div>
+    <div class="sec-s">Desde la primera cita hasta el cobro final. OneClinic cubre cada paso del flujo clínico sin fricciones ni papel.</div>
+    <div class="pf-grid">
+      <div class="pf-card tall">
+        <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80" alt="Recepción clínica moderna">
+        <div class="pf-overlay">
+          <div class="pf-chip">Agenda &amp; Citas</div>
+          <div class="pf-title">Control total de tu agenda en tiempo real</div>
+          <div class="pf-desc">Vista diaria, semanal y mensual. Múltiples profesionales y salas. Recordatorios automáticos que reducen las ausencias hasta un 60%.</div>
+        </div>
+      </div>
+      <div class="pf-right">
+        <div class="pf-card" style="min-height:200px;flex:1">
+          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80" alt="Historial clínico digital">
+          <div class="pf-overlay">
+            <div class="pf-chip">Historial &amp; Tratamientos</div>
+            <div class="pf-title">Historial y planes centralizados</div>
+            <div class="pf-desc">Ficha completa con diagnósticos, alergias, planes de tratamiento activos y evolución. Acceso seguro desde cualquier dispositivo.</div>
+          </div>
+        </div>
+        <div class="pf-card" style="min-height:200px;flex:1">
+          <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80" alt="Facturación automatizada">
+          <div class="pf-overlay">
+            <div class="pf-chip">Facturación</div>
+            <div class="pf-title">Cobros y facturas en segundos</div>
+            <div class="pf-desc">Presupuestos, facturas y control de impagados. Exportación contable integrada sin esfuerzo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ AI SECTION ══════════════════ -->
+<section id="ia" class="ai-section">
+  <div class="ai-bg-glow"></div>
+  <div class="ai-bg-glow2"></div>
+  <div class="wrap">
+    <div class="ai-inner">
+      <div>
+        <div class="ai-badge">✦ Asistente IA Multicanal</div>
+        <div class="sec-h" style="color:#fff">Un asistente clínico con IA<br>que lo sabe todo del paciente</div>
+        <p class="sec-s">Nuestro asistente con IA atiende llamadas telefónicas, gestiona citas y accede al historial clínico del paciente en tiempo real. Conoce sus tratamientos, alergias y próximas visitas para ofrecer una atención personalizada las 24 horas. Sin intervención humana. Sin esperas. Sin errores.</p>
+        <div class="ai-pills">
+          <div class="ai-pill"><span>📞</span> Atiende llamadas con voz natural</div>
+          <div class="ai-pill"><span>💬</span> Chat por WhatsApp, email y web</div>
+          <div class="ai-pill"><span>🗓️</span> Agenda y reagenda citas automáticamente</div>
+          <div class="ai-pill"><span>📋</span> Consulta el historial del paciente</div>
+          <div class="ai-pill"><span>💊</span> Informa sobre tratamientos en curso</div>
+          <div class="ai-pill"><span>🌙</span> Disponible 24 horas al día</div>
+          <div class="ai-pill"><span>🌐</span> Multiidioma (ES, EN, CA, PT)</div>
+          <div class="ai-pill"><span>📊</span> Aprende de cada interacción</div>
+        </div>
+        <a href="#precios" class="ai-cta-link">Incluido en todos los planes →</a>
+      </div>
+      <div>
+        <div class="chat-mockup">
+          <div class="chat-top">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-info">
+              <strong>Asistente OneClinic</strong>
+              <span>Powered by IA · Clínica Salud Integral</span>
+            </div>
+            <div class="chat-status"><span class="status-dot"></span>En línea</div>
+          </div>
+          <div class="chat-body">
+            <div>
+              <div class="msg msg-bot"><strong>¡Hola!</strong> Soy el asistente virtual de Clínica Salud Integral. ¿En qué puedo ayudarte hoy?</div>
+              <div class="msg-time">09:14</div>
+            </div>
+            <div>
+              <div class="msg msg-user">Quiero pedir cita con el dermatólogo para esta semana</div>
+              <div class="msg-time msg-time-right">09:15</div>
+            </div>
+            <div>
+              <div class="msg msg-bot">Perfecto. Tenemos disponibilidad con la Dra. López esta semana. ¿Cuál te viene mejor?
+                <div class="chat-slots">
+                  <button class="slot-btn" onclick="selectSlot(this)">Mar 15 · 10:00</button>
+                  <button class="slot-btn" onclick="selectSlot(this)">Mié 16 · 11:30</button>
+                  <button class="slot-btn active" onclick="selectSlot(this)">Jue 17 · 09:00</button>
+                </div>
+              </div>
+              <div class="msg-time">09:15</div>
+            </div>
+            <div>
+              <div class="msg msg-user">El jueves a las 9 perfecto</div>
+              <div class="msg-time msg-time-right">09:16</div>
+            </div>
+            <div>
+              <div class="msg msg-bot">✅ <strong>Cita confirmada</strong> para el jueves 17 a las 09:00 con la Dra. López. Recibirás un recordatorio por SMS 24h antes. ¿Necesitas algo más?</div>
+              <div class="msg-time">09:16</div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input class="chat-field" type="text" placeholder="Escribe tu mensaje...">
+            <button class="chat-send">↑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photo strip -->
+    <div class="photo-strip">
+      <div class="photo-item">
+        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&q=80" alt="Doctor con tablet digital">
+        <div class="photo-caption">Historial en cualquier dispositivo</div>
+      </div>
+      <div class="photo-item">
+        <img src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=600&q=80" alt="Clínica dental moderna">
+        <div class="photo-caption">Gestión multi-especialidad</div>
+      </div>
+      <div class="photo-item">
+        <img src="https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&q=80" alt="Equipo médico profesional">
+        <div class="photo-caption">Más tiempo para tus pacientes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FEATURES GRID ══════════════════ -->
+<section class="feats-section">
+  <div class="wrap">
+    <div class="tag">Funcionalidades</div>
+    <div class="sec-h">Diseñado para clínicas reales</div>
+    <div class="sec-s">Cada función pensada para eliminar fricciones y devolverte tiempo. Para cualquier especialidad médica.</div>
+    <div class="feats-grid">
+      <div class="feat"><div class="feat-ico">📅</div><h3>Agenda inteligente</h3><p>Vista multi-profesional y multi-sala. Citas recurrentes, bloqueos y gestión de listas de espera automáticas.</p></div>
+      <div class="feat"><div class="feat-ico">🤖</div><h3>Asistente IA Multicanal</h3><p>Atiende llamadas, chats y mensajes. Gestiona citas, consulta historiales y accede a información del paciente. Responde, confirma y reagenda de forma autónoma, 24/7.</p></div>
+      <div class="feat"><div class="feat-ico">📋</div><h3>Historial clínico integrado</h3><p>Ficha clínica con diagnósticos, alergias, planes de tratamiento activos y evolución del paciente. Consentimientos digitales, RGPD compliant.</p></div>
+      <div class="feat"><div class="feat-ico">💳</div><h3>Facturación total</h3><p>Presupuestos, facturas, remesas y control de cobros. Exportación directa a tu gestoría o programa contable.</p></div>
+      <div class="feat"><div class="feat-ico">📊</div><h3>Panel de análisis</h3><p>KPIs en tiempo real por especialidad, profesional y período. Toma decisiones basadas en datos, no en intuición.</p></div>
+      <div class="feat"><div class="feat-ico">🩺</div><h3>Planes de tratamiento</h3><p>Diseña, asigna y haz seguimiento de planes de tratamiento por paciente. El historial se actualiza en cada visita, accesible para todo el equipo.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ PRICING ══════════════════ -->
+<section id="precios" class="pricing-section">
+  <div class="wrap" style="text-align:center">
+    <div class="tag" style="text-align:center">Precios</div>
+    <div class="sec-h" style="margin:0 auto">Elige tu plan. Cancela cuando quieras.</div>
+    <p style="color:var(--muted);margin:.75rem auto 0;max-width:460px;font-size:1rem;line-height:1.7">14 días gratis en todos los planes. Sin tarjeta de crédito. Sin letra pequeña.</p>
+    <div class="ptoggle">
+      <span class="toggle-lbl">Mensual</span>
+      <button class="tsw" id="tsw" onclick="flipPricing()"></button>
+      <span class="toggle-lbl">Anual <span class="tbadge">Ahorra 20%</span></span>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-n">Starter</div>
+        <div class="plan-d">Para clínicas pequeñas que empiezan a digitalizarse</div>
+        <div class="plan-p"><span class="p-amt" id="pp1">49€</span><span class="p-sfx">/mes</span></div>
+        <div class="p-note" id="pn1">Facturado mensualmente</div>
+        <hr class="plan-sep">
+        <ul class="plan-feats">
+          <li><span class="pf-ok">✓</span>Hasta 2 profesionales</li>
+          <li><span class="pf-ok">✓</span>Agenda y gestión de citas</li>
+          <li><span class="pf-ok">✓</span>Historial clínico básico</li>
+          <li><span class="pf-ok">✓</span>Facturación simple</li>
+          <li><span class="pf-ok">✓</span>Asistente IA básico</li>
+          <li><span class="pf-ok">✓</span>Soporte por email</li>
+        </ul>
+        <button class="plan-btn pb-sec">Empezar gratis</button>
+      </div>
+      <div class="plan hot">
+        <div class="plan-tag">⚡ Más popular</div>
+        <div class="plan-n">Pro</div>
+        <div class="plan-d">Para clínicas en crecimiento que necesitan control total</div>
+        <div class="plan-p"><span class="p-amt" id="pp2">99€</span><span class="p-sfx">/mes</span></div>
+        <div class="p-note" id="pn2">Facturado mensualmente</div>
+        <hr class="plan-sep">
+        <ul class="plan-feats">
+          <li><span class="pf-ok">✓</span>Hasta 8 profesionales</li>
+          <li><span class="pf-ok">✓</span>Todo lo de Starter</li>
+          <li><span class="pf-ok">✓</span>Asistente IA completo 24/7</li>
+          <li><span class="pf-ok">✓</span>WhatsApp &amp; email automatizados</li>
+          <li><span class="pf-ok">✓</span>Estadísticas avanzadas</li>
+          <li><span class="pf-ok">✓</span>Multi-especialidad</li>
+          <li><span class="pf-ok">✓</span>Soporte prioritario chat</li>
+        </ul>
+        <button class="plan-btn pb-main">Empezar gratis</button>
+      </div>
+      <div class="plan">
+        <div class="plan-n">Clínica</div>
+        <div class="plan-d">Para grupos con múltiples sedes o alta demanda</div>
+        <div class="plan-p"><span class="p-amt" id="pp3">199€</span><span class="p-sfx">/mes</span></div>
+        <div class="p-note" id="pn3">Facturado mensualmente</div>
+        <hr class="plan-sep">
+        <ul class="plan-feats">
+          <li><span class="pf-ok">✓</span>Profesionales ilimitados</li>
+          <li><span class="pf-ok">✓</span>Todo lo de Pro</li>
+          <li><span class="pf-ok">✓</span>Multi-sede centralizada</li>
+          <li><span class="pf-ok">✓</span>API e integraciones</li>
+          <li><span class="pf-ok">✓</span>IA personalizada para tu clínica</li>
+          <li><span class="pf-ok">✓</span>Onboarding dedicado</li>
+          <li><span class="pf-ok">✓</span>Soporte 24/7 por teléfono</li>
+        </ul>
+        <button class="plan-btn pb-sec">Contactar ventas</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ TESTIMONIALS ══════════════════ -->
+<section id="testimonios" class="test-section">
+  <div class="wrap">
+    <div class="tag">Casos de éxito</div>
+    <div class="sec-h">Clínicas que ya han transformado su gestión</div>
+    <div class="test-grid">
+      <div class="test-c">
+        <div class="test-stars">★★★★★</div>
+        <div class="test-q">"Llevábamos 10 años con papel y boli. En dos días migramos todo a OneClinic y el cambio fue radical. Ahora tenemos control total de agenda y cobros, y el asistente de IA agenda la mitad de las citas sola."</div>
+        <div class="test-who">
+          <div class="test-av av1">SM</div>
+          <div><div class="test-nm">Sara Montilla</div><div class="test-rl">Directora · Clínica Salud Integral, Madrid</div></div>
+        </div>
+      </div>
+      <div class="test-c">
+        <div class="test-stars">★★★★★</div>
+        <div class="test-q">"Lo que más valoro es el asistente IA. Nuestros pacientes pueden pedir cita a las 2 de la madrugada por WhatsApp y el sistema lo gestiona solo. Hemos reducido las llamadas entrantes un 70%."</div>
+        <div class="test-who">
+          <div class="test-av av2">JR</div>
+          <div><div class="test-nm">Javier Roca</div><div class="test-rl">Fundador · Dental Roca, Barcelona</div></div>
+        </div>
+      </div>
+      <div class="test-c">
+        <div class="test-stars">★★★★★</div>
+        <div class="test-q">"Tenemos 3 sedes y por fin lo vemos todo centralizado. Los informes nos ayudaron a detectar qué tratamientos son más rentables. Amortizamos la suscripción en el primer mes."</div>
+        <div class="test-who">
+          <div class="test-av av3">ML</div>
+          <div><div class="test-nm">Marta Lloret</div><div class="test-rl">Gerente · Grupo Estética ML, Valencia</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CTA FINAL ══════════════════ -->
+<section class="cta-section">
+  <div class="cta-photo"></div>
+  <div class="cta-glow"></div>
+  <div class="cta-wrap">
+    <h2>Tu clínica merece<br>trabajar con <span>inteligencia</span></h2>
+    <p>Empieza hoy. 14 días gratis, sin tarjeta, sin compromiso. Configura tu clínica en menos de 1 hora.</p>
+    <div class="cta-btns">
+      <a href="#precios" class="btn-cw">Empezar gratis ahora →</a>
+      <a href="https://demo.oneclinic.app/dashboard" target="_blank" class="btn-co">▶ Ver demo en vivo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer>
+  <div class="foot-i">
+    <div class="foot-logo">One<em>Clinic</em></div>
+    <div class="foot-links">
+      <a href="#">Funciones</a>
+      <a href="#precios">Precios</a>
+      <a href="#">Privacidad</a>
+      <a href="#">RGPD</a>
+      <a href="#">Contacto</a>
+    </div>
+    <div class="foot-copy">© 2025 OneClinic · Todos los derechos reservados</div>
+  </div>
+</footer>
+
+<!-- ══════════════════ LEAD MODAL ══════════════════ -->
+<div id="leadModal" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Cerrar">&times;</button>
+    <div class="modal-head">
+      <div class="modal-logo">One<em>Clinic</em></div>
+      <h3>Empieza gratis 14 días</h3>
+      <p>Sin tarjeta de crédito. Te contactamos en menos de 24 horas.</p>
+    </div>
+    <form id="leadForm" action="https://formspree.io/f/TU_FORM_ID" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" name="telefono" placeholder="+34 600 000 000" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="tuclinica@email.com" required>
+      </div>
+      <div class="form-group">
+        <label for="tipo_clinica">Tipo de clínica</label>
+        <select id="tipo_clinica" name="tipo_clinica" required>
+          <option value="">Selecciona tu especialidad...</option>
+          <option value="Dental">Dental</option>
+          <option value="Médica general">Médica general</option>
+          <option value="Estética">Estética</option>
+          <option value="Fisioterapia">Fisioterapia</option>
+          <option value="Dermatología">Dermatología</option>
+          <option value="Otras">Otras</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="comentarios">Comentarios (opcional)</label>
+        <textarea id="comentarios" name="comentarios" rows="3" placeholder="Cuéntanos sobre tu clínica..."></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Solicitar demo gratuita →</button>
+      <p class="form-footer">🔒 Tus datos están protegidos. Sin spam.</p>
+    </form>
+    <div id="formSuccess" class="form-success" style="display:none">
+      <div class="success-icon">✅</div>
+      <h3>¡Solicitud recibida!</h3>
+      <p>Nos pondremos en contacto contigo en menos de 24 horas.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', function() {
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Hamburger menu toggle
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.querySelector('.nav-links');
+  navToggle.addEventListener('click', function() {
+    navToggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+
+  // Close menu when clicking a link
+  document.querySelectorAll('.nav-links a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      navToggle.classList.remove('active');
+      navLinks.classList.remove('open');
+    });
+  });
+
+  // Pricing toggle
+  var annual = false;
+  var prices = [{m:'49€',a:'39€'},{m:'99€',a:'79€'},{m:'199€',a:'159€'}];
+  var notes  = [
+    {m:'Facturado mensualmente', a:'Facturado anualmente · 2 meses gratis'},
+    {m:'Facturado mensualmente', a:'Facturado anualmente · 2 meses gratis'},
+    {m:'Facturado mensualmente', a:'Facturado anualmente · 2 meses gratis'}
+  ];
+
+  function flipPricing() {
+    annual = !annual;
+    document.getElementById('tsw').classList.toggle('on', annual);
+    for (var i = 0; i < prices.length; i++) {
+      document.getElementById('pp' + (i+1)).textContent = annual ? prices[i].a : prices[i].m;
+      document.getElementById('pn' + (i+1)).textContent = annual ? notes[i].a : notes[i].m;
+    }
+  }
+
+  // Chat slot selector
+  function selectSlot(el) {
+    var siblings = el.closest('.chat-slots').querySelectorAll('.slot-btn');
+    siblings.forEach(function(b){ b.classList.remove('active'); });
+    el.classList.add('active');
+  }
+
+  // ══════════════════ MODAL LEADS ══════════════════
+  var modal = document.getElementById('leadModal');
+  var form = document.getElementById('leadForm');
+  var closeBtn = document.querySelector('.modal-close');
+
+  function openModal() {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Cerrar con botón X
+  closeBtn.addEventListener('click', closeModal);
+
+  // Cerrar haciendo click fuera (en el overlay)
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+
+  // Cerrar con tecla ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Interceptar todos los CTA buttons
+  var ctaBtns = document.querySelectorAll(
+    '.btn-hero-main, .btn-teal, .plan-btn, .btn-cw'
+  );
+  ctaBtns.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      // Excepto los botones que apunten a URLs externas
+      if (this.hasAttribute('target') && this.getAttribute('target') === '_blank') {
+        return;
+      }
+      e.preventDefault();
+      openModal();
+    });
+  });
+
+  // Enviar formulario con AJAX
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var submitBtn = this.querySelector('.btn-submit');
+    var originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
+
+    try {
+      var res = await fetch(this.action, {
+        method: 'POST',
+        body: new FormData(this),
+        headers: {'Accept': 'application/json'}
+      });
+
+      if (res.ok) {
+        document.getElementById('leadForm').style.display = 'none';
+        document.getElementById('formSuccess').style.display = 'block';
+        // Cerrar modal después de 3 segundos
+        setTimeout(function() {
+          closeModal();
+          // Limpiar para próximo uso
+          document.getElementById('leadForm').style.display = 'block';
+          document.getElementById('formSuccess').style.display = 'none';
+          form.reset();
+        }, 3000);
+      } else {
+        submitBtn.textContent = 'Error, intenta de nuevo';
+        submitBtn.disabled = false;
+        setTimeout(function() {
+          submitBtn.textContent = originalText;
+        }, 2000);
+      }
+    } catch (error) {
+      submitBtn.textContent = 'Error de conexión';
+      submitBtn.disabled = false;
+      setTimeout(function() {
+        submitBtn.textContent = originalText;
+      }, 2000);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verifica tu correo · Glass UI</title>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <div class="app login-page">
+
+    <div class="login-box">
+
+      <img src="assets/images/logo.png" alt="Logo" class="login-logo" />
+
+      <h1>Verifica tu correo</h1>
+
+      <p style="text-align:center; margin-top:-5px; margin-bottom:15px; color:var(--txt-2);">
+        Te hemos enviado un correo con un enlace de verificación.<br>
+        Revisa tu bandeja de entrada.
+      </p>
+
+      <!-- MENSAJE -->
+      <div id="verify-msg" class="error-box" style="display:none;"></div>
+
+      <div class="loader" id="verify-loader" style="margin-top:12px;"></div>
+
+      <div class="login-links" style="margin-top:25px;">
+        <a href="login.html">← Volver al inicio de sesión</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Opcional: refrescar estado de verificación -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <script>
+    // Opcional: puedes verificar si el usuario ya validó el email
+    async function checkVerification() {
+      const msg = document.getElementById("verify-msg");
+
+      try {
+        const { data } = await client.auth.getUser();
+
+        if (data.user?.email_confirmed_at) {
+          msg.style.display = "block";
+          msg.style.color = "var(--success)";
+          msg.textContent = "Tu correo ya ha sido verificado ✔ Redirigiendo...";
+
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1500);
+        }
+      } catch (err) {
+        msg.style.display = "block";
+        msg.textContent = err.message;
+      }
+    }
+
+    // Comprobación automática cada 5s
+    setInterval(checkVerification, 5000);
+  </script>
+
+</body>
+</html>

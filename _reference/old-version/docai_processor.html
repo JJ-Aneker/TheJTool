@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocAI Document Processor</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+    :root {
+      --bg: #0f1115;
+      --accent: #9ad1ff;
+      --txt1: #e6e7eb;
+      --txt2: rgba(238,244,255,.60);
+      --panel: rgba(255,255,255,.06);
+      --panel-dark: rgba(0,0,0,.18);
+      --border: rgba(255,255,255,.10);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font: 14px Inter, system-ui, sans-serif; color: var(--txt1); background: var(--bg); }
+    .app { display: flex; flex-direction: column; min-height: 100vh; padding: 20px; max-width: 1000px; margin: 0 auto; }
+    .card { background: linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10); border-radius: 8px; padding: 16px; margin-bottom: 12px; backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .label { font-size: 11px; color: rgba(238,244,255,.65); margin-bottom: 4px; display: block; font-weight: 600; }
+    input, textarea, select { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.18); color: var(--txt1); padding: 7px 10px; border-radius: 8px; font-family: inherit; font-size: 13px; width: 100%; margin-bottom: 8px; box-sizing: border-box; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,.06); }
+    input[type="file"] { padding: 10px; }
+    .btn { background: var(--accent); color: #000; border: none; padding: 9px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; margin-right: 8px; }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: rgba(255,255,255,.06); color: var(--txt1); border: 1px solid rgba(255,255,255,.14); margin-right: 8px; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .error { background: rgba(255,60,60,.10); border: 1px solid rgba(255,60,60,.25); color: #fca5a5; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+    .success { background: rgba(100,200,100,.10); border: 1px solid rgba(100,200,100,.25); color: #a7f3d0; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+    .info { background: rgba(100,150,255,.10); border: 1px solid rgba(100,150,255,.25); color: #a5d6ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
+    .warning { background: rgba(255,180,0,.10); border: 1px solid rgba(255,180,0,.25); color: #ffd580; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
+    textarea { min-height: 120px; resize: vertical; font-family: 'Courier New', monospace; }
+    h1 { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; margin: 0 0 20px 0; }
+    h2 { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 12px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .stat { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); padding: 10px; border-radius: 6px; }
+    .stat-label { font-size: 11px; color: rgba(238,244,255,.65); display: block; margin-bottom: 4px; }
+    .stat-value { font-size: 14px; font-weight: 600; color: var(--accent); }
+    .buttons { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 8px; }
+    .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(100,150,255,.3); border-top-color: #a5d6ff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .response-section { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 6px; padding: 12px; margin-top: 8px; }
+    .response-header { font-size: 12px; font-weight: 600; color: var(--txt2); margin-bottom: 8px; }
+    .json-viewer { background: rgba(0,0,0,.3); padding: 10px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 12px; color: #a5d6ff; font-family: 'Courier New', monospace; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>🔍 DocAI Document Processor</h1>
+  <div class="info">Cargue un documento para extraer información usando DocAI</div>
+
+  <div class="card">
+    <h2>1. Configurar Credenciales</h2>
+    <div class="info">✅ Endpoint proxy configurado: https://therefore.es/docai_proxy.php</div>
+
+    <label class="label">Token Bearer (Authorization)</label>
+    <input type="text" id="bearerToken" value="eyJhbGciOiJSUzI1NiIsImtpZCI6IjUzMkVFMzQ2NjdGNDFCRUJBQTRFNTQ5M0Y1QjI1REM2QjAxQUE5NzkiLCJ4NXQiOiJVeTdqUm1mMEctdXFUbFNUOWJKZHhyQWFxWGsiLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2Nhbm9uLmRvY2FpLmVzLyIsImlhdCI6MTc3NTc0MDE0NCwiYXVkIjoiRG9jYWkiLCJzY29wZSI6ImVtYWlsIHByb2ZpbGUgcm9sZXMgcGhvbmUgYWRkcmVzcyBEb2NhaSIsImp0aSI6IjJmY2Q1MTYxLWQxZmEtNDBkYS04NmEyLTg5OWMwYTExNTgyZSIsInN1YiI6IjliZWI5MDMyLTY5NTItMzE4MS0zOGU3LTNhMWZkNTZkMjkxZCIsInRlbmFudGlkIjoiODIyNDViOTItMjgyMC04OWYzLTQwM2QtM2ExZmQ1NmQyOGU3IiwidW5pcXVlX25hbWUiOiJhZG1pbiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluIiwiZ2l2ZW5fbmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiZW1haWwiOiJqakBjYW5vbi5lcyIsImVtYWlsX3ZlcmlmaWVkIjoiRmFsc2UiLCJwaG9uZV9udW1iZXJfdmVyaWZpZWQiOiJGYWxzZSIsIm9pX3Byc3QiOiJEb2NhaV9XZWIiLCJjbGllbnRfaWQiOiJEb2NhaV9XZWIiLCJvaV90a25faWQiOiI2OWJhYTI1Yi0yNjgxLTE3MjEtNmU0Yi0zYTIwODQ4OTI0ZDkifQ.qVuQZ3yzwRVRpfvXRpNW7nMO0sx6arkL4nmR0qe71ai-rqxGB8h_z_bgxdYwPXuHZ9kmn2IEB4R9sIgzqoMh7PdOnrHw1oxJfLK5J8qusABCmwhzOnWh5b2I65bdX7motq6R6hsS5pEMH6EOcE-Hqr7l7quGyq_k55CBOabARAp-4rnbsmYdAEHMHzTa84jH2mSNsrAeG0giZCE_kZCGApS-vGX-PX7EU6SEu0WihCunQiknKfQ2Dd9YeGD881giK_Y_4HQZDdSfCiknPBZMrctCiXxFgpwHeNn4wx-UieH8dk4RsKAt2JT7bkTJc-ia8n0Y3BG1Gd8ynF9x0kTx_g" readonly />
+    <div class="info">Token pre-configurado (no editable)</div>
+  </div>
+
+  <div class="card">
+    <h2>2. Seleccionar Documento</h2>
+    <label class="label">Archivo a procesar</label>
+    <input type="file" id="documentFile" accept=".pdf,.jpg,.jpeg,.png,.tiff,.bmp" />
+    <div class="info">Formatos soportados: PDF, JPG, PNG, TIFF, BMP</div>
+  </div>
+
+  <div class="card">
+    <h2>3. Procesar</h2>
+    <div class="buttons">
+      <button class="btn" id="processBtn" onclick="processDocument()">📤 Enviar Documento</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetApp()">🔄 Limpiar</button>
+    </div>
+  </div>
+
+  <div class="card" id="statusCard" style="display:none;">
+    <h2>📊 Estado del Proceso</h2>
+    <div id="statusLog" style="background: rgba(0,0,0,.3); padding: 12px; border-radius: 4px; font-size: 12px; color: #a5d6ff; font-family: 'Courier New', monospace; white-space: pre-wrap; word-break: break-word; max-height: 250px; overflow-y: auto;">
+    </div>
+  </div>
+
+  <div class="card" id="debugCard" style="display:none;">
+    <h2>🔍 Detalles de la Llamada</h2>
+    <div class="response-section">
+      <div class="response-header">URL Completa</div>
+      <div class="json-viewer" id="debugUrl"></div>
+    </div>
+    <div class="response-section">
+      <div class="response-header">Headers</div>
+      <div class="json-viewer" id="debugHeaders"></div>
+    </div>
+    <div class="response-section">
+      <div class="response-header">FormData</div>
+      <div class="json-viewer" id="debugFormData"></div>
+    </div>
+  </div>
+
+  <div id="messages"></div>
+
+  <div class="card" id="resultCard" style="display:none;">
+    <h2>Resultado de DocAI</h2>
+
+    <div class="grid">
+      <div class="stat">
+        <span class="stat-label">Estado</span>
+        <span class="stat-value" id="statusBadge">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Tiempo procesamiento</span>
+        <span class="stat-value" id="processingTime">—</span>
+      </div>
+    </div>
+
+    <div class="response-section">
+      <div class="response-header">📋 Respuesta JSON (Completa)</div>
+      <textarea id="jsonOutput" readonly></textarea>
+    </div>
+
+    <div class="response-section">
+      <div class="response-header">🔍 Resumen Extraído</div>
+      <div id="extractedSummary" style="color: var(--txt2); font-size: 12px; white-space: pre-wrap; word-break: break-word;"></div>
+    </div>
+
+    <div class="buttons" style="margin-top: 12px;">
+      <button class="btn" onclick="downloadJson()">⬇ Descargar JSON</button>
+      <button class="btn btn-secondary btn-sm" onclick="copyJsonToClipboard()">📋 Copiar JSON</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const bearerToken = document.getElementById('bearerToken');
+const documentFile = document.getElementById('documentFile');
+const processBtn = document.getElementById('processBtn');
+const messagesDiv = document.getElementById('messages');
+const resultCard = document.getElementById('resultCard');
+const statusCard = document.getElementById('statusCard');
+const jsonOutput = document.getElementById('jsonOutput');
+const extractedSummary = document.getElementById('extractedSummary');
+
+let lastResponse = null;
+let startTime = null;
+let statusLog = '';
+
+function addLog(msg) {
+  const timestamp = new Date().toLocaleTimeString('es-ES');
+  statusLog += `[${timestamp}] ${msg}\n`;
+  document.getElementById('statusLog').textContent = statusLog;
+  document.getElementById('statusLog').scrollTop = document.getElementById('statusLog').scrollHeight;
+  console.log(msg);
+}
+
+// =========================================================================
+// Procesar documento
+// =========================================================================
+async function processDocument() {
+  // Limpiar logs previos
+  statusLog = '';
+  document.getElementById('statusCard').style.display = 'block';
+  document.getElementById('statusLog').textContent = '';
+
+  addLog('🚀 Iniciando proceso...');
+
+  // Validaciones
+  if (!bearerToken.value.trim()) {
+    addLog('❌ Token Bearer vacío');
+    showError('❌ Token Bearer no configurado');
+    processBtn.disabled = false;
+    return;
+  }
+  addLog('✅ Token Bearer validado');
+
+  const file = documentFile.files[0];
+  if (!file) {
+    addLog('❌ No hay archivo seleccionado');
+    showError('❌ Seleccione un documento');
+    processBtn.disabled = false;
+    return;
+  }
+  addLog(`✅ Archivo seleccionado: ${file.name} (${file.size} bytes, ${file.type})`);
+
+  try {
+    processBtn.disabled = true;
+    startTime = Date.now();
+
+    addLog('📦 Preparando FormData...');
+    const formData = new FormData();
+    formData.append('files', file);
+    formData.append('token', bearerToken.value.trim());
+    addLog('✅ FormData preparado');
+
+    const proxyUrl = 'https://therefore.es/docai_proxy_v2.php';
+    addLog(`🌐 URL destino: ${proxyUrl}`);
+
+    addLog('📤 Enviando petición al servidor...');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    addLog(`✅ Respuesta recibida: HTTP ${response.status}`);
+
+    const endTime = Date.now();
+    const processingTime = ((endTime - startTime) / 1000).toFixed(2);
+    addLog(`⏱️ Tiempo total: ${processingTime}s`);
+
+    if (!response.ok) {
+      addLog(`❌ Error HTTP ${response.status}: ${response.statusText}`);
+      const errorText = await response.text();
+      addLog(`📋 Respuesta del servidor: ${errorText.substring(0, 200)}`);
+      showError(`❌ Error HTTP ${response.status}: ${response.statusText}`);
+      processBtn.disabled = false;
+      return;
+    }
+
+    addLog('📖 Parseando respuesta JSON...');
+    const result = await response.json();
+    lastResponse = result;
+    addLog('✅ JSON parseado correctamente');
+
+    // Mostrar resultado
+    jsonOutput.value = JSON.stringify(result, null, 2);
+    document.getElementById('statusBadge').textContent = '✅ Exitoso';
+    document.getElementById('processingTime').textContent = `${processingTime}s`;
+
+    // Mostrar resumen
+    showSummary(result);
+
+    resultCard.style.display = 'block';
+    addLog('🎉 ¡Documento procesado exitosamente!');
+    showSuccess('✅ Documento procesado correctamente');
+    processBtn.disabled = false;
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      addLog('❌ Timeout — la petición tardó más de 30 segundos');
+      showError('❌ Timeout: el servidor tardó demasiado en responder');
+    } else {
+      addLog(`❌ Error: ${err.message}`);
+      showError(`❌ Error: ${err.message}`);
+    }
+    console.error(err);
+    processBtn.disabled = false;
+  }
+}
+
+// =========================================================================
+// Leer archivo como Base64
+// =========================================================================
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// =========================================================================
+// Mostrar resumen de respuesta
+// =========================================================================
+function showSummary(result) {
+  let summary = '';
+
+  // Intentar extraer información relevante de la respuesta
+  if (result.data) {
+    summary = JSON.stringify(result.data, null, 2);
+  } else if (result.entities) {
+    summary = 'Entidades extraídas:\n' + JSON.stringify(result.entities, null, 2);
+  } else if (result.text) {
+    summary = 'Texto extraído:\n' + result.text;
+  } else if (result.tables) {
+    summary = 'Tablas encontradas:\n' + JSON.stringify(result.tables, null, 2);
+  } else {
+    summary = JSON.stringify(result, null, 2);
+  }
+
+  extractedSummary.textContent = summary;
+}
+
+// =========================================================================
+// Descargar JSON
+// =========================================================================
+function downloadJson() {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+  const blob = new Blob([jsonOutput.value], { type: 'application/json; charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `docai_response_${timestamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showSuccess('✅ JSON descargado');
+}
+
+function copyJsonToClipboard() {
+  jsonOutput.select();
+  document.execCommand('copy');
+  showSuccess('✅ JSON copiado al portapapeles');
+}
+
+// =========================================================================
+// Mensajes
+// =========================================================================
+function showError(msg) {
+  messagesDiv.innerHTML = `<div class="error">${msg}</div>`;
+}
+
+function showSuccess(msg) {
+  messagesDiv.innerHTML = `<div class="success">${msg}</div>`;
+}
+
+function showLoading(msg) {
+  messagesDiv.innerHTML = `<div class="info"><span class="loading"></span> ${msg}</div>`;
+}
+
+function resetApp() {
+  documentFile.value = '';
+  jsonOutput.value = '';
+  extractedSummary.textContent = '';
+  resultCard.style.display = 'none';
+  messagesDiv.innerHTML = '';
+  statusCard.style.display = 'none';
+  statusLog = '';
+  document.getElementById('statusLog').textContent = '';
+  processBtn.disabled = false;
+  lastResponse = null;
+}
+
+// Permitir toggle de visibilidad del token
+bearerToken.addEventListener('dblclick', function() {
+  this.type = this.type === 'password' ? 'text' : 'password';
+});
+</script>
+</body>
+</html>

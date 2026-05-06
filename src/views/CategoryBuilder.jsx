@@ -22,26 +22,131 @@ function toCamelKey(s) {
     .join('') || 'campo'
 }
 
+// Therefore TypeNo mapping (official types)
 const FIELD_TYPES = [
-  { value: 'string', label: 'String' },
-  { value: 'int', label: 'Entero' },
-  { value: 'decimal', label: 'Decimal' },
-  { value: 'date', label: 'Fecha' },
-  { value: 'datetime', label: 'Fecha-Hora' },
-  { value: 'boolean', label: 'Booleano' },
+  { value: '1', label: 'Texto (String)', typeno: 1 },
+  { value: '2', label: 'Número (Integer)', typeno: 2 },
+  { value: '3', label: 'Fecha (Date)', typeno: 3 },
+  { value: '5', label: 'Dinero (Money)', typeno: 5 },
+  { value: '6', label: 'Booleano (Logical)', typeno: 6 },
+  { value: '7', label: 'Fecha-Hora (DateTime)', typeno: 7 },
+  { value: '10', label: 'Tabla (Table)', typeno: 10 },
+  { value: '15', label: 'Lista/Lookup', typeno: 15 },
 ]
 
+// BGR color helper (Blue-Green-Red format, Therefore standard)
+const bgr = (r, g, b) => b * 65536 + g * 256 + r
+
+// Therefore color palettes (official themes)
+const COLOR_PALETTES = {
+  'Corporativa': {
+    name: 'Corporativa',
+    secBg: bgr(0, 0, 0),
+    secText: bgr(255, 255, 255),
+    hdrBg: bgr(154, 69, 26),
+    hdrText: bgr(255, 255, 255),
+    hdrSub: bgr(220, 160, 120),
+    hdrMed: bgr(100, 40, 15),
+    dlgBg: bgr(192, 192, 192),
+    tabBg: bgr(160, 160, 160),
+    fieldBg: bgr(255, 255, 255),
+    fieldText: bgr(0, 0, 0),
+    labelColor: bgr(55, 65, 81)
+  },
+  'Therefore Azul': {
+    name: 'Therefore Azul',
+    secBg: bgr(24, 95, 165),
+    secText: bgr(255, 255, 255),
+    hdrBg: bgr(24, 95, 165),
+    hdrText: bgr(255, 255, 255),
+    hdrSub: bgr(180, 210, 240),
+    hdrMed: bgr(16, 75, 140),
+    dlgBg: bgr(240, 240, 240),
+    tabBg: bgr(192, 192, 192),
+    fieldBg: bgr(255, 255, 255),
+    fieldText: bgr(0, 0, 0),
+    labelColor: bgr(55, 65, 81)
+  },
+  'Verde Corporativo': {
+    name: 'Verde Corporativo',
+    secBg: bgr(22, 101, 52),
+    secText: bgr(255, 255, 255),
+    hdrBg: bgr(22, 101, 52),
+    hdrText: bgr(255, 255, 255),
+    hdrSub: bgr(187, 247, 208),
+    hdrMed: bgr(15, 75, 38),
+    dlgBg: bgr(240, 245, 240),
+    tabBg: bgr(192, 192, 192),
+    fieldBg: bgr(255, 255, 255),
+    fieldText: bgr(0, 0, 0),
+    labelColor: bgr(55, 65, 81)
+  },
+  'Rojo Institucional': {
+    name: 'Rojo Institucional',
+    secBg: bgr(153, 27, 27),
+    secText: bgr(255, 255, 255),
+    hdrBg: bgr(153, 27, 27),
+    hdrText: bgr(255, 255, 255),
+    hdrSub: bgr(254, 202, 202),
+    hdrMed: bgr(120, 20, 20),
+    dlgBg: bgr(245, 240, 240),
+    tabBg: bgr(192, 192, 192),
+    fieldBg: bgr(255, 255, 255),
+    fieldText: bgr(0, 0, 0),
+    labelColor: bgr(55, 65, 81)
+  },
+  'Gris Neutro': {
+    name: 'Gris Neutro',
+    secBg: bgr(55, 65, 81),
+    secText: bgr(255, 255, 255),
+    hdrBg: bgr(55, 65, 81),
+    hdrText: bgr(255, 255, 255),
+    hdrSub: bgr(209, 213, 219),
+    hdrMed: bgr(31, 41, 55),
+    dlgBg: bgr(243, 244, 246),
+    tabBg: bgr(192, 192, 192),
+    fieldBg: bgr(255, 255, 255),
+    fieldText: bgr(0, 0, 0),
+    labelColor: bgr(55, 65, 81)
+  },
+  'Morado': {
+    name: 'Morado',
+    secBg: bgr(88, 28, 135),
+    secText: bgr(255, 255, 255),
+    hdrBg: bgr(88, 28, 135),
+    hdrText: bgr(255, 255, 255),
+    hdrSub: bgr(233, 213, 255),
+    hdrMed: bgr(59, 7, 100),
+    dlgBg: bgr(245, 240, 250),
+    tabBg: bgr(192, 192, 192),
+    fieldBg: bgr(255, 255, 255),
+    fieldText: bgr(0, 0, 0),
+    labelColor: bgr(55, 65, 81)
+  }
+}
+
+// Maps CSV type aliases to Therefore TypeNo values
 const TYPE_ALIAS = {
-  'string': 'text', 'texto': 'text', 'text': 'text',
-  'email': 'email',
-  'date': 'date', 'fecha': 'date',
-  'datetime': 'datetime', 'timestamp': 'datetime', 'fecha y hora': 'datetime',
-  'number': 'number', 'integer': 'number', 'int': 'number', 'entero': 'number',
-  'money': 'money', 'importe': 'money', 'decimal': 'money',
-  'boolean': 'boolean', 'bool': 'boolean', 'lógico': 'boolean',
-  'lookup': 'lookup', 'lista': 'lookup', 'combo': 'lookup',
-  'image': 'image', 'imagen': 'image', 'foto': 'image',
-  'table': 'table', 'tabla': 'table', 'grid': 'table',
+  // String (TypeNo 1)
+  'string': '1', 'texto': '1', 'text': '1', 'str': '1', 'varchar': '1',
+  'email': '1', 'correo': '1',
+  'phone': '1', 'teléfono': '1', 'celular': '1',
+  // Integer (TypeNo 2)
+  'number': '2', 'integer': '2', 'int': '2', 'entero': '2', 'número': '2', 'numeric': '2',
+  // Date (TypeNo 3)
+  'date': '3', 'fecha': '3',
+  // Money (TypeNo 5)
+  'money': '5', 'importe': '5', 'decimal': '5', 'currency': '5',
+  // Logical (TypeNo 6)
+  'boolean': '6', 'bool': '6', 'lógico': '6', 'logical': '6', 'checkbox': '6',
+  // DateTime (TypeNo 7)
+  'datetime': '7', 'timestamp': '7', 'fecha y hora': '7', 'fecha-hora': '7',
+  // Memo → String with max length (TypeNo 1)
+  'memo': '1', 'texto largo': '1', 'textarea': '1', 'longtext': '1',
+  // Lookup (TypeNo 15)
+  'lookup': '15', 'lista': '15', 'combo': '15', 'desplegable': '15',
+  // Table (TypeNo 10)
+  'table': '10', 'tabla': '10', 'grid': '10',
 }
 
 const COLOR_PRESETS = {
@@ -135,7 +240,7 @@ function parseCsv(raw) {
     const tipo = idx.tipo >= 0 ? (TYPE_ALIAS[cols[idx.tipo]?.toLowerCase()] || 'text') : 'text'
     const required = idx.obligatorio >= 0 ? ['1', 'si', 'sí', 'yes', 'true'].includes((cols[idx.obligatorio] || '').toLowerCase()) : false
     const seccion = idx.seccion >= 0 ? (cols[idx.seccion] || 'GENERAL').toUpperCase() : 'GENERAL'
-    const pestaña = idx.pestaña >= 0 ? (cols[idx.pestaña] || 'Datos').trim() : 'Datos'
+    const pestaña = idx.pestaña >= 0 ? (cols[idx.pestaña] || '').trim() : ''
     const length = idx.length >= 0 ? (cols[idx.length] || '').trim() : ''
 
     if (!categoryMap[categoria]) categoryMap[categoria] = {}
@@ -150,8 +255,7 @@ function parseCsv(raw) {
     name: catName,
     sections: Object.entries(sections).map(([secName, fields]) => {
       // Extract unique pestaña values from fields for this section
-      const pestañasSet = new Set(fields.map(f => f.pestaña).filter(Boolean))
-      pestañasSet.add('Datos') // Ensure 'Datos' is always present
+      const pestañasSet = new Set(fields.map(f => f.pestaña?.trim()).filter(Boolean))
       const pestañas = Array.from(pestañasSet).sort()
 
       return {
@@ -363,7 +467,7 @@ function SectionBlock({ section, secIdx, fields, allPestañas, updateField, remo
 function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange }) {
   const [expanded, setExpanded] = useState(false)
   const autoKey = toCamelKey(field.nombre)
-  const isStringField = ['text', 'email', 'phone'].includes(field.tipo)
+  const isStringField = field.tipo === '1' // TypeNo 1 = String field requires length
 
   return (
     <>
@@ -476,7 +580,7 @@ function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange })
               className="category-input-compact"
             />
           </div>
-          {field.tipo === 'table' && (
+          {field.tipo === '10' && (
             <div style={{ gridColumn: '1 / -1', marginTop: '8px', padding: '8px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)' }}>
               <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--accent-primary)', marginBottom: '6px', textTransform: 'uppercase' }}>Columnas de tabla</div>
               {!field.columnas && (onChange({ ...field, columnas: [] }))}
@@ -502,7 +606,7 @@ function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange })
                     }}
                   />
                   <select
-                    value={col.tipo || 'text'}
+                    value={col.tipo || '1'}
                     onChange={e => {
                       const newCols = [...(field.columnas || [])]
                       newCols[colIdx].tipo = e.target.value
@@ -519,7 +623,7 @@ function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange })
                       boxSizing: 'border-box'
                     }}
                   >
-                    {FIELD_TYPES.filter(t => t.value !== 'table').map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    {FIELD_TYPES.filter(t => t.value !== '10').map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </select>
                   <input
                     type="number"
@@ -555,7 +659,7 @@ function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange })
               <button
                 onClick={() => {
                   const newCols = [...(field.columnas || [])]
-                  newCols.push({ id: newGuid(), nombre: '', tipo: 'text', length: 100 })
+                  newCols.push({ id: newGuid(), nombre: '', tipo: '1', length: 100 })
                   onChange({ ...field, columnas: newCols })
                 }}
                 className="btn-default"
@@ -577,7 +681,8 @@ export default function CategoryBuilder() {
     {
       id: newGuid(),
       name: 'CATEGORÍA 1',
-      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: '' }], pestañas: [] }]
+      palette: 'Therefore Azul',
+      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: '1', required: false, pestaña: '' }], pestañas: [] }]
     }
   ])
   const [activeCategory, setActiveCategory] = useState(0)
@@ -755,7 +860,7 @@ export default function CategoryBuilder() {
 
   const addField = (secIdx) => {
     const updated = [...categories]
-    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, pestaña: '' })
+    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: '1', required: false, pestaña: '' })
     setCategories(updated)
   }
 
@@ -938,6 +1043,11 @@ export default function CategoryBuilder() {
   const TAB_FLD_W2 = TAB_INNER_W - TAB_INNER - TAB_FLD_X2  // 98
   const TAB_SEC_W = TAB_INNER_W - TAB_INNER * 2   // 470
 
+  const hasLengthTag = (typeno) => {
+    // Per Therefore: TypeNo 1,2,3,5,6,7,9 get Length tag; others don't
+    return ['1', '2', '3', '5', '6', '7', '9'].includes(String(typeno))
+  }
+
   const generateXml = () => {
     setError('')
 
@@ -953,7 +1063,6 @@ export default function CategoryBuilder() {
     }
 
     try {
-      // Generar XML MÍNIMO desde cero - sin depender de plantillas
       const cat = categories[0]
       const nombre = cat.name.trim()
       const ctgry_id = sanitizeName(cat.name)
@@ -963,56 +1072,81 @@ export default function CategoryBuilder() {
         return
       }
 
-      // Función para generar GUID
-      const genGuid = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-          const r = Math.random() * 16 | 0
-          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16).toUpperCase()
-        })
-      }
-
-      // Generar campos XML
+      // Generar campos XML con manejo de tablas
       let fieldsXml = ''
       let fieldNo = -1
       let dispOrder = 1
+      let parentTableFieldNo = null
 
       cat.sections.forEach((sec) => {
         sec.fields.filter(f => f.nombre.trim()).forEach((field) => {
           const colname = sanitizeName(field.fieldKey || field.nombre)
-          const typeno = typeToTypeNo[field.tipo] || '1'
+          const typeno = field.tipo // Ya es el TypeNo
+          const width = calculateFieldWidth(field.length, typeno)
 
-          fieldsXml += `<Field>`
-          fieldsXml += `<FieldNo>${fieldNo--}</FieldNo>`
-          fieldsXml += `<Caption UPT="1"><TStr><T><L>1034</L><S>${escapeXml(field.nombre)}</S></T></TStr></Caption>`
-          fieldsXml += `<TypeNo>${typeno}</TypeNo>`
-          if (normalizeFieldLength(field.tipo, field.length, typeno) > 0) {
-            fieldsXml += `<Length>${normalizeFieldLength(field.tipo, field.length, typeno)}</Length>`
+          // Si es una tabla, primero generar el campo tabla, luego sus columnas
+          if (typeno === '10') {
+            parentTableFieldNo = fieldNo
+            fieldsXml += makeTableField({
+              fieldno: fieldNo--,
+              fieldid: colname,
+              caption: field.nombre,
+              width: Math.min(width, 580),
+              height: 92,
+              posx: 20,
+              posy: dispOrder * 20,
+              tabMeta: ''
+            })
+
+            // Generar columnas de la tabla
+            if (field.columnas && field.columnas.length > 0) {
+              field.columnas.forEach((col, colIdx) => {
+                const colColname = sanitizeName(col.nombre || `Col${colIdx + 1}`)
+                fieldsXml += makeTableColumnField({
+                  fieldno: fieldNo--,
+                  colname: colColname,
+                  fieldid: `${colname}_${colColname}`,
+                  caption: col.nombre,
+                  typeno: col.tipo,
+                  length: col.length,
+                  taborder: colIdx + 1,
+                  disporder: colIdx + 1,
+                  parentTableNo: parentTableFieldNo
+                })
+              })
+            }
+          } else {
+            // Campo normal
+            fieldsXml += makeDataField({
+              fieldno: fieldNo--,
+              colname: colname,
+              fieldid: colname,
+              caption: field.nombre,
+              typeno: typeno,
+              length: hasLengthTag(typeno) ? field.length : '',
+              width: width,
+              height: 14,
+              posx: 102,
+              posy: dispOrder * 20,
+              taborder: 1,
+              disporder: dispOrder,
+              tabMeta: ''
+            })
           }
-          fieldsXml += `<Width>100</Width>`
-          fieldsXml += `<Height>12</Height>`
-          fieldsXml += `<PosX>10</PosX>`
-          fieldsXml += `<PosY>${dispOrder * 20}</PosY>`
-          fieldsXml += `<Visible>1</Visible>`
-          fieldsXml += `<RegExHelp UPT="1"><TStr></TStr></RegExHelp>`
-          fieldsXml += `<Links></Links>`
-          fieldsXml += `<Id>${genGuid()}</Id>`
-          fieldsXml += `<DisplayProp></DisplayProp>`
-          fieldsXml += `<TabInfo FactoryType="0"></TabInfo>`
-          fieldsXml += `<FieldID>${colname}</FieldID>`
-          fieldsXml += `<DisplayPropCond></DisplayPropCond>`
-          fieldsXml += `<Filter></Filter>`
-          fieldsXml += `</Field>`
 
           dispOrder++
         })
       })
 
-      // Construir XML completo - estructura mínima pero válida
-      const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories><Category><CtgryNo>-1</CtgryNo><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${fieldsXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>800</Width><Height>400</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>15921906</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode><DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos></FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos></FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles><CtgryID>${ctgry_id}</CtgryID></Category></Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
+      // Get palette colors
+      const palette = COLOR_PALETTES[cat.palette || 'Therefore Azul'] || COLOR_PALETTES['Therefore Azul']
+
+      // Construir XML completo con colores de paleta
+      const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories><Category><CtgryNo>-1</CtgryNo><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${fieldsXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>800</Width><Height>400</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${palette.dlgBg}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode><DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos></FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos></FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles><CtgryID>${ctgry_id}</CtgryID></Category></Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
 
       setXml(xml)
       setXmlModalOpen(true)
-      message.success('✅ XML generado - estructura mínima')
+      message.success('✅ XML generado con soporte para tablas')
       return
     } catch (err) {
       setError(`Error: ${err.message}`)
@@ -1500,6 +1634,15 @@ export default function CategoryBuilder() {
           >
             ⚡ Generar XML
           </button>
+          <button
+            onClick={() => {
+              message.info('Función eForm en desarrollo. Próximamente podrás generar eForms desde aquí.')
+            }}
+            className="btn-default"
+            style={{ opacity: 0.6 }}
+          >
+            📋 Generar eForm
+          </button>
         </div>
       </div>
 
@@ -1722,8 +1865,8 @@ export default function CategoryBuilder() {
                       type="number"
                       value={record.field.length || ''}
                       onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, length: e.target.value })}
-                      placeholder={record.field.tipo === 'string' ? '100' : '-'}
-                      disabled={record.field.tipo !== 'string'}
+                      placeholder={record.field.tipo === '1' ? '100' : '-'}
+                      disabled={record.field.tipo !== '1'}
                       className="form-input"
                       style={{ fontSize: '12px', padding: '4px' }}
                     />
@@ -1799,8 +1942,32 @@ export default function CategoryBuilder() {
                   borderRadius: '6px',
                   marginBottom: '16px'
                 }}>
-                  <div style={{ fontSize: '18px', fontWeight: '600' }}>
+                  <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px' }}>
                     {cat.name || 'Sin nombre'}
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <label style={{ fontSize: '12px', fontWeight: '600' }}>Paleta Therefore:</label>
+                    <select
+                      value={cat.palette || 'Therefore Azul'}
+                      onChange={e => {
+                        const updated = [...categories]
+                        updated[activeCategory].palette = e.target.value
+                        setCategories(updated)
+                      }}
+                      style={{
+                        padding: '6px 10px',
+                        fontSize: '12px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: 'rgba(255,255,255,0.2)',
+                        color: 'white',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {Object.keys(COLOR_PALETTES).map(palName => (
+                        <option key={palName} value={palName}>{palName}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

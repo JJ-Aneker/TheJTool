@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iniciar sesión · Glass UI</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ESTILOS ESPECÍFICOS DE LOGIN -->
+ 
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+</head>
+
+<body>
+
+  <div class="app login-page">
+
+    <form id="login-form" class="login-box">
+
+      <img src="assets/images/logo.png" alt="Logo" class="login-logo" />
+
+      <h1>Iniciar sesión</h1>
+
+      <!-- MENSAJE DE ERROR -->
+      <div id="login-error" class="error-box"></div>
+
+      <input id="email" type="email" placeholder="Correo electrónico" required />
+      <input id="password" type="password" placeholder="Contraseña" required />
+
+      <button type="submit">Entrar</button>
+
+      <div class="loader" id="login-loader"></div>
+
+      <div class="login-links">
+        <a href="forgot.html">¿Olvidaste tu contraseña?</a> |
+        <a href="signup.html">Crear cuenta</a>
+      </div>
+
+
+      <div class="login-footer">© 2025 Aneker</div>
+    </form>
+
+  </div>
+
+
+  <!-- SCRIPT DE LOGIN -->
+  <script>
+    const form = document.getElementById("login-form");
+    const errorBox = document.getElementById("login-error");
+    const loader = document.getElementById("login-loader");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      errorBox.style.display = "none";
+      loader.style.display = "block";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      try {
+        const user = await login(email, password);
+
+        window.location.href = "index.html";
+
+      } catch (err) {
+
+        errorBox.textContent = err.message;
+        errorBox.style.display = "block";
+
+      } finally {
+        loader.style.display = "none";
+      }
+    });
+
+
+
+
+
+  </script>
+
+</body>
+</html>
