@@ -36,6 +36,12 @@ const FIELD_TYPES = [
 
 // BGR color helper (Blue-Green-Red format, Therefore standard)
 const bgr = (r, g, b) => b * 65536 + g * 256 + r
+const bgrToHex = (val) => {
+  const b = (val >> 16) & 0xff
+  const g = (val >> 8) & 0xff
+  const r = val & 0xff
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+}
 
 // Therefore color palettes (official themes)
 const COLOR_PALETTES = {
@@ -675,6 +681,128 @@ function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange })
   )
 }
 
+// Dialog Preview Component (visualiza cómo se vería en Therefore)
+function DialogPreview({ catName, sections, hasTable, palette }) {
+  const [activeTab, setActiveTab] = useState(1)
+  const pal = palette || COLOR_PALETTES['Therefore Azul']
+
+  const secBgHex = bgrToHex(pal.secBg)
+  const secTextHex = bgrToHex(pal.secText)
+  const dlgBgHex = bgrToHex(pal.dlgBg)
+  const hdrBgHex = bgrToHex(pal.hdrBg)
+  const hdrTextHex = bgrToHex(pal.hdrText)
+  const hdrSubHex = bgrToHex(pal.hdrSub)
+  const fieldBgHex = bgrToHex(pal.fieldBg || bgr(255, 255, 255))
+  const fieldTextHex = bgrToHex(pal.fieldText || bgr(0, 0, 0))
+  const labelColorHex = bgrToHex(pal.labelColor || bgr(55, 65, 81))
+  const tabBgHex = bgrToHex(pal.tabBg || bgr(192, 192, 192))
+
+  const SCALE = 0.8
+  const DW = 530
+  const LX1 = 5, LW = 95, FX1 = 102, FW = 160, LX2 = 270, FX2 = 368, FW2 = 152
+  const ROW_Hp = 14, LBL_Hp = 12, ROW_GAPp = 18, SEC_Hp = 13, SEC_GAPp = 16, HDR_Hp = 42, TAB_PAD_Yp = 44
+
+  const TYPE_ICON = { '1': 'abc', '2': '123', '3': '📅', '5': '€', '6': '✓', '7': '🕐', '15': '▾', '10': '📋' }
+
+  // Build rows
+  const rows = []
+  let yPos = hasTable ? 8 : HDR_Hp + SEC_GAPp
+  sections.filter(s => s.fields.some(f => f.nombre)).forEach((sec) => {
+    rows.push({ type: 'sec', y: yPos, label: sec.name })
+    yPos += SEC_GAPp
+    const fields = sec.fields.filter(f => f.nombre && f.tipo !== '10')
+    for (let i = 0; i < fields.length; i += 2) {
+      rows.push({ type: 'row', y: yPos, f1: fields[i], f2: fields[i + 1] })
+      yPos += ROW_GAPp
+    }
+    yPos += 6
+  })
+
+  const contentH = yPos + 10
+  const dialogH = hasTable ? TAB_PAD_Yp + Math.max(contentH + 20, 260) + 10 : HDR_Hp + contentH + 10
+
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <div style={{ width: DW * SCALE, background: '#e5e7eb', border: '1px solid #9ca3af', borderBottom: 'none', borderRadius: '4px 4px 0 0', display: 'flex', alignItems: 'center', gap: 5, padding: `${3 * SCALE}px ${8 * SCALE}px`, fontFamily: 'Arial' }}>
+        {['#ef4444', '#f59e0b', '#22c55e'].map((c, i) => <span key={i} style={{ width: 8 * SCALE, height: 8 * SCALE, borderRadius: '50%', background: c, display: 'inline-block' }} />)}
+        <span style={{ marginLeft: 6, fontSize: 8 * SCALE, color: '#6b7280' }}>{catName || 'Sin nombre'} · Therefore</span>
+      </div>
+      <div style={{ width: DW * SCALE, height: Math.min(dialogH, 520) * SCALE, background: dlgBgHex, border: '1px solid #9ca3af', borderRadius: '0 0 4px 4px', position: 'relative', overflow: 'hidden', fontFamily: 'Arial,sans-serif' }}>
+        {!hasTable && (
+          <>
+            <div style={{ position: 'absolute', left: 5 * SCALE, top: 6 * SCALE, width: (DW - 10) * SCALE, height: 18 * SCALE, background: hdrBgHex, display: 'flex', alignItems: 'center', paddingLeft: 5 * SCALE }}>
+              <span style={{ fontSize: 11 * SCALE, fontWeight: 700, color: hdrTextHex }}>{catName || 'Categoría'}</span>
+            </div>
+            <div style={{ position: 'absolute', left: 5 * SCALE, top: 26 * SCALE, width: (DW - 10) * SCALE, height: 12 * SCALE, background: hdrBgHex, display: 'flex', alignItems: 'center', paddingLeft: 5 * SCALE }}>
+              <span style={{ fontSize: 7 * SCALE, color: hdrSubHex }}>DATOS</span>
+            </div>
+          </>
+        )}
+
+        {hasTable && (
+          <div style={{ position: 'absolute', left: 5 * SCALE, top: 4 * SCALE, display: 'flex', gap: 2 }}>
+            {[{ n: 1, l: 'Datos' }, { n: 2, l: 'Historial' }].map(t => (
+              <div
+                key={t.n}
+                onClick={() => setActiveTab(t.n)}
+                style={{
+                  padding: `${2 * SCALE}px ${10 * SCALE}px`,
+                  fontSize: 8 * SCALE,
+                  cursor: 'pointer',
+                  borderRadius: `${3 * SCALE}px ${3 * SCALE}px 0 0`,
+                  background: activeTab === t.n ? dlgBgHex : tabBgHex,
+                  color: activeTab === t.n ? '#1e293b' : '#6b7280',
+                  border: '1px solid #9ca3af',
+                  fontWeight: activeTab === t.n ? 700 : 400,
+                  fontFamily: 'Arial,sans-serif'
+                }}
+              >
+                {t.l}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {rows.map((row, ri) =>
+          row.type === 'sec' ? (
+            <div
+              key={ri}
+              style={{
+                position: 'absolute',
+                left: (hasTable ? LX1 + 5 : LX1) * SCALE,
+                top: row.y * SCALE,
+                width: (DW - 10 - (hasTable ? 20 : 0)) * SCALE,
+                height: SEC_Hp * SCALE,
+                background: secBgHex,
+                display: 'flex',
+                alignItems: 'center',
+                paddingLeft: 6 * SCALE
+              }}
+            >
+              <span style={{ fontSize: 7 * SCALE, fontWeight: 700, color: secTextHex }}>{row.label}</span>
+            </div>
+          ) : (
+            <div key={ri}>
+              {row.f1 && (
+                <div style={{ position: 'absolute', left: (hasTable ? LX1 + 5 : LX1) * SCALE, top: row.y * SCALE, width: (LW + FW + 5) * SCALE, height: ROW_Hp * SCALE }}>
+                  <div style={{ position: 'absolute', left: 0, top: 1 * SCALE, width: LW * SCALE, height: LBL_Hp * SCALE, fontSize: 7 * SCALE, color: labelColorHex, textAlign: 'right', lineHeight: `${LBL_Hp * SCALE}px`, paddingRight: 3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{row.f1.nombre}</div>
+                  <div style={{ position: 'absolute', left: (FX1 - LX1 + (hasTable ? 5 : 0)) * SCALE, top: 0, width: FW * SCALE, height: ROW_Hp * SCALE, background: fieldBgHex, border: '1px solid #9ca3af', fontSize: 7 * SCALE, color: fieldTextHex, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 3 }}>{TYPE_ICON[row.f1.tipo] || '?'}</div>
+                </div>
+              )}
+              {row.f2 && (
+                <div style={{ position: 'absolute', left: (hasTable ? LX2 + 5 : LX2) * SCALE, top: row.y * SCALE, width: (LW + FW2 + 5) * SCALE, height: ROW_Hp * SCALE }}>
+                  <div style={{ position: 'absolute', left: 0, top: 1 * SCALE, width: LW * SCALE, height: LBL_Hp * SCALE, fontSize: 7 * SCALE, color: labelColorHex, textAlign: 'right', lineHeight: `${LBL_Hp * SCALE}px`, paddingRight: 3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{row.f2.nombre}</div>
+                  <div style={{ position: 'absolute', left: (FX2 - LX2 + (hasTable ? 5 : 0)) * SCALE, top: 0, width: FW2 * SCALE, height: ROW_Hp * SCALE, background: fieldBgHex, border: '1px solid #9ca3af', fontSize: 7 * SCALE, color: fieldTextHex, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 3 }}>{TYPE_ICON[row.f2.tipo] || '?'}</div>
+                </div>
+              )}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function CategoryBuilder() {
   const { user } = useAuth()
   const [categories, setCategories] = useState([
@@ -695,6 +823,7 @@ export default function CategoryBuilder() {
   const [managerOpen, setManagerOpen] = useState(false)
   const [xmlModalOpen, setXmlModalOpen] = useState(false)
   const [colorModalOpen, setColorModalOpen] = useState(false)
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
   const [csvModalOpen, setCsvModalOpen] = useState(false)
   const [customColors, setCustomColors] = useState(COLOR_PRESETS.dark.colors)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
@@ -1671,6 +1800,12 @@ export default function CategoryBuilder() {
           >
             📋 Generar eForm
           </button>
+          <button
+            onClick={() => setPreviewModalOpen(true)}
+            className="btn-default"
+          >
+            👁 Preview
+          </button>
         </div>
       </div>
 
@@ -2250,6 +2385,28 @@ export default function CategoryBuilder() {
               ✓ Aplicar Colores
             </button>
           </div>
+        </div>
+      </Modal>
+
+      {/* Preview Modal */}
+      <Modal
+        title="👁 Vista Previa"
+        open={previewModalOpen}
+        onCancel={() => setPreviewModalOpen(false)}
+        width={700}
+        footer={null}
+      >
+        <div style={{ padding: '20px 0' }}>
+          {activeCategory < categories.length && (
+            <DialogPreview
+              catName={categories[activeCategory].name}
+              sections={categories[activeCategory].sections}
+              hasTable={categories[activeCategory].sections.some(s =>
+                s.fields.some(f => f.tipo === '10')
+              )}
+              palette={COLOR_PALETTES[categories[activeCategory].palette || 'Therefore Azul']}
+            />
+          )}
         </div>
       </Modal>
 
