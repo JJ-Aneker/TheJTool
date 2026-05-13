@@ -148,7 +148,7 @@ ${JSON.stringify(PREMISAS_COMUNES, null, 2)}
 Configurable a nivel de expediente, categoría, WF y campo individual, con condiciones sobre valores de campos.
 
 ### POSICIONALES DE IMAGEN
-Cuando el documento de referencia incluya capturas de pantalla, diagramas o figuras,
+Cuando el documento de referencia incluya capturas de pantalla, diagramas o figuras, 
 indica su posición en los campos de descripción usando este formato exacto:
 <<<IMAGEN: descripción de lo que debería mostrar la imagen>>>
 
