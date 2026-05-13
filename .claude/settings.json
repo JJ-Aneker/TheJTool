@@ -3,7 +3,13 @@
     "allow": [
       "Bash(curl -s http://localhost:5173/)",
       "Bash(npm list *)",
-      "Bash(python3)"
+      "Bash(python3)",
+      "Bash(netstat -tlnp)",
+      "Bash(pkill -f \"node server.js\")",
+      "Bash(curl -s http://localhost:3002/api/health)",
+      "Bash(netstat -tuln)",
+      "Bash(pkill -f \"node|vite\")",
+      "PowerShell(Start-Sleep -Seconds 10; $response = try { Invoke-WebRequest -Uri \"http://localhost:5173\" -TimeoutSec 2 -ErrorAction Stop; $true } catch { $false }; if \\($response\\) { \"Frontend is running on port 5173\" } else { \"Checking alternative ports...\"; @\\(5173..5181\\) | ForEach-Object { $port = $_; try { $r = Invoke-WebRequest -Uri \"http://localhost:$port\" -TimeoutSec 1 -ErrorAction Stop; \"✓ Frontend found on port $port\" } catch {} } })"
     ]
   }
 }

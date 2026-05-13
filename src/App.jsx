@@ -15,7 +15,8 @@ import {
   LogoutOutlined,
   UserSwitchOutlined,
   SunOutlined,
-  MoonOutlined
+  MoonOutlined,
+  ThunderboltOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './hooks/useTheme'
@@ -32,6 +33,7 @@ import UserManager from './views/UserManager'
 import WebServicesManager from './views/WebServicesManager'
 import EFormBuilder from './views/EFormBuilder'
 import CategoryBuilder from './views/CategoryBuilder'
+import EFDTGenerator from './views/EFDTGenerator'
 import Placeholder from './views/Placeholder'
 
 const { Sider, Content } = Layout
@@ -80,6 +82,12 @@ const getMenuItems = () => [
     icon: <FileTextOutlined />,
     label: 'Documentación de Proyectos',
     path: '/docs'
+  },
+  {
+    key: 'efdt',
+    icon: <ThunderboltOutlined />,
+    label: 'Generador EFDT',
+    path: '/efdt'
   },
   {
     key: 'workflows',
@@ -362,6 +370,7 @@ function AppContent() {
             <Route path="/tenants" element={<Placeholder icon={<CloudOutlined />} title="Gestión de Tenants" description="Próximamente: Integración de tu Tenant Manager mejorado" />} />
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
             <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" description="Próximamente: Documentación del proyecto" />} />
+            <Route path="/efdt" element={<EFDTGenerator />} />
             <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" description="Próximamente: Integración de tu Workflow Manager mejorado" />} />
             <Route path="/web-services" element={<WebServicesManager />} />
           </Routes>

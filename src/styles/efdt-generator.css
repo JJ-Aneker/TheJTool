@@ -1,0 +1,359 @@
+/* src/styles/efdt-generator.css */
+/* Módulo generador EFDT — Canon España · Therefore™ */
+
+/* ── ROOT ──────────────────────────────────────────────────────────────────── */
+.efdt-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 100%;
+}
+
+/* ── HEADER ─────────────────────────────────────────────────────────────────── */
+.efdt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 12px;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: 16px;
+}
+
+.efdt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.efdt-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: #C00000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.efdt-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.efdt-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.efdt-header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── STEPS ───────────────────────────────────────────────────────────────────── */
+.efdt-steps-bar {
+  padding: 12px 0 20px;
+}
+
+/* ── CONTENT ─────────────────────────────────────────────────────────────────── */
+.efdt-content {
+  flex: 1;
+}
+
+/* ── GRID ────────────────────────────────────────────────────────────────────── */
+.efdt-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.efdt-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .efdt-grid-2 { grid-template-columns: 1fr; }
+  .efdt-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── PANEL ────────────────────────────────────────────────────────────────────── */
+.efdt-panel {
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.efdt-panel-title {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-canvas, #fafafa);
+}
+
+.efdt-panel-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── FIELDS ──────────────────────────────────────────────────────────────────── */
+.efdt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.efdt-field label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── FILE LIST ───────────────────────────────────────────────────────────────── */
+.efdt-file-list {
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.efdt-file-list-title {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--bg-canvas, #fafafa);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.efdt-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-default);
+  transition: background 0.15s;
+}
+
+.efdt-file-item:last-child { border-bottom: none; }
+.efdt-file-item:hover { background: var(--bg-hover); }
+
+.efdt-file-name {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.efdt-file-size {
+  font-size: 10px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── UPLOAD DRAGGER ──────────────────────────────────────────────────────────── */
+.efdt-dragger .ant-upload-drag {
+  border-radius: 8px !important;
+  border-color: var(--border-default) !important;
+  background: var(--bg-canvas, #fafafa) !important;
+}
+
+.efdt-dragger .ant-upload-drag:hover {
+  border-color: #C00000 !important;
+}
+
+/* ── HINTS ───────────────────────────────────────────────────────────────────── */
+.efdt-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-canvas, #fafafa);
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+}
+
+.efdt-hint-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* ── TIP ─────────────────────────────────────────────────────────────────────── */
+.efdt-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(192, 0, 0, 0.04);
+  border: 1px solid rgba(192, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+/* ── META BAR ────────────────────────────────────────────────────────────────── */
+.efdt-meta-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-canvas, #fafafa);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* ── COLLAPSE ────────────────────────────────────────────────────────────────── */
+.efdt-collapse {
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+/* ── DATA FIELDS ─────────────────────────────────────────────────────────────── */
+.efdt-data-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.efdt-data-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.efdt-data-value {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── ACTIONS ─────────────────────────────────────────────────────────────────── */
+.efdt-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.efdt-btn-primary {
+  background: #C00000 !important;
+  border-color: #C00000 !important;
+}
+
+.efdt-btn-primary:hover {
+  background: #a00000 !important;
+  border-color: #a00000 !important;
+}
+
+/* ── SUCCESS ─────────────────────────────────────────────────────────────────── */
+.efdt-success-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 24px;
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+}
+
+.efdt-success-icon {
+  font-size: 48px;
+  color: #52c41a;
+}
+
+.efdt-post-download-tips {
+  margin-top: 32px;
+  padding: 16px;
+  background: var(--bg-canvas, #fafafa);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  text-align: left;
+  width: 100%;
+  max-width: 480px;
+}
+
+.efdt-tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* ── ESTIMATION TABLE ────────────────────────────────────────────────────────── */
+.efdt-est-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.efdt-est-table th {
+  background: #C00000;
+  color: #fff;
+  font-weight: 600;
+  padding: 7px 8px;
+  text-align: left;
+  border: 1px solid #C00000;
+}
+
+.efdt-est-table td {
+  padding: 5px 6px;
+  border: 1px solid var(--border-default);
+  vertical-align: middle;
+}
+
+.efdt-est-table tbody tr:nth-child(even) td {
+  background: var(--bg-canvas, #fafafa);
+}
+
+.efdt-est-table tbody tr:hover td {
+  background: var(--bg-hover);
+}
+
+.efdt-est-total td {
+  background: #404040 !important;
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 6px;
+  border-color: #404040;
+}
+
+/* ── REFINE BOX ──────────────────────────────────────────────────────────────── */
+.efdt-refine-box {
+  margin-top: 16px;
+  border: 1px solid rgba(192, 0, 0, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.efdt-refine-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(192, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(192, 0, 0, 0.15);
+}
+
+.efdt-refine-body {
+  padding: 12px 14px;
+}
+
