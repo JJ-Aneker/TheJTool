@@ -253,22 +253,25 @@ ${refDoc.text}
         text: `--- DOCUMENTOS DEL BRIEFING DEL CLIENTE ---`
       })
       for (const file of files) {
-        // Normalizar media_type — el navegador a veces devuelve tipos incorrectos o vacíos
+        // Limpiar prefijo data URL si viene incluido (data:...;base64,XXXX)
+        const cleanBase64 = (b64) => b64 ? b64.replace(/^data:[^;]+;base64,/, '') : b64
+
+        // Detectar tipo por nombre además del mime type
         const isPdf  = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf')
         const isDocx = file.type?.includes('word') || file.type?.includes('document') ||
                        file.name?.toLowerCase().endsWith('.docx') || file.name?.toLowerCase().endsWith('.doc')
         const isImg  = file.type?.startsWith('image/')
 
-        if (isPdf && file.base64) {
-          // PDF — Claude lo acepta nativamente
+        const b64 = cleanBase64(file.base64)
+
+        if (isPdf && b64) {
           userContent.push({
             type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: file.base64 }
+            source: { type: 'base64', media_type: 'application/pdf', data: b64 }
           })
-        } else if (isDocx && file.base64) {
-          // Word — extraer texto con mammoth
+        } else if (isDocx && b64) {
           try {
-            const buf  = Buffer.from(file.base64, 'base64')
+            const buf  = Buffer.from(b64, 'base64')
             const text = await extractDocxText(buf)
             if (text) {
               userContent.push({
@@ -277,19 +280,17 @@ ${refDoc.text}
               })
             }
           } catch (e) {
-            // fallback: enviar como texto si hay textContent
             userContent.push({
               type: 'text',
               text: `[DOCUMENTO: ${file.name}]\n${file.textContent || '(no se pudo extraer el contenido)'}\n`
             })
           }
-        } else if (isImg && file.base64) {
+        } else if (isImg && b64) {
           userContent.push({
             type: 'image',
-            source: { type: 'base64', media_type: file.type, data: file.base64 }
+            source: { type: 'base64', media_type: file.type, data: b64 }
           })
         } else {
-          // HTML, TXT, email u otro — enviar como texto
           userContent.push({
             type: 'text',
             text: `[DOCUMENTO: ${file.name}]\n${file.textContent || '(contenido no disponible como texto)'}\n`
