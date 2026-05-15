@@ -30,6 +30,7 @@ import Home from './views/Home'
 import Login from './views/Login'
 import UserProfile from './views/UserProfile'
 import UserManager from './views/UserManager'
+import TenantManager from './views/TenantManager'
 import WebServicesManager from './views/WebServicesManager'
 import EFormBuilder from './views/EFormBuilder'
 import CategoryBuilder from './views/CategoryBuilder'
@@ -367,7 +368,7 @@ function AppContent() {
             <Route path="/users" element={<UserManager />} />
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
-            <Route path="/tenants" element={<Placeholder icon={<CloudOutlined />} title="Gestión de Tenants" description="Próximamente: Integración de tu Tenant Manager mejorado" />} />
+            <Route path="/tenants" element={<TenantManager />} />
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
             <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" description="Próximamente: Documentación del proyecto" />} />
             <Route path="/efdt" element={<EFDTGenerator />} />
