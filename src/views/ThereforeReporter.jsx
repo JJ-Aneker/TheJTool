@@ -39,7 +39,7 @@ export default function ThereforeReporter() {
     try {
       const { data, error } = await supabase
         .from('tenants')
-        .select('id, nombre, url, tenant')
+        .select('id, nombre, url, tenant, shared, owner_id')
         .order('nombre', { ascending: true })
 
       if (error) throw error
@@ -58,7 +58,7 @@ export default function ThereforeReporter() {
         .from('reporter_profiles')
         .select(`
           *,
-          tenants:tenant_id (id, nombre, url, tenant, usuario)
+          tenants:tenant_id (id, nombre, url, tenant, usuario, shared, owner_id)
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })

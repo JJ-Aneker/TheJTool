@@ -1,34 +1,45 @@
 import { useState, useEffect } from 'react'
-import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm, Tooltip } from 'antd'
-import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons'
+import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm, Tooltip, Checkbox } from 'antd'
+import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LinkOutlined, GlobalOutlined, LockOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
+import { useAuth } from '../hooks/useAuth'
+import { useRole } from '../hooks/useRole'
 
 export default function TenantManager() {
   const [form] = Form.useForm()
+  const { user } = useAuth()
+  const { isAdmin } = useRole()
   const [loading, setLoading] = useState(false)
   const [tenants, setTenants] = useState([])
   const [selectedTenant, setSelectedTenant] = useState(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [canEdit, setCanEdit] = useState(false)
 
   useEffect(() => {
     loadTenants()
-  }, [])
+  }, [user, isAdmin])
 
   useEffect(() => {
     if (isModalVisible && selectedTenant) {
+      const isOwner = selectedTenant.owner_id === user?.id
+      setCanEdit(isOwner || isAdmin)
       form.setFieldsValue({
         nombre: selectedTenant.nombre || '',
         url: selectedTenant.url || '',
         tenant: selectedTenant.tenant || '',
         usuario: selectedTenant.usuario || '',
-        password: selectedTenant.password || ''
+        password: selectedTenant.password || '',
+        shared: selectedTenant.shared || false
       })
     } else if (isModalVisible && !selectedTenant) {
+      setCanEdit(true)
       form.resetFields()
     }
-  }, [isModalVisible, selectedTenant, form])
+  }, [isModalVisible, selectedTenant, form, user, isAdmin])
 
   const loadTenants = async () => {
+    if (!user) return
+
     setLoading(true)
     try {
       const { data, error } = await supabase
@@ -64,15 +75,26 @@ export default function TenantManager() {
       title: 'Tenant ID',
       dataIndex: 'tenant',
       key: 'tenant',
-      width: 150,
+      width: 120,
       render: (text) => <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)', fontSize: '12px' }}>{text || '-'}</span>
     },
     {
       title: 'Usuario',
       dataIndex: 'usuario',
       key: 'usuario',
-      width: 150,
+      width: 140,
       render: (text) => <span>{text || '-'}</span>
+    },
+    {
+      title: 'Compartido',
+      dataIndex: 'shared',
+      key: 'shared',
+      width: 100,
+      render: (shared) => (
+        <Tag icon={shared ? <GlobalOutlined /> : <LockOutlined />} color={shared ? 'blue' : 'default'}>
+          {shared ? 'Público' : 'Privado'}
+        </Tag>
+      )
     },
     {
       title: 'Creado',
@@ -86,40 +108,49 @@ export default function TenantManager() {
       key: 'actions',
       width: 200,
       fixed: 'right',
-      render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Abrir en nueva ventana">
-            <Button
-              type="link"
-              size="small"
-              icon={<LinkOutlined />}
-              onClick={() => window.open(record.url, '_blank')}
-            />
-          </Tooltip>
-          <Tooltip title="Editar tenant">
-            <Button
-              type="link"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => editTenant(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Eliminar tenant"
-            description="¿Estás seguro de que quieres eliminar este tenant?"
-            onConfirm={() => deleteTenant(record)}
-            okText="Sí"
-            cancelText="No"
-          >
-            <Button
-              type="link"
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            />
-          </Popconfirm>
-        </Space>
-      )
+      render: (_, record) => {
+        const isOwner = record.owner_id === user?.id
+        const canModify = isOwner || isAdmin
+
+        return (
+          <Space size="small">
+            <Tooltip title="Abrir en nueva ventana">
+              <Button
+                type="link"
+                size="small"
+                icon={<LinkOutlined />}
+                onClick={() => window.open(record.url, '_blank')}
+              />
+            </Tooltip>
+            {canModify && (
+              <>
+                <Tooltip title="Editar tenant">
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={() => editTenant(record)}
+                  />
+                </Tooltip>
+                <Popconfirm
+                  title="Eliminar tenant"
+                  description="¿Estás seguro de que quieres eliminar este tenant?"
+                  onConfirm={() => deleteTenant(record)}
+                  okText="Sí"
+                  cancelText="No"
+                >
+                  <Button
+                    type="link"
+                    danger
+                    size="small"
+                    icon={<DeleteOutlined />}
+                  />
+                </Popconfirm>
+              </>
+            )}
+          </Space>
+        )
+      }
     }
   ]
 
@@ -130,6 +161,7 @@ export default function TenantManager() {
 
   const createNewTenant = () => {
     setSelectedTenant(null)
+    setCanEdit(true)
     form.resetFields()
     setIsModalVisible(true)
   }
@@ -165,6 +197,7 @@ export default function TenantManager() {
             tenant: values.tenant,
             usuario: values.usuario,
             password: values.password,
+            shared: values.shared || false,
             updated_at: new Date().toISOString()
           })
           .eq('id', selectedTenant.id)
@@ -187,6 +220,8 @@ export default function TenantManager() {
             tenant: values.tenant,
             usuario: values.usuario,
             password: values.password,
+            shared: values.shared || false,
+            owner_id: user.id,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }])
@@ -231,7 +266,7 @@ export default function TenantManager() {
           rowKey="id"
           pagination={{ pageSize: 10 }}
           style={{ width: '100%' }}
-          scroll={{ x: 1200, y: 'calc(100vh - 250px)' }}
+          scroll={{ x: 1300, y: 'calc(100vh - 250px)' }}
         />
       </Spin>
 
@@ -289,6 +324,16 @@ export default function TenantManager() {
             rules={[{ required: true, message: 'Contraseña requerida' }]}
           >
             <Input.Password placeholder="Contraseña" />
+          </Form.Item>
+
+          <Form.Item
+            label="Compartir"
+            name="shared"
+            valuePropName="checked"
+          >
+            <Checkbox>
+              Hacer este tenant visible para todos (públicamente)
+            </Checkbox>
           </Form.Item>
         </Form>
       </Modal>
