@@ -1,28 +1,52 @@
+import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import { supabase } from '../config/supabaseClient'
 
 export function useRole() {
   const { user } = useAuth()
+  const [dbRole, setDbRole] = useState(null)
+
+  useEffect(() => {
+    if (!user?.id) return
+
+    // Read role from profiles table (most up-to-date source)
+    const fetchRole = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single()
+
+        if (!error && data) {
+          setDbRole(data.role)
+        }
+      } catch (err) {
+        console.error('Error fetching role:', err)
+      }
+    }
+
+    fetchRole()
+  }, [user?.id])
 
   const getRole = () => {
     if (!user) return null
 
-    // First, try to read from JWT claims (most up-to-date)
-    // @ts-ignore
-    if (user.role === 'admin') return 'admin'
+    // Priority: Database (most reliable) > JWT metadata
+    if (dbRole) return dbRole
 
-    // Fallback to user_metadata
+    // Fallback to JWT metadata
     return user.user_metadata?.role || user.raw_user_meta_data?.role || 'user'
   }
 
   const isAdmin = () => {
     if (!user) return false
 
-    // Check JWT claims first (is_admin claim set by server)
-    // @ts-ignore
-    if (user.app_metadata?.is_admin === true) return true
+    // Check database first
+    if (dbRole === 'admin') return true
 
-    // Fallback to role in metadata
-    const role = getRole()
+    // Fallback to JWT metadata
+    const role = user.user_metadata?.role || user.raw_user_meta_data?.role
     return role === 'admin'
   }
 
