@@ -3,6 +3,7 @@ import { Table, Button, Space, Modal, Form, Input, Select, message, Spin, Popcon
 import { ThunderboltOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import { thereforeService } from '../services/thereforeService'
 
 export default function ThereforeReporter() {
   const { user } = useAuth()
@@ -33,7 +34,7 @@ export default function ThereforeReporter() {
     } else if (isModalVisible && !selectedProfile) {
       form.resetFields()
     }
-  }, [isModalVisible, selectedProfile, form])
+  }, [isModalVisible, selectedProfile])
 
   const loadTenants = async () => {
     try {
@@ -63,7 +64,14 @@ export default function ThereforeReporter() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        if (error.code === 'PGRST116') {
+          message.error('Tabla reporter_profiles no existe. Contacta al administrador.')
+        } else {
+          throw error
+        }
+        return
+      }
       setProfiles(data || [])
     } catch (err) {
       message.error('Error al cargar perfiles: ' + err.message)
@@ -170,9 +178,32 @@ export default function ThereforeReporter() {
   const viewProfileData = async (profile) => {
     setReportLoading(true)
     try {
-      // Aquí iría la lógica para extraer datos del servidor
-      // Por ahora, será un placeholder
+      if (!profile.tenants?.url || !profile.tenants?.usuario) {
+        message.error('Tenant no tiene URL o credenciales configuradas')
+        return
+      }
+
+      // Extract credentials from tenant
+      const url = profile.tenants.url.replace(/\/$/, '') + '/theservice/v0001/restun'
+      const usuario = profile.tenants.usuario
+      const password = profile.tenants?.password || ''
+
+      // Fetch report data from Therefore
+      const datos = await thereforeService.extractReportData(url, usuario, password)
+
       setReportData({
+        id: profile.id,
+        nombre: profile.nombre,
+        tenant: profile.tenants?.nombre,
+        url: profile.tenants?.url,
+        datos
+      })
+      setActiveTab('datos')
+    } catch (err) {
+      message.error('Error al extraer datos: ' + err.message)
+      // Aún así mostrar un reporte vacío para que vea la estructura
+      setReportData({
+        id: profile.id,
         nombre: profile.nombre,
         tenant: profile.tenants?.nombre,
         url: profile.tenants?.url,
@@ -181,11 +212,10 @@ export default function ThereforeReporter() {
           casos: 0,
           usuarios: 0,
           workflows: 0
-        }
+        },
+        error: err.message
       })
       setActiveTab('datos')
-    } catch (err) {
-      message.error('Error al extraer datos: ' + err.message)
     } finally {
       setReportLoading(false)
     }
@@ -329,6 +359,18 @@ export default function ThereforeReporter() {
                 <h3>{reportData.nombre}</h3>
                 <p><strong>Servidor:</strong> {reportData.tenant}</p>
                 <p><strong>URL:</strong> {reportData.url}</p>
+                {reportData.error && (
+                  <div style={{
+                    marginTop: '15px',
+                    padding: '12px',
+                    backgroundColor: '#fff7e6',
+                    border: '1px solid #ffc069',
+                    borderRadius: '4px',
+                    color: '#d46b08'
+                  }}>
+                    <strong>Advertencia:</strong> {reportData.error}
+                  </div>
+                )}
                 <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
                   <Card>
                     <div style={{ textAlign: 'center' }}>

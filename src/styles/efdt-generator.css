@@ -1,22 +1,23 @@
-/* src/styles/efdt-generator.css */
-/* Módulo generador EFDT — Canon España · Therefore™ */
+/* Therefore EFDT Generator Styles - Unified with eFormBuilder & CategoryBuilder */
+/* Fully adapted for dark/light theme using design tokens */
 
-/* ── ROOT ──────────────────────────────────────────────────────────────────── */
+/* ── CONTAINER ────────────────────────────────────────────────────────────────── */
 .efdt-root {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-primary);
+  padding: 24px;
+  min-height: calc(100vh - 100px);
 }
 
-/* ── HEADER ─────────────────────────────────────────────────────────────────── */
+/* ── HEADER ───────────────────────────────────────────────────────────────────── */
 .efdt-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 0 12px;
   border-bottom: 1px solid var(--border-default);
-  margin-bottom: 16px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.efdt-header > div:first-child {
+  margin-bottom: 12px;
 }
 
 .efdt-header-left {
@@ -29,7 +30,7 @@
   width: 36px;
   height: 36px;
   background: var(--accent-error);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,28 +48,28 @@
 }
 
 .efdt-subtitle {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .efdt-header-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
 }
 
-/* ── STEPS ───────────────────────────────────────────────────────────────────── */
+/* ── STEPS BAR ────────────────────────────────────────────────────────────────── */
 .efdt-steps-bar {
   padding: 12px 0 20px;
 }
 
-/* ── CONTENT ─────────────────────────────────────────────────────────────────── */
+/* ── CONTENT ──────────────────────────────────────────────────────────────────── */
 .efdt-content {
   flex: 1;
 }
 
-/* ── GRID ────────────────────────────────────────────────────────────────────── */
+/* ── GRID LAYOUTS ─────────────────────────────────────────────────────────────── */
 .efdt-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -87,11 +88,11 @@
   .efdt-grid-3 { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ── PANEL ────────────────────────────────────────────────────────────────────── */
+/* ── PANEL / CARD ─────────────────────────────────────────────────────────────── */
 .efdt-panel {
-  background: var(--bg-surface, #fff);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -113,7 +114,7 @@
   gap: 14px;
 }
 
-/* ── FIELDS ──────────────────────────────────────────────────────────────────── */
+/* ── FORM FIELDS ──────────────────────────────────────────────────────────────── */
 .efdt-field {
   display: flex;
   flex-direction: column;
@@ -122,25 +123,28 @@
 
 .efdt-field label {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-/* ── FILE LIST ───────────────────────────────────────────────────────────────── */
+/* ── FILE LIST ────────────────────────────────────────────────────────────────── */
 .efdt-file-list {
   border: 1px solid var(--border-default);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .efdt-file-list-title {
   padding: 8px 12px;
   font-size: 11px;
+  font-weight: 600;
   color: var(--text-secondary);
-  background: var(--bg-canvas, #fafafa);
+  background: var(--bg-hover);
   border-bottom: 1px solid var(--border-default);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .efdt-file-item {
@@ -172,23 +176,23 @@
 
 /* ── UPLOAD DRAGGER ──────────────────────────────────────────────────────────── */
 .efdt-dragger .ant-upload-drag {
-  border-radius: 8px !important;
+  border-radius: var(--radius-md) !important;
   border-color: var(--border-default) !important;
-  background: var(--bg-canvas, #fafafa) !important;
+  background: var(--bg-canvas) !important;
 }
 
 .efdt-dragger .ant-upload-drag:hover {
   border-color: var(--accent-error) !important;
 }
 
-/* ── HINTS ───────────────────────────────────────────────────────────────────── */
+/* ── HINTS ────────────────────────────────────────────────────────────────────── */
 .efdt-hints {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background: var(--bg-canvas, #fafafa);
-  border-radius: 8px;
+  background: var(--bg-canvas);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
 }
 
@@ -198,7 +202,7 @@
   gap: 8px;
 }
 
-/* ── TIP ─────────────────────────────────────────────────────────────────────── */
+/* ── TIP ──────────────────────────────────────────────────────────────────────── */
 .efdt-tip {
   display: flex;
   align-items: flex-start;
@@ -206,28 +210,49 @@
   padding: 10px 12px;
   background: rgba(255, 80, 80, 0.08);
   border: 1px solid rgba(255, 80, 80, 0.2);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 }
 
-/* ── META BAR ────────────────────────────────────────────────────────────────── */
+/* ── META BAR ──────────────────────────────────────────────────────────────────── */
 .efdt-meta-bar {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
-  background: var(--bg-canvas, #fafafa);
+  background: var(--bg-canvas);
   border: 1px solid var(--border-default);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin-bottom: 12px;
 }
 
-/* ── COLLAPSE ────────────────────────────────────────────────────────────────── */
+/* ── COLLAPSE / ACCORDION ─────────────────────────────────────────────────────── */
 .efdt-collapse {
-  border-radius: 10px !important;
+  border-radius: var(--radius-md) !important;
   overflow: hidden;
 }
 
-/* ── DATA FIELDS ─────────────────────────────────────────────────────────────── */
+.efdt-collapse .ant-collapse-header {
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  background: var(--bg-card) !important;
+}
+
+.efdt-collapse .ant-collapse-header:hover {
+  color: var(--accent-primary) !important;
+}
+
+.efdt-collapse .ant-collapse-content {
+  background: var(--bg-card) !important;
+  color: var(--text-primary);
+}
+
+.efdt-collapse .ant-collapse-content-box {
+  padding: 16px !important;
+}
+
+/* ── DATA FIELDS (for review section) ──────────────────────────────────────────── */
 .efdt-data-field {
   display: flex;
   flex-direction: column;
@@ -236,7 +261,7 @@
 
 .efdt-data-label {
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -246,9 +271,28 @@
   font-size: 12px;
   color: var(--text-primary);
   font-weight: 500;
+  padding: 6px 0;
 }
 
-/* ── ACTIONS ─────────────────────────────────────────────────────────────────── */
+/* ── EDITABLE DATA VALUE ──────────────────────────────────────────────────────── */
+.efdt-data-value input,
+.efdt-data-value .ant-input {
+  background: var(--bg-input) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-data-value input:focus,
+.efdt-data-value .ant-input:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1) !important;
+}
+
+/* ── ACTIONS FOOTER ───────────────────────────────────────────────────────────── */
 .efdt-actions {
   display: flex;
   align-items: center;
@@ -256,10 +300,12 @@
   padding-top: 4px;
 }
 
+/* ── BUTTONS ──────────────────────────────────────────────────────────────────── */
 .efdt-btn-primary {
   background: var(--accent-error) !important;
   border-color: var(--accent-error) !important;
   color: #ffffff !important;
+  font-weight: 600;
 }
 
 .efdt-btn-primary:hover {
@@ -267,16 +313,21 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ── SUCCESS ─────────────────────────────────────────────────────────────────── */
+.efdt-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── SUCCESS CARD ─────────────────────────────────────────────────────────────── */
 .efdt-success-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   padding: 40px 24px;
-  background: var(--bg-surface, #fff);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .efdt-success-icon {
@@ -284,12 +335,13 @@
   color: var(--accent-success);
 }
 
+/* ── POST-DOWNLOAD TIPS ───────────────────────────────────────────────────────── */
 .efdt-post-download-tips {
   margin-top: 32px;
   padding: 16px;
-  background: var(--bg-canvas, #fafafa);
+  background: var(--bg-canvas);
   border: 1px solid var(--border-default);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   text-align: left;
   width: 100%;
   max-width: 480px;
@@ -302,11 +354,14 @@
   margin-bottom: 8px;
 }
 
+.efdt-tip-row:last-child { margin-bottom: 0; }
+
 /* ── ESTIMATION TABLE ────────────────────────────────────────────────────────── */
 .efdt-est-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
+  background: var(--bg-card);
 }
 
 .efdt-est-table th {
@@ -322,14 +377,16 @@
   padding: 5px 6px;
   border: 1px solid var(--border-default);
   vertical-align: middle;
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 .efdt-est-table tbody tr:nth-child(even) td {
-  background: var(--bg-canvas, #fafafa);
+  background: var(--bg-hover);
 }
 
 .efdt-est-table tbody tr:hover td {
-  background: var(--bg-hover);
+  background: rgba(54, 99, 255, 0.1);
 }
 
 .efdt-est-total td {
@@ -344,7 +401,7 @@
 .efdt-refine-box {
   margin-top: 16px;
   border: 1px solid rgba(255, 80, 80, 0.25);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
@@ -359,5 +416,151 @@
 
 .efdt-refine-body {
   padding: 12px 14px;
+  background: var(--bg-card);
 }
 
+/* ── ANT DESIGN OVERRIDES ─────────────────────────────────────────────────────── */
+.efdt-root .ant-input,
+.efdt-root .ant-input-number,
+.efdt-root .ant-input-number-input,
+.efdt-root .ant-select-selector,
+.efdt-root .ant-picker {
+  background: var(--bg-input) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+  font-family: inherit;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-input::placeholder,
+.efdt-root .ant-input-number::placeholder {
+  color: var(--text-secondary);
+}
+
+.efdt-root .ant-input:focus,
+.efdt-root .ant-input-number:focus,
+.efdt-root .ant-input-number-input:focus,
+.efdt-root .ant-select-focused .ant-select-selector,
+.efdt-root .ant-picker:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1) !important;
+}
+
+.efdt-root .ant-select-item {
+  color: var(--text-primary);
+}
+
+.efdt-root .ant-select-item-option-selected {
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-input-textarea-wrapper .ant-input-textarea {
+  background: var(--bg-input);
+}
+
+.efdt-root .ant-input-textarea .ant-input {
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+.efdt-root .ant-btn-primary {
+  background: var(--accent-error) !important;
+  border-color: var(--accent-error) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow-md);
+}
+
+.efdt-root .ant-btn-default {
+  color: var(--text-primary) !important;
+  border-color: var(--border-default) !important;
+  background: transparent;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-btn-default:hover {
+  color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-btn-text {
+  color: var(--accent-error) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-btn-text:hover {
+  color: #ff6b6b !important;
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-btn-icon-only {
+  border-color: var(--border-default);
+  background: transparent;
+  color: var(--accent-primary) !important;
+}
+
+.efdt-root .ant-btn-icon-only:hover {
+  color: var(--accent-primary) !important;
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-alert {
+  background: var(--bg-card) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-alert-error {
+  background: rgba(255, 80, 80, 0.12) !important;
+  border-color: var(--accent-error) !important;
+}
+
+.efdt-root .ant-alert-error .ant-alert-message {
+  color: var(--accent-error) !important;
+}
+
+.efdt-root .ant-tag {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.efdt-root .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-tail::after {
+  background: var(--accent-error);
+}
+
+.efdt-root .ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-tail::after {
+  background: var(--accent-success);
+}
+
+.efdt-root .ant-badge-status-dot {
+  background: var(--accent-primary);
+}
+
+.efdt-root .ant-collapse {
+  background: var(--bg-card);
+  border-color: var(--border-default);
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-default);
+}
