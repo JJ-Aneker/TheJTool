@@ -1,0 +1,27 @@
+/* TenantManager table styles */
+
+/* Fix background color for actions column in dark mode */
+.ant-table-wrapper .ant-table-cell[data-column-key="actions"] {
+  background-color: inherit !important;
+}
+
+/* Ensure action buttons have proper background in dark mode */
+.ant-table-wrapper .ant-table-cell[data-column-key="actions"] .ant-btn-link {
+  background-color: transparent !important;
+}
+
+/* Better spacing for small tables */
+.ant-table-small .ant-table-cell {
+  padding: 8px 12px;
+}
+
+/* Fix fixed column background in dark mode */
+.ant-table-wrapper .ant-table-fixed-left .ant-table-cell,
+.ant-table-wrapper .ant-table-fixed-right .ant-table-cell {
+  background-color: inherit !important;
+}
+
+/* Ensure proper text color in dark mode for links */
+.ant-table-wrapper .ant-table-cell a {
+  color: var(--accent-primary);
+}

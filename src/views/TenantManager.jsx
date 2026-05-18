@@ -4,6 +4,7 @@ import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LinkOutlined
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
 import { useRole } from '../hooks/useRole'
+import '../styles/tenant-manager.css'
 
 export default function TenantManager() {
   const [form] = Form.useForm()
