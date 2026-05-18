@@ -19,11 +19,13 @@ import {
   ThunderboltOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
+import { useRole } from './hooks/useRole'
 import { useTheme } from './hooks/useTheme'
 import './styles/design-tokens.css'
 
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 
 // Vistas
 import Home from './views/Home'
@@ -41,75 +43,79 @@ import Placeholder from './views/Placeholder'
 const { Sider, Content } = Layout
 
 // Menu items flat structure
-const getMenuItems = () => [
-  {
-    key: 'home',
-    icon: <HomeOutlined />,
-    label: 'Inicio',
-    path: '/'
-  },
-  {
-    key: 'users',
-    icon: <UserOutlined />,
-    label: 'Gestión de Usuarios',
-    path: '/users'
-  },
-  {
-    key: 'eforms',
-    icon: <FormOutlined />,
-    label: 'Generador de eForms',
-    path: '/eforms'
-  },
+const getMenuItems = (isAdmin = false) => {
+  const allItems = [
     {
-    key: 'category-builder',
-    icon: <AppstoreOutlined />,
-    label: 'Category Builder',
-    path: '/category-builder'
-  },
-  {
-    key: 'tenants',
-    icon: <CloudOutlined />,
-    label: 'Gestión de Tenants',
-    path: '/tenants'
-  },
-  {
-    key: 'api-explorer',
-    icon: <ApiOutlined />,
-    label: 'Explorador API REST',
-    path: '/api-explorer'
-  },
+      key: 'home',
+      icon: <HomeOutlined />,
+      label: 'Inicio',
+      path: '/'
+    },
+    {
+      key: 'users',
+      icon: <UserOutlined />,
+      label: 'Gestión de Usuarios',
+      path: '/users',
+      adminOnly: true
+    },
+    {
+      key: 'eforms',
+      icon: <FormOutlined />,
+      label: 'Generador de eForms',
+      path: '/eforms'
+    },
+    {
+      key: 'category-builder',
+      icon: <AppstoreOutlined />,
+      label: 'Category Builder',
+      path: '/category-builder'
+    },
+    {
+      key: 'tenants',
+      icon: <CloudOutlined />,
+      label: 'Gestión de Tenants',
+      path: '/tenants'
+    },
+    {
+      key: 'api-explorer',
+      icon: <ApiOutlined />,
+      label: 'Explorador API REST',
+      path: '/api-explorer'
+    },
+    {
+      key: 'docs',
+      icon: <FileTextOutlined />,
+      label: 'Documentación de Proyectos',
+      path: '/docs'
+    },
+    {
+      key: 'efdt',
+      icon: <ThunderboltOutlined />,
+      label: 'Generador EFDT',
+      path: '/efdt'
+    },
+    {
+      key: 'reporter',
+      icon: <FileTextOutlined />,
+      label: 'Therefore Reporter',
+      path: '/reporter'
+    },
+    {
+      key: 'workflows',
+      icon: <SettingOutlined />,
+      label: 'Configuración de Workflows',
+      path: '/workflows'
+    },
+    {
+      key: 'web-services',
+      icon: <CloudOutlined />,
+      label: 'Servicios Web',
+      path: '/web-services'
+    }
+  ]
 
-  {
-    key: 'docs',
-    icon: <FileTextOutlined />,
-    label: 'Documentación de Proyectos',
-    path: '/docs'
-  },
-  {
-    key: 'efdt',
-    icon: <ThunderboltOutlined />,
-    label: 'Generador EFDT',
-    path: '/efdt'
-  },
-  {
-    key: 'reporter',
-    icon: <FileTextOutlined />,
-    label: 'Therefore Reporter',
-    path: '/reporter'
-  },
-  {
-    key: 'workflows',
-    icon: <SettingOutlined />,
-    label: 'Configuración de Workflows',
-    path: '/workflows'
-  },
-  {
-    key: 'web-services',
-    icon: <CloudOutlined />,
-    label: 'Servicios Web',
-    path: '/web-services'
-  }
-]
+  return allItems.filter(item => !item.adminOnly || isAdmin)
+}
 
 function AppContent() {
   const [collapsed, setCollapsed] = useState(() => {
@@ -119,6 +125,7 @@ function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
   const { isAuthenticated, user, logout, loading } = useAuth()
+  const { isAdmin } = useRole()
   const { isDark, toggleTheme } = useTheme()
 
   const handleSidebarToggle = (value) => {
@@ -149,13 +156,13 @@ function AppContent() {
   }
 
   const getSelectedKey = () => {
-    const items = getMenuItems()
+    const items = getMenuItems(isAdmin)
     const item = items.find(m => m.path === location.pathname)
     return item ? [item.key] : ['home']
   }
 
   const handleMenuClick = (e) => {
-    const items = getMenuItems()
+    const items = getMenuItems(isAdmin)
     const item = items.find(m => m.key === e.key)
     if (item) {
       navigate(item.path)
@@ -293,7 +300,7 @@ function AppContent() {
             mode="inline"
             selectedKeys={getSelectedKey()}
             onClick={handleMenuClick}
-            items={getMenuItems()}
+            items={getMenuItems(isAdmin)}
             style={{
               background: 'var(--bg-sidebar)',
               borderRight: 'none',
@@ -372,7 +379,7 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<UserProfile />} />
-            <Route path="/users" element={<UserManager />} />
+            <Route path="/users" element={<AdminRoute><UserManager /></AdminRoute>} />
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
             <Route path="/tenants" element={<TenantManager />} />

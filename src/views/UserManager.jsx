@@ -273,8 +273,8 @@ export default function UserManager() {
       if (error) throw error
 
       setUsers(users.map(u =>
-        u.id === selectedUser.id
-          ? { ...u, ...values }
+        u.user_id === selectedUser.user_id
+          ? { ...u, ...values, updated_at: new Date().toISOString() }
           : u
       ))
       message.success('Usuario actualizado exitosamente')
