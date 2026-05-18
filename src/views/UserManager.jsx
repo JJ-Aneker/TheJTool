@@ -277,7 +277,17 @@ export default function UserManager() {
           ? { ...u, ...values, updated_at: new Date().toISOString() }
           : u
       ))
-      message.success('Usuario actualizado exitosamente')
+
+      // If role changed, show message and offer to refresh
+      if (values.role !== selectedUser.role) {
+        message.success('Usuario actualizado. La sesión se actualizará en la próxima recarga.')
+        // Reload page after 2 seconds to refresh JWT
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      } else {
+        message.success('Usuario actualizado exitosamente')
+      }
 
       setIsModalVisible(false)
       form.resetFields()

@@ -59,7 +59,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       message: 'User role updated successfully',
-      user: data?.user
+      user: data?.user,
+      note: 'Session will refresh on next page reload or logout/login'
     })
   } catch (error) {
     console.error('Error in update-user-role:', error)
