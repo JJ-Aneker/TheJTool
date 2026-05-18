@@ -1,27 +1,47 @@
-/* TenantManager table styles */
+/* TenantManager table styles - Dark mode fix */
 
-/* Fix background color for actions column in dark mode */
-.ant-table-wrapper .ant-table-cell[data-column-key="actions"] {
-  background-color: inherit !important;
-}
-
-/* Ensure action buttons have proper background in dark mode */
-.ant-table-wrapper .ant-table-cell[data-column-key="actions"] .ant-btn-link {
+/* Override fixed right column background in dark mode */
+.ant-table-wrapper .ant-table-fixed-right {
   background-color: transparent !important;
 }
 
-/* Better spacing for small tables */
-.ant-table-small .ant-table-cell {
-  padding: 8px 12px;
-}
-
-/* Fix fixed column background in dark mode */
-.ant-table-wrapper .ant-table-fixed-left .ant-table-cell,
 .ant-table-wrapper .ant-table-fixed-right .ant-table-cell {
-  background-color: inherit !important;
+  background-color: var(--bg-card) !important;
+  background: var(--bg-card) !important;
 }
 
-/* Ensure proper text color in dark mode for links */
-.ant-table-wrapper .ant-table-cell a {
-  color: var(--accent-primary);
+.ant-table-wrapper .ant-table-row .ant-table-cell {
+  background-color: transparent;
+}
+
+.ant-table-wrapper .ant-table-row:hover .ant-table-cell {
+  background-color: transparent !important;
+}
+
+/* Force dark background for table cells in dark mode */
+.ant-table-wrapper .ant-table {
+  background-color: var(--bg-card);
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  background-color: transparent !important;
+  border-bottom-color: var(--border-default);
+}
+
+.ant-table-wrapper .ant-table-tbody > tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Specific fix for actions column */
+.ant-table-wrapper .ant-table-cell:last-child {
+  background-color: var(--bg-card) !important;
+}
+
+.ant-table-wrapper .ant-table-cell:last-child .ant-space {
+  background-color: transparent;
+}
+
+/* Button styling */
+.ant-table-wrapper .ant-btn {
+  background-color: transparent !important;
 }
