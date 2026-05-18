@@ -236,6 +236,24 @@ export default function UserManager() {
 
     setLoading(true)
     try {
+      // If role changed, update via backend API
+      if (values.role !== selectedUser.role) {
+        const response = await fetch('/api/admin/update-user-role', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: selectedUser.user_id,
+            role: values.role
+          })
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.details || error.error)
+        }
+      }
+
+      // Update profiles table with other fields
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -253,6 +271,7 @@ export default function UserManager() {
         .eq('user_id', selectedUser.user_id)
 
       if (error) throw error
+
       setUsers(users.map(u =>
         u.id === selectedUser.id
           ? { ...u, ...values }
