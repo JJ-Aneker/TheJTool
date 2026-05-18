@@ -2,57 +2,75 @@ import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
 import { supabase } from '../config/supabaseClient'
 
+/**
+ * useRole Hook
+ *
+ * SECURITY: All authorization (roles/permissions) are read from the 'profiles' table.
+ * Supabase Auth is used ONLY for authentication (login/password).
+ *
+ * This hook fetches the user's role from the database, making it the single source of truth.
+ */
 export function useRole() {
   const { user } = useAuth()
-  const [dbRole, setDbRole] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!user?.id) {
+      setProfile(null)
+      setLoading(false)
+      return
+    }
 
-    // Read role from profiles table (most up-to-date source)
-    const fetchRole = async () => {
+    // ALWAYS read from profiles table - this is the source of truth for authorization
+    const fetchProfile = async () => {
       try {
-        const { data, error } = await supabase
+        setLoading(true)
+        const { data, error: err } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, approved')
           .eq('user_id', user.id)
           .single()
 
-        if (!error && data) {
-          setDbRole(data.role)
+        if (err) {
+          console.error('Error fetching profile:', err)
+          setError(err)
+          setProfile(null)
+        } else if (data) {
+          setProfile(data)
+          setError(null)
         }
       } catch (err) {
-        console.error('Error fetching role:', err)
+        console.error('Unexpected error fetching profile:', err)
+        setError(err)
+      } finally {
+        setLoading(false)
       }
     }
 
-    fetchRole()
+    fetchProfile()
   }, [user?.id])
 
   const getRole = () => {
-    if (!user) return null
-
-    // Priority: Database (most reliable) > JWT metadata
-    if (dbRole) return dbRole
-
-    // Fallback to JWT metadata
-    return user.user_metadata?.role || user.raw_user_meta_data?.role || 'user'
+    return profile?.role || 'user'
   }
 
   const isAdmin = () => {
-    if (!user) return false
+    return profile?.role === 'admin'
+  }
 
-    // Check database first
-    if (dbRole === 'admin') return true
-
-    // Fallback to JWT metadata
-    const role = user.user_metadata?.role || user.raw_user_meta_data?.role
-    return role === 'admin'
+  const isApproved = () => {
+    return profile?.approved === true
   }
 
   return {
     isAdmin: isAdmin(),
     role: getRole(),
+    approved: isApproved(),
+    loading,
+    error,
+    profile,
     user
   }
 }

@@ -3,9 +3,17 @@ import { Spin, Result, Button } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { useRole } from '../hooks/useRole'
 
+/**
+ * AdminRoute Component
+ *
+ * Protects routes that require admin access.
+ * Checks role from 'profiles' table (NOT from JWT).
+ */
 export default function AdminRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth()
-  const { isAdmin } = useRole()
+  const { isAuthenticated, loading: authLoading } = useAuth()
+  const { isAdmin, loading: roleLoading } = useRole()
+
+  const loading = authLoading || roleLoading
 
   if (loading) {
     return (
@@ -15,7 +23,7 @@ export default function AdminRoute({ children }) {
         alignItems: 'center',
         minHeight: '100vh'
       }}>
-        <Spin size="large" />
+        <Spin size="large" tip="Verificando permisos..." />
       </div>
     )
   }
