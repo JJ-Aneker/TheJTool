@@ -110,10 +110,12 @@ export default function TenantManager() {
       fixed: 'right',
       render: (_, record) => {
         const isOwner = record.owner_id === user?.id
+        // Siempre mostrar botones, pero dejar que el backend valide permisos
+        // Si es owner o admin, puede modificar
         const canModify = isOwner || isAdmin
 
         return (
-          <Space size="small">
+          <Space size="small" wrap>
             <Tooltip title="Abrir en nueva ventana">
               <Button
                 type="link"
@@ -122,32 +124,31 @@ export default function TenantManager() {
                 onClick={() => window.open(record.url, '_blank')}
               />
             </Tooltip>
-            {canModify && (
-              <>
-                <Tooltip title="Editar tenant">
-                  <Button
-                    type="link"
-                    size="small"
-                    icon={<EditOutlined />}
-                    onClick={() => editTenant(record)}
-                  />
-                </Tooltip>
-                <Popconfirm
-                  title="Eliminar tenant"
-                  description="¿Estás seguro de que quieres eliminar este tenant?"
-                  onConfirm={() => deleteTenant(record)}
-                  okText="Sí"
-                  cancelText="No"
-                >
-                  <Button
-                    type="link"
-                    danger
-                    size="small"
-                    icon={<DeleteOutlined />}
-                  />
-                </Popconfirm>
-              </>
-            )}
+            <Tooltip title={canModify ? 'Editar tenant' : 'Sin permiso'}>
+              <Button
+                type="link"
+                size="small"
+                icon={<EditOutlined />}
+                disabled={!canModify}
+                onClick={() => editTenant(record)}
+              />
+            </Tooltip>
+            <Popconfirm
+              title="Eliminar tenant"
+              description="¿Estás seguro de que quieres eliminar este tenant?"
+              onConfirm={() => deleteTenant(record)}
+              okText="Sí"
+              cancelText="No"
+              disabled={!canModify}
+            >
+              <Button
+                type="link"
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+                disabled={!canModify}
+              />
+            </Popconfirm>
           </Space>
         )
       }
@@ -266,7 +267,8 @@ export default function TenantManager() {
           rowKey="id"
           pagination={{ pageSize: 10 }}
           style={{ width: '100%' }}
-          scroll={{ x: 1300, y: 'calc(100vh - 250px)' }}
+          scroll={{ x: 1500, y: 'calc(100vh - 250px)' }}
+          size="small"
         />
       </Spin>
 

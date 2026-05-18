@@ -12,6 +12,7 @@ dotenv.config({ path: join(__dirname, '.env') });
 
 import analyzeHandler from './api/analyze.js';
 import buildDocxHandler from './api/build-docx.js';
+import executeSqlHandler from './api/execute-sql.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -29,6 +30,9 @@ app.get('/api/health', (req, res) => {
 // EFDT API routes
 app.post('/api/analyze', analyzeHandler);
 app.post('/api/build-docx', buildDocxHandler);
+
+// Admin routes
+app.post('/api/admin/execute-sql', executeSqlHandler);
 
 // Start server
 app.listen(PORT, () => {
