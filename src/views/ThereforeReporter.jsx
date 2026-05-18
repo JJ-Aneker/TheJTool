@@ -3,10 +3,12 @@ import { Table, Button, Space, Modal, Form, Input, Select, message, Spin, Popcon
 import { ThunderboltOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import { useRole } from '../hooks/useRole'
 import { thereforeService } from '../services/thereforeService'
 
 export default function ThereforeReporter() {
   const { user } = useAuth()
+  const { isAdmin } = useRole()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [profiles, setProfiles] = useState([])
@@ -22,7 +24,7 @@ export default function ThereforeReporter() {
       loadTenants()
       loadProfiles()
     }
-  }, [user])
+  }, [user, isAdmin])
 
   useEffect(() => {
     if (isModalVisible && selectedProfile) {
@@ -37,16 +39,25 @@ export default function ThereforeReporter() {
   }, [isModalVisible, selectedProfile])
 
   const loadTenants = async () => {
+    if (!user) return
+
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('tenants')
         .select('id, nombre, url, tenant, shared, owner_id')
-        .order('nombre', { ascending: true })
+
+      // Filtro en la app: admins ven todos, usuarios normales ven sus propios + compartidos
+      if (!isAdmin) {
+        query = query.or(`owner_id.eq.${user.id},shared.eq.true`)
+      }
+
+      const { data, error } = await query.order('nombre', { ascending: true })
 
       if (error) throw error
       setTenants(data || [])
     } catch (err) {
       console.error('Error loading tenants:', err.message)
+      message.error('Error al cargar tenants: ' + err.message)
     }
   }
 
@@ -61,18 +72,13 @@ export default function ThereforeReporter() {
           *,
           tenants:tenant_id (id, nombre, url, tenant, usuario, shared, owner_id)
         `)
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          message.error('Tabla reporter_profiles no existe. Contacta al administrador.')
-        } else {
-          throw error
-        }
-        return
-      }
-      setProfiles(data || [])
+      if (error) throw error
+
+      // Filtro en la app: solo perfiles del usuario actual
+      const filteredProfiles = data?.filter(p => p.user_id === user.id) || []
+      setProfiles(filteredProfiles)
     } catch (err) {
       message.error('Error al cargar perfiles: ' + err.message)
     } finally {
