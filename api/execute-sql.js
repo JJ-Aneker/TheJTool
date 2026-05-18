@@ -12,11 +12,11 @@ export default async function handler(req, res) {
 
   try {
     const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_KEY
 
     if (!supabaseUrl || !serviceRoleKey) {
       return res.status(400).json({
-        error: 'Missing SUPABASE_SERVICE_ROLE_KEY environment variable'
+        error: 'Missing SUPABASE_SERVICE_KEY environment variable'
       })
     }
 
