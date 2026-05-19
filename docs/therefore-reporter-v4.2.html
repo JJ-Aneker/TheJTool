@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therefore Reporter</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181b23;
+  --surface2: #1f2330;
+  --surface3: #252a3a;
+  --border: rgba(255,255,255,0.07);
+  --border-md: rgba(255,255,255,0.12);
+  --border-hi: rgba(255,255,255,0.22);
+  --text: #e8eaf0;
+  --text-muted: #8890a8;
+  --text-hint: #4a5068;
+  --accent: #4f8ef7;
+  --accent2: #7c3aed;
+  --accent-glow: rgba(79,142,247,0.15);
+  --success: #34d399;
+  --success-bg: rgba(52,211,153,0.1);
+  --danger: #f87171;
+  --danger-bg: rgba(248,113,113,0.1);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251,191,36,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 5px;
+  --font: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-mono: 'Cascadia Code', 'Consolas', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13.5px; line-height: 1.5; overflow: hidden; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
+
+/* ── LAYOUT ── */
+.app { display: grid; grid-template-rows: 48px 1fr; height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 20px;
+  position: relative; z-index: 100;
+}
+.topbar-logo {
+  font-size: 14px; font-weight: 700; letter-spacing: -0.3px;
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar-logo-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.topbar-logo span { color: var(--accent); }
+.topbar-sep { width: 1px; height: 20px; background: var(--border-md); margin: 0 4px; }
+.topbar-tag { font-size: 11px; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border-md); padding: 2px 8px; border-radius: 20px; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+/* ── PAGES ── */
+.page { display: none; height: calc(100vh - 48px); }
+.page.active { display: flex; flex-direction: column; }
+#page-home { overflow-y: auto; }
+#page-editor { overflow: hidden; }
+#page-results { overflow: hidden; }
+#page-help { overflow-y: auto; }
+
+/* ── HOME PAGE ── */
+.home-header {
+  padding: 32px 32px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.home-title { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+.home-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 24px 32px 32px;
+  align-content: start;
+}
+.profile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+.profile-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0; transition: opacity 0.15s;
+}
+.profile-card:hover { border-color: var(--border-hi); box-shadow: 0 4px 24px rgba(0,0,0,0.3); transform: translateY(-1px); }
+.profile-card:hover::before { opacity: 1; }
+.profile-card-icon { font-size: 22px; margin-bottom: 12px; }
+.profile-card-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.profile-card-url { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-card-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.meta-chip { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); }
+.profile-card-actions { position: absolute; top: 12px; right: 12px; display: none; gap: 4px; }
+.profile-card:hover .profile-card-actions { display: flex; }
+.icon-btn { width: 28px; height: 28px; border-radius: var(--radius-xs); background: var(--surface2); border: 1px solid var(--border-md); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.1s; }
+.icon-btn:hover { background: var(--surface3); color: var(--text); }
+.icon-btn.danger:hover { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+
+.new-card {
+  background: transparent;
+  border: 1px dashed var(--border-md);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; min-height: 140px; color: var(--text-muted);
+  text-align: center;
+}
+.new-card:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+.new-card-icon { font-size: 24px; }
+.new-card-label { font-size: 13px; font-weight: 500; }
+
+/* ── EDITOR PAGE ── */
+.editor-wrap { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+/* zona superior: nombre + conexión */
+.editor-header-zone {
+  background: var(--surface); border-bottom: 1px solid var(--border-md);
+  flex-shrink: 0; display: flex; flex-direction: column;
+}
+.editor-namebar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px; border-bottom: 1px solid var(--border);
+}
+.editor-connbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 18px 10px; flex-wrap: wrap;
+}
+.editor-panel-num {
+  font-size: 13px; font-weight: 700; color: var(--accent); flex-shrink: 0;
+}
+.editor-panel-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.7px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0;
+}
+.editor-name-input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border-md);
+  border-radius: var(--radius-xs); color: var(--text); outline: none;
+  padding: 7px 12px; font-size: 14px; font-weight: 600; font-family: var(--font);
+  transition: border-color 0.15s; min-width: 0;
+}
+.editor-name-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.editor-name-input::placeholder { color: var(--text-hint); font-weight: 400; }
+
+/* inputs de conexión compactos */
+.conn-inp {
+  background: var(--surface2); border: 1px solid var(--border-md);
+  border-radius: var(--radius-xs); color: var(--text); outline: none;
+  padding: 6px 10px; font-size: 12px; font-family: var(--font);
+  transition: border-color 0.15s; min-width: 0;
+}
+.conn-inp:focus { border-color: var(--accent); }
+.conn-inp { flex: 2; }
+.conn-inp.conn-inp-sm { flex: 1; }
+.conn-inp.conn-inp-xs { flex: 0.6; }
+
+/* paneles categorías | campos */
+.editor-panels {
+  display: grid; grid-template-columns: 1fr 1fr;
+  flex: 1; min-height: 0;
+  margin: 12px; gap: 0;
+  border: 1px solid var(--border-md); border-radius: var(--radius);
+  overflow: hidden; background: var(--surface);
+  /* Hacer que las columnas del grid tengan altura real */
+  grid-template-rows: 1fr;
+  align-items: stretch;
+}
+.ep {
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--border-md);
+  /* Sin overflow:hidden aquí — lo gestiona ep-body */
+  min-height: 0; height: 100%;
+}
+.ep:last-child { border-right: none; }
+.ep-head {
+  background: var(--surface); border-bottom: 1px solid var(--border-md);
+  padding: 10px 16px; flex-shrink: 0; height: 44px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ep-num {
+  font-size: 13px; font-weight: 700; color: var(--accent); flex-shrink: 0;
+}
+.ep-title { font-size: 13px; font-weight: 600; flex: 1; }
+.ep-badge {
+  font-size: 10px; padding: 1px 8px; border-radius: 20px;
+  background: var(--surface3); color: var(--text-hint);
+  border: 1px solid var(--border); transition: all 0.2s; flex-shrink: 0;
+}
+.ep-badge.lit { background: rgba(79,142,247,0.15); color: var(--accent); border-color: rgba(79,142,247,0.3); }
+.ep-body {
+  flex: 1; min-height: 0;
+  overflow-y: auto; padding: 14px 16px; background: var(--surface2);
+}
+
+/* campo loading */
+.field-loading { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; padding: 14px 0; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.card-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-muted); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── FORM ── */
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.field label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.field-hint { font-size: 11px; color: var(--text-hint); }
+input[type=text], input[type=password], input[type=date], select, textarea {
+  background: var(--surface2); border: 1px solid var(--border-md);
+  border-radius: var(--radius-xs); color: var(--text);
+  padding: 8px 11px; font-size: 13px; font-family: var(--font);
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-md); background: var(--surface2);
+  color: var(--text); font-size: 13px; font-family: var(--font);
+  cursor: pointer; transition: all 0.12s; white-space: nowrap; font-weight: 500;
+}
+.btn:hover { background: var(--surface3); border-color: var(--border-hi); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { opacity: 0.88; background: var(--accent); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: transparent; }
+.btn-danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+.btn-lg { padding: 10px 20px; font-size: 14px; }
+
+/* ── ALERTS ── */
+.alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; display: flex; align-items: flex-start; gap: 9px; }
+.alert-info { background: var(--accent-glow); color: #93b8fa; border: 1px solid rgba(79,142,247,0.2); }
+.alert-success { background: var(--success-bg); color: var(--success); border: 1px solid rgba(52,211,153,0.2); }
+.alert-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
+.alert-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+
+/* ── TREE ── */
+.tree { font-size: 13px; }
+.tree-folder { display: flex; align-items: center; gap: 7px; padding: 5px 8px; border-radius: var(--radius-xs); cursor: pointer; user-select: none; color: var(--text-muted); }
+.tree-folder:hover { background: var(--surface2); color: var(--text); }
+.tree-folder-icon { font-size: 13px; color: var(--accent); }
+.tree-folder-arrow { margin-left: auto; font-size: 11px; transition: transform 0.15s; }
+.tree-folder.collapsed .tree-folder-arrow { transform: rotate(-90deg); }
+.tree-children { padding-left: 20px; }
+.tree-category { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: var(--radius-xs); cursor: pointer; }
+.tree-category:hover { background: var(--surface2); }
+.tree-category input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; }
+.tree-category-name { flex: 1; }
+.tree-category-no { font-size: 11px; color: var(--text-hint); font-family: var(--font-mono); }
+
+/* ── FIELDS LIST ── */
+.fields-list { display: flex; flex-direction: column; gap: 2px; max-height: 380px; overflow-y: auto; }
+.field-item { display: flex; align-items: center; gap: 9px; padding: 6px 10px; border-radius: var(--radius-xs); border: 1px solid transparent; }
+.field-item:hover { background: var(--surface2); border-color: var(--border); }
+.field-item input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; }
+.field-item-caption { flex: 1; font-size: 13px; }
+.field-item-name { font-size: 11px; color: var(--text-hint); font-family: var(--font-mono); }
+.type-pill { font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); flex-shrink: 0; }
+
+.fields-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-xs); margin-bottom: 8px; }
+.fields-search { flex: 1; background: transparent; border: none; color: var(--text); font-size: 13px; outline: none; }
+.fields-search::placeholder { color: var(--text-hint); }
+
+/* ── RESULTS PAGE ── */
+.results-layout { display: grid; grid-template-rows: auto 1fr; height: calc(100vh - 48px); }
+.results-top { padding: 20px 28px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 16px; }
+.results-profile-bar { display: flex; align-items: center; gap: 12px; }
+.results-profile-name { font-size: 16px; font-weight: 700; }
+.results-filters { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+
+.stats-bar { display: flex; gap: 20px; align-items: center; }
+.stat { display: flex; flex-direction: column; }
+.stat-val { font-size: 22px; font-weight: 700; line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.stat-sep { width: 1px; height: 36px; background: var(--border); }
+
+.results-body { overflow: auto; padding: 0; }
+.results-table-wrap { min-width: 100%; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead { position: sticky; top: 0; z-index: 10; }
+th { background: var(--surface); color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-md); white-space: nowrap; }
+td { padding: 8px 14px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+.cat-pill { font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); font-family: var(--font-mono); }
+
+/* ── PROGRESS ── */
+.progress-wrap { padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.progress-bar { width: 100%; max-width: 400px; height: 3px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.3s; }
+.progress-label { font-size: 13px; color: var(--text-muted); }
+
+/* ── SPINNER ── */
+.spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.15); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* ── EMPTY STATE ── */
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 60px; color: var(--text-muted); text-align: center; }
+.empty-icon { font-size: 40px; opacity: 0.4; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.empty-sub { font-size: 13px; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: var(--bg);
+  padding: 10px 18px; border-radius: var(--radius-sm);
+  font-size: 13px; z-index: 9999;
+  opacity: 0; transition: opacity 0.2s; pointer-events: none;
+  font-weight: 500;
+}
+
+/* ── MODAL ── */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: center; justify-content: center; }
+.modal-backdrop.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border-md); border-radius: var(--radius); padding: 24px; min-width: 360px; max-width: 480px; }
+.modal-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+/* ── BADGE ── */
+.badge { font-size: 10px; padding: 1px 6px; border-radius: 10px; background: var(--surface3); color: var(--text-hint); border: 1px solid var(--border); }
+
+.select-bar { display: flex; gap: 6px; align-items: center; padding: 8px 0; }
+.select-bar span { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+/* ── DASHBOARD ── */
+.dashboard { padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+.dash-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+.dash-stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 24px; flex: 1; min-width: 140px; position: relative; overflow: hidden;
+}
+.dash-stat-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+}
+.dash-stat-card.blue::after { background: var(--accent); }
+.dash-stat-card.green::after { background: var(--success); }
+.dash-stat-card.amber::after { background: var(--amber); }
+.dash-stat-card.purple::after { background: var(--accent2); }
+.dash-stat-val { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.dash-stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.dash-stat-sub { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+
+.dash-charts { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+.dash-chart-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.dash-chart-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+.bar-list { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 0 160px; }
+.bar-track { flex: 1; height: 18px; background: var(--surface3); border-radius: 4px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.bar-count { font-size: 11px; color: var(--text-muted); flex: 0 0 40px; text-align: right; font-family: var(--font-mono); }
+
+.dash-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 4px 0; }
+.dash-detail-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); cursor: pointer; user-select: none; }
+.dash-detail-toggle:hover { color: var(--text); }
+
+/* grupo colores para barras */
+.bar-fill.c0 { background: linear-gradient(90deg, #4f8ef7, #7c3aed); }
+.bar-fill.c1 { background: linear-gradient(90deg, #34d399, #059669); }
+.bar-fill.c2 { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+.bar-fill.c3 { background: linear-gradient(90deg, #f87171, #dc2626); }
+.bar-fill.c4 { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+.bar-fill.c5 { background: linear-gradient(90deg, #38bdf8, #0284c7); }
+.bar-fill.c6 { background: linear(90deg, #fb923c, #ea580c); }
+.bar-fill.c7 { background: linear-gradient(90deg, #4ade80, #16a34a); }
+
+/* ── HOME CARD DATE FILTER ── */
+.card-date-filter { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.card-date-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card-date-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.card-date-input { font-size: 12px; padding: 4px 8px; background: var(--surface2); border: 1px solid var(--border-md); border-radius: 4px; color: var(--text); width: 130px; }
+.card-run-btn { margin-top: 10px; width: 100%; justify-content: center; }
+
+/* ── HELP PAGE ── */
+.help-wrap { max-width: 860px; margin: 0 auto; padding: 36px 32px 64px; }
+.help-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+.help-hero-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+.help-hero-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+.help-hero-sub { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.help-version { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border-md); color: var(--text-muted); margin-left: auto; align-self: flex-start; white-space: nowrap; }
+
+.help-toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 36px; }
+.help-toc-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 12px; }
+.help-toc ol { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.help-toc li { font-size: 13px; }
+.help-toc a { color: var(--accent); text-decoration: none; }
+.help-toc a:hover { text-decoration: underline; }
+
+.help-section { margin-bottom: 48px; scroll-margin-top: 20px; }
+.help-section-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.help-section-num { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.help-p { font-size: 13.5px; line-height: 1.7; color: var(--text); margin-bottom: 14px; }
+.help-p:last-child { margin-bottom: 0; }
+
+.help-steps { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+.help-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.help-step:last-child { border-bottom: none; }
+.help-step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--surface3); border: 2px solid var(--border-md); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.help-step-body { flex: 1; min-width: 0; }
+.help-step-title { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+.help-step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+.help-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin: 16px 0; }
+.help-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+.help-alert { padding: 12px 16px; border-radius: var(--radius-sm); margin: 12px 0; font-size: 13px; line-height: 1.6; }
+.help-alert.warn { background: var(--amber-bg); border: 1px solid rgba(251,191,36,0.3); color: var(--amber); }
+.help-alert.info { background: var(--accent-glow); border: 1px solid rgba(79,142,247,0.3); color: #90b8ff; }
+.help-alert.success { background: var(--success-bg); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+.help-alert.danger { background: var(--danger-bg); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
+.help-alert b { font-weight: 700; }
+
+.help-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+.help-table th { background: var(--surface3); padding: 8px 12px; text-align: left; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-md); }
+.help-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.help-table tr:last-child td { border-bottom: none; }
+.help-table code { font-family: var(--font-mono); font-size: 11px; background: var(--surface3); padding: 1px 5px; border-radius: 3px; }
+
+.help-kbd { display: inline-block; font-size: 11px; font-family: var(--font-mono); background: var(--surface3); border: 1px solid var(--border-md); border-radius: 4px; padding: 1px 6px; color: var(--text); }
+.help-panel-diagram { display: grid; grid-template-rows: auto 1fr; gap: 8px; margin: 16px 0; }
+.help-panel-top { background: var(--surface3); border: 1px solid var(--border-md); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+.help-panel-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.help-panel-box { background: var(--surface3); border: 1px solid var(--border-md); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--text-muted); min-height: 60px; }
+.help-panel-box b { display: block; color: var(--accent); font-size: 13px; margin-bottom: 3px; }
+.help-tag { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 20px; font-weight: 600; }
+.help-tag.blue { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+.help-tag.green { background: var(--success-bg); color: var(--success); border: 1px solid rgba(52,211,153,0.3); }
+.help-tag.amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+
+/* campo "agrupar" en editor */
+.field-item .grp-chk { accent-color: var(--amber); }
+.grp-pill { font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); flex-shrink: 0; display: none; }
+.field-item.grouped .grp-pill { display: inline-flex; }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-icon">🗄</div>
+      Therefore <span>Reporter</span>
+    </div>
+    <div class="topbar-sep"></div>
+    <span class="topbar-tag">Multi-Query</span>
+    <div class="topbar-right" id="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('help')" style="font-size:12px">❓ Ayuda</button>
+    </div>
+  </header>
+
+  <!-- ═══ HOME PAGE ═══ -->
+  <div class="page active" id="page-home">
+    <div class="home-header">
+      <div>
+        <div class="home-title">Mis informes</div>
+        <div class="home-subtitle">Selecciona un perfil para ejecutar o crea uno nuevo</div>
+      </div>
+    </div>
+    <div class="home-grid" id="home-grid">
+      <!-- Cards rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ═══ EDITOR PAGE ═══ -->
+  <div class="page" id="page-editor">
+    <div class="editor-wrap">
+
+      <!-- ZONA SUPERIOR: nombre + conexión -->
+      <div class="editor-header-zone">
+
+        <!-- fila 1: nombre + botones -->
+        <div class="editor-namebar">
+          <div class="editor-panel-num">①</div>
+          <span class="editor-panel-label">Perfil</span>
+          <input class="editor-name-input" id="inp-name" type="text" placeholder="Nombre del perfil...">
+          <button class="btn btn-ghost btn-sm" onclick="goHome()">← Volver</button>
+          <button class="btn btn-sm" id="btn-test-profile" onclick="testProfile()" disabled>▶ Probar</button>
+          <button class="btn btn-primary btn-sm" id="btn-save-profile" onclick="saveProfile()" disabled>💾 Guardar</button>
+        </div>
+
+        <!-- fila 2: conexión compacta -->
+        <div class="editor-connbar">
+          <input type="text" id="inp-url" class="conn-inp" placeholder="URL del servidor (https://...)">
+          <input type="text" id="inp-user" class="conn-inp conn-inp-sm" placeholder="Usuario">
+          <input type="password" id="inp-pass" class="conn-inp conn-inp-sm" placeholder="Contraseña"
+            onkeydown="if(event.key==='Enter') conectar()">
+          <input type="text" id="inp-tenant" class="conn-inp conn-inp-xs" placeholder="Tenant">
+          <button class="btn btn-primary btn-sm" id="btn-connect" onclick="conectar()">🔗 Conectar</button>
+          <div id="conn-status"></div>
+        </div>
+
+      </div><!-- /.editor-header-zone -->
+
+      <!-- PANELES: categorías | campos -->
+      <div class="editor-panels">
+
+        <!-- Panel CATEGORÍAS -->
+        <div class="ep" id="ep-left">
+          <div class="ep-head">
+            <div class="ep-num">②</div>
+            <div class="ep-title">Categorías</div>
+            <span class="ep-badge" id="cats-badge">—</span>
+            <button class="btn btn-sm" style="margin-left:4px" onclick="selectAllCats(true)">✓</button>
+            <button class="btn btn-sm" onclick="selectAllCats(false)">✕</button>
+            <span id="cats-selected-label" style="font-size:11px;color:var(--text-muted);white-space:nowrap">0 sel.</span>
+          </div>
+          <div class="ep-body">
+            <div id="tree-container">
+              <div class="alert alert-info">Conecta al servidor primero</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel CAMPOS -->
+        <div class="ep" id="ep-right">
+          <div class="ep-head">
+            <div class="ep-num">③</div>
+            <div class="ep-title">Campos del informe</div>
+            <span class="ep-badge" id="fields-badge">—</span>
+          </div>
+          <div class="ep-body">
+            <div class="fields-toolbar" style="margin-bottom:10px">
+              <input class="fields-search" type="text" placeholder="Buscar campo..." oninput="filterFields(this.value)">
+              <span style="font-size:11px;color:var(--text-hint);white-space:nowrap" id="fields-count-label"></span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+              <input type="checkbox" id="chk-all" onchange="selectAllFields(this.checked)" style="accent-color:var(--accent);width:14px;height:14px;cursor:pointer">
+              <label for="chk-all" style="font-size:12px;color:var(--text-muted);cursor:pointer">Seleccionar todos</label>
+            </div>
+            <div class="fields-list" id="fields-list">
+              <div class="alert alert-info">Conecta y selecciona categorías</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.editor-panels -->
+    </div><!-- /.editor-wrap -->
+  </div><!-- /#page-editor -->
+
+  <!-- ═══ RESULTS PAGE ═══ -->
+  <div class="page" id="page-results">
+    <div class="results-layout">
+      <div class="results-top">
+        <div class="results-profile-bar">
+          <button class="btn btn-ghost btn-sm" onclick="goHome()">← Volver</button>
+          <div class="results-profile-name" id="res-profile-name"></div>
+          <div style="margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <!-- Filtro de fecha — OBLIGATORIO -->
+            <div id="date-filter-bar" style="display:flex; align-items:center; gap:6px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:4px 10px;">
+              <label style="font-size:11px;color:var(--text-muted);white-space:nowrap;">📅 Campo fecha</label>
+              <select id="flt-date-field" style="font-size:12px;padding:3px 6px;background:var(--surface3);border:1px solid var(--border);border-radius:4px;color:var(--text)"></select>
+              <input type="date" id="flt-date-from" style="font-size:12px;padding:3px 6px;background:var(--surface3);border:1px solid var(--border);border-radius:4px;color:var(--text)">
+              <span style="font-size:11px;color:var(--text-hint)">→</span>
+              <input type="date" id="flt-date-to" style="font-size:12px;padding:3px 6px;background:var(--surface3);border:1px solid var(--border);border-radius:4px;color:var(--text)">
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-run" onclick="ejecutarConsulta()" style="display:none">
+              ▶ Ejecutar
+            </button>
+            <button class="btn btn-sm" id="btn-export" onclick="exportCSV()" style="display:none">
+              ⬇ Exportar CSV
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+      <div class="results-body" id="results-body">
+        <div class="empty">
+          <div class="empty-icon">📊</div>
+          <div class="empty-title">Listo para ejecutar</div>
+          <div class="empty-sub">Pulsa "Ejecutar" para extraer los datos del servidor</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ HELP PAGE ═══ -->
+  <div class="page" id="page-help">
+    <div class="help-wrap">
+
+      <div class="help-hero">
+        <div class="help-hero-icon">🗄</div>
+        <div>
+          <div class="help-hero-title">Therefore Reporter</div>
+          <div class="help-hero-sub">Guía de usuario — Informes multi-categoría sobre Therefore™ DMS</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+          <span class="help-version">v4.2</span>
+          <button class="btn btn-ghost btn-sm" onclick="goHome()">← Volver</button>
+        </div>
+      </div>
+
+      <div class="help-toc">
+        <div class="help-toc-title">📋 Contenido</div>
+        <ol>
+          <li><a href="#h1">¿Qué es Therefore Reporter?</a></li>
+          <li><a href="#h2">Estructura de la aplicación</a></li>
+          <li><a href="#h3">Crear un perfil de informe</a></li>
+          <li><a href="#h4">Ejecutar una consulta</a></li>
+          <li><a href="#h5">Interpretar los resultados</a></li>
+          <li><a href="#h6">Exportar a CSV</a></li>
+          <li><a href="#h7">Gestionar perfiles</a></li>
+          <li><a href="#h8">Limitaciones por navegador y cómo resolverlas</a></li>
+          <li><a href="#h9">Preguntas frecuentes</a></li>
+        </ol>
+      </div>
+
+      <div class="help-section" id="h1">
+        <div class="help-section-title"><div class="help-section-num">1</div>¿Qué es Therefore Reporter?</div>
+        <p class="help-p">Therefore Reporter es una aplicación web standalone (un único fichero <code style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:1px 5px;border-radius:3px">.html</code>) que permite ejecutar consultas simultáneas sobre múltiples categorías de Therefore™ DMS y visualizar los resultados en un dashboard con gráficos y tabla de detalle.</p>
+        <p class="help-p">No requiere instalación. Se conecta directamente a la API REST de Therefore usando las credenciales del usuario. Los perfiles de informe se guardan localmente en el navegador.</p>
+        <div class="help-alert info"><b>Requisito:</b> Acceso a una instancia de Therefore™ con credenciales válidas. La contraseña nunca se transmite en texto plano después del login inicial — se usa un token de sesión temporal.</div>
+      </div>
+
+      <div class="help-section" id="h2">
+        <div class="help-section-title"><div class="help-section-num">2</div>Estructura de la aplicación</div>
+        <div class="help-card"><div class="help-card-title">🏠 Pantalla principal — Mis informes</div><p class="help-p" style="margin:0">Tarjetas de perfiles guardados. Desde aquí puedes abrir una consulta, editar o crear perfiles.</p></div>
+        <div class="help-card">
+          <div class="help-card-title">⚙️ Editor de perfiles</div>
+          <div class="help-panel-diagram">
+            <div class="help-panel-top">① <b style="color:var(--text)">Nombre + conexión</b> — URL, usuario, contraseña, tenant + botones Guardar / Probar</div>
+            <div class="help-panel-bottom">
+              <div class="help-panel-box"><b>② Categorías</b>Árbol de Therefore. Al cambiar la selección los campos se recalculan automáticamente.</div>
+              <div class="help-panel-box"><b>③ Campos del informe</b>Campos comunes a todas las categorías. Elige cuáles incluir y cuáles agrupar en gráficos.</div>
+            </div>
+          </div>
+        </div>
+        <div class="help-card"><div class="help-card-title">📊 Pantalla de resultados</div><p class="help-p" style="margin:0">Filtro de fechas obligatorio, botón Ejecutar, dashboard con estadísticas y gráficos, tabla de detalle expandible.</p></div>
+      </div>
+
+      <div class="help-section" id="h3">
+        <div class="help-section-title"><div class="help-section-num">3</div>Crear un perfil de informe</div>
+        <div class="help-steps">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Pulsa "＋ Nuevo perfil de informe"</div><div class="help-step-desc">En la pantalla principal, haz clic en la tarjeta con el símbolo +.</div></div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Rellena los datos de conexión y conecta</div><div class="help-step-desc">Introduce la URL del servidor (ej: <code style="font-family:var(--font-mono);font-size:11px;background:var(--surface3);padding:1px 5px;border-radius:3px">https://miempresa.thereforeonline.com</code>), usuario, contraseña y TenantName si es Therefore Online. Pulsa <b>Conectar y cargar categorías</b>.</div></div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Selecciona categorías en el panel ②</div><div class="help-step-desc">Marca las categorías del informe. Los campos comunes se recalculan automáticamente en el panel ③ al cambiar la selección.</div></div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Configura los campos en el panel ③</div><div class="help-step-desc">Marca los campos a incluir. Activa <span class="help-tag amber">Agrupar</span> en los campos que quieres ver como gráfico en el dashboard (ej: Estado, Tipo, Responsable).</div></div></div>
+          <div class="help-step"><div class="help-step-num">5</div><div class="help-step-body"><div class="help-step-title">Escribe el nombre y guarda</div><div class="help-step-desc">Dale un nombre en el campo ① y pulsa <b>💾 Guardar</b>. O usa <b>▶ Probar</b> para ejecutar sin guardar.</div></div></div>
+        </div>
+        <div class="help-alert info"><b>Solo campos comunes:</b> el panel ③ muestra únicamente los campos que existen en <em>todas</em> las categorías seleccionadas.</div>
+      </div>
+
+      <div class="help-section" id="h4">
+        <div class="help-section-title"><div class="help-section-num">4</div>Ejecutar una consulta</div>
+        <div class="help-steps">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Pulsa "📂 Abrir consulta" en la tarjeta del perfil</div><div class="help-step-desc">Si el perfil no tiene contraseña guardada, se pedirá antes de continuar.</div></div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Selecciona el campo de fecha y el rango</div><div class="help-step-desc">Elige el campo de fecha y las fechas de inicio y fin. <b>El filtro es obligatorio.</b> Por defecto se precarga el último mes.</div></div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Pulsa ▶ Ejecutar</div><div class="help-step-desc">La app lanza las consultas para cada categoría y pagina automáticamente hasta obtener todos los resultados.</div></div></div>
+        </div>
+        <div class="help-alert warn"><b>Filtro de fechas obligatorio:</b> sin filtro, las consultas sobre categorías con muchos documentos pueden agotar los recursos del servidor.</div>
+      </div>
+
+      <div class="help-section" id="h5">
+        <div class="help-section-title"><div class="help-section-num">5</div>Interpretar los resultados</div>
+        <div class="help-card"><div class="help-card-title">📈 Tarjetas de resumen</div><p class="help-p" style="margin:0">Total de documentos, categorías con datos, campos del informe y agrupaciones activas.</p></div>
+        <div class="help-card"><div class="help-card-title">📊 Gráficos de barras</div><p class="help-p" style="margin:0">Un gráfico por cada campo marcado como "Agrupar", más uno fijo con la distribución por categoría. Top 15 valores más frecuentes.</p></div>
+        <div class="help-card"><div class="help-card-title">🔍 Tabla de detalle</div><p class="help-p" style="margin:0">Expandible pulsando "Ver detalle". Puedes cambiar el rango de fechas y volver a ejecutar sin salir de la pantalla.</p></div>
+      </div>
+
+      <div class="help-section" id="h6">
+        <div class="help-section-title"><div class="help-section-num">6</div>Exportar a CSV</div>
+        <table class="help-table">
+          <tr><th>Característica</th><th>Detalle</th></tr>
+          <tr><td>Separador</td><td>Punto y coma (<code>;</code>) — compatible con Excel en español</td></tr>
+          <tr><td>Codificación</td><td>UTF-8 con BOM</td></tr>
+          <tr><td>Nombre del fichero</td><td><code>NombrePerfil_YYYY-MM-DD.csv</code></td></tr>
+          <tr><td>Contenido</td><td>Categoría + todos los campos del informe, todos los registros del último resultado</td></tr>
+        </table>
+      </div>
+
+      <div class="help-section" id="h7">
+        <div class="help-section-title"><div class="help-section-num">7</div>Gestionar perfiles</div>
+        <table class="help-table">
+          <tr><th>Acción</th><th>Cómo</th></tr>
+          <tr><td><b>Editar</b></td><td>Pasa el ratón sobre la tarjeta y pulsa ✏. Se abre el editor con todos los datos precargados.</td></tr>
+          <tr><td><b>Eliminar</b></td><td>Pasa el ratón y pulsa 🗑. Pide confirmación.</td></tr>
+          <tr><td><b>Contraseña</b></td><td>Se almacena en Base64. Los perfiles con contraseña guardada no la piden al ejecutar.</td></tr>
+          <tr><td><b>Persistencia</b></td><td><code>localStorage</code> del navegador. Local a ese equipo y navegador.</td></tr>
+          <tr><td><b>Pérdida</b></td><td>Al borrar historial del navegador, en modo incógnito, o si cambia la URL del fichero.</td></tr>
+        </table>
+        <div class="help-alert warn"><b>Seguridad:</b> Base64 es ofuscación, no cifrado. En entornos compartidos usa una cuenta de servicio con permisos limitados.</div>
+      </div>
+
+      <div class="help-section" id="h8">
+        <div class="help-section-title"><div class="help-section-num">8</div>Limitaciones por navegador y cómo resolverlas</div>
+        <p class="help-p">Al abrirse como fichero local (<code style="font-family:var(--font-mono);font-size:11px;background:var(--surface3);padding:1px 5px;border-radius:3px">file://</code>), los navegadores aplican la política CORS que puede bloquear peticiones al servidor Therefore.</p>
+        <div class="help-alert danger"><b>Chrome:</b> bloquea todas las peticiones desde ficheros locales. Verás errores <em>"CORS policy: No Access-Control-Allow-Origin"</em>. No funciona directamente.</div>
+        <div class="help-alert success"><b>Microsoft Edge:</b> permite las peticiones desde ficheros locales sin restricciones. <b>Navegador recomendado.</b></div>
+        <div class="help-steps" style="margin-top:16px">
+          <div class="help-step"><div class="help-step-num">A</div><div class="help-step-body"><div class="help-step-title">Usar <code style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:1px 5px;border-radius:3px">launch-reporter.bat</code> <span class="help-tag green">Recomendado</span></div><div class="help-step-desc">Colócalo en la misma carpeta que el HTML y haz doble clic. Busca Chrome automáticamente y lo lanza sin CORS. Si no encuentra Chrome, abre Edge. El perfil de Chrome usado es temporal y separado de tu Chrome habitual — no afecta tu navegación normal.</div></div></div>
+          <div class="help-step"><div class="help-step-num">B</div><div class="help-step-body"><div class="help-step-title">Usar Microsoft Edge directamente</div><div class="help-step-desc">Abre Edge y arrastra el fichero HTML, o usa <span class="help-kbd">Ctrl+O</span>. No requiere configuración adicional.</div></div></div>
+        </div>
+        <div class="help-alert info"><b>¿Por qué Edge sí y Chrome no?</b> Edge permite peticiones desde ficheros locales mientras que Chrome trata <code style="font-family:var(--font-mono);font-size:11px">file://</code> como origen nulo y las bloquea. Ambos comportamientos son correctos — Edge hace una excepción para el uso local.</div>
+      </div>
+
+      <div class="help-section" id="h9">
+        <div class="help-section-title"><div class="help-section-num">9</div>Preguntas frecuentes</div>
+        <div class="help-card" style="margin-bottom:10px"><div class="help-card-title">❓ El panel de campos está vacío tras seleccionar categorías</div><p class="help-p" style="margin:0">Solo aparecen campos comunes a <em>todas</em> las categorías. Si no comparten ninguno, el panel queda vacío. Prueba con menos categorías.</p></div>
+        <div class="help-card" style="margin-bottom:10px"><div class="help-card-title">❓ El informe devuelve 0 resultados</div><p class="help-p" style="margin:0">Verifica que el campo de fecha contiene datos en el rango indicado. Prueba ampliando el rango de fechas.</p></div>
+        <div class="help-card" style="margin-bottom:10px"><div class="help-card-title">❓ Error 500 al conectar</div><p class="help-p" style="margin:0">Normalmente son credenciales incorrectas. En Therefore Online, el TenantName debe coincidir con el subdominio (si la URL es <code style="font-family:var(--font-mono);font-size:11px;background:var(--surface3);padding:1px 5px;border-radius:3px">miempresa.thereforeonline.com</code>, el tenant es <code style="font-family:var(--font-mono);font-size:11px;background:var(--surface3);padding:1px 5px;border-radius:3px">miempresa</code>).</p></div>
+        <div class="help-card" style="margin-bottom:10px"><div class="help-card-title">❓ He perdido mis perfiles</div><p class="help-p" style="margin:0">Se guardan en localStorage. Se pierden al limpiar historial del navegador, en modo incógnito, o si cambias la ubicación del fichero HTML.</p></div>
+        <div class="help-card" style="margin-bottom:10px"><div class="help-card-title">❓ El campo de fecha no aparece en el selector</div><p class="help-p" style="margin:0">La app detecta campos de fecha por nombre ("fecha", "date", "time", "stamp"). Si el tuyo no sigue ese patrón, aparecerá junto al resto de campos disponibles.</p></div>
+        <div class="help-card"><div class="help-card-title">❓ ¿Funciona con Therefore On-Premise?</div><p class="help-p" style="margin:0">Sí. Introduce la URL completa y deja TenantName vacío. El TenantName solo es necesario para Therefore Online.</p></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:24px;display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
+        <span style="font-size:12px;color:var(--text-hint)">Therefore Reporter v4.2 — Documentación interna</span>
+        <button class="btn btn-ghost btn-sm" onclick="goHome()">← Volver al inicio</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const S = {
+  url: '', user: '', pass: '', tenant: '', token: null, headers: {},
+  tree: [],
+  selectedCatNos: new Set(),
+  allFields: [],       // {name, caption, type}
+  selectedFields: [],  // filtered subset
+  captionMap: {},      // ColName -> Caption
+  catFieldOrder: {},   // catNo -> [ColName,...]
+  results: [],
+  resultHeaders: [],
+  activeProfile: null, // profile object being run
+  _activeQueryId: null,
+  _editingProfileName: null, // null = new profile
+};
+
+const PROFILES_KEY = 'therefore_reporter_v2_profiles';
+// Perfiles en memoria (funciona desde file://)
+if (!window._profilesStore) window._profilesStore = {};
+
+// ═══════════════════════════════════════════════════════════
+// PROFILES (localStorage)
+// ═══════════════════════════════════════════════════════════
+function getProfiles() {
+  // Intentar localStorage primero; si falla (file://) usar memoria
+  try {
+    const ls = localStorage.getItem(PROFILES_KEY);
+    if (ls) {
+      const parsed = JSON.parse(ls);
+      // Sincronizar a memoria
+      Object.assign(window._profilesStore, parsed);
+    }
+  } catch(e) {}
+  return window._profilesStore;
+}
+function setProfiles(p) {
+  window._profilesStore = p;
+  try { localStorage.setItem(PROFILES_KEY, JSON.stringify(p)); } catch(e) {}
+}
+
+function renderHome() {
+  const grid = document.getElementById('home-grid');
+  const profiles = getProfiles();
+  const keys = Object.keys(profiles);
+  grid.innerHTML = '';
+
+  // Calcular fechas por defecto: último mes hasta hoy
+  const today = new Date().toISOString().split('T')[0];
+  const monthAgo = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
+
+  keys.forEach(name => {
+    const p = profiles[name];
+    const card = document.createElement('div');
+    card.className = 'profile-card';
+    const catCount = (p.savedCatNos || []).length;
+    const fieldCount = (p.savedFields || []).length;
+    const host = p.url ? (() => { try { return new URL(p.url).hostname; } catch { return p.url; } })() : '—';
+    const safeId = name.replace(/[^a-zA-Z0-9]/g, '_');
+
+    // Detectar campos fecha disponibles en el perfil
+
+
+    card.innerHTML = `
+      <div class="profile-card-actions">
+        <div class="icon-btn" title="Editar" onclick="editProfile('${esc(name)}')">✏</div>
+        <div class="icon-btn danger" title="Eliminar" onclick="deleteProfile('${esc(name)}')">🗑</div>
+      </div>
+      <div class="profile-card-icon">📋</div>
+      <div class="profile-card-name">${name}</div>
+      <div class="profile-card-url">${host}</div>
+      <div class="profile-card-meta">
+        <span class="meta-chip">👤 ${p.user || '—'}</span>
+        <span class="meta-chip">📁 ${catCount} cat.</span>
+        <span class="meta-chip">🗂 ${fieldCount} campos</span>
+      </div>
+      <div class="card-date-filter">
+        <div class="card-date-row">
+          <input type="password" id="home-pass-${safeId}" placeholder="Contraseña..."
+            class="card-date-input" style="flex:1;width:100%;"
+            onkeydown="if(event.key==='Enter') runProfileFromCard('${esc(name)}','${safeId}')">
+        </div>
+        <button class="btn btn-primary btn-sm card-run-btn" onclick="runProfileFromCard('${esc(name)}','${safeId}')">
+          📂 Abrir consulta
+        </button>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // New card
+  const nc = document.createElement('div');
+  nc.className = 'new-card';
+  nc.onclick = () => newProfile();
+  nc.innerHTML = `<div class="new-card-icon">＋</div><div class="new-card-label">Nuevo perfil de informe</div>`;
+  grid.appendChild(nc);
+}
+
+function newProfile() {
+  S._editingProfileName = null;
+  resetEditorState();
+  showPage('editor');
+  switchTab('conn');
+  document.getElementById('btn-save-profile').disabled = true;
+}
+
+function editProfile(name) {
+  const profiles = getProfiles();
+  const p = profiles[name];
+  if (!p) return;
+  S._editingProfileName = name;
+  resetEditorState();
+
+  document.getElementById('inp-name').value   = name;
+  document.getElementById('inp-url').value    = p.url    || '';
+  document.getElementById('inp-user').value   = p.user   || '';
+  document.getElementById('inp-tenant').value = p.tenant || '';
+  S._pendingCatNos  = p.savedCatNos  || [];
+  S._pendingFields  = p.savedFields  || [];
+
+  showPage('editor');
+  switchTab('conn');
+  document.getElementById('btn-save-profile').disabled = false;
+}
+
+function deleteProfile(name) {
+  if (!confirm(`¿Eliminar el perfil "${name}"?`)) return;
+  const p = getProfiles();
+  delete p[name];
+  setProfiles(p);
+  renderHome();
+  toast(`Perfil "${name}" eliminado`);
+}
+
+async function runProfileFromCard(name, safeId) {
+  const pass = document.getElementById('home-pass-' + safeId)?.value;
+  if (!pass) { toast('Introduce la contraseña'); document.getElementById('home-pass-' + safeId)?.focus(); return; }
+
+  // Cargar perfil y conectar directamente sin modal
+  const profiles = getProfiles();
+  const p = profiles[name];
+  if (!p) return;
+
+  S.activeProfile = { name, ...p };
+  S.url    = p.url;
+  S.user   = p.user;
+  S.pass   = pass;
+  S.tenant = p.tenant || '';
+  S.captionMap    = p.captionMap    || {};
+  S.catFieldOrder = p.catFieldOrder || {};
+  S.catNames      = p.catNames      || {};
+  S.groupFields   = p.groupFields   || [];
+  S.selectedCatNos = new Set(p.savedCatNos || []);
+
+  // Verificar que user y pass están presentes
+  if (!S.user || !S.pass) {
+    toast('❌ Usuario o contraseña vacíos');
+    console.error('user:', S.user, 'pass length:', S.pass?.length, 'tenant:', S.tenant);
+    return;
+  }
+  const basicAuth = 'Basic ' + btoa(S.user + ':' + S.pass);
+  S.headers = { 'Authorization': basicAuth, 'Content-Type': 'application/json', 'Accept': 'application/json' };
+  if (S.tenant) S.headers['TenantName'] = S.tenant;
+  console.log('[runProfileFromCard] url:', S.url, 'user:', S.user, 'tenant:', S.tenant, 'pass length:', S.pass?.length);
+
+  try {
+    const tr = await api('GetConnectionToken', {});
+    S.token = tr.Token;
+    S.headers['Authorization'] = 'Basic ' + btoa(S.user + ':' + S.token);
+    S.headers['UseToken'] = '1';
+  } catch(e) {
+    toast('Error de conexión: ' + e.message);
+    return;
+  }
+
+  document.getElementById('res-profile-name').textContent = p.name;
+  S.results = [];
+  S.canonicalFields = null;
+  document.getElementById('btn-export').style.display = 'none';
+  document.getElementById('btn-run').style.display = '';
+
+  // Precargar filtro de fecha: último mes → hoy por defecto
+  const _today = new Date().toISOString().split('T')[0];
+  const _monthAgo = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
+  const _df = document.getElementById('flt-date-from');
+  const _dt = document.getElementById('flt-date-to');
+  if (_df) _df.value = _monthAgo;
+  if (_dt) _dt.value = _today;
+  populateDateFields(p.savedFields || []);
+
+  document.getElementById('results-body').innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">📅</div>
+      <div class="empty-title">Selecciona el rango de fechas</div>
+      <div class="empty-sub">Ajusta el filtro de fechas y pulsa "Ejecutar"</div>
+    </div>`;
+
+  showPage('results');
+}
+
+function toggleGroupField(chk) {
+  const item = chk.closest('.field-item');
+  item.classList.toggle('grouped', chk.checked);
+}
+
+function toggleDateFilter(enabled) {
+  // El filtro de fecha es siempre visible — esta función solo rellena el select si hace falta
+  const fields = S.canonicalFields || (S.activeProfile?.savedFields || []);
+  if (fields.length) populateDateFields(fields);
+}
+
+function populateDateFields(canonicalFields) {
+  const sel = document.getElementById('flt-date-field');
+  if (!sel) return;
+
+  // Detectar campos fecha: por nombre (fecha/date/time) o por FieldType=3/4 en allFields
+  const dateTypeFields = new Set(
+    (S.allFields || []).filter(f => f.type === 3 || f.type === 4).map(f => f.name)
+  );
+  let dateFields = canonicalFields.filter(f =>
+    f !== 'DocNo' && (
+      dateTypeFields.has(f) ||
+      f.toLowerCase().includes('fecha') ||
+      f.toLowerCase().includes('date') ||
+      f.toLowerCase().includes('time') ||
+      f.toLowerCase().includes('stamp')
+    )
+  );
+
+  // Fallback: si no hay campos fecha detectados, ofrecer todos los campos
+  if (!dateFields.length) dateFields = canonicalFields.filter(f => f !== 'DocNo');
+
+  // Mantener selección actual si el campo sigue disponible
+  const currentVal = sel.value;
+  sel.innerHTML = dateFields.map(f =>
+    `<option value="${f}">${S.captionMap[f] || f}</option>`
+  ).join('');
+  if (currentVal && dateFields.includes(currentVal)) sel.value = currentVal;
+
+  // Valores por defecto solo si están vacíos
+  const df = document.getElementById('flt-date-from');
+  const dt = document.getElementById('flt-date-to');
+  if (!df.value) df.value = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
+  if (!dt.value) dt.value = new Date().toISOString().split('T')[0];
+}
+
+async function testProfile() {
+  if (!S.token && !S.headers['Authorization']) {
+    toast('Conecta al servidor primero');
+    return;
+  }
+  if (!S.selectedCatNos.size) {
+    toast('Selecciona al menos una categoría');
+    return;
+  }
+
+  const name = document.getElementById('inp-name').value.trim() || 'Prueba';
+  const selectedFields = new Set(['DocNo']);
+  document.querySelectorAll('.field-chk:checked').forEach(c => selectedFields.add(c.dataset.field));
+  const groupFields = [];
+  document.querySelectorAll('.grp-chk:checked').forEach(c => groupFields.push(c.dataset.field));
+
+  S.activeProfile = {
+    name,
+    url: S.url,
+    user: S.user,
+    tenant: S.tenant,
+    savedCatNos: [...S.selectedCatNos],
+    savedFields: [...selectedFields],
+    groupFields,
+    captionMap: S.captionMap,
+    catFieldOrder: S.catFieldOrder,
+    catNames: S.catNames || {}
+  };
+  S.results = [];
+  S.canonicalFields = null;
+
+  document.getElementById('res-profile-name').textContent = name + ' (prueba)';
+  document.getElementById('btn-export').style.display = 'none';
+  document.getElementById('btn-run').style.display = 'none';
+
+  // Precargar filtro de fecha
+  const today = new Date().toISOString().split('T')[0];
+  const monthAgo = new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
+  const df = document.getElementById('flt-date-from');
+  const dt = document.getElementById('flt-date-to');
+  if (df) df.value = monthAgo;
+  if (dt) dt.value = today;
+  populateDateFields([...selectedFields]);
+
+  showPage('results');
+  // Ejecutar directamente
+  await ejecutarConsulta();
+}
+
+function saveProfile() {
+  const name = document.getElementById('inp-name').value.trim();
+  const url   = document.getElementById('inp-url').value.trim();
+  const user  = document.getElementById('inp-user').value.trim();
+  const tenant= document.getElementById('inp-tenant').value.trim();
+  if (!name) { toast('Escribe un nombre para el perfil'); return; }
+  if (!url || !user) { toast('Rellena URL y usuario'); return; }
+
+  // Guardar los ColNames seleccionados — el orden se recalcula desde el servidor al ejecutar
+  const selectedFields = new Set(['DocNo']);
+  document.querySelectorAll('.field-chk:checked').forEach(c => selectedFields.add(c.dataset.field));
+  // Campos marcados para agrupar en el dashboard
+  const groupFields = [];
+  document.querySelectorAll('.grp-chk:checked').forEach(c => groupFields.push(c.dataset.field));
+
+  const profiles = getProfiles();
+  // If renaming, delete old key
+  if (S._editingProfileName && S._editingProfileName !== name) {
+    delete profiles[S._editingProfileName];
+  }
+  profiles[name] = {
+    url, user, tenant,
+    savedCatNos: [...S.selectedCatNos],
+    savedFields: [...selectedFields],
+    captionMap: S.captionMap,
+    catFieldOrder: S.catFieldOrder,
+    catNames: S.catNames || {},
+  };
+  setProfiles(profiles);
+  S._editingProfileName = name;
+  toast(`Perfil "${name}" guardado ✓`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RUN PROFILE
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════
+async function api(endpoint, body) {
+  const url = S.url.replace(/\/$/, '') + '/theservice/v0001/restun/' + endpoint;
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: S.headers,
+    body: JSON.stringify(body || {})
+  });
+  if (!r.ok) throw new Error('HTTP ' + r.status + ' — ' + endpoint);
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONNECT (editor)
+// ═══════════════════════════════════════════════════════════
+async function conectar() {
+  const btn = document.getElementById('btn-connect');
+  const status = document.getElementById('conn-status');
+
+  S.url    = document.getElementById('inp-url').value.trim();
+  S.user   = document.getElementById('inp-user').value.trim();
+  S.pass   = document.getElementById('inp-pass').value;
+  S.tenant = document.getElementById('inp-tenant').value.trim();
+
+  if (!S.url || !S.user || !S.pass) {
+    status.innerHTML = '<span class="alert alert-danger" style="padding:6px 10px">Rellena URL, usuario y contraseña</span>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Conectando...';
+  status.innerHTML = '';
+
+  // Verificar que user y pass están presentes
+  if (!S.user || !S.pass) {
+    toast('❌ Usuario o contraseña vacíos');
+    console.error('user:', S.user, 'pass length:', S.pass?.length, 'tenant:', S.tenant);
+    return;
+  }
+  const basicAuth = 'Basic ' + btoa(S.user + ':' + S.pass);
+  S.headers = { 'Authorization': basicAuth, 'Content-Type': 'application/json', 'Accept': 'application/json' };
+  if (S.tenant) S.headers['TenantName'] = S.tenant;
+  console.log('[runProfileFromCard] url:', S.url, 'user:', S.user, 'tenant:', S.tenant, 'pass length:', S.pass?.length);
+
+  try {
+    const tr = await api('GetConnectionToken', {});
+    S.token = tr.Token;
+    S.headers['Authorization'] = 'Basic ' + btoa(S.user + ':' + S.token);
+    S.headers['UseToken'] = '1';
+
+    await cargarArbol();
+    status.innerHTML = '<span class="alert alert-success" style="padding:6px 10px">✓ Conectado</span>';
+    document.getElementById('btn-save-profile').disabled = false;
+
+    // Restore categories if editing
+    if (S._pendingCatNos && S._pendingCatNos.length) {
+      S._pendingCatNos.forEach(n => {
+        S.selectedCatNos.add(n);
+        const chk = document.querySelector(`[data-catno="${n}"]`);
+        if (chk) chk.checked = true;
+      });
+      updateCatsLabel();
+      updateCatsBadge();
+      // Restaurar campos automáticamente si los tenemos guardados
+      if (S._pendingFields && S._pendingFields.length) {
+        await cargarCampos();
+      }
+    } else {
+      updateCatsBadge();
+    }
+  } catch(e) {
+    status.innerHTML = `<span class="alert alert-danger" style="padding:6px 10px">✗ ${e.message}</span>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🔗 Conectar y cargar categorías';
+}
+
+// ═══════════════════════════════════════════════════════════
+// TREE
+// ═══════════════════════════════════════════════════════════
+async function cargarArbol() {
+  const resp = await api('GetCategoriesTree', {});
+  S.tree = resp.TreeItems || resp.Categories || [];
+  renderTree();
+}
+
+function renderTree() {
+  const c = document.getElementById('tree-container');
+  c.innerHTML = '';
+  if (!S.tree.length) { c.innerHTML = '<div class="alert alert-amber">Sin categorías</div>'; return; }
+  const wrap = document.createElement('div');
+  wrap.className = 'tree';
+  renderNodes(S.tree, wrap);
+  c.appendChild(wrap);
+}
+
+function renderNodes(nodes, parent) {
+  if (!Array.isArray(nodes)) return;
+  nodes.forEach(node => {
+    const children = node.ChildItems || node.SubCategories || node.Children || [];
+    if (node.ItemType === 1 || (children.length && node.ItemType !== 2)) {
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <div class="tree-folder" onclick="toggleFolder(this)">
+          <span class="tree-folder-icon">📁</span>
+          <span>${node.Name || 'Carpeta'}</span>
+          <span class="tree-folder-arrow">▾</span>
+        </div>
+        <div class="tree-children"></div>`;
+      renderNodes(children, wrap.querySelector('.tree-children'));
+      parent.appendChild(wrap);
+    }
+    if (node.ItemType === 2 || (node.ItemType !== 1 && !children.length && node.ItemNo !== undefined)) {
+      const catNo = node.ItemNo ?? node.CategoryNo;
+      S.catNames = S.catNames || {};
+      S.catNames[catNo] = node.Name || ('Cat #' + catNo);
+      const div = document.createElement('div');
+      div.className = 'tree-category';
+      div.innerHTML = `
+        <input type="checkbox" data-catno="${catNo}" onchange="toggleCat(this)">
+        <span class="tree-category-name">${node.Name || 'Cat'}</span>
+        <span class="tree-category-no">#${catNo}</span>`;
+      parent.appendChild(div);
+    }
+  });
+}
+
+function toggleFolder(el) {
+  el.classList.toggle('collapsed');
+  el.nextElementSibling.style.display = el.classList.contains('collapsed') ? 'none' : '';
+}
+
+function toggleCat(chk) {
+  const n = parseInt(chk.dataset.catno);
+  if (chk.checked) S.selectedCatNos.add(n); else S.selectedCatNos.delete(n);
+  updateCatsLabel();
+  updateCatsBadge();
+  scheduleFieldsReload();
+}
+
+function selectAllCats(val) {
+  document.querySelectorAll('[data-catno]').forEach(c => {
+    c.checked = val;
+    const n = parseInt(c.dataset.catno);
+    if (val) S.selectedCatNos.add(n); else S.selectedCatNos.delete(n);
+  });
+  updateCatsLabel();
+  updateCatsBadge();
+  scheduleFieldsReload();
+}
+
+function updateCatsLabel() {
+  const el = document.getElementById('cats-selected-label');
+  if (el) el.textContent = `${S.selectedCatNos.size} seleccionadas`;
+}
+
+// Recarga de campos con debounce — se dispara automáticamente al cambiar categorías
+let _fieldsTimer = null;
+function scheduleFieldsReload() {
+  clearTimeout(_fieldsTimer);
+  if (!S.selectedCatNos.size) {
+    document.getElementById('fields-list').innerHTML = '<div class="alert alert-info">Selecciona categorías en el panel ②</div>';
+    const fcl = document.getElementById('fields-count-label');
+    if (fcl) fcl.textContent = 'Solo se muestran campos comunes a todas las categorías seleccionadas';
+    updateFieldsBadge(0);
+    document.getElementById('btn-test-profile').disabled = true;
+    return;
+  }
+  document.getElementById('fields-list').innerHTML = '<div class="alert alert-info" style="display:flex;align-items:center;gap:8px"><span class="spinner"></span> Calculando campos comunes...</div>';
+  _fieldsTimer = setTimeout(() => cargarCampos(), 700);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIELDS
+// ═══════════════════════════════════════════════════════════
+async function cargarCampos() {
+  if (!S.selectedCatNos.size) { return; }
+
+  const list = document.getElementById('fields-list');
+  list.innerHTML = '<div class="alert alert-info" style="display:flex;align-items:center;gap:8px"><span class="spinner"></span> Cargando campos...</div>';
+
+  const fieldMap = new Map();
+  fieldMap.set('DocNo', { caption: 'DocNo', type: 0, catNos: [...S.selectedCatNos] });
+  S.catFieldOrder = {};
+  S.captionMap = { 'DocNo': 'DocNo' };
+
+  for (const catNo of S.selectedCatNos) {
+    try {
+      const resp = await api('GetCategoryInfo', { CategoryNo: catNo });
+      // Excluir campos tipo tabla/array (FieldType 8) y campos sin ColName
+      const fields = (resp.CategoryFields || resp.Fields || []).filter(f => f.ColName && f.FieldType !== 8);
+      S.catFieldOrder[catNo] = fields.map(f => f.ColName);
+      fields.forEach(f => {
+        S.captionMap[f.ColName] = f.Caption || f.ColName;
+        if (!fieldMap.has(f.ColName)) {
+          fieldMap.set(f.ColName, { caption: f.Caption || f.ColName, type: f.FieldType || 0, catNos: [] });
+        }
+        fieldMap.get(f.ColName).catNos.push(catNo);
+      });
+    } catch(e) {}
+  }
+
+  const total = S.selectedCatNos.size;
+  S.allFields = [...fieldMap.entries()]
+    .map(([name, v]) => ({ name, ...v }))
+    .filter(f => f.name === 'DocNo' || f.catNos.length === total);
+
+  renderFieldsList(S.allFields);
+  markTabDone('cats');
+  document.getElementById('btn-test-profile').disabled = false;
+
+  // Restore pending field selection
+  if (S._pendingFields && S._pendingFields.length) {
+    document.querySelectorAll('.field-chk').forEach(c => {
+      c.checked = S._pendingFields.includes(c.dataset.field);
+    });
+    S._pendingFields = [];
+  }
+}
+
+function renderFieldsList(fields) {
+  const list = document.getElementById('fields-list');
+  list.innerHTML = '';
+  const fieldsToShow = fields.filter(f => f.name !== 'DocNo');
+  updateFieldsBadge(fieldsToShow.length);
+  document.getElementById('btn-test-profile').disabled = fieldsToShow.length === 0;
+  const fcl = document.getElementById('fields-count-label');
+  if (fcl) fcl.textContent = fieldsToShow.length + ' campos comunes';
+  const groupedSet = new Set(S.activeProfile?.groupFields || []);
+  fields.forEach(f => {
+    if (f.name === 'DocNo') return; // DocNo siempre incluido, no mostrar en lista
+    const typeLabel = typeStr(f.type);
+    const isGrouped = groupedSet.has(f.name);
+    const div = document.createElement('div');
+    div.className = 'field-item' + (isGrouped ? ' grouped' : '');
+    div.innerHTML = `
+      <input type="checkbox" class="field-chk" data-field="${f.name}" checked>
+      <span class="field-item-caption">${f.caption}</span>
+      <span class="field-item-name">${f.name}</span>
+      <span class="type-pill">${typeLabel}</span>
+      <label title="Agrupar por este campo en el dashboard" style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--amber);white-space:nowrap;margin-left:4px;">
+        <input type="checkbox" class="grp-chk" data-field="${f.name}" ${isGrouped ? 'checked' : ''} style="accent-color:var(--amber);width:12px;height:12px;" onchange="toggleGroupField(this)">
+        Agrupar
+      </label>
+      <span class="grp-pill">📊 Agrupar</span>`;
+    list.appendChild(div);
+  });
+  markTabDone('fields');
+}
+
+function filterFields(q) {
+  const lower = q.toLowerCase();
+  document.querySelectorAll('.field-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(lower) ? '' : 'none';
+  });
+}
+
+function selectAllFields(checked) {
+  document.querySelectorAll('.field-chk').forEach(c => c.checked = checked);
+}
+
+function typeStr(t) {
+  return {0:'Texto',1:'Texto',2:'Entero',3:'Fecha',4:'Fecha',5:'Decimal',6:'Bool',7:'Keyword'}[t] || 'Texto';
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXECUTE QUERY
+// ═══════════════════════════════════════════════════════════
+async function ejecutarConsulta() {
+  const body = document.getElementById('results-body');
+  if (!body) { console.error('results-body no encontrado'); return; }
+
+  document.getElementById('btn-export').style.display = 'none';
+
+
+
+  body.innerHTML = `
+    <div class="progress-wrap">
+      <div style="font-size:14px;font-weight:600">Extrayendo datos...</div>
+      <div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+      <div class="progress-label" id="plabel">Preparando...</div>
+    </div>`;
+
+  const p = S.activeProfile;
+  const catNos = [...S.selectedCatNos];
+  const savedFields = p.savedFields || [];
+
+  // Always rebuild catFieldOrder fresh to guarantee column alignment
+  setProgress(5, 'Verificando estructura de campos...');
+  S.catFieldOrder = {};
+  for (const catNo of catNos) {
+    try {
+      const resp = await api('GetCategoryInfo', { CategoryNo: catNo });
+      // Excluir campos tipo tabla (FieldType 8) igual que en cargarCampos
+      // Therefore no incluye estos en IndexValues
+      const fields = (resp.CategoryFields || []).filter(f => f.ColName && f.FieldType !== 8);
+      S.catFieldOrder[catNo] = fields.map(f => f.ColName);
+      fields.forEach(f => {
+        S.captionMap[f.ColName] = f.Caption || f.ColName;
+      });
+    } catch(e) {}
+  }
+  // Also refresh catNames from tree if missing
+  if (!Object.keys(S.catNames || {}).length && p.catNames) {
+    S.catNames = p.catNames;
+  }
+
+  // Filtro de fecha — puede venir de la tarjeta home (S._cardDateFilter) o del panel de resultados
+  // Filtro de fecha desde el panel de resultados
+  // Filtro de fecha OBLIGATORIO
+  const dateField = document.getElementById('flt-date-field')?.value;
+  const dateFrom  = document.getElementById('flt-date-from')?.value;
+  const dateTo    = document.getElementById('flt-date-to')?.value;
+  if (!dateFrom || !dateTo) {
+    body.innerHTML = '<div style="padding:28px"><div class="alert alert-danger">✗ Introduce el rango de fechas (desde y hasta) para ejecutar el informe</div></div>';
+    return;
+  }
+  if (!dateField) {
+    body.innerHTML = '<div style="padding:28px"><div class="alert alert-danger">✗ No hay campos de tipo fecha en el perfil. Añade un campo fecha en el editor.</div></div>';
+    return;
+  }
+  // Una sola condición con Operator:0 y "yyyy-mm-dd TO yyyy-mm-dd"
+  // Validado en producción contra Therefore Online — mismo operando que el Navigator
+  const dateCondition = { FieldNoOrName: dateField, Operator: 0, Condition: dateFrom + ' TO ' + dateTo };
+
+  const queries = catNos.map(catNo => ({
+    CategoryNo: catNo, Mode: 0, MaxRows: 10000,
+    Conditions: [dateCondition]
+  }));
+
+  try {
+    setProgress(15, 'Ejecutando consulta...');
+
+    // Release previous if any
+    if (S._activeQueryId) {
+      const _prevId = S._activeQueryId;
+      S._activeQueryId = null;
+      const _prevUrl = S.url.replace(/\/$/, '') + '/theservice/v0001/restun/ReleaseMultiQuery';
+      const _prevHeaders = {...S.headers};
+      setTimeout(() => fetch(_prevUrl, { method:'POST', headers: _prevHeaders, body: JSON.stringify({ QueryID: _prevId }) }).catch(()=>{}), 0);
+    }
+
+    const resp = await api('ExecuteMultiQuery', { Queries: queries, MaxRows: 500000, RowBlockSize: 500 });
+    S.results = [];
+    let queryId = resp.QueryID;
+    S._activeQueryId = queryId;
+    let hasMore = resp.HasMoreRows;
+    let page = 1;
+
+    // canonicalFields: orden real de la primera categoría con datos según Columns de la respuesta
+    // Igual que el VBA — usa Columns[i].IndexDataFieldName para mapear
+    const savedSet = new Set(savedFields);
+    const firstQR = (resp.QueryResults || []).find(qr => (qr.Columns || []).length > 0);
+    const refColumns = firstQR ? (firstQR.Columns || []) : [];
+    const canonicalFields = [
+      'DocNo',
+      ...refColumns
+        .map(c => c.IndexDataFieldName)
+        .filter(n => n && n !== 'DocNo' && savedSet.has(n))
+    ];
+    S.canonicalFields = canonicalFields;
+
+    processPage(resp.QueryResults || [], canonicalFields);
+    setProgress(30, `Página ${page} — ${S.results.length} registros`);
+
+    while (hasMore) {
+      page++;
+      setProgress(Math.min(30 + page * 3, 88), `Página ${page} — ${S.results.length} registros`);
+      const next = await api('GetNextMultiQueryRows', { QueryID: queryId });
+      processPage(next.QueryResults || [], S.canonicalFields);
+      hasMore = next.HasMoreRows;
+    }
+
+    // Release — fuera del contexto async para no bloquear el flujo
+    S._activeQueryId = null;
+    const _releaseUrl = S.url.replace(/\/$/, '') + '/theservice/v0001/restun/ReleaseMultiQuery';
+    const _releaseHeaders = {...S.headers};
+    const _releaseId = queryId;
+    setTimeout(() => fetch(_releaseUrl, { method:'POST', headers: _releaseHeaders, body: JSON.stringify({ QueryID: _releaseId }) }).catch(()=>{}), 0);
+
+    setProgress(100, 'Renderizando...');
+    if (!S.canonicalFields || !S.canonicalFields.length) {
+      body.innerHTML = `<div style="padding:28px"><div class="alert alert-danger">✗ Error: no se pudo determinar la estructura de campos. Intenta de nuevo.</div></div>`;
+      return;
+    }
+    populateDateFields(S.canonicalFields);
+    renderResults(S.canonicalFields);
+
+    document.getElementById('btn-export').style.display = 'flex';
+  } catch(e) {
+    console.error('ejecutarConsulta error:', e);
+    body.innerHTML = `<div style="padding:28px"><div class="alert alert-danger">✗ Error: ${e.message || e}</div></div>`;
+  }
+
+
+}
+
+function processPage(queryResults, savedFields) {
+  const savedSet = new Set(savedFields);
+  queryResults.forEach(qr => {
+    const catNo = qr.CategoryNo;
+    // Usar Columns de la respuesta — igual que el VBA con mapaColumnas
+    // Columns[i].IndexDataFieldName da el nombre del campo en la posición i de IndexValues
+    const columns = qr.Columns || [];
+    const colMap = {}; // fieldName -> índice en IndexValues (0-based)
+    columns.forEach((col, i) => {
+      if (col.IndexDataFieldName) colMap[col.IndexDataFieldName] = i;
+    });
+
+    (qr.ResultRows || []).forEach(row => {
+      if (!row.IndexValues) return;
+      const rec = { '_cat': catNo };
+      savedFields.forEach(fname => {
+        if (fname === 'DocNo') { rec.DocNo = row.DocNo ?? ''; return; }
+        const idx = colMap[fname];
+        rec[fname] = (idx !== undefined && idx < row.IndexValues.length)
+          ? (row.IndexValues[idx] == null ? '' : String(row.IndexValues[idx]))
+          : '';
+      });
+      S.results.push(rec);
+    });
+  });
+}
+
+function renderDashboard(savedFields) {
+  const body = document.getElementById('results-body');
+  if (!S.results.length) {
+    body.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">Sin resultados</div><div class="empty-sub">Prueba a modificar el filtro de fechas</div></div>`;
+    return;
+  }
+
+  const p = S.activeProfile;
+  const groupFields = p.groupFields || [];
+  const now = new Date().toLocaleString('es-ES');
+
+  // ── Calcular agregaciones ──
+  // Por categoría
+  const byCat = {};
+  S.results.forEach(rec => {
+    const catNo = rec._cat;
+    const name = S.catNames[catNo] || ('#' + catNo);
+    byCat[name] = (byCat[name] || 0) + 1;
+  });
+
+  // Por campos de agrupación
+  const byField = {};
+  groupFields.forEach(f => {
+    byField[f] = {};
+    S.results.forEach(rec => {
+      const v = rec[f] || '(vacío)';
+      byField[f][v] = (byField[f][v] || 0) + 1;
+    });
+  });
+
+  // ── HTML ──
+  const dash = document.createElement('div');
+  dash.className = 'dashboard';
+
+  // Stat cards
+  const uniqueCats = Object.keys(byCat).length;
+  dash.innerHTML = `
+    <div class="dash-stats">
+      <div class="dash-stat-card blue">
+        <div class="dash-stat-val">${S.results.length.toLocaleString('es-ES')}</div>
+        <div class="dash-stat-lbl">Total documentos</div>
+        <div class="dash-stat-sub">Última extracción: ${now}</div>
+      </div>
+      <div class="dash-stat-card green">
+        <div class="dash-stat-val">${uniqueCats}</div>
+        <div class="dash-stat-lbl">Categorías con datos</div>
+      </div>
+      <div class="dash-stat-card amber">
+        <div class="dash-stat-val">${savedFields.filter(f=>f!=='DocNo').length}</div>
+        <div class="dash-stat-lbl">Campos en informe</div>
+      </div>
+      ${groupFields.length ? `<div class="dash-stat-card purple">
+        <div class="dash-stat-val">${groupFields.length}</div>
+        <div class="dash-stat-lbl">Agrupaciones activas</div>
+      </div>` : ''}
+    </div>
+
+    <div class="dash-charts" id="dash-charts"></div>
+
+    <div class="dash-actions">
+      <label class="dash-detail-toggle" onclick="toggleDetail()">
+        <span id="detail-toggle-icon">▶</span>
+        <span id="detail-toggle-label">Ver detalle (${S.results.length.toLocaleString('es-ES')} registros)</span>
+      </label>
+    </div>
+    <div id="detail-table-wrap" style="display:none"></div>`;
+
+  body.innerHTML = '';
+  body.appendChild(dash);
+
+  // ── Gráfico por categoría ──
+  const chartsEl = document.getElementById('dash-charts');
+  chartsEl.appendChild(buildBarChart('📁 Documentos por categoría', byCat, 0));
+
+  // ── Gráficos por campos de agrupación ──
+  groupFields.forEach((f, i) => {
+    const caption = S.captionMap[f] || f;
+    chartsEl.appendChild(buildBarChart('📊 ' + caption, byField[f], i + 1));
+  });
+}
+
+function buildBarChart(title, dataObj, colorIdx) {
+  // Ordenar por valor desc, top 15
+  const sorted = Object.entries(dataObj)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15);
+  const max = sorted[0]?.[1] || 1;
+  const colors = ['c0','c1','c2','c3','c4','c5','c6','c7'];
+  const col = colors[colorIdx % colors.length];
+
+  const card = document.createElement('div');
+  card.className = 'dash-chart-card';
+  card.innerHTML = `<div class="dash-chart-title">${title}</div><div class="bar-list"></div>`;
+  const list = card.querySelector('.bar-list');
+
+  sorted.forEach(([label, count]) => {
+    const pct = Math.round((count / max) * 100);
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label" title="${label}">${label}</div>
+      <div class="bar-track"><div class="bar-fill ${col}" style="width:${pct}%"></div></div>
+      <div class="bar-count">${count.toLocaleString('es-ES')}</div>`;
+    list.appendChild(row);
+  });
+
+  if (Object.keys(dataObj).length > 15) {
+    const more = document.createElement('div');
+    more.style.cssText = 'font-size:11px;color:var(--text-hint);padding:6px 0 0 0;text-align:center;';
+    more.textContent = `+ ${Object.keys(dataObj).length - 15} valores más`;
+    list.appendChild(more);
+  }
+
+  return card;
+}
+
+function toggleDetail() {
+  const wrap = document.getElementById('detail-table-wrap');
+  const icon = document.getElementById('detail-toggle-icon');
+  const label = document.getElementById('detail-toggle-label');
+  const isVisible = wrap.style.display !== 'none';
+
+  if (isVisible) {
+    wrap.style.display = 'none';
+    icon.textContent = '▶';
+    label.textContent = `Ver detalle (${S.results.length.toLocaleString('es-ES')} registros)`;
+  } else {
+    if (!wrap.dataset.built) {
+      wrap.dataset.built = '1';
+      wrap.appendChild(buildDetailTable(S.canonicalFields));
+    }
+    wrap.style.display = '';
+    icon.textContent = '▼';
+    label.textContent = 'Ocultar detalle';
+  }
+}
+
+function buildDetailTable(savedFields) {
+  const headers = ['_cat', ...savedFields];
+  const colCaptions = ['Categoría', ...savedFields.map(n => n)];
+
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const hrow = document.createElement('tr');
+  colCaptions.forEach(h => { const th = document.createElement('th'); th.textContent = h; hrow.appendChild(th); });
+  thead.appendChild(hrow); table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  S.results.forEach(rec => {
+    const tr = document.createElement('tr');
+    headers.forEach(h => {
+      const td = document.createElement('td');
+      if (h === '_cat') { const nm = S.catNames[rec[h]] || ('#'+rec[h]); td.innerHTML = `<span class="cat-pill" title="#${rec[h]}">${nm}</span>`; }
+      else { td.textContent = rec[h] ?? ''; td.title = rec[h] ?? ''; }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'results-table-wrap';
+  wrap.appendChild(table);
+  return wrap;
+}
+
+// Alias para compatibilidad con llamadas existentes
+function renderResults(savedFields) { renderDashboard(savedFields); }
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════
+function exportCSV() {
+  if (!S.results.length) return;
+  const p = S.activeProfile;
+  // Usar canonicalFields (orden del servidor, calculado al ejecutar)
+  const savedFields = S.canonicalFields || p.savedFields || [];
+  const headers = ['Categoría', ...savedFields.map(n => n)];
+  const dataKeys = ['_cat', ...savedFields];
+
+  const rows = [headers.join(';')];
+  S.results.forEach(rec => {
+    rows.push(dataKeys.map(k => {
+      const v = k === '_cat' ? (S.catNames[rec[k]] || rec[k]) : (rec[k] ?? '');
+      return '"' + String(v).replace(/"/g, '""') + '"';
+    }).join(';'));
+  });
+
+  const blob = new Blob(['\uFEFF' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${p.name}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAV & UI HELPERS
+// ═══════════════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+}
+
+function goHome() { showPage('home'); renderHome(); }
+
+// switchTab y markTabDone — compatibilidad (ya no hay tabs en el editor)
+function switchTab(name) { /* panels always visible — no-op */ }
+function markTabDone(name) { /* no-op */ }
+
+function updateCatsBadge() {
+  const n = S.selectedCatNos.size;
+  const badge = document.getElementById('cats-badge');
+  if (!badge) return;
+  badge.textContent = n > 0 ? n + ' seleccionadas' : 'Sin selección';
+  badge.className = 'ep-badge' + (n > 0 ? ' lit' : '');
+  const ep = document.getElementById('ep-left');
+  if (ep) ep.classList.toggle('ep-active', n > 0);
+}
+
+function updateFieldsBadge(count) {
+  const badge = document.getElementById('fields-badge');
+  if (!badge) return;
+  badge.textContent = count > 0 ? count + ' campos' : '—';
+  badge.className = 'ep-badge' + (count > 0 ? ' lit' : '');
+  const ep = document.getElementById('ep-right');
+  if (ep) ep.classList.toggle('ep-active', count > 0);
+}
+
+function resetEditorState() {
+  S.selectedCatNos.clear();
+  S.allFields = [];
+  S.catFieldOrder = {};
+  S.captionMap = {};
+  S._pendingCatNos = [];
+  S._pendingFields = [];
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-url').value = '';
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+  document.getElementById('inp-tenant').value = '';
+  document.getElementById('conn-status').innerHTML = '';
+  document.getElementById('tree-container').innerHTML = '<div class="alert alert-info">Conecta al servidor primero</div>';
+  document.getElementById('fields-list').innerHTML = '<div class="alert alert-info">Carga los campos desde el panel ②</div>';
+  document.getElementById('btn-test-profile').disabled = true;
+  document.getElementById('btn-save-profile').disabled = true;
+  updateCatsBadge();
+  updateFieldsBadge(0);
+  const fcl = document.getElementById('fields-count-label');
+  if (fcl) fcl.textContent = 'Solo se muestran campos comunes a todas las categorías seleccionadas';
+}
+
+function setProgress(pct, label) {
+  const b = document.getElementById('pbar');
+  const l = document.getElementById('plabel');
+  if (b) b.style.width = pct + '%';
+  if (l) l.textContent = label;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.style.opacity = '0', 2800);
+}
+
+function esc(s) { return String(s).replace(/'/g, "\\'"); }
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+renderHome();
+</script>
+</body>
+</html>
