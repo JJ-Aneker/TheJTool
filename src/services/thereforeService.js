@@ -389,20 +389,24 @@ class ThereforeService {
    * CRITICAL: Use Columns[i].IndexDataFieldName for mapping, not GetCategoryInfo order
    */
   _processPage(queryResults, canonicalFields, rowsArray) {
+    if (!Array.isArray(queryResults)) return
+
     queryResults.forEach(qr => {
       const catNo = qr.CategoryNo
-      const columns = qr.Columns || []
+      const columns = Array.isArray(qr.Columns) ? qr.Columns : []
 
       // Build column map: fieldName → index in IndexValues
       const colMap = {}
       columns.forEach((col, i) => {
-        if (col.IndexDataFieldName) {
+        if (col && col.IndexDataFieldName) {
           colMap[col.IndexDataFieldName] = i
         }
       })
 
       // Process each row
-      (qr.ResultRows || []).forEach(row => {
+      const resultRows = Array.isArray(qr.ResultRows) ? qr.ResultRows : []
+      resultRows.forEach(row => {
+        if (!row) return
         const rec = { _cat: catNo }
         canonicalFields.forEach(fname => {
           if (fname === 'DocNo') {
@@ -410,8 +414,9 @@ class ThereforeService {
             return
           }
           const idx = colMap[fname]
-          rec[fname] = idx !== undefined && idx < row.IndexValues.length
-            ? (row.IndexValues[idx] == null ? '' : String(row.IndexValues[idx]))
+          const indexValues = Array.isArray(row.IndexValues) ? row.IndexValues : []
+          rec[fname] = idx !== undefined && idx < indexValues.length
+            ? (indexValues[idx] == null ? '' : String(indexValues[idx]))
             : ''
         })
         rowsArray.push(rec)
