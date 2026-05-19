@@ -253,6 +253,12 @@ export default function ThereforeReporter() {
 
     setLoading(true)
     try {
+      // Build field_types map (fieldName -> FieldType)
+      const fieldTypes = {}
+      editorState.allCommonFields.forEach(f => {
+        fieldTypes[f.name] = f.type
+      })
+
       const data = {
         nombre,
         tenant_id: tenantId,
@@ -262,6 +268,7 @@ export default function ThereforeReporter() {
         caption_map: editorState.captionMap,
         cat_field_order: editorState.catFieldOrder,
         cat_names: editorState.catNames,
+        field_types: fieldTypes,
       }
 
       if (editorState.profileId) {
@@ -670,12 +677,10 @@ function ResultsView(props) {
     captionMap
   } = props
 
+  // FieldType 3 = DateField, 5 = DateTimeField
+  const fieldTypes = resultsState.profile?.field_types || {}
   const dateFields = resultsState.profile?.saved_fields?.filter(f =>
-    f !== 'DocNo' && (
-      f.toLowerCase().includes('fecha') ||
-      f.toLowerCase().includes('date') ||
-      f.toLowerCase().includes('time')
-    )
+    f !== 'DocNo' && (fieldTypes[f] === 3 || fieldTypes[f] === 5)
   ) || []
 
   return (
