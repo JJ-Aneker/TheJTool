@@ -257,7 +257,18 @@ class ThereforeService {
       })
 
       if (!resp.ok) {
-        throw new Error(resp.status === 401 ? 'Credenciales inválidas' : `HTTP ${resp.status}`)
+        let errorMsg = `HTTP ${resp.status}`
+        if (resp.status === 401) {
+          errorMsg = 'Credenciales inválidas'
+        } else if (resp.status === 500) {
+          try {
+            const errorData = await resp.json()
+            errorMsg = errorData.message || errorData.error || `Servidor error: ${resp.status}`
+          } catch {
+            errorMsg = 'Error del servidor Therefore (500). Verifica credenciales y URL'
+          }
+        }
+        throw new Error(errorMsg)
       }
 
       const { Token } = await resp.json()
