@@ -181,6 +181,15 @@ export default function ThereforeReporter() {
     setIsModalVisible(true)
   }
 
+  const refreshReportData = async () => {
+    if (!reportData || !reportData.id) return
+
+    const profile = profiles.find(p => p.id === reportData.id)
+    if (profile) {
+      await viewProfileData(profile)
+    }
+  }
+
   const viewProfileData = async (profile) => {
     setReportLoading(true)
     try {
@@ -393,16 +402,26 @@ export default function ThereforeReporter() {
             ) : reportData ? (
               <Card style={{ marginTop: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <h3 style={{ margin: '0 0 10px 0' }}>{reportData.nombre}</h3>
                     <p style={{ margin: '5px 0', color: 'var(--text-secondary)' }}><strong>Servidor:</strong> {reportData.tenant}</p>
                     <p style={{ margin: '5px 0', color: 'var(--text-secondary)', fontSize: '12px' }}><strong>URL:</strong> {reportData.url}</p>
                   </div>
-                  {reportData.extractedAt && (
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>
-                      Actualizado: {new Date(reportData.extractedAt).toLocaleString('es-ES')}
-                    </p>
-                  )}
+                  <Space direction="vertical" align="end">
+                    {reportData.extractedAt && (
+                      <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        Actualizado: {new Date(reportData.extractedAt).toLocaleString('es-ES')}
+                      </p>
+                    )}
+                    <Button
+                      size="small"
+                      icon={<ReloadOutlined />}
+                      onClick={refreshReportData}
+                      loading={reportLoading}
+                    >
+                      Refrescar
+                    </Button>
+                  </Space>
                 </div>
 
                 {reportData.error && (
