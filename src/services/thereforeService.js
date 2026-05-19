@@ -247,7 +247,10 @@ class ThereforeService {
       'Content-Type': 'application/json',
       Accept: 'application/json'
     }
-    if (tenantName) basicHeaders.TenantName = tenantName
+    // Tenant name is required by Therefore server
+    if (tenantName) {
+      basicHeaders.TenantName = tenantName
+    }
 
     try {
       const resp = await fetch(url + '/GetConnectionToken', {

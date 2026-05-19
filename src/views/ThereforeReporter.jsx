@@ -158,6 +158,11 @@ export default function ThereforeReporter() {
       return
     }
 
+    if (!tenant.tenant) {
+      message.error('El tenant no tiene configurado el nombre de tenant. Revisa la configuración del servidor.')
+      return
+    }
+
     setLoading(true)
     try {
       const { headers, baseUrl } = await thereforeService.connect(
