@@ -8,6 +8,10 @@ class ThereforeService {
     this.tokens = {} // Cache de tokens por URL
   }
 
+  // ═══════════════════════════════════════════════════════════
+  // LEGACY METHODS (metric extraction)
+  // ═══════════════════════════════════════════════════════════
+
   /**
    * Get connection token from Therefore server
    */
@@ -215,6 +219,204 @@ class ThereforeService {
    */
   clearToken(url) {
     delete this.tokens[url]
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // NEW METHODS (multi-category profile creation & execution)
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Helper: Build Therefore API base URL
+   */
+  buildBaseUrl(tenantUrl) {
+    return tenantUrl.replace(/\/$/, '') + '/theservice/v0001/restun'
+  }
+
+  /**
+   * NEW: Connect to Therefore server and get auth headers + token
+   * Used for profile creation/editing workflow
+   */
+  async connect(tenantUrl, usuario, password, tenantName = '') {
+    if (!tenantUrl || !usuario || !password) {
+      throw new Error('URL, usuario y contraseña son requeridos')
+    }
+
+    const url = this.buildBaseUrl(tenantUrl)
+    const basicHeaders = {
+      Authorization: 'Basic ' + btoa(usuario + ':' + password),
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    }
+    if (tenantName) basicHeaders.TenantName = tenantName
+
+    try {
+      const resp = await fetch(url + '/GetConnectionToken', {
+        method: 'POST',
+        headers: basicHeaders,
+        body: '{}'
+      })
+
+      if (!resp.ok) {
+        throw new Error(resp.status === 401 ? 'Credenciales inválidas' : `HTTP ${resp.status}`)
+      }
+
+      const { Token } = await resp.json()
+      const headers = {
+        Authorization: 'Basic ' + btoa(usuario + ':' + Token),
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        UseToken: '1'
+      }
+      if (tenantName) headers.TenantName = tenantName
+
+      return { token: Token, headers, baseUrl: url }
+    } catch (err) {
+      throw new Error('Error de conexión: ' + err.message)
+    }
+  }
+
+  /**
+   * NEW: Get category tree structure
+   */
+  async getCategoryTree(baseUrl, headers) {
+    const resp = await fetch(baseUrl + '/GetCategoriesTree', {
+      method: 'POST',
+      headers,
+      body: '{}'
+    })
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+    const data = await resp.json()
+    return data.TreeItems || data.Categories || []
+  }
+
+  /**
+   * NEW: Get category fields, filtering FieldType === 8 (table fields)
+   */
+  async getCategoryInfo(baseUrl, headers, categoryNo) {
+    const resp = await fetch(baseUrl + '/GetCategoryInfo', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ CategoryNo: categoryNo })
+    })
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+    const data = await resp.json()
+    const fields = (data.CategoryFields || data.Fields || []).filter(f => f.ColName && f.FieldType !== 8)
+    return { fields, categoryNo }
+  }
+
+  /**
+   * NEW: Execute multi-category query with full pagination support
+   * Retorna: { rows: [{_cat, DocNo, ...fields}], canonicalFields: [...], catNames: {}, error?: msg }
+   */
+  async executeMultiQuery(baseUrl, headers, queries, savedFields, onProgress = null) {
+    const savedSet = new Set(savedFields || [])
+
+    try {
+      // 1. Execute initial query
+      if (onProgress) onProgress(10, 'Ejecutando consulta...')
+
+      const resp = await fetch(baseUrl + '/ExecuteMultiQuery', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          Queries: queries,
+          MaxRows: 500000,
+          RowBlockSize: 500
+        })
+      })
+
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+      const data = await resp.json()
+
+      let rows = []
+      let queryId = data.QueryID
+      let hasMore = data.HasMoreRows
+      let page = 1
+
+      // 2. Determine canonical fields from first non-empty QueryResult.Columns
+      const firstQR = (data.QueryResults || []).find(qr => qr.Columns?.length > 0)
+      const canonicalFields = [
+        'DocNo',
+        ...(firstQR?.Columns || [])
+          .map(c => c.IndexDataFieldName)
+          .filter(n => n && n !== 'DocNo' && savedSet.has(n))
+      ]
+
+      // 3. Process first page
+      this._processPage(data.QueryResults || [], canonicalFields, rows)
+      if (onProgress) onProgress(30, `Página ${page} — ${rows.length} registros`)
+
+      // 4. Pagination loop
+      while (hasMore) {
+        page++
+        const nextResp = await fetch(baseUrl + '/GetNextMultiQueryRows', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ QueryID: queryId })
+        })
+
+        if (!nextResp.ok) break
+        const nextData = await nextResp.json()
+        this._processPage(nextData.QueryResults || [], canonicalFields, rows)
+        hasMore = nextData.HasMoreRows
+        if (onProgress) onProgress(Math.min(30 + page * 3, 90), `Página ${page} — ${rows.length} registros`)
+      }
+
+      // 5. Release query (fire-and-forget)
+      if (queryId) {
+        setTimeout(() => {
+          fetch(baseUrl + '/ReleaseMultiQuery', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ QueryID: queryId })
+          }).catch(() => {})
+        }, 0)
+      }
+
+      if (onProgress) onProgress(100, 'Renderizando...')
+
+      return { rows, canonicalFields, error: null }
+    } catch (err) {
+      console.error('executeMultiQuery error:', err)
+      return { rows: [], canonicalFields: [], error: err.message }
+    }
+  }
+
+  /**
+   * Helper: Process a page of QueryResults using Columns mapping
+   * CRITICAL: Use Columns[i].IndexDataFieldName for mapping, not GetCategoryInfo order
+   */
+  _processPage(queryResults, canonicalFields, rowsArray) {
+    queryResults.forEach(qr => {
+      const catNo = qr.CategoryNo
+      const columns = qr.Columns || []
+
+      // Build column map: fieldName → index in IndexValues
+      const colMap = {}
+      columns.forEach((col, i) => {
+        if (col.IndexDataFieldName) {
+          colMap[col.IndexDataFieldName] = i
+        }
+      })
+
+      // Process each row
+      (qr.ResultRows || []).forEach(row => {
+        const rec = { _cat: catNo }
+        canonicalFields.forEach(fname => {
+          if (fname === 'DocNo') {
+            rec.DocNo = row.DocNo ?? ''
+            return
+          }
+          const idx = colMap[fname]
+          rec[fname] = idx !== undefined && idx < row.IndexValues.length
+            ? (row.IndexValues[idx] == null ? '' : String(row.IndexValues[idx]))
+            : ''
+        })
+        rowsArray.push(rec)
+      })
+    })
   }
 }
 
