@@ -584,38 +584,48 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', height: '100%', overflow: 'auto' }}>
-      <div>
-        <h2>Crear / Editar Perfil</h2>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', height: '100%', overflow: 'auto' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid var(--border-default)' }}>
+        <div>
+          <h2 style={{ margin: '0 0 4px 0' }}>Crear / Editar Perfil</h2>
+          {editorState.nombre && editorState.tenantId && (
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+              <strong>{editorState.nombre}</strong> • {tenants.find(t => t.id === editorState.tenantId)?.nombre}
+              {editorState.connected && <span style={{ color: 'var(--success)', marginLeft: '8px' }}>✓ Conectado</span>}
+            </div>
+          )}
+        </div>
+        <Button loading={loading} onClick={onConnect} type="primary">
+          🔗 Conectar
+        </Button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', flex: 1 }}>
-        {/* Panel 1: Conexión */}
-        <div className="editor-panel">
-          <h3>① Conexión</h3>
-          <Form form={form} layout="vertical">
-            <Form.Item label="Nombre del perfil" required>
-              <Input value={editorState.nombre} onChange={onNameChange} placeholder="ej: Aliseda - Notificaciones" />
-            </Form.Item>
-            <Form.Item label="Servidor" required>
-              <Select
-                value={editorState.tenantId || undefined}
-                onChange={onTenantChange}
-                placeholder="Selecciona..."
-                options={tenants.map(t => ({ label: t.nombre, value: t.id }))}
-              />
-            </Form.Item>
-          </Form>
-          <Button loading={loading} onClick={onConnect} block type="primary" style={{ marginTop: '10px' }}>
-            🔗 Conectar
-          </Button>
-          {editorState.connected && <div style={{ marginTop: '10px', color: 'var(--success)' }}>✓ Conectado</div>}
-        </div>
+      {/* Connection Form */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <Form layout="vertical" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <Form.Item label="Nombre del perfil" required style={{ marginBottom: '12px' }}>
+            <Input value={editorState.nombre} onChange={onNameChange} placeholder="ej: Aliseda - Notificaciones" />
+          </Form.Item>
+        </Form>
+        <Form layout="vertical" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <Form.Item label="Servidor" required style={{ marginBottom: '12px' }}>
+            <Select
+              value={editorState.tenantId || undefined}
+              onChange={onTenantChange}
+              placeholder="Selecciona..."
+              options={tenants.map(t => ({ label: t.nombre, value: t.id }))}
+            />
+          </Form.Item>
+        </Form>
+      </div>
 
+      {/* Panels: Categorías & Campos */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', flex: 1, minHeight: 0 }}>
         {/* Panel 2: Categorías */}
-        <div className="editor-panel">
-          <h3>② Categorías</h3>
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: '6px', padding: '10px', maxHeight: '400px', overflow: 'auto' }}>
+        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-primary)' }}>② Categorías</h3>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px', flex: 1, overflow: 'auto' }}>
             {editorState.connected ? renderCategoryTree(editorState.catTree) : <Empty description="Conecta primero" />}
           </div>
           <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -624,14 +634,14 @@ function EditorView(props) {
         </div>
 
         {/* Panel 3: Campos */}
-        <div className="editor-panel">
-          <h3>③ Campos</h3>
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: '6px', padding: '10px', maxHeight: '400px', overflow: 'auto' }}>
+        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-primary)' }}>③ Campos</h3>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px', flex: 1, overflow: 'auto' }}>
             {editorState.allCommonFields.length === 0 ? (
               <Empty description="Selecciona categorías" />
             ) : (
               editorState.allCommonFields.map(f => (
-                <div key={f.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0', borderBottom: '1px solid var(--border-default)' }}>
+                <div key={f.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0', borderBottom: '1px solid var(--border-default)', color: 'var(--text-primary)' }}>
                   {f.name !== 'DocNo' && (
                     <input
                       type="checkbox"
@@ -640,9 +650,9 @@ function EditorView(props) {
                     />
                   )}
                   {f.name === 'DocNo' && <span style={{ width: '18px' }}>✓</span>}
-                  <span style={{ flex: 1, fontSize: '12px' }}>{f.caption}</span>
+                  <span style={{ flex: 1, fontSize: '13px', fontWeight: f.name === 'DocNo' ? '500' : '400' }}>{f.caption}</span>
                   {f.name !== 'DocNo' && (
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                       <input
                         type="checkbox"
                         checked={editorState.groupFields.has(f.name)}
@@ -654,6 +664,9 @@ function EditorView(props) {
                 </div>
               ))
             )}
+          </div>
+          <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+            {editorState.selectedFields.size} campos seleccionados
           </div>
         </div>
       </div>
@@ -697,7 +710,7 @@ function ResultsView(props) {
         <h1 style={{ margin: 0, flex: 1 }}>{resultsState.profile?.nombre}</h1>
       </div>
 
-      {/* Filters */}
+      {/* Filters & Export */}
       <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
         <Form layout="vertical" style={{ display: 'flex', gap: '10px', flex: 1 }}>
           <Form.Item label="Campo fecha" style={{ flex: 1, marginBottom: 0 }}>
@@ -725,6 +738,7 @@ function ResultsView(props) {
             />
           </Form.Item>
           <Button type="primary" onClick={onRun} loading={loading}>▶ Ejecutar</Button>
+          <Button onClick={onExport} type="default">⬇ Exportar CSV</Button>
         </Form>
       </div>
 
@@ -825,8 +839,8 @@ function DashboardView(props) {
       </div>
 
       {/* Charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
-        <BarChart title="📁 Documentos por categoría" data={byCat} colorIdx={0} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '24px', marginTop: '30px' }}>
+        <BarChart title="📁 Documentos por categoría" data={byCat} colorIdx={0} catNames={catNames} />
         {groupFields.map((f, i) => (
           <BarChart key={f} title={`📊 Por ${captionMap[f] || f}`} data={byField[f] || {}} colorIdx={i + 1} />
         ))}
@@ -873,10 +887,6 @@ function DashboardView(props) {
         )}
       </div>
 
-      {/* Export */}
-      <Button onClick={onExport} block type="primary" style={{ marginTop: '10px' }}>
-        ⬇ Exportar CSV
-      </Button>
     </div>
   )
 }
@@ -885,7 +895,7 @@ function DashboardView(props) {
 // BAR CHART COMPONENT
 // ═══════════════════════════════════════════════════════════
 
-function BarChart({ title, data, colorIdx }) {
+function BarChart({ title, data, colorIdx, catNames }) {
   const sorted = Object.entries(data)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 15)
@@ -895,14 +905,18 @@ function BarChart({ title, data, colorIdx }) {
 
   return (
     <Card>
-      <div style={{ marginBottom: '15px', fontWeight: '600' }}>{title}</div>
+      <div style={{ marginBottom: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{title}</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {sorted.map(([label, count]) => {
           const pct = Math.round((count / max) * 100)
+          // For categories, try to get the friendly name from catNames
+          const displayLabel = catNames && label.startsWith('#')
+            ? catNames[label.replace('#', '')] || label
+            : label
           return (
             <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '100px', fontSize: '11px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={label}>
-                {label}
+              <div style={{ width: '120px', fontSize: '11px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-secondary)' }} title={displayLabel}>
+                {displayLabel}
               </div>
               <div style={{ flex: 1, height: '20px', backgroundColor: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
                 <div
