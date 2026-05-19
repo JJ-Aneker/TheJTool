@@ -18,7 +18,8 @@ class ThereforeService {
         {},
         {
           auth: { username: usuario, password },
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 10000
         }
       )
 
@@ -29,7 +30,16 @@ class ThereforeService {
       throw new Error('No token received from server')
     } catch (err) {
       if (err.response?.status === 401) {
-        throw new Error('Credenciales inválidas')
+        throw new Error('Credenciales inválidas. Verifica usuario y contraseña del Therefore.')
+      }
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        throw new Error('Timeout: El servidor Therefore tarda demasiado en responder')
+      }
+      if (err.message?.includes('CORS')) {
+        throw new Error('Error CORS: Puede que el servidor Therefore no permita acceso desde el navegador')
+      }
+      if (!url) {
+        throw new Error('URL del servidor no configurada')
       }
       throw new Error(`Error de autenticación: ${err.message}`)
     }
@@ -52,13 +62,17 @@ class ThereforeService {
           headers: {
             'UseToken': '1',
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 10000
         }
       )
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
       console.error('Error counting documents:', err.message)
+      if (err.message?.includes('403') || err.message?.includes('permission')) {
+        throw new Error('Permiso denegado: El usuario no tiene permisos para consultar documentos')
+      }
       return 0
     }
   }
@@ -82,13 +96,17 @@ class ThereforeService {
           headers: {
             'UseToken': '1',
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 10000
         }
       )
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
       console.error('Error counting cases:', err.message)
+      if (err.message?.includes('403') || err.message?.includes('permission')) {
+        throw new Error('Permiso denegado: El usuario no tiene permisos para consultar casos')
+      }
       return 0
     }
   }
@@ -110,13 +128,17 @@ class ThereforeService {
           headers: {
             'UseToken': '1',
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 10000
         }
       )
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
       console.error('Error counting users:', err.message)
+      if (err.message?.includes('403') || err.message?.includes('permission')) {
+        throw new Error('Permiso denegado: El usuario no tiene permisos para consultar usuarios')
+      }
       return 0
     }
   }
@@ -136,13 +158,17 @@ class ThereforeService {
           headers: {
             'UseToken': '1',
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 10000
         }
       )
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
       console.error('Error counting workflows:', err.message)
+      if (err.message?.includes('403') || err.message?.includes('permission')) {
+        throw new Error('Permiso denegado: El usuario no tiene permisos para consultar workflows')
+      }
       return 0
     }
   }
@@ -151,20 +177,34 @@ class ThereforeService {
    * Extract report data from Therefore server
    */
   async extractReportData(url, usuario, password) {
+    if (!url || !usuario) {
+      throw new Error('URL y usuario del servidor Therefore son requeridos')
+    }
+
     try {
-      const [documentos, casos, usuarios, workflows] = await Promise.all([
+      const results = await Promise.allSettled([
         this.getDocumentCount(url, usuario, password),
         this.getCaseCount(url, usuario, password),
         this.getUserCount(url, usuario, password),
         this.getWorkflowCount(url, usuario, password)
       ])
 
-      return {
-        documentos,
-        casos,
-        usuarios,
-        workflows
+      const [docResult, caseResult, userResult, workflowResult] = results
+
+      const reportData = {
+        documentos: docResult.status === 'fulfilled' ? docResult.value : 0,
+        casos: caseResult.status === 'fulfilled' ? caseResult.value : 0,
+        usuarios: userResult.status === 'fulfilled' ? userResult.value : 0,
+        workflows: workflowResult.status === 'fulfilled' ? workflowResult.value : 0
       }
+
+      // If any query failed, throw the first error
+      const failedResult = results.find(r => r.status === 'rejected')
+      if (failedResult) {
+        throw failedResult.reason
+      }
+
+      return reportData
     } catch (err) {
       throw new Error(`Error extrayendo datos: ${err.message}`)
     }

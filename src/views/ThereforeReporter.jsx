@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Table, Button, Space, Modal, Form, Input, Select, message, Spin, Popconfirm, Tooltip, Card, Empty, Tabs } from 'antd'
-import { ThunderboltOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
+import { ThunderboltOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
 import { useRole } from '../hooks/useRole'
@@ -185,7 +185,8 @@ export default function ThereforeReporter() {
     setReportLoading(true)
     try {
       if (!profile.tenants?.url || !profile.tenants?.usuario) {
-        message.error('Tenant no tiene URL o credenciales configuradas')
+        message.error('El tenant no tiene URL o credenciales configuradas')
+        setReportLoading(false)
         return
       }
 
@@ -202,11 +203,24 @@ export default function ThereforeReporter() {
         nombre: profile.nombre,
         tenant: profile.tenants?.nombre,
         url: profile.tenants?.url,
-        datos
+        datos,
+        extractedAt: new Date().toISOString()
       })
       setActiveTab('datos')
     } catch (err) {
-      message.error('Error al extraer datos: ' + err.message)
+      const errorMsg = err.message || 'Error desconocido al extraer datos'
+
+      // Mostrar error específico
+      if (errorMsg.includes('Credenciales')) {
+        message.error('❌ Credenciales inválidas. Verifica el usuario y contraseña en la configuración del tenant.')
+      } else if (errorMsg.includes('timeout')) {
+        message.error('⏱️ El servidor Therefore tarda demasiado en responder. Intenta de nuevo.')
+      } else if (errorMsg.includes('CORS')) {
+        message.error('🔒 Error CORS: Contacta al administrador para configurar el acceso.')
+      } else {
+        message.error('❌ Error: ' + errorMsg)
+      }
+
       // Aún así mostrar un reporte vacío para que vea la estructura
       setReportData({
         id: profile.id,
@@ -219,7 +233,8 @@ export default function ThereforeReporter() {
           usuarios: 0,
           workflows: 0
         },
-        error: err.message
+        error: errorMsg,
+        extractedAt: new Date().toISOString()
       })
       setActiveTab('datos')
     } finally {
@@ -317,14 +332,29 @@ export default function ThereforeReporter() {
         <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
           <ThunderboltOutlined /> Therefore Reporter
         </h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={createNewProfile}
-          size="large"
-        >
-          Nuevo Perfil
-        </Button>
+        <Space>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => {
+              loadTenants()
+              loadProfiles()
+            }}
+            loading={loading}
+            title="Recargar datos"
+          >
+            Recargar
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={createNewProfile}
+            size="large"
+            disabled={tenants.length === 0}
+            title={tenants.length === 0 ? 'Primero debes crear un tenant en Gestión de Tenants' : ''}
+          >
+            Nuevo Perfil
+          </Button>
+        </Space>
       </div>
 
       <Tabs
@@ -359,95 +389,124 @@ export default function ThereforeReporter() {
             key: 'datos',
             label: 'Datos Extraídos',
             children: reportLoading ? (
-              <Spin spinning style={{ marginTop: '50px' }} />
+              <Spin spinning style={{ marginTop: '50px' }} tip="Extrayendo datos del servidor..." />
             ) : reportData ? (
               <Card style={{ marginTop: '20px' }}>
-                <h3>{reportData.nombre}</h3>
-                <p><strong>Servidor:</strong> {reportData.tenant}</p>
-                <p><strong>URL:</strong> {reportData.url}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 10px 0' }}>{reportData.nombre}</h3>
+                    <p style={{ margin: '5px 0', color: 'var(--text-secondary)' }}><strong>Servidor:</strong> {reportData.tenant}</p>
+                    <p style={{ margin: '5px 0', color: 'var(--text-secondary)', fontSize: '12px' }}><strong>URL:</strong> {reportData.url}</p>
+                  </div>
+                  {reportData.extractedAt && (
+                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      Actualizado: {new Date(reportData.extractedAt).toLocaleString('es-ES')}
+                    </p>
+                  )}
+                </div>
+
                 {reportData.error && (
                   <div style={{
                     marginTop: '15px',
-                    padding: '12px',
+                    marginBottom: '20px',
+                    padding: '12px 15px',
                     backgroundColor: '#fff7e6',
                     border: '1px solid #ffc069',
                     borderRadius: '4px',
                     color: '#d46b08'
                   }}>
-                    <strong>Advertencia:</strong> {reportData.error}
+                    <strong>⚠️ Advertencia:</strong> {reportData.error}
                   </div>
                 )}
-                <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-                  <Card>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
-                        {reportData.datos.documentos}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Documentos</div>
+
+                <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                  <Card hoverable style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--accent-primary)', marginBottom: '8px' }}>
+                      {reportData.datos.documentos.toLocaleString('es-ES')}
                     </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Documentos</div>
                   </Card>
-                  <Card>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
-                        {reportData.datos.casos}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Casos</div>
+                  <Card hoverable style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--accent-primary)', marginBottom: '8px' }}>
+                      {reportData.datos.casos.toLocaleString('es-ES')}
                     </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Casos</div>
                   </Card>
-                  <Card>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
-                        {reportData.datos.usuarios}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Usuarios</div>
+                  <Card hoverable style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--accent-primary)', marginBottom: '8px' }}>
+                      {reportData.datos.usuarios.toLocaleString('es-ES')}
                     </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Usuarios</div>
                   </Card>
-                  <Card>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
-                        {reportData.datos.workflows}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Workflows</div>
+                  <Card hoverable style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--accent-primary)', marginBottom: '8px' }}>
+                      {reportData.datos.workflows.toLocaleString('es-ES')}
                     </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Workflows</div>
                   </Card>
                 </div>
               </Card>
             ) : (
-              <Empty description="Selecciona un perfil y haz clic en 'Ver datos' para extraer información" style={{ marginTop: '50px' }} />
+              <Empty
+                description="Selecciona un perfil y haz clic en el ojo para extraer información"
+                style={{ marginTop: '100px' }}
+              />
             )
           }
         ]}
       />
 
       <Modal
-        title={selectedProfile ? 'Editar Perfil' : 'Crear Nuevo Perfil'}
+        title={selectedProfile ? '✏️ Editar Perfil' : '➕ Crear Nuevo Perfil'}
         open={isModalVisible}
         onOk={() => form.submit()}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          setIsModalVisible(false)
+          setSelectedProfile(null)
+          form.resetFields()
+        }}
         confirmLoading={loading}
         width={600}
+        okText={selectedProfile ? 'Actualizar' : 'Crear'}
+        cancelText="Cancelar"
       >
         <Form
           form={form}
           layout="vertical"
           onFinish={handleModalOk}
+          autoComplete="off"
         >
           <Form.Item
             label="Nombre del Perfil"
             name="nombre"
-            rules={[{ required: true, message: 'Nombre requerido' }]}
+            rules={[
+              { required: true, message: 'El nombre es requerido' },
+              { min: 3, message: 'El nombre debe tener al menos 3 caracteres' },
+              { max: 100, message: 'El nombre no puede exceder 100 caracteres' }
+            ]}
           >
-            <Input placeholder="ej: Reportes de Matrículas" />
+            <Input
+              placeholder="ej: Reportes de Matrículas"
+              maxLength={100}
+            />
           </Form.Item>
 
           <Form.Item
             label="Servidor (Tenant)"
             name="tenant_id"
-            rules={[{ required: true, message: 'Servidor requerido' }]}
+            rules={[{ required: true, message: 'Debes seleccionar un servidor' }]}
+            tooltip="Selecciona el servidor Therefore que deseas monitorear"
           >
             <Select
               placeholder="Selecciona un servidor"
               options={tenantOptions}
+              notFoundContent={
+                tenants.length === 0 ? (
+                  <div style={{ color: 'var(--text-secondary)' }}>
+                    No hay servidores disponibles. Crea uno en Gestión de Tenants.
+                  </div>
+                ) : undefined
+              }
             />
           </Form.Item>
 
@@ -456,8 +515,10 @@ export default function ThereforeReporter() {
             name="descripcion"
           >
             <Input.TextArea
-              placeholder="Descripción del perfil de reporte"
+              placeholder="Descripción del propósito de este perfil de reporte"
               rows={3}
+              maxLength={500}
+              showCount
             />
           </Form.Item>
         </Form>
