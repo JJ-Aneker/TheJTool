@@ -142,15 +142,12 @@ export default function ThereforeReporter() {
   }
 
   const connectToTenant = async () => {
-    const nombre = form.getFieldValue('nombre')
-    const tenantId = form.getFieldValue('tenantId')
-
-    if (!nombre || !tenantId) {
+    if (!editorState.nombre || !editorState.tenantId) {
       message.error('Completa nombre y servidor')
       return
     }
 
-    const tenant = tenants.find(t => t.id === tenantId)
+    const tenant = tenants.find(t => t.id === editorState.tenantId)
     if (!tenant) {
       message.error('Servidor no encontrado')
       return
@@ -169,8 +166,6 @@ export default function ThereforeReporter() {
 
       setEditorState(s => ({
         ...s,
-        nombre,
-        tenantId,
         connected: true,
         connectionHeaders: headers,
         connectionBaseUrl: baseUrl,
