@@ -12,7 +12,6 @@ export default function ThereforeReporter() {
   const [loading, setLoading] = useState(false)
   const [profiles, setProfiles] = useState([])
   const [tenants, setTenants] = useState([])
-  const [form] = Form.useForm()
 
   // Editor state
   const [editorState, setEditorState] = useState({
@@ -144,7 +143,6 @@ export default function ThereforeReporter() {
         groupFields: new Set(),
       })
     }
-    form.resetFields()
     setView('editor')
   }
 
@@ -462,7 +460,6 @@ export default function ThereforeReporter() {
     return <EditorView
       editorState={editorState}
       tenants={tenants}
-      form={form}
       loading={loading}
       onNameChange={(e) => setEditorState(s => ({ ...s, nombre: e.target.value }))}
       onTenantChange={(tenantId) => {
@@ -552,7 +549,7 @@ export default function ThereforeReporter() {
 // ═══════════════════════════════════════════════════════════
 
 function EditorView(props) {
-  const { editorState, tenants, form, loading, onNameChange, onTenantChange, onConnect, onToggleCategory, onToggleField, onToggleGroup, onSave, onCancel } = props
+  const { editorState, tenants, loading, onNameChange, onTenantChange, onConnect, onToggleCategory, onToggleField, onToggleGroup, onSave, onCancel } = props
 
   const renderCategoryTree = (tree) => {
     return tree.map((node, i) => {
