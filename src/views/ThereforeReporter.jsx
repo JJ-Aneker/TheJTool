@@ -56,6 +56,13 @@ export default function ThereforeReporter() {
     }
   }, [user])
 
+  // Load category fields when connected and categories change
+  useEffect(() => {
+    if (editorState.connected && editorState.selectedCatNos.size > 0) {
+      loadCategoryFields()
+    }
+  }, [editorState.connected, editorState.selectedCatNos.size])
+
   // ═══════════════════════════════════════════════════════════
   // DATA LOADING
   // ═══════════════════════════════════════════════════════════
