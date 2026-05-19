@@ -187,6 +187,9 @@ export default function ThereforeReporter() {
     }
 
     const fieldMap = new Map()
+    const newCaptionMap = { ...editorState.captionMap }
+    const newCatFieldOrder = { ...editorState.catFieldOrder }
+
     fieldMap.set('DocNo', { caption: 'DocNo', type: 0, catNos: [...editorState.selectedCatNos] })
 
     try {
@@ -197,22 +200,16 @@ export default function ThereforeReporter() {
           catNo
         )
 
-        const newCatFieldOrder = { ...editorState.catFieldOrder }
         newCatFieldOrder[catNo] = fields.map(f => f.ColName)
 
         fields.forEach(f => {
           const caption = f.Caption || f.ColName
           if (!fieldMap.has(f.ColName)) {
             fieldMap.set(f.ColName, { caption, type: f.FieldType || 0, catNos: [] })
+            newCaptionMap[f.ColName] = caption
           }
           fieldMap.get(f.ColName).catNos.push(catNo)
         })
-
-        setEditorState(s => ({
-          ...s,
-          catFieldOrder: newCatFieldOrder,
-          captionMap: { ...s.captionMap, [f.ColName]: caption }
-        }))
       }
 
       const total = editorState.selectedCatNos.size
@@ -220,7 +217,12 @@ export default function ThereforeReporter() {
         .map(([name, v]) => ({ name, ...v }))
         .filter(f => f.name === 'DocNo' || f.catNos.length === total)
 
-      setEditorState(s => ({ ...s, allCommonFields: commonFields }))
+      setEditorState(s => ({
+        ...s,
+        catFieldOrder: newCatFieldOrder,
+        captionMap: newCaptionMap,
+        allCommonFields: commonFields
+      }))
     } catch (err) {
       console.error('Error loading fields:', err)
       message.error('Error: ' + err.message)
