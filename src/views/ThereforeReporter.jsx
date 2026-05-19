@@ -705,41 +705,50 @@ function ResultsView(props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', height: '100%', overflow: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={onBack}>Volver</Button>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h1 style={{ margin: 0, flex: 1 }}>{resultsState.profile?.nombre}</h1>
       </div>
 
-      {/* Filters & Export */}
-      <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
-        <Form layout="vertical" style={{ display: 'flex', gap: '10px', flex: 1 }}>
-          <Form.Item label="Campo fecha" style={{ flex: 1, marginBottom: 0 }}>
+      {/* Filters & Actions */}
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        {/* Filtros en una línea */}
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
+            <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Campo fecha:</label>
             <Select
               value={resultsState.dateField || undefined}
               onChange={onDateFieldChange}
               options={dateFields.map(f => ({ label: captionMap[f] || f, value: f }))}
               placeholder="Selecciona..."
+              style={{ flex: 1 }}
             />
-          </Form.Item>
-          <Form.Item label="Desde" style={{ width: '150px', marginBottom: 0 }}>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Desde:</label>
             <input
               type="date"
               value={resultsState.dateFrom}
               onChange={(e) => onDateFromChange(e.target.value)}
-              style={{ padding: '6px', border: '1px solid var(--border-default)', borderRadius: '4px' }}
+              style={{ padding: '6px 8px', border: '1px solid var(--border-default)', borderRadius: '4px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
             />
-          </Form.Item>
-          <Form.Item label="Hasta" style={{ width: '150px', marginBottom: 0 }}>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Hasta:</label>
             <input
               type="date"
               value={resultsState.dateTo}
               onChange={(e) => onDateToChange(e.target.value)}
-              style={{ padding: '6px', border: '1px solid var(--border-default)', borderRadius: '4px' }}
+              style={{ padding: '6px 8px', border: '1px solid var(--border-default)', borderRadius: '4px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
             />
-          </Form.Item>
+          </div>
+        </div>
+
+        {/* Botones */}
+        <div style={{ display: 'flex', gap: '8px', whiteSpace: 'nowrap' }}>
+          <Button icon={<ArrowLeftOutlined />} onClick={onBack}>Volver</Button>
           <Button type="primary" onClick={onRun} loading={loading}>▶ Ejecutar</Button>
-          <Button onClick={onExport} type="default">⬇ Exportar CSV</Button>
-        </Form>
+          <Button onClick={onExport} type="default">⬇ CSV</Button>
+        </div>
       </div>
 
       {/* Progress */}
