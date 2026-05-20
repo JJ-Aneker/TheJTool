@@ -564,7 +564,7 @@ function EditorView(props) {
       if (node.ItemType === 1 || (children.length && node.ItemType !== 2)) {
         return (
           <div key={i} style={{ marginLeft: '20px' }}>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '12px', margin: '8px 0' }}>📁 {node.Name}</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '12px', margin: '8px 0', fontWeight: '500' }}>📁 {node.Name}</div>
             {renderCategoryTree(children)}
           </div>
         )
@@ -572,13 +572,14 @@ function EditorView(props) {
 
       if (node.ItemType === 2 || (!children.length && catNo !== undefined)) {
         return (
-          <div key={catNo} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0' }}>
+          <div key={catNo} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 4px', borderRadius: '3px', color: 'var(--text-primary)', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
             <input
               type="checkbox"
               checked={editorState.selectedCatNos.has(catNo)}
               onChange={(e) => onToggleCategory(catNo, e.target.checked)}
+              style={{ cursor: 'pointer' }}
             />
-            <span>{node.Name || `Cat #${catNo}`}</span>
+            <span style={{ fontSize: '13px' }}>{node.Name || `Cat #${catNo}`}</span>
           </div>
         )
       }
@@ -586,7 +587,7 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', height: '100%', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', height: '100%', minHeight: 0 }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid var(--border-default)' }}>
         <div>
