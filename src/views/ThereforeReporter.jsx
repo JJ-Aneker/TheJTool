@@ -641,12 +641,11 @@ function EditorView(props) {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '2px 4px',
+              padding: '4px 2px',
               borderRadius: '3px',
               color: 'var(--text-primary)',
               transition: 'background 0.2s',
-              fontSize: '12px',
-              borderBottom: '1px solid var(--bg-secondary)'
+              fontSize: '12px'
             }}
             onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
@@ -657,7 +656,7 @@ function EditorView(props) {
               onChange={(e) => onToggleCategory(catNo, e.target.checked)}
               style={{ cursor: 'pointer', width: '16px' }}
             />
-            <span>{editorState.catNames[catNo] || node.Name || `Cat #${catNo}`}</span>
+            <span>{node.Name || `Cat #${catNo}`}</span>
           </div>
         )
       }
