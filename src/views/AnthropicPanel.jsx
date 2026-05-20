@@ -15,6 +15,10 @@ export default function AnthropicPanel() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [testLoading, setTestLoading] = useState(false)
   const [testResult, setTestResult] = useState(null)
+  const [budgetLimit, setBudgetLimit] = useState(() => {
+    const saved = localStorage.getItem('anthropic_budget_limit')
+    return saved ? parseFloat(saved) : null
+  })
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -113,6 +117,15 @@ export default function AnthropicPanel() {
     }
   }
 
+  const handleBudgetChange = (value) => {
+    setBudgetLimit(value)
+    if (value) {
+      localStorage.setItem('anthropic_budget_limit', value.toString())
+    } else {
+      localStorage.removeItem('anthropic_budget_limit')
+    }
+  }
+
   const periodOptions = [
     { label: 'Today', value: 1 },
     { label: '7 days', value: 7 },
@@ -123,7 +136,7 @@ export default function AnthropicPanel() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '20px', height: '100%', overflow: 'auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <h1 className="page-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <h1 className="page-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
           <KeyOutlined /> Anthropic API Management
         </h1>
       </div>
@@ -213,6 +226,15 @@ export default function AnthropicPanel() {
               />
             </div>
 
+            {/* Available Balance Card */}
+            {usage?.summary && (
+              <BalanceCard
+                totalCost={usage.summary.totalCost}
+                budgetLimit={budgetLimit}
+                onBudgetChange={handleBudgetChange}
+              />
+            )}
+
             {/* Stats Cards */}
             {usage?.summary && (
               <div style={{
@@ -247,7 +269,7 @@ export default function AnthropicPanel() {
             {usage && (
               <>
                 <div>
-                  <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px' }}>Usage by Module</h3>
+                  <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px', color: 'var(--text-primary)' }}>Usage by Module</h3>
                   <UsageTable data={usage.byModule} />
                 </div>
 
@@ -363,6 +385,98 @@ function UsageTable({ data, isUser = false }) {
         </tbody>
       </table>
     </div>
+  )
+}
+
+function BalanceCard({ totalCost, budgetLimit, onBudgetChange }) {
+  const remaining = budgetLimit ? budgetLimit - totalCost : null
+  const percentUsed = budgetLimit ? (totalCost / budgetLimit) * 100 : 0
+  const isOver = budgetLimit && totalCost > budgetLimit
+
+  return (
+    <Card
+      style={{
+        backgroundColor: isOver ? 'rgba(239, 68, 68, 0.05)' : 'rgba(79, 142, 247, 0.05)',
+        borderColor: isOver ? 'var(--kpi-red)' : 'var(--kpi-blue)',
+        borderWidth: '1px'
+      }}
+    >
+      <Space direction="vertical" style={{ width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Available Balance</div>
+          {budgetLimit && (
+            <Tag color={isOver ? 'red' : 'green'}>
+              {isOver ? '⚠️ Over Budget' : '✓ On Track'}
+            </Tag>
+          )}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+          <div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Spent (This Period)</div>
+            <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
+              ${totalCost.toFixed(2)}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Budget Limit</div>
+            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
+              {budgetLimit ? `$${budgetLimit.toFixed(2)}` : 'Not set'}
+            </div>
+          </div>
+        </div>
+
+        {budgetLimit && (
+          <>
+            <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  width: `${Math.min(percentUsed, 100)}%`,
+                  height: '100%',
+                  backgroundColor: isOver ? 'var(--kpi-red)' : 'var(--kpi-green)',
+                  transition: 'width 0.3s'
+                }}
+              />
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+              {isOver ? (
+                <>Over by <span style={{ color: 'var(--kpi-red)', fontWeight: 600 }}>${Math.abs(remaining).toFixed(2)}</span></>
+              ) : (
+                <>Remaining: <span style={{ color: 'var(--kpi-green)', fontWeight: 600 }}>${remaining.toFixed(2)}</span></>
+              )}
+              ({percentUsed.toFixed(0)}% used)
+            </div>
+          </>
+        )}
+
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <label style={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap' }}>Set Budget:</label>
+          <InputNumber
+            value={budgetLimit}
+            onChange={onBudgetChange}
+            prefix="$"
+            precision={2}
+            min={0}
+            placeholder="Enter limit"
+            style={{ flex: 1 }}
+          />
+          {budgetLimit && (
+            <Button
+              type="text"
+              size="small"
+              onClick={() => onBudgetChange(null)}
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+
+        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+          💡 Tip: Set a budget limit to track spending. The actual balance is available in your Anthropic console.
+        </div>
+      </Space>
+    </Card>
   )
 }
 
