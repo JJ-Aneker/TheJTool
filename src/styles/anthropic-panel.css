@@ -1,0 +1,15 @@
+/* Anthropic Panel Styles */
+
+.anthropic-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+}
+
+.anthropic-card :where(.ant-card-head) {
+  border-bottom: 1px solid var(--border-default);
+}
+
+.anthropic-card :where(.ant-card-body) {
+  padding: 16px;
+}

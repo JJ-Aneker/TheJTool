@@ -16,7 +16,8 @@ import {
   UserSwitchOutlined,
   SunOutlined,
   MoonOutlined,
-  ThunderboltOutlined
+  ThunderboltOutlined,
+  KeyOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useRole } from './hooks/useRole'
@@ -38,6 +39,7 @@ import EFormBuilder from './views/EFormBuilder'
 import CategoryBuilder from './views/CategoryBuilder'
 import EFDTGenerator from './views/EFDTGenerator'
 import ThereforeReporter from './views/ThereforeReporter'
+import AnthropicPanel from './views/AnthropicPanel'
 import Placeholder from './views/Placeholder'
 
 const { Sider, Content } = Layout
@@ -56,6 +58,13 @@ const getMenuItems = (isAdmin = false) => {
       icon: <UserOutlined />,
       label: 'Gestión de Usuarios',
       path: '/users',
+      adminOnly: true
+    },
+    {
+      key: 'anthropic',
+      icon: <KeyOutlined />,
+      label: 'API Anthropic',
+      path: '/anthropic',
       adminOnly: true
     },
     {
@@ -382,6 +391,7 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<AdminRoute><UserManager /></AdminRoute>} />
+            <Route path="/anthropic" element={<AdminRoute><AnthropicPanel /></AdminRoute>} />
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
             <Route path="/tenants" element={<TenantManager />} />

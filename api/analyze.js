@@ -3,6 +3,7 @@
 // y extrae datos estructurados del proyecto via Claude API
 
 import { createClient } from '@supabase/supabase-js'
+import { callAnthropic } from './anthropicClient.js'
 import { RATIOS } from './_lib/knowledge/ratios.js'
 import { TEXTOS } from './_lib/knowledge/textos_estandar.js'
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js'
@@ -318,28 +319,17 @@ Solo JSON puro, sin texto adicional.`
     })
 
     // ── LLAMADA A CLAUDE API ────────────────────────────────────────────────
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 6000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userContent }],
-      }),
+    const userId = req.headers['x-user-id'] || null
+
+    const data = await callAnthropic({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 6000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userContent }],
+    }, {
+      userId,
+      module: 'efdt'
     })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: data.error?.message || 'Error en la API de Anthropic',
-      })
-    }
 
     const rawText = data.content[0].text
     let projectData

@@ -174,13 +174,15 @@ export default function ThereforeReporter() {
       )
 
       const catTree = await thereforeService.getCategoryTree(baseUrl, headers)
+      const extractedNames = extractCategoryNames(catTree)
 
       setEditorState(s => ({
         ...s,
         connected: true,
         connectionHeaders: headers,
         connectionBaseUrl: baseUrl,
-        catTree
+        catTree,
+        catNames: extractedNames
       }))
 
       message.success('✓ Conectado')
@@ -189,6 +191,26 @@ export default function ThereforeReporter() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Extract category names from tree for use throughout the app
+  const extractCategoryNames = (tree) => {
+    const names = {}
+    const traverse = (items) => {
+      if (!items) return
+      items.forEach(item => {
+        if (item.ItemType === 2 || (!item.ChildItems && item.ItemNo !== undefined)) {
+          // This is a category
+          const catNo = item.ItemNo ?? item.CategoryNo
+          if (catNo !== undefined) {
+            names[catNo] = item.Name || `#${catNo}`
+          }
+        }
+        if (item.ChildItems) traverse(item.ChildItems)
+      })
+    }
+    traverse(tree)
+    return names
   }
 
   const loadCategoryFields = async () => {
@@ -200,6 +222,7 @@ export default function ThereforeReporter() {
     const fieldMap = new Map()
     const newCaptionMap = { ...editorState.captionMap }
     const newCatFieldOrder = { ...editorState.catFieldOrder }
+    const newCatNames = { ...editorState.catNames, ...extractCategoryNames(editorState.catTree) }
 
     fieldMap.set('DocNo', { caption: 'DocNo', type: 0, catNos: [...editorState.selectedCatNos] })
 
@@ -230,6 +253,7 @@ export default function ThereforeReporter() {
 
       setEditorState(s => ({
         ...s,
+        catNames: newCatNames,
         catFieldOrder: newCatFieldOrder,
         captionMap: newCaptionMap,
         allCommonFields: commonFields
@@ -497,18 +521,22 @@ export default function ThereforeReporter() {
   }
 
   if (view === 'results') {
-    return <ResultsView
-      resultsState={resultsState}
-      loading={loading}
-      onDateFieldChange={(field) => setResultsState(s => ({ ...s, dateField: field }))}
-      onDateFromChange={(date) => setResultsState(s => ({ ...s, dateFrom: date }))}
-      onDateToChange={(date) => setResultsState(s => ({ ...s, dateTo: date }))}
-      onRun={runQuery}
-      onExport={exportCSV}
-      onBack={() => setView('home')}
-      catNames={editorState.catNames}
-      captionMap={editorState.captionMap}
-    />
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <ResultsView
+          resultsState={resultsState}
+          loading={loading}
+          onDateFieldChange={(field) => setResultsState(s => ({ ...s, dateField: field }))}
+          onDateFromChange={(date) => setResultsState(s => ({ ...s, dateFrom: date }))}
+          onDateToChange={(date) => setResultsState(s => ({ ...s, dateTo: date }))}
+          onRun={runQuery}
+          onExport={exportCSV}
+          onBack={() => setView('home')}
+          catNames={editorState.catNames}
+          captionMap={editorState.captionMap}
+        />
+      </div>
+    )
   }
 
   // HOME VIEW
@@ -584,18 +612,8 @@ function EditorView(props) {
         return (
           <div key={i}>
             <div
-              style={{
-                marginLeft: `${level * 16}px`,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: '4px 2px',
-                cursor: 'pointer',
-                color: 'var(--text-secondary)',
-                fontSize: '12px',
-                fontWeight: '500',
-                userSelect: 'none'
-              }}
+              className="tr-tree-item"
+              style={{ marginLeft: `${level * 16}px`, cursor: 'pointer', fontWeight: '500' }}
               onClick={() => toggleFolder(folderKey)}
             >
               <span style={{ width: '16px', textAlign: 'center' }}>
@@ -612,19 +630,8 @@ function EditorView(props) {
         return (
           <div
             key={catNo}
-            style={{
-              marginLeft: `${level * 16}px`,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 2px',
-              borderRadius: '3px',
-              color: 'var(--text-primary)',
-              transition: 'background 0.2s',
-              fontSize: '12px'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            className="tr-tree-item"
+            style={{ marginLeft: `${level * 16}px` }}
           >
             <input
               type="checkbox"
@@ -727,18 +734,10 @@ function EditorView(props) {
                 Selecciona categorías
               </div>
             ) : (
-              editorState.allCommonFields.map(f => (
+              [...editorState.allCommonFields].sort((a, b) => a.caption.localeCompare(b.caption)).map(f => (
                 <div
                   key={f.name}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '2px 4px',
-                    color: 'var(--text-primary)',
-                    fontSize: '11px',
-                    borderBottom: '1px solid var(--bg-secondary)'
-                  }}
+                  className="tr-field-item"
                 >
                   {f.name !== 'DocNo' && (
                     <input
@@ -797,77 +796,83 @@ function ResultsView(props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0, height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h1 style={{ margin: 0, flex: 1 }}>{resultsState.profile?.nombre}</h1>
+      {/* Header - non-scrollable */}
+      <div style={{ padding: '20px 20px 0 20px', flexShrink: 0, borderBottom: '1px solid var(--border-default)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <h1 style={{ margin: 0, flex: 1 }}>{resultsState.profile?.nombre}</h1>
+        </div>
+
+        {/* Filters & Actions */}
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '16px' }}>
+          {/* Filtros en una línea */}
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
+              <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Campo fecha:</label>
+              <Select
+                value={resultsState.dateField || undefined}
+                onChange={onDateFieldChange}
+                options={dateFields.map(f => ({ label: captionMap[f] || f, value: f }))}
+                placeholder="Selecciona..."
+                style={{ flex: 1 }}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Desde:</label>
+              <input
+                type="date"
+                value={resultsState.dateFrom}
+                onChange={(e) => onDateFromChange(e.target.value)}
+                style={{ padding: '6px 8px', border: '1px solid var(--border-default)', borderRadius: '4px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Hasta:</label>
+              <input
+                type="date"
+                value={resultsState.dateTo}
+                onChange={(e) => onDateToChange(e.target.value)}
+                style={{ padding: '6px 8px', border: '1px solid var(--border-default)', borderRadius: '4px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+              />
+            </div>
+          </div>
+
+          {/* Botones */}
+          <div style={{ display: 'flex', gap: '8px', whiteSpace: 'nowrap' }}>
+            <Button icon={<ArrowLeftOutlined />} onClick={onBack}>Volver</Button>
+            <Button type="primary" onClick={onRun} loading={loading}>▶ Ejecutar</Button>
+            <Button onClick={onExport} type="default">⬇ CSV</Button>
+          </div>
+        </div>
+
+        {/* Progress */}
+        {loading && (
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '10px', fontSize: '12px' }}>{resultsState.progress.label}</div>
+            <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ width: `${resultsState.progress.pct}%`, height: '100%', backgroundColor: 'var(--accent-primary)', transition: 'width 0.3s' }} />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Filters & Actions */}
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        {/* Filtros en una línea */}
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
-            <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Campo fecha:</label>
-            <Select
-              value={resultsState.dateField || undefined}
-              onChange={onDateFieldChange}
-              options={dateFields.map(f => ({ label: captionMap[f] || f, value: f }))}
-              placeholder="Selecciona..."
-              style={{ flex: 1 }}
-            />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Desde:</label>
-            <input
-              type="date"
-              value={resultsState.dateFrom}
-              onChange={(e) => onDateFromChange(e.target.value)}
-              style={{ padding: '6px 8px', border: '1px solid var(--border-default)', borderRadius: '4px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-            />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <label style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>Hasta:</label>
-            <input
-              type="date"
-              value={resultsState.dateTo}
-              onChange={(e) => onDateToChange(e.target.value)}
-              style={{ padding: '6px 8px', border: '1px solid var(--border-default)', borderRadius: '4px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-            />
-          </div>
-        </div>
+      {/* Content - scrollable */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px' }}>
+        {/* Dashboard */}
+        {!loading && resultsState.rows.length > 0 && (
+          <DashboardView
+            rows={resultsState.rows}
+            canonicalFields={resultsState.canonicalFields}
+            catNames={resultsState.profile?.cat_names || {}}
+            captionMap={resultsState.profile?.caption_map || {}}
+            groupFields={resultsState.profile?.group_fields || []}
+            onExport={onExport}
+          />
+        )}
 
-        {/* Botones */}
-        <div style={{ display: 'flex', gap: '8px', whiteSpace: 'nowrap' }}>
-          <Button icon={<ArrowLeftOutlined />} onClick={onBack}>Volver</Button>
-          <Button type="primary" onClick={onRun} loading={loading}>▶ Ejecutar</Button>
-          <Button onClick={onExport} type="default">⬇ CSV</Button>
-        </div>
+        {!loading && resultsState.rows.length === 0 && !resultsState.dateFrom && (
+          <Empty description="Selecciona rango de fechas y ejecuta" style={{ marginTop: '50px' }} />
+        )}
       </div>
-
-      {/* Progress */}
-      {loading && (
-        <div>
-          <div style={{ marginBottom: '10px', fontSize: '12px' }}>{resultsState.progress.label}</div>
-          <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
-            <div style={{ width: `${resultsState.progress.pct}%`, height: '100%', backgroundColor: 'var(--accent-primary)', transition: 'width 0.3s' }} />
-          </div>
-        </div>
-      )}
-
-      {/* Dashboard */}
-      {!loading && resultsState.rows.length > 0 && (
-        <DashboardView
-          rows={resultsState.rows}
-          canonicalFields={resultsState.canonicalFields}
-          catNames={resultsState.profile?.cat_names || {}}
-          captionMap={resultsState.profile?.caption_map || {}}
-          groupFields={resultsState.profile?.group_fields || []}
-          onExport={onExport}
-        />
-      )}
-
-      {!loading && resultsState.rows.length === 0 && !resultsState.dateFrom && (
-        <Empty description="Selecciona rango de fechas y ejecuta" style={{ marginTop: '50px' }} />
-      )}
     </div>
   )
 }
