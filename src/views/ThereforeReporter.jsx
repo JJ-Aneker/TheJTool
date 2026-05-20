@@ -635,93 +635,180 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px', height: '100%', minHeight: 0 }}>
-      {/* Header with buttons */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '6px', borderBottom: '1px solid var(--border-default)' }}>
-        <div>
-          <h2 style={{ margin: 0 }}>Crear / Editar Perfil</h2>
-          {editorState.nombre && editorState.tenantId && (
-            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-              <strong>{editorState.nombre}</strong> • {tenants.find(t => t.id === editorState.tenantId)?.nombre}
-              {editorState.connected && <span style={{ color: 'var(--success)', marginLeft: '6px' }}>✓ Conectado</span>}
-            </div>
-          )}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0 }}>
+      {/* Single Header Line: Title | Nombre | Servidor | Buttons */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        paddingBottom: '8px',
+        borderBottom: '1px solid var(--border-default)',
+        marginBottom: '8px',
+        minHeight: 0
+      }}>
+        <div style={{ minWidth: 0 }}>
+          <h2 style={{ margin: 0, fontSize: '14px', whiteSpace: 'nowrap' }}>Crear / Editar Perfil</h2>
         </div>
-        <Space size="small">
-          <Button onClick={onCancel}>Cancelar</Button>
-          <Button type="primary" loading={loading} onClick={onSave}>💾 Guardar</Button>
-          <Button loading={loading} onClick={onConnect} type="primary">
-            🔗 Conectar
-          </Button>
-        </Space>
-      </div>
 
-      {/* Connection Form - Inline labels */}
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '13px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-          <label style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontWeight: '500' }}>Nombre del perfil:</label>
-          <Input value={editorState.nombre} onChange={onNameChange} placeholder="ej: Aliseda - Notificaciones" size="small" style={{ flex: 1 }} />
+        {editorState.nombre && editorState.tenantId && (
+          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', minWidth: 0 }}>
+            <strong>{editorState.nombre}</strong> • {tenants.find(t => t.id === editorState.tenantId)?.nombre}
+            {editorState.connected && <span style={{ color: 'var(--accent-primary)' }}>✓</span>}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
+          <label style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Nombre:</label>
+          <Input
+            value={editorState.nombre}
+            onChange={onNameChange}
+            placeholder="ej: Aliseda - Notificaciones"
+            size="small"
+            style={{ flex: 1, minWidth: '150px' }}
+          />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-          <label style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontWeight: '500' }}>Servidor:</label>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
+          <label style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Servidor:</label>
           <Select
             value={editorState.tenantId || undefined}
             onChange={onTenantChange}
             placeholder="Selecciona..."
             options={tenants.map(t => ({ label: t.nombre, value: t.id }))}
             size="small"
-            style={{ flex: 1 }}
+            style={{ flex: 1, minWidth: '150px' }}
           />
         </div>
+
+        <Space size="small" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <Button size="small" onClick={onCancel}>Cancelar</Button>
+          <Button size="small" type="primary" loading={loading} onClick={onSave}>💾 Guardar</Button>
+          <Button size="small" loading={loading} onClick={onConnect} type="primary">
+            🔗 Conectar
+          </Button>
+        </Space>
       </div>
 
       {/* Panels: Categorías & Campos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flex: 1, minHeight: 0 }}>
-        {/* Panel 2: Categorías */}
-        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <h3 style={{ margin: '0 0 6px 0', color: 'var(--text-primary)', fontSize: '13px' }}>② Categorías</h3>
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: '4px', padding: '6px', flex: 1, overflow: 'auto', minHeight: 0 }}>
-            {editorState.connected ? renderCategoryTree(editorState.catTree) : <Empty description="Conecta primero" />}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', flex: 1, minHeight: 0 }}>
+        {/* Panel: Categorías */}
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          {/* Panel Header */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            paddingBottom: '4px',
+            borderBottom: '1px solid var(--border-default)',
+            marginBottom: '4px'
+          }}>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>📁 Categorías</span>
+            <span style={{
+              fontSize: '10px',
+              padding: '2px 6px',
+              borderRadius: '12px',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-secondary)',
+              whiteSpace: 'nowrap'
+            }}>
+              {editorState.selectedCatNos.size} seleccionadas
+            </span>
           </div>
-          <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--text-secondary)' }}>
-            {editorState.selectedCatNos.size} seleccionadas
+          {/* Scrollable Content */}
+          <div style={{
+            border: '1px solid var(--border-default)',
+            borderRadius: '4px',
+            flex: 1,
+            overflow: 'auto',
+            minHeight: 0
+          }}>
+            {editorState.connected ? (
+              <div style={{ padding: '2px' }}>
+                {renderCategoryTree(editorState.catTree)}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
+                Conecta primero
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Panel 3: Campos */}
-        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <h3 style={{ margin: '0 0 6px 0', color: 'var(--text-primary)', fontSize: '13px' }}>③ Campos</h3>
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: '4px', padding: '6px', flex: 1, overflow: 'auto', minHeight: 0 }}>
+        {/* Panel: Campos */}
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          {/* Panel Header */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            paddingBottom: '4px',
+            borderBottom: '1px solid var(--border-default)',
+            marginBottom: '4px'
+          }}>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>🗂 Campos del informe</span>
+            <span style={{
+              fontSize: '10px',
+              padding: '2px 6px',
+              borderRadius: '12px',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-secondary)',
+              whiteSpace: 'nowrap'
+            }}>
+              {editorState.selectedFields.size} campos
+            </span>
+          </div>
+          {/* Scrollable Content */}
+          <div style={{
+            border: '1px solid var(--border-default)',
+            borderRadius: '4px',
+            flex: 1,
+            overflow: 'auto',
+            minHeight: 0
+          }}>
             {editorState.allCommonFields.length === 0 ? (
-              <Empty description="Selecciona categorías" />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
+                Selecciona categorías
+              </div>
             ) : (
-              editorState.allCommonFields.map(f => (
-                <div key={f.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', borderBottom: '1px solid var(--border-default)', color: 'var(--text-primary)', fontSize: '12px' }}>
-                  {f.name !== 'DocNo' && (
-                    <input
-                      type="checkbox"
-                      checked={editorState.selectedFields.has(f.name)}
-                      onChange={(e) => onToggleField(f.name, e.target.checked)}
-                    />
-                  )}
-                  {f.name === 'DocNo' && <span style={{ width: '18px' }}>✓</span>}
-                  <span style={{ flex: 1, fontWeight: f.name === 'DocNo' ? '500' : '400' }}>{f.caption}</span>
-                  {f.name !== 'DocNo' && (
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+              <div style={{ padding: '2px' }}>
+                {editorState.allCommonFields.map(f => (
+                  <div
+                    key={f.name}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '2px 4px',
+                      color: 'var(--text-primary)',
+                      fontSize: '11px',
+                      borderBottom: '1px solid var(--bg-secondary)'
+                    }}
+                  >
+                    {f.name !== 'DocNo' && (
                       <input
                         type="checkbox"
-                        checked={editorState.groupFields.has(f.name)}
-                        onChange={(e) => onToggleGroup(f.name, e.target.checked)}
+                        checked={editorState.selectedFields.has(f.name)}
+                        onChange={(e) => onToggleField(f.name, e.target.checked)}
+                        style={{ width: '14px', height: '14px', cursor: 'pointer' }}
                       />
-                      Agrupar
-                    </label>
-                  )}
-                </div>
-              ))
+                    )}
+                    {f.name === 'DocNo' && <span style={{ width: '18px', textAlign: 'center' }}>✓</span>}
+                    <span style={{ flex: 1, fontWeight: f.name === 'DocNo' ? '600' : '400', minWidth: 0 }}>{f.caption}</span>
+                    {f.name !== 'DocNo' && (
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={editorState.groupFields.has(f.name)}
+                          onChange={(e) => onToggleGroup(f.name, e.target.checked)}
+                          style={{ width: '12px', height: '12px' }}
+                        />
+                        Agrupar
+                      </label>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
-          </div>
-          <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--text-secondary)' }}>
-            {editorState.selectedFields.size} campos seleccionados
           </div>
         </div>
       </div>
