@@ -411,7 +411,7 @@ export default function ThereforeReporter() {
 
       // Build queries
       const queries = resultsState.profile.saved_cat_nos.map(catNo => ({
-        CategoryNo: String(catNo),
+        CategoryNo: catNo,
         Mode: 0,
         MaxRows: 10000,
         Conditions: [{

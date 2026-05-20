@@ -311,7 +311,7 @@ class ThereforeService {
     const resp = await fetch(baseUrl + '/GetCategoryInfo', {
       method: 'POST',
       headers,
-      body: JSON.stringify({ CategoryNo: String(categoryNo) })
+      body: JSON.stringify({ CategoryNo: categoryNo })
     })
 
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
