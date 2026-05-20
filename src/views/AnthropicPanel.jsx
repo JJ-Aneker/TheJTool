@@ -19,6 +19,10 @@ export default function AnthropicPanel() {
     const saved = localStorage.getItem('anthropic_budget_limit')
     return saved ? parseFloat(saved) : null
   })
+  const [availableBalance, setAvailableBalance] = useState(() => {
+    const saved = localStorage.getItem('anthropic_available_balance')
+    return saved ? parseFloat(saved) : null
+  })
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -123,6 +127,15 @@ export default function AnthropicPanel() {
       localStorage.setItem('anthropic_budget_limit', value.toString())
     } else {
       localStorage.removeItem('anthropic_budget_limit')
+    }
+  }
+
+  const handleAvailableBalanceChange = (value) => {
+    setAvailableBalance(value)
+    if (value) {
+      localStorage.setItem('anthropic_available_balance', value.toString())
+    } else {
+      localStorage.removeItem('anthropic_available_balance')
     }
   }
 
@@ -232,6 +245,8 @@ export default function AnthropicPanel() {
                 totalCost={usage.summary.totalCost}
                 budgetLimit={budgetLimit}
                 onBudgetChange={handleBudgetChange}
+                availableBalance={availableBalance}
+                onAvailableBalanceChange={handleAvailableBalanceChange}
               />
             )}
 
@@ -388,30 +403,29 @@ function UsageTable({ data, isUser = false }) {
   )
 }
 
-function BalanceCard({ totalCost, budgetLimit, onBudgetChange }) {
+function BalanceCard({ totalCost, budgetLimit, onBudgetChange, availableBalance, onAvailableBalanceChange }) {
   const remaining = budgetLimit ? budgetLimit - totalCost : null
   const percentUsed = budgetLimit ? (totalCost / budgetLimit) * 100 : 0
   const isOver = budgetLimit && totalCost > budgetLimit
+  const remainingInAccount = availableBalance ? availableBalance - totalCost : null
 
   return (
     <Card
       style={{
-        backgroundColor: isOver ? 'rgba(239, 68, 68, 0.05)' : 'rgba(79, 142, 247, 0.05)',
-        borderColor: isOver ? 'var(--kpi-red)' : 'var(--kpi-blue)',
+        backgroundColor: isOver || (remainingInAccount && remainingInAccount < 0) ? 'rgba(239, 68, 68, 0.05)' : 'rgba(79, 142, 247, 0.05)',
+        borderColor: isOver || (remainingInAccount && remainingInAccount < 0) ? 'var(--kpi-red)' : 'var(--kpi-blue)',
         borderWidth: '1px'
       }}
     >
       <Space direction="vertical" style={{ width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Available Balance</div>
-          {budgetLimit && (
-            <Tag color={isOver ? 'red' : 'green'}>
-              {isOver ? '⚠️ Over Budget' : '✓ On Track'}
-            </Tag>
+          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Account Balance & Spending</div>
+          {(isOver || (remainingInAccount && remainingInAccount < 0)) && (
+            <Tag color="red">⚠️ Low Balance</Tag>
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           <div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Spent (This Period)</div>
             <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
@@ -419,9 +433,15 @@ function BalanceCard({ totalCost, budgetLimit, onBudgetChange }) {
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Budget Limit</div>
-            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
-              {budgetLimit ? `$${budgetLimit.toFixed(2)}` : 'Not set'}
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Available Balance</div>
+            <div style={{ fontSize: '18px', fontWeight: '600', color: availableBalance ? 'var(--kpi-green)' : 'var(--text-secondary)' }}>
+              {availableBalance ? `$${availableBalance.toFixed(2)}` : 'Not set'}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Remaining</div>
+            <div style={{ fontSize: '18px', fontWeight: '600', color: remainingInAccount ? (remainingInAccount < 0 ? 'var(--kpi-red)' : 'var(--kpi-green)') : 'var(--text-secondary)' }}>
+              {remainingInAccount !== null ? `$${remainingInAccount.toFixed(2)}` : '—'}
             </div>
           </div>
         </div>
@@ -449,31 +469,69 @@ function BalanceCard({ totalCost, budgetLimit, onBudgetChange }) {
           </>
         )}
 
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <label style={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap' }}>Set Budget:</label>
-          <InputNumber
-            value={budgetLimit}
-            onChange={onBudgetChange}
-            prefix="$"
-            precision={2}
-            min={0}
-            placeholder="Enter limit"
-            style={{ flex: 1 }}
-          />
-          {budgetLimit && (
-            <Button
-              type="text"
-              size="small"
-              onClick={() => onBudgetChange(null)}
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              Clear
-            </Button>
-          )}
+        {remainingInAccount !== null && (
+          <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border-default)', borderRadius: '3px', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: `${Math.min((totalCost / availableBalance) * 100, 100)}%`,
+                height: '100%',
+                backgroundColor: remainingInAccount < 0 ? 'var(--kpi-red)' : 'var(--kpi-green)',
+                transition: 'width 0.3s'
+              }}
+            />
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flex: 1, minWidth: '250px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap' }}>Account Balance:</label>
+            <InputNumber
+              value={availableBalance}
+              onChange={onAvailableBalanceChange}
+              prefix="$"
+              precision={2}
+              min={0}
+              placeholder="Enter your balance"
+              style={{ flex: 1 }}
+            />
+            {availableBalance && (
+              <Button
+                type="text"
+                size="small"
+                onClick={() => onAvailableBalanceChange(null)}
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                ✕
+              </Button>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flex: 1, minWidth: '250px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap' }}>Budget Limit:</label>
+            <InputNumber
+              value={budgetLimit}
+              onChange={onBudgetChange}
+              prefix="$"
+              precision={2}
+              min={0}
+              placeholder="Optional limit"
+              style={{ flex: 1 }}
+            />
+            {budgetLimit && (
+              <Button
+                type="text"
+                size="small"
+                onClick={() => onBudgetChange(null)}
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                ✕
+              </Button>
+            )}
+          </div>
         </div>
 
         <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-          💡 Tip: Set a budget limit to track spending. The actual balance is available in your Anthropic console.
+          💡 Set your account balance to track remaining credit. Budget limit is optional for spending alerts. Values are saved locally.
         </div>
       </Space>
     </Card>

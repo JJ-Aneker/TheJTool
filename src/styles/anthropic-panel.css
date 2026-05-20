@@ -13,3 +13,35 @@
 .anthropic-card :where(.ant-card-body) {
   padding: 16px;
 }
+
+/* Dark mode text contrast fixes */
+.anthropic-card h1,
+.anthropic-card h2,
+.anthropic-card h3,
+.anthropic-card h4,
+.anthropic-card h5,
+.anthropic-card h6 {
+  color: var(--text-primary) !important;
+}
+
+.anthropic-card label {
+  color: var(--text-primary) !important;
+}
+
+.anthropic-card .ant-card-head-title {
+  color: var(--text-primary) !important;
+}
+
+/* Input styling for dark mode */
+.anthropic-card :where(.ant-input),
+.anthropic-card :where(.ant-input-number),
+.anthropic-card :where(.ant-select-selector) {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+
+.anthropic-card :where(.ant-input)::placeholder,
+.anthropic-card :where(.ant-input-number)::placeholder {
+  color: var(--text-secondary) !important;
+}
