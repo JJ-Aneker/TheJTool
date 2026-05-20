@@ -174,15 +174,13 @@ export default function ThereforeReporter() {
       )
 
       const catTree = await thereforeService.getCategoryTree(baseUrl, headers)
-      const extractedNames = extractCategoryNames(catTree)
 
       setEditorState(s => ({
         ...s,
         connected: true,
         connectionHeaders: headers,
         connectionBaseUrl: baseUrl,
-        catTree,
-        catNames: extractedNames
+        catTree
       }))
 
       message.success('✓ Conectado')
@@ -191,26 +189,6 @@ export default function ThereforeReporter() {
     } finally {
       setLoading(false)
     }
-  }
-
-  // Extract category names from tree for use throughout the app
-  const extractCategoryNames = (tree) => {
-    const names = {}
-    const traverse = (items) => {
-      if (!items) return
-      items.forEach(item => {
-        if (item.ItemType === 2 || (!item.ChildItems && item.ItemNo !== undefined)) {
-          // This is a category
-          const catNo = item.ItemNo ?? item.CategoryNo
-          if (catNo !== undefined) {
-            names[catNo] = item.Name || `#${catNo}`
-          }
-        }
-        if (item.ChildItems) traverse(item.ChildItems)
-      })
-    }
-    traverse(tree)
-    return names
   }
 
   const loadCategoryFields = async () => {
@@ -222,7 +200,6 @@ export default function ThereforeReporter() {
     const fieldMap = new Map()
     const newCaptionMap = { ...editorState.captionMap }
     const newCatFieldOrder = { ...editorState.catFieldOrder }
-    const newCatNames = { ...editorState.catNames, ...extractCategoryNames(editorState.catTree) }
 
     fieldMap.set('DocNo', { caption: 'DocNo', type: 0, catNos: [...editorState.selectedCatNos] })
 
@@ -253,7 +230,6 @@ export default function ThereforeReporter() {
 
       setEditorState(s => ({
         ...s,
-        catNames: newCatNames,
         catFieldOrder: newCatFieldOrder,
         captionMap: newCaptionMap,
         allCommonFields: commonFields
@@ -751,7 +727,7 @@ function EditorView(props) {
                 Selecciona categorías
               </div>
             ) : (
-              [...editorState.allCommonFields].sort((a, b) => a.caption.localeCompare(b.caption)).map(f => (
+              editorState.allCommonFields.map(f => (
                 <div
                   key={f.name}
                   style={{
