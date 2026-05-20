@@ -463,33 +463,37 @@ export default function ThereforeReporter() {
   // ═══════════════════════════════════════════════════════════
 
   if (view === 'editor') {
-    return <EditorView
-      editorState={editorState}
-      tenants={tenants}
-      loading={loading}
-      onNameChange={(e) => setEditorState(s => ({ ...s, nombre: e.target.value }))}
-      onTenantChange={(tenantId) => {
-        const tenant = tenants.find(t => t.id === tenantId)
-        setEditorState(s => ({ ...s, tenantId, catNames: tenant ? { [tenant.id]: tenant.nombre } : {} }))
-      }}
-      onConnect={connectToTenant}
-      onToggleCategory={toggleCategory}
-      onToggleField={(field, checked) => {
-        const newSelectedFields = new Set(editorState.selectedFields)
-        if (field === 'DocNo') return
-        if (checked) newSelectedFields.add(field)
-        else newSelectedFields.delete(field)
-        setEditorState(s => ({ ...s, selectedFields: newSelectedFields }))
-      }}
-      onToggleGroup={(field, checked) => {
-        const newGroupFields = new Set(editorState.groupFields)
-        if (checked) newGroupFields.add(field)
-        else newGroupFields.delete(field)
-        setEditorState(s => ({ ...s, groupFields: newGroupFields }))
-      }}
-      onSave={saveProfile}
-      onCancel={() => setView('home')}
-    />
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <EditorView
+          editorState={editorState}
+          tenants={tenants}
+          loading={loading}
+          onNameChange={(e) => setEditorState(s => ({ ...s, nombre: e.target.value }))}
+          onTenantChange={(tenantId) => {
+            const tenant = tenants.find(t => t.id === tenantId)
+            setEditorState(s => ({ ...s, tenantId, catNames: tenant ? { [tenant.id]: tenant.nombre } : {} }))
+          }}
+          onConnect={connectToTenant}
+          onToggleCategory={toggleCategory}
+          onToggleField={(field, checked) => {
+            const newSelectedFields = new Set(editorState.selectedFields)
+            if (field === 'DocNo') return
+            if (checked) newSelectedFields.add(field)
+            else newSelectedFields.delete(field)
+            setEditorState(s => ({ ...s, selectedFields: newSelectedFields }))
+          }}
+          onToggleGroup={(field, checked) => {
+            const newGroupFields = new Set(editorState.groupFields)
+            if (checked) newGroupFields.add(field)
+            else newGroupFields.delete(field)
+            setEditorState(s => ({ ...s, groupFields: newGroupFields }))
+          }}
+          onSave={saveProfile}
+          onCancel={() => setView('home')}
+        />
+      </div>
+    )
   }
 
   if (view === 'results') {
