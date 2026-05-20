@@ -28,31 +28,7 @@ export default function AnthropicPanel() {
   useEffect(() => {
     loadStatus()
     loadUsage()
-    loadBalance()
   }, [period])
-
-  const loadBalance = async () => {
-    try {
-      const resp = await fetch('/api/admin/anthropic/balance', {
-        headers: getAuthHeaders()
-      })
-      const data = await resp.json()
-
-      if (data.success && data.balance) {
-        // Try to extract numeric balance from response
-        const balanceValue = typeof data.balance === 'number'
-          ? data.balance
-          : data.balance.balance || data.balance.available_balance || null
-
-        if (balanceValue) {
-          handleAvailableBalanceChange(balanceValue)
-        }
-      }
-    } catch (err) {
-      // Silent fail - balance is optional
-      console.log('Could not auto-fetch balance:', err.message)
-    }
-  }
 
   const getAuthHeaders = () => ({
     'Authorization': `Bearer ${session?.access_token}`,
