@@ -201,7 +201,7 @@ function AppContent() {
   ]
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>
       {/* Sidebar - 100% height with internal header and footer */}
       <div
         style={{
