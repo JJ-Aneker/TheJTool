@@ -689,33 +689,35 @@ function EditorView(props) {
         </Space>
       </div>
 
-      {/* Panels Row: Categorías & Campos — flex cadena */}
+      {/* Panels Row: Categorías & Campos — GRID con grid-template-rows: 1fr */}
       <div style={{
         flex: 1,
         minHeight: 0,
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
         gap: '12px',
         padding: '0 12px 12px 12px',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        gridTemplateRows: '1fr',
+        alignItems: 'stretch'
       }}>
         {/* Panel: Categorías */}
         <div style={{
-          flex: 1,
-          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden',
-          border: '1px solid var(--border-default)',
-          borderRadius: '8px'
+          minHeight: 0,
+          height: '100%'
         }}>
           {/* Panel Header — altura fija */}
           <div style={{
-            flex: '0 0 auto',
+            flexShrink: 0,
+            height: '44px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '8px 12px',
-            borderBottom: '1px solid var(--border-default)'
+            padding: '10px 16px',
+            borderBottom: '1px solid var(--border-default)',
+            background: 'var(--bg-secondary)'
           }}>
             <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>📁 Categorías</span>
             <span style={{
@@ -734,7 +736,8 @@ function EditorView(props) {
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
-            padding: '4px'
+            padding: '14px 16px',
+            background: 'var(--bg-card)'
           }}>
             {editorState.connected ? renderCategoryTree(editorState.catTree) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
@@ -746,22 +749,21 @@ function EditorView(props) {
 
         {/* Panel: Campos */}
         <div style={{
-          flex: 1,
-          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden',
-          border: '1px solid var(--border-default)',
-          borderRadius: '8px'
+          minHeight: 0,
+          height: '100%'
         }}>
           {/* Panel Header — altura fija */}
           <div style={{
-            flex: '0 0 auto',
+            flexShrink: 0,
+            height: '44px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '8px 12px',
-            borderBottom: '1px solid var(--border-default)'
+            padding: '10px 16px',
+            borderBottom: '1px solid var(--border-default)',
+            background: 'var(--bg-secondary)'
           }}>
             <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>🗂 Campos del informe</span>
             <span style={{
@@ -780,7 +782,8 @@ function EditorView(props) {
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
-            padding: '4px'
+            padding: '14px 16px',
+            background: 'var(--bg-card)'
           }}>
             {editorState.allCommonFields.length === 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
