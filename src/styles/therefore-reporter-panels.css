@@ -1,0 +1,122 @@
+/* Replicar EXACTAMENTE los estilos del HTML standalone que funciona */
+
+/* Editor wrap — flex column container */
+.tr-editor-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Header zone — fixed height */
+.tr-editor-header-zone {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panels row — GRID que ocupa todo el espacio restante */
+.tr-editor-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  flex: 1;
+  min-height: 0;
+  margin: 12px;
+  gap: 0;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-card);
+  align-items: stretch;
+}
+
+/* Cada panel */
+.tr-ep {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  border-right: 1px solid var(--border-default);
+}
+
+.tr-ep:last-child {
+  border-right: none;
+}
+
+/* Cabecera del panel — altura fija */
+.tr-ep-head {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-default);
+  padding: 10px 16px;
+  flex-shrink: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tr-ep-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.tr-ep-badge {
+  font-size: 10px;
+  padding: 1px 8px;
+  border-radius: 20px;
+  background: var(--bg-secondary);
+  color: var(--text-hint);
+  border: 1px solid var(--border-default);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Cuerpo del panel — SCROLLEABLE */
+.tr-ep-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+  background: var(--bg-card);
+}
+
+/* Tree container */
+.tr-tree {
+  font-size: 12px;
+}
+
+.tr-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--bg-secondary);
+  font-size: 11px;
+}
+
+/* Fields list */
+.tr-fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tr-field-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--bg-secondary);
+  font-size: 11px;
+}
+
+.tr-field-item:last-child {
+  border-bottom: none;
+}

@@ -5,6 +5,7 @@ import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
 import { thereforeService } from '../services/thereforeService'
 import '../styles/therefore-reporter.css'
+import '../styles/therefore-reporter-panels.css'
 
 export default function ThereforeReporter() {
   const { user } = useAuth()
@@ -635,110 +636,71 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0, height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div className="tr-editor-wrap">
       {/* Single Header Line: Title | Nombre | Servidor | Buttons */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '12px',
-        paddingBottom: '8px',
-        borderBottom: '1px solid var(--border-default)',
-        flex: '0 0 auto'
-      }}>
-        <div style={{ minWidth: 0 }}>
-          <h2 style={{ margin: 0, fontSize: '14px', whiteSpace: 'nowrap' }}>Crear / Editar Perfil</h2>
-        </div>
-
-        {editorState.nombre && editorState.tenantId && (
-          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', minWidth: 0 }}>
-            <strong>{editorState.nombre}</strong> • {tenants.find(t => t.id === editorState.tenantId)?.nombre}
-            {editorState.connected && <span style={{ color: 'var(--accent-primary)' }}>✓</span>}
-          </div>
-        )}
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
-          <label style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Nombre:</label>
-          <Input
-            value={editorState.nombre}
-            onChange={onNameChange}
-            placeholder="ej: Aliseda - Notificaciones"
-            size="small"
-            style={{ flex: 1, minWidth: '150px' }}
-          />
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
-          <label style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Servidor:</label>
-          <Select
-            value={editorState.tenantId || undefined}
-            onChange={onTenantChange}
-            placeholder="Selecciona..."
-            options={tenants.map(t => ({ label: t.nombre, value: t.id }))}
-            size="small"
-            style={{ flex: 1, minWidth: '150px' }}
-          />
-        </div>
-
-        <Space size="small" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-          <Button size="small" onClick={onCancel}>Cancelar</Button>
-          <Button size="small" type="primary" loading={loading} onClick={onSave}>💾 Guardar</Button>
-          <Button size="small" loading={loading} onClick={onConnect} type="primary">
-            🔗 Conectar
-          </Button>
-        </Space>
-      </div>
-
-      {/* Panels Row: Categorías & Campos — GRID con grid-template-rows: 1fr */}
-      <div style={{
-        flex: 1,
-        minHeight: 0,
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '12px',
-        padding: '0 12px 12px 12px',
-        overflow: 'hidden',
-        gridTemplateRows: '1fr',
-        alignItems: 'stretch'
-      }}>
-        {/* Panel: Categorías */}
+      <div className="tr-editor-header-zone">
         <div style={{
           display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          height: '100%'
+          alignItems: 'center',
+          gap: '12px',
+          padding: '12px',
+          paddingBottom: '8px',
         }}>
-          {/* Panel Header — altura fija */}
-          <div style={{
-            flexShrink: 0,
-            height: '44px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 16px',
-            borderBottom: '1px solid var(--border-default)',
-            background: 'var(--bg-secondary)'
-          }}>
+          <div style={{ minWidth: 0 }}>
+            <h2 style={{ margin: 0, fontSize: '14px', whiteSpace: 'nowrap' }}>Crear / Editar Perfil</h2>
+          </div>
+
+          {editorState.nombre && editorState.tenantId && (
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', minWidth: 0 }}>
+              <strong>{editorState.nombre}</strong> • {tenants.find(t => t.id === editorState.tenantId)?.nombre}
+              {editorState.connected && <span style={{ color: 'var(--accent-primary)' }}>✓</span>}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Nombre:</label>
+            <Input
+              value={editorState.nombre}
+              onChange={onNameChange}
+              placeholder="ej: Aliseda - Notificaciones"
+              size="small"
+              style={{ flex: 1, minWidth: '150px' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Servidor:</label>
+            <Select
+              value={editorState.tenantId || undefined}
+              onChange={onTenantChange}
+              placeholder="Selecciona..."
+              options={tenants.map(t => ({ label: t.nombre, value: t.id }))}
+              size="small"
+              style={{ flex: 1, minWidth: '150px' }}
+            />
+          </div>
+
+          <Space size="small" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <Button size="small" onClick={onCancel}>Cancelar</Button>
+            <Button size="small" type="primary" loading={loading} onClick={onSave}>💾 Guardar</Button>
+            <Button size="small" loading={loading} onClick={onConnect} type="primary">
+              🔗 Conectar
+            </Button>
+          </Space>
+        </div>
+      </div>
+
+      {/* Panels Row: Categorías & Campos */}
+      <div className="tr-editor-panels">
+        {/* Panel: Categorías */}
+        <div className="tr-ep">
+          <div className="tr-ep-head">
             <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>📁 Categorías</span>
-            <span style={{
-              fontSize: '10px',
-              padding: '2px 6px',
-              borderRadius: '12px',
-              background: 'var(--bg-secondary)',
-              color: 'var(--text-secondary)',
-              whiteSpace: 'nowrap'
-            }}>
+            <span className="tr-ep-badge">
               {editorState.selectedCatNos.size} seleccionadas
             </span>
           </div>
-          {/* Scrollable Content — cadena flex */}
-          <div style={{
-            flex: 1,
-            minHeight: 0,
-            overflowY: 'auto',
-            padding: '14px 16px',
-            background: 'var(--bg-card)'
-          }}>
+          <div className="tr-ep-body">
             {editorState.connected ? renderCategoryTree(editorState.catTree) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
                 Conecta primero
@@ -748,43 +710,14 @@ function EditorView(props) {
         </div>
 
         {/* Panel: Campos */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          height: '100%'
-        }}>
-          {/* Panel Header — altura fija */}
-          <div style={{
-            flexShrink: 0,
-            height: '44px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 16px',
-            borderBottom: '1px solid var(--border-default)',
-            background: 'var(--bg-secondary)'
-          }}>
+        <div className="tr-ep">
+          <div className="tr-ep-head">
             <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>🗂 Campos del informe</span>
-            <span style={{
-              fontSize: '10px',
-              padding: '2px 6px',
-              borderRadius: '12px',
-              background: 'var(--bg-secondary)',
-              color: 'var(--text-secondary)',
-              whiteSpace: 'nowrap'
-            }}>
+            <span className="tr-ep-badge">
               {editorState.selectedFields.size} campos
             </span>
           </div>
-          {/* Scrollable Content — cadena flex */}
-          <div style={{
-            flex: 1,
-            minHeight: 0,
-            overflowY: 'auto',
-            padding: '14px 16px',
-            background: 'var(--bg-card)'
-          }}>
+          <div className="tr-ep-body">
             {editorState.allCommonFields.length === 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
                 Selecciona categorías
