@@ -635,7 +635,7 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'visible', maxHeight: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
       {/* Single Header Line: Title | Nombre | Servidor | Buttons */}
       <div style={{
         display: 'flex',
@@ -644,7 +644,7 @@ function EditorView(props) {
         paddingBottom: '8px',
         borderBottom: '1px solid var(--border-default)',
         marginBottom: '8px',
-        minHeight: 0
+        flex: '0 0 auto'
       }}>
         <div style={{ minWidth: 0 }}>
           <h2 style={{ margin: 0, fontSize: '14px', whiteSpace: 'nowrap' }}>Crear / Editar Perfil</h2>
@@ -689,18 +689,32 @@ function EditorView(props) {
         </Space>
       </div>
 
-      {/* Panels: Categorías & Campos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', flex: 1, minHeight: 0 }}>
+      {/* Panels Row: Categorías & Campos — flex cadena */}
+      <div style={{
+        flex: 1,
+        minHeight: 0,
+        display: 'flex',
+        gap: '12px',
+        overflow: 'hidden'
+      }}>
         {/* Panel: Categorías */}
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          {/* Panel Header */}
+        <div style={{
+          flex: 1,
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          border: '1px solid var(--border-default)',
+          borderRadius: '8px'
+        }}>
+          {/* Panel Header — altura fija */}
           <div style={{
+            flex: '0 0 auto',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            paddingBottom: '4px',
-            borderBottom: '1px solid var(--border-default)',
-            marginBottom: '4px'
+            padding: '8px 12px',
+            borderBottom: '1px solid var(--border-default)'
           }}>
             <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>📁 Categorías</span>
             <span style={{
@@ -714,19 +728,14 @@ function EditorView(props) {
               {editorState.selectedCatNos.size} seleccionadas
             </span>
           </div>
-          {/* Scrollable Content */}
+          {/* Scrollable Content — cadena flex */}
           <div style={{
-            border: '1px solid var(--border-default)',
-            borderRadius: '4px',
             flex: 1,
-            overflow: 'auto',
-            minHeight: 0
+            minHeight: 0,
+            overflowY: 'auto',
+            padding: '4px'
           }}>
-            {editorState.connected ? (
-              <div style={{ padding: '2px' }}>
-                {renderCategoryTree(editorState.catTree)}
-              </div>
-            ) : (
+            {editorState.connected ? renderCategoryTree(editorState.catTree) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
                 Conecta primero
               </div>
@@ -735,15 +744,23 @@ function EditorView(props) {
         </div>
 
         {/* Panel: Campos */}
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          {/* Panel Header */}
+        <div style={{
+          flex: 1,
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          border: '1px solid var(--border-default)',
+          borderRadius: '8px'
+        }}>
+          {/* Panel Header — altura fija */}
           <div style={{
+            flex: '0 0 auto',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            paddingBottom: '4px',
-            borderBottom: '1px solid var(--border-default)',
-            marginBottom: '4px'
+            padding: '8px 12px',
+            borderBottom: '1px solid var(--border-default)'
           }}>
             <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>🗂 Campos del informe</span>
             <span style={{
@@ -757,57 +774,54 @@ function EditorView(props) {
               {editorState.selectedFields.size} campos
             </span>
           </div>
-          {/* Scrollable Content */}
+          {/* Scrollable Content — cadena flex */}
           <div style={{
-            border: '1px solid var(--border-default)',
-            borderRadius: '4px',
             flex: 1,
-            overflow: 'auto',
-            minHeight: 0
+            minHeight: 0,
+            overflowY: 'auto',
+            padding: '4px'
           }}>
             {editorState.allCommonFields.length === 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '12px' }}>
                 Selecciona categorías
               </div>
             ) : (
-              <div style={{ padding: '2px' }}>
-                {editorState.allCommonFields.map(f => (
-                  <div
-                    key={f.name}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '2px 4px',
-                      color: 'var(--text-primary)',
-                      fontSize: '11px',
-                      borderBottom: '1px solid var(--bg-secondary)'
-                    }}
-                  >
-                    {f.name !== 'DocNo' && (
+              editorState.allCommonFields.map(f => (
+                <div
+                  key={f.name}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '2px 4px',
+                    color: 'var(--text-primary)',
+                    fontSize: '11px',
+                    borderBottom: '1px solid var(--bg-secondary)'
+                  }}
+                >
+                  {f.name !== 'DocNo' && (
+                    <input
+                      type="checkbox"
+                      checked={editorState.selectedFields.has(f.name)}
+                      onChange={(e) => onToggleField(f.name, e.target.checked)}
+                      style={{ width: '14px', height: '14px', cursor: 'pointer', flexShrink: 0 }}
+                    />
+                  )}
+                  {f.name === 'DocNo' && <span style={{ width: '18px', textAlign: 'center', flexShrink: 0 }}>✓</span>}
+                  <span style={{ flex: 1, fontWeight: f.name === 'DocNo' ? '600' : '400', minWidth: 0 }}>{f.caption}</span>
+                  {f.name !== 'DocNo' && (
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', cursor: 'pointer', flexShrink: 0 }}>
                       <input
                         type="checkbox"
-                        checked={editorState.selectedFields.has(f.name)}
-                        onChange={(e) => onToggleField(f.name, e.target.checked)}
-                        style={{ width: '14px', height: '14px', cursor: 'pointer' }}
+                        checked={editorState.groupFields.has(f.name)}
+                        onChange={(e) => onToggleGroup(f.name, e.target.checked)}
+                        style={{ width: '12px', height: '12px' }}
                       />
-                    )}
-                    {f.name === 'DocNo' && <span style={{ width: '18px', textAlign: 'center' }}>✓</span>}
-                    <span style={{ flex: 1, fontWeight: f.name === 'DocNo' ? '600' : '400', minWidth: 0 }}>{f.caption}</span>
-                    {f.name !== 'DocNo' && (
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={editorState.groupFields.has(f.name)}
-                          onChange={(e) => onToggleGroup(f.name, e.target.checked)}
-                          style={{ width: '12px', height: '12px' }}
-                        />
-                        Agrupar
-                      </label>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      Agrupar
+                    </label>
+                  )}
+                </div>
+              ))
             )}
           </div>
         </div>
@@ -841,7 +855,7 @@ function ResultsView(props) {
   ) || []
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'visible', maxHeight: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h1 style={{ margin: 0, flex: 1 }}>{resultsState.profile?.nombre}</h1>
       </div>
