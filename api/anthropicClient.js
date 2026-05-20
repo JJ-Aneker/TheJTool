@@ -1,9 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-)
+// Lazy initialize Supabase client (don't create at module load time)
+let supabase = null
+
+function getSupabaseClient() {
+  if (!supabase) {
+    supabase = createClient(
+      process.env.VITE_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY
+    )
+  }
+  return supabase
+}
 
 // Pricing per million tokens (as of 2025-05)
 const PRICING = {
@@ -58,7 +66,8 @@ export async function callAnthropic(params, options = {}) {
   // This doesn't block the response
   ;(async () => {
     try {
-      await supabase.from('anthropic_usage').insert({
+      const sb = getSupabaseClient()
+      await sb.from('anthropic_usage').insert({
         user_id: userId,
         module,
         model: params.model,
