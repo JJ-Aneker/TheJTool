@@ -635,7 +635,7 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0, boxSizing: 'border-box', maxHeight: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
       {/* Single Header Line: Title | Nombre | Servidor | Buttons */}
       <div style={{
         display: 'flex',
@@ -841,7 +841,7 @@ function ResultsView(props) {
   ) || []
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', height: '100%', minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h1 style={{ margin: 0, flex: 1 }}>{resultsState.profile?.nombre}</h1>
       </div>

@@ -373,7 +373,8 @@ function AppContent() {
           padding: 'var(--content-padding-top) var(--content-padding-x)',
           background: 'var(--bg-canvas)',
           flex: 1,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          overflowY: 'auto'
         }}>
           <Routes>
             <Route path="/" element={<Home />} />
