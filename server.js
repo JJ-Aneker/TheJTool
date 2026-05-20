@@ -19,6 +19,7 @@ import anthropicStatusHandler from './api/anthropic-status.js';
 import anthropicUsageHandler from './api/anthropic-usage.js';
 import anthropicApiKeyHandler from './api/anthropic-apikey.js';
 import anthropicTestHandler from './api/anthropic-test.js';
+import anthropicBalanceHandler from './api/anthropic-balance.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -81,6 +82,7 @@ app.post('/api/admin/update-user-role', updateUserRoleHandler);
 
 // Anthropic API management routes (admin only)
 app.get('/api/admin/anthropic/status', verifyAdmin, anthropicStatusHandler);
+app.get('/api/admin/anthropic/balance', verifyAdmin, anthropicBalanceHandler);
 app.get('/api/admin/anthropic/usage', verifyAdmin, anthropicUsageHandler);
 app.get('/api/admin/anthropic/usage/history', verifyAdmin, anthropicUsageHandler);
 app.put('/api/admin/anthropic/apikey', verifyAdmin, anthropicApiKeyHandler);
