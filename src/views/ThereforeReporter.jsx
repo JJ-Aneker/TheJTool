@@ -635,7 +635,7 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0, boxSizing: 'border-box', maxHeight: '100%' }}>
       {/* Single Header Line: Title | Nombre | Servidor | Buttons */}
       <div style={{
         display: 'flex',
