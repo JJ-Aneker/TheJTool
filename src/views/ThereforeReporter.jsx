@@ -555,31 +555,79 @@ export default function ThereforeReporter() {
 
 function EditorView(props) {
   const { editorState, tenants, loading, onNameChange, onTenantChange, onConnect, onToggleCategory, onToggleField, onToggleGroup, onSave, onCancel } = props
+  const [expandedFolders, setExpandedFolders] = useState(new Set())
 
-  const renderCategoryTree = (tree) => {
+  const toggleFolder = (folderName) => {
+    const newExpanded = new Set(expandedFolders)
+    if (newExpanded.has(folderName)) {
+      newExpanded.delete(folderName)
+    } else {
+      newExpanded.add(folderName)
+    }
+    setExpandedFolders(newExpanded)
+  }
+
+  const renderCategoryTree = (tree, level = 0) => {
     return tree.map((node, i) => {
       const catNo = node.ItemNo ?? node.CategoryNo
       const children = node.ChildItems || node.SubCategories || node.Children || []
+      const isFolder = node.ItemType === 1 || (children.length && node.ItemType !== 2)
+      const folderKey = `folder-${level}-${node.Name || i}`
+      const isExpanded = expandedFolders.has(folderKey)
 
-      if (node.ItemType === 1 || (children.length && node.ItemType !== 2)) {
+      if (isFolder) {
         return (
-          <div key={i} style={{ marginLeft: '20px' }}>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '12px', margin: '8px 0', fontWeight: '500' }}>📁 {node.Name}</div>
-            {renderCategoryTree(children)}
+          <div key={i}>
+            <div
+              style={{
+                marginLeft: `${level * 16}px`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 2px',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)',
+                fontSize: '12px',
+                fontWeight: '500',
+                userSelect: 'none'
+              }}
+              onClick={() => toggleFolder(folderKey)}
+            >
+              <span style={{ width: '16px', textAlign: 'center' }}>
+                {isExpanded ? '▼' : '▶'}
+              </span>
+              <span>📁 {node.Name}</span>
+            </div>
+            {isExpanded && renderCategoryTree(children, level + 1)}
           </div>
         )
       }
 
       if (node.ItemType === 2 || (!children.length && catNo !== undefined)) {
         return (
-          <div key={catNo} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 4px', borderRadius: '3px', color: 'var(--text-primary)', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+          <div
+            key={catNo}
+            style={{
+              marginLeft: `${level * 16}px`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 2px',
+              borderRadius: '3px',
+              color: 'var(--text-primary)',
+              transition: 'background 0.2s',
+              fontSize: '12px'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
             <input
               type="checkbox"
               checked={editorState.selectedCatNos.has(catNo)}
               onChange={(e) => onToggleCategory(catNo, e.target.checked)}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', width: '16px' }}
             />
-            <span style={{ fontSize: '13px' }}>{node.Name || `Cat #${catNo}`}</span>
+            <span>{node.Name || `Cat #${catNo}`}</span>
           </div>
         )
       }
