@@ -635,64 +635,68 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', height: '100%', minHeight: 0 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid var(--border-default)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px', height: '100%', minHeight: 0 }}>
+      {/* Header with buttons */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '6px', borderBottom: '1px solid var(--border-default)' }}>
         <div>
-          <h2 style={{ margin: '0 0 4px 0' }}>Crear / Editar Perfil</h2>
+          <h2 style={{ margin: 0 }}>Crear / Editar Perfil</h2>
           {editorState.nombre && editorState.tenantId && (
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>
               <strong>{editorState.nombre}</strong> • {tenants.find(t => t.id === editorState.tenantId)?.nombre}
-              {editorState.connected && <span style={{ color: 'var(--success)', marginLeft: '8px' }}>✓ Conectado</span>}
+              {editorState.connected && <span style={{ color: 'var(--success)', marginLeft: '6px' }}>✓ Conectado</span>}
             </div>
           )}
         </div>
-        <Button loading={loading} onClick={onConnect} type="primary">
-          🔗 Conectar
-        </Button>
+        <Space size="small">
+          <Button onClick={onCancel}>Cancelar</Button>
+          <Button type="primary" loading={loading} onClick={onSave}>💾 Guardar</Button>
+          <Button loading={loading} onClick={onConnect} type="primary">
+            🔗 Conectar
+          </Button>
+        </Space>
       </div>
 
-      {/* Connection Form */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-        <Form layout="vertical" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <Form.Item label="Nombre del perfil" required style={{ marginBottom: '12px' }}>
-            <Input value={editorState.nombre} onChange={onNameChange} placeholder="ej: Aliseda - Notificaciones" />
-          </Form.Item>
-        </Form>
-        <Form layout="vertical" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <Form.Item label="Servidor" required style={{ marginBottom: '12px' }}>
-            <Select
-              value={editorState.tenantId || undefined}
-              onChange={onTenantChange}
-              placeholder="Selecciona..."
-              options={tenants.map(t => ({ label: t.nombre, value: t.id }))}
-            />
-          </Form.Item>
-        </Form>
+      {/* Connection Form - Inline labels */}
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '13px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+          <label style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontWeight: '500' }}>Nombre del perfil:</label>
+          <Input value={editorState.nombre} onChange={onNameChange} placeholder="ej: Aliseda - Notificaciones" size="small" style={{ flex: 1 }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+          <label style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontWeight: '500' }}>Servidor:</label>
+          <Select
+            value={editorState.tenantId || undefined}
+            onChange={onTenantChange}
+            placeholder="Selecciona..."
+            options={tenants.map(t => ({ label: t.nombre, value: t.id }))}
+            size="small"
+            style={{ flex: 1 }}
+          />
+        </div>
       </div>
 
       {/* Panels: Categorías & Campos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flex: 1, minHeight: 0 }}>
         {/* Panel 2: Categorías */}
-        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-primary)' }}>② Categorías</h3>
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px', flex: 1, overflow: 'auto' }}>
+        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <h3 style={{ margin: '0 0 6px 0', color: 'var(--text-primary)', fontSize: '13px' }}>② Categorías</h3>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: '4px', padding: '6px', flex: 1, overflow: 'auto', minHeight: 0 }}>
             {editorState.connected ? renderCategoryTree(editorState.catTree) : <Empty description="Conecta primero" />}
           </div>
-          <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+          <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--text-secondary)' }}>
             {editorState.selectedCatNos.size} seleccionadas
           </div>
         </div>
 
         {/* Panel 3: Campos */}
-        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-primary)' }}>③ Campos</h3>
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: '6px', padding: '12px', flex: 1, overflow: 'auto' }}>
+        <div className="editor-panel" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <h3 style={{ margin: '0 0 6px 0', color: 'var(--text-primary)', fontSize: '13px' }}>③ Campos</h3>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: '4px', padding: '6px', flex: 1, overflow: 'auto', minHeight: 0 }}>
             {editorState.allCommonFields.length === 0 ? (
               <Empty description="Selecciona categorías" />
             ) : (
               editorState.allCommonFields.map(f => (
-                <div key={f.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0', borderBottom: '1px solid var(--border-default)', color: 'var(--text-primary)' }}>
+                <div key={f.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', borderBottom: '1px solid var(--border-default)', color: 'var(--text-primary)', fontSize: '12px' }}>
                   {f.name !== 'DocNo' && (
                     <input
                       type="checkbox"
@@ -701,9 +705,9 @@ function EditorView(props) {
                     />
                   )}
                   {f.name === 'DocNo' && <span style={{ width: '18px' }}>✓</span>}
-                  <span style={{ flex: 1, fontSize: '13px', fontWeight: f.name === 'DocNo' ? '500' : '400' }}>{f.caption}</span>
+                  <span style={{ flex: 1, fontWeight: f.name === 'DocNo' ? '500' : '400' }}>{f.caption}</span>
                   {f.name !== 'DocNo' && (
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                       <input
                         type="checkbox"
                         checked={editorState.groupFields.has(f.name)}
@@ -716,15 +720,10 @@ function EditorView(props) {
               ))
             )}
           </div>
-          <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+          <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--text-secondary)' }}>
             {editorState.selectedFields.size} campos seleccionados
           </div>
         </div>
-      </div>
-
-      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-        <Button onClick={onCancel}>Cancelar</Button>
-        <Button type="primary" loading={loading} onClick={onSave}>💾 Guardar</Button>
       </div>
     </div>
   )
