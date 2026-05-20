@@ -635,15 +635,15 @@ function EditorView(props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: '12px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0, height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
       {/* Single Header Line: Title | Nombre | Servidor | Buttons */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
+        padding: '12px',
         paddingBottom: '8px',
         borderBottom: '1px solid var(--border-default)',
-        marginBottom: '8px',
         flex: '0 0 auto'
       }}>
         <div style={{ minWidth: 0 }}>
@@ -695,6 +695,7 @@ function EditorView(props) {
         minHeight: 0,
         display: 'flex',
         gap: '12px',
+        padding: '0 12px 12px 12px',
         overflow: 'hidden'
       }}>
         {/* Panel: Categorías */}
@@ -855,7 +856,7 @@ function ResultsView(props) {
   ) || []
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0, height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h1 style={{ margin: 0, flex: 1 }}>{resultsState.profile?.nombre}</h1>
       </div>
