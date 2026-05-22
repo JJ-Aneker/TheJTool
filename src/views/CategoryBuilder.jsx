@@ -1472,6 +1472,17 @@ export default function CategoryBuilder() {
     }
 
     try {
+      // Map any type value to valid Therefore TypeNo
+      const normalizeFieldType = (fieldType) => {
+        const typeMap = {
+          '1': '1', '2': '2', '3': '3', '5': '5', '6': '6', '7': '7', '10': '10', '13': '13',
+          'text': '1', 'string': '1', 'int': '2', 'integer': '2', 'date': '3', 'money': '5',
+          'decimal': '5', 'boolean': '6', 'bool': '6', 'datetime': '7', 'timestamp': '7',
+          'table': '10', 'tab': '13'
+        }
+        return typeMap[String(fieldType || '').toLowerCase().trim()] || '1'
+      }
+
       const cat = categories[0]
       const nombre = cat.name.trim()
       const ctgry_id = sanitizeName(cat.name)
@@ -1515,9 +1526,10 @@ export default function CategoryBuilder() {
             hasTable = true
             field.columnas.forEach(col => {
               if (!col.nombre.trim()) return
-              const lt = col.tipo === '5' ? '<Length>18</Length>' : (col.tipo !== '3' && col.tipo !== '6' && col.tipo !== '7') ? `<Length>${col.length || 50}</Length>` : ''
+              const normalizedType = normalizeFieldType(col.tipo)
+              const lt = normalizedType === '5' ? '<Length>18</Length>' : (normalizedType !== '3' && normalizedType !== '6' && normalizedType !== '7') ? `<Length>${col.length || 50}</Length>` : ''
               const colname = sanitizeName(col.nombre)
-              tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${col.tipo}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+              tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
               colNo--
               allTableCols.push(col)
             })
@@ -1537,15 +1549,17 @@ export default function CategoryBuilder() {
           const f1 = sec.fields[i]
           const f2 = sec.fields[i + 1]
 
-          if (f1 && f1.tipo !== '10') {
+          if (f1 && normalizeFieldType(f1.tipo) !== '10') {
             const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
+            const normalizedType1 = normalizeFieldType(f1.tipo)
             fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
-            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: f1.tipo, length: f1.length, width: FLD_W, height: ROW_H, posx: hasTable ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: hasTable ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
           }
-          if (f2 && f2.tipo !== '10') {
+          if (f2 && normalizeFieldType(f2.tipo) !== '10') {
             const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
+            const normalizedType2 = normalizeFieldType(f2.tipo)
             fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
-            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: f2.tipo, length: f2.length, width: FLD_W2, height: ROW_H, posx: hasTable ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: hasTable ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
           }
           yPos += ROW_GAP
         }
