@@ -1499,120 +1499,130 @@ export default function CategoryBuilder() {
         return typeMap[String(fieldType || '').toLowerCase().trim()] || '1'
       }
 
-      const cat = categories[0]
-      const nombre = cat.name.trim()
-      const ctgry_id = sanitizeName(cat.name)
-      const tableName = sanitizeName(nombre)
-
-      if (!nombre) {
-        setError('La categoría debe tener un nombre.')
+      // Process ALL categories
+      if (categories.length === 0) {
+        setError('Añade al menos una categoría.')
         return
       }
 
-      // Preparar secciones con campos válidos
-      const sections = cat.sections
-        .filter(sec => sec.fields.some(f => f.nombre.trim()))
-        .map(sec => ({
-          name: sec.name,
-          fields: sec.fields.filter(f => f.nombre.trim())
-        }))
+      let globalFieldNo = -1
+      let globalLabelNo = -50
+      let globalColNo = -202
 
-      if (sections.length === 0) {
-        setError('Añade al menos un campo.')
-        return
-      }
+      const categoryBlocks = categories.map((cat, catIdx) => {
+        const nombre = cat.name.trim()
+        const ctgry_id = sanitizeName(cat.name)
+        const tableName = sanitizeName(nombre)
 
-      // Get palette
-      const pal = COLOR_PALETTES[cat.palette || 'Therefore Azul']
+        if (!nombre) return ''
 
-      // ── BUILD CATEGORY XML ──────────────────────────────────────────
-      const TAB_NO = -200, TABLE_NO = -201
-      let colNo = -202, fieldNo = -1, labelNo = -50
-      let fieldsXml = '', dispOrder = 1, tabOrder = 1
-      const tm = n => `<BelongsToTable>${n}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>1</ShowInTabNo>`
+        // Preparar secciones con campos válidos
+        const sections = cat.sections
+          .filter(sec => sec.fields.some(f => f.nombre.trim()))
+          .map(sec => ({
+            name: sec.name,
+            fields: sec.fields.filter(f => f.nombre.trim())
+          }))
 
-      // Table column fields (if any table exists)
-      let tableColFields = ''
-      let hasTable = false
-      const allTableCols = []
+        if (sections.length === 0) return ''
 
-      sections.forEach(sec => {
-        sec.fields.forEach(field => {
-          if (field.tipo === '10' && field.columnas && field.columnas.length > 0) {
-            hasTable = true
-            field.columnas.forEach(col => {
-              if (!col.nombre.trim()) return
-              const normalizedType = normalizeFieldType(col.tipo)
-              const lt = normalizedType === '5' ? '<Length>18</Length>' : (normalizedType !== '3' && normalizedType !== '6' && normalizedType !== '7') ? `<Length>${col.length || 50}</Length>` : ''
-              const colname = sanitizeName(col.nombre)
-              tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
-              colNo--
-              allTableCols.push(col)
-            })
-          }
+        // Get palette
+        const pal = COLOR_PALETTES[cat.palette || 'Therefore Azul']
+
+        // ── BUILD CATEGORY XML ──────────────────────────────────────────
+        const TAB_NO = globalFieldNo--
+        const TABLE_NO = globalFieldNo--
+        let colNo = globalColNo, fieldNo = globalFieldNo, labelNo = globalLabelNo
+        globalColNo -= 100  // Reserve space for table columns
+        globalFieldNo -= 100  // Reserve space for fields
+        globalLabelNo -= 50   // Reserve space for labels
+
+        let fieldsXml = '', dispOrder = 1, tabOrder = 1
+        const tm = n => `<BelongsToTable>${n}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>1</ShowInTabNo>`
+
+        // Table column fields (if any table exists)
+        let tableColFields = ''
+        let hasTable = false
+        const allTableCols = []
+
+        sections.forEach(sec => {
+          sec.fields.forEach(field => {
+            if (field.tipo === '10' && field.columnas && field.columnas.length > 0) {
+              hasTable = true
+              field.columnas.forEach(col => {
+                if (!col.nombre.trim()) return
+                const normalizedType = normalizeFieldType(col.tipo)
+                const lt = normalizedType === '5' ? '<Length>18</Length>' : (normalizedType !== '3' && normalizedType !== '6' && normalizedType !== '7') ? `<Length>${col.length || 50}</Length>` : ''
+                const colname = sanitizeName(col.nombre)
+                tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                colNo--
+                allTableCols.push(col)
+              })
+            }
+          })
         })
-      })
 
-      // Data fields
-      let yPos = hasTable ? 8 : HDR_H + SEC_GAP
-      const sectionWidth = hasTable ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
+        // Data fields
+        let yPos = hasTable ? 8 : HDR_H + SEC_GAP
+        const sectionWidth = hasTable ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
 
-      sections.forEach((sec, si) => {
-        fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: pal.secText, bclr: pal.secBg, al: 4, pd: 6, tabMeta: hasTable ? tm(1) : '' })
-        yPos += SEC_GAP
+        sections.forEach((sec, si) => {
+          fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: pal.secText, bclr: pal.secBg, al: 4, pd: 6, tabMeta: hasTable ? tm(1) : '' })
+          yPos += SEC_GAP
 
-        for (let i = 0; i < sec.fields.length; i += 2) {
-          const f1 = sec.fields[i]
-          const f2 = sec.fields[i + 1]
+          for (let i = 0; i < sec.fields.length; i += 2) {
+            const f1 = sec.fields[i]
+            const f2 = sec.fields[i + 1]
 
-          if (f1 && normalizeFieldType(f1.tipo) !== '10') {
-            const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
-            const normalizedType1 = normalizeFieldType(f1.tipo)
-            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
-            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: hasTable ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+            if (f1 && normalizeFieldType(f1.tipo) !== '10') {
+              const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
+              const normalizedType1 = normalizeFieldType(f1.tipo)
+              fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
+              fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: hasTable ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+            }
+            if (f2 && normalizeFieldType(f2.tipo) !== '10') {
+              const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
+              const normalizedType2 = normalizeFieldType(f2.tipo)
+              fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
+              fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: hasTable ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+            }
+            yPos += ROW_GAP
           }
-          if (f2 && normalizeFieldType(f2.tipo) !== '10') {
-            const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
-            const normalizedType2 = normalizeFieldType(f2.tipo)
-            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
-            fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: hasTable ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
-          }
-          yPos += ROW_GAP
+          yPos += 6
+        })
+
+        const contentH = yPos + 10
+
+        // Header (flat, no tabs)
+        let headerXml = ''
+        if (!hasTable) {
+          headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Title_${tableName}`, caption: nombre, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: pal.hdrText, bclr: pal.hdrBg, al: 4, pd: 5 })
+          headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Sub_${tableName}`, caption: tableName, width: DIALOG_W - 10, height: 12, posx: 5, posy: 26, fsize: 9, tclr: pal.hdrSub, bclr: pal.hdrBg, al: 4, pd: 5 })
         }
-        yPos += 6
-      })
 
-      const contentH = yPos + 10
+        // Tab + Table control fields (if table exists)
+        let tabXml = ''
+        if (hasTable) {
+          const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
+          const tableH = Math.max(contentH, 240) - 30
+          const tabH2 = Math.max(contentH + 20, 260)
 
-      // Header (flat, no tabs)
-      let headerXml = ''
-      if (!hasTable) {
-        headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Title_${tableName}`, caption: nombre, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: pal.hdrText, bclr: pal.hdrBg, al: 4, pd: 5 })
-        headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Sub_${tableName}`, caption: tableName, width: DIALOG_W - 10, height: 12, posx: 5, posy: 26, fsize: 9, tclr: pal.hdrSub, bclr: pal.hdrBg, al: 4, pd: 5 })
-      }
+          // Table field
+          tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption('Historial')}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>TheIxTable_${toCamel(tableName)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>2</ShowInTabNo><FieldID>Historial_${toCamel(tableName)}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
 
-      // Tab + Table control fields (if table exists)
-      let tabXml = ''
-      if (hasTable) {
-        const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
-        const tableH = Math.max(contentH, 240) - 30
-        const tabH2 = Math.max(contentH + 20, 260)
+          // Tab control field
+          tabXml += `<Field><FieldNo>${TAB_NO}</FieldNo>${xmlCaption('Datos')}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${pal.tabBg}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs><T FactoryType="1"><TabNo>1</TabNo><TabPos>1</TabPos><TabCapt><TStr><T><L>1034</L><S>Datos</S></T></TStr></TabCapt></T><T FactoryType="1"><TabNo>2</TabNo><TabPos>2</TabPos><TabCapt><TStr><T><L>1034</L><S>Historial</S></T></TStr></TabCapt></T></Tabs></TabInfo><FieldID>Tab_${toCamel(tableName)}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        }
 
-        // Table field
-        tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption('Historial')}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>TheIxTable_${toCamel(tableName)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>2</ShowInTabNo><FieldID>Historial_${toCamel(tableName)}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+        const dialogH = hasTable ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
+        const titleFlds = [-1, -2, -3].slice(0, Math.min(3, sections.flatMap(s => s.fields).length)).map(n => `<Fld>${n}</Fld>`).join('')
+        const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
 
-        // Tab control field
-        tabXml += `<Field><FieldNo>${TAB_NO}</FieldNo>${xmlCaption('Datos')}<TypeNo>13</TypeNo><Width>${DIALOG_W - TAB_MARGIN * 2}</Width><Height>${tabH2}</Height><PosX>${TAB_PAD_X}</PosX><PosY>${TAB_PAD_Y}</PosY><DontLoadValues>1</DontLoadValues>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp><Face>Arial</Face><FSize>8</FSize><BClr>${pal.tabBg}</BClr></DisplayProp><TabInfo FactoryType="1"><Tabs><T FactoryType="1"><TabNo>1</TabNo><TabPos>1</TabPos><TabCapt><TStr><T><L>1034</L><S>Datos</S></T></TStr></TabCapt></T><T FactoryType="1"><TabNo>2</TabNo><TabPos>2</TabPos><TabCapt><TStr><T><L>1034</L><S>Historial</S></T></TStr></TabCapt></T></Tabs></TabInfo><FieldID>Tab_${toCamel(tableName)}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
-      }
+        return `<Category><CtgryNo>-1</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${tableColFields}${fieldsXml}${headerXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${pal.dlgBg}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgry_id}</CtgryID></Category>`
+      }).filter(xml => xml)
 
-      const dialogH = hasTable ? TAB_PAD_Y + Math.max(contentH + 20, 260) + 10 : HDR_H + contentH + 10
-      const titleFlds = [-1, -2, -3].slice(0, Math.min(3, sections.flatMap(s => s.fields).length)).map(n => `<Fld>${n}</Fld>`).join('')
-      const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
-
-      const categoryXml = `<Category><CtgryNo>-1</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${tableColFields}${fieldsXml}${headerXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${pal.dlgBg}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgry_id}</CtgryID></Category>`
-
-      // Build complete XML
-      const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${categoryXml}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
+      // Build complete XML with all categories
+      const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${categoryBlocks.join('')}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
 
       setXml(xml)
       setXmlModalOpen(true)
