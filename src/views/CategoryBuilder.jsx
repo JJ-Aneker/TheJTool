@@ -1098,7 +1098,7 @@ export default function CategoryBuilder() {
       id: newGuid(),
       name: 'CATEGORÍA 1',
       palette: 'Therefore Azul',
-      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: '1', required: false, pestaña: '' }], pestañas: [] }]
+      sections: [{ id: newGuid(), name: 'GENERAL', fields: [{ id: newGuid(), nombre: '', fieldKey: '', tipo: '1', required: false, pestaña: '', length: 100 }], pestañas: [] }]
     }
   ])
   const [activeCategory, setActiveCategory] = useState(0)
@@ -1277,7 +1277,7 @@ export default function CategoryBuilder() {
 
   const addField = (secIdx) => {
     const updated = [...categories]
-    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: '1', required: false, pestaña: '' })
+    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: '1', required: false, pestaña: '', length: 100 })
     setCategories(updated)
   }
 
@@ -1387,9 +1387,10 @@ export default function CategoryBuilder() {
   }
 
   const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width, height, posx, posy, taborder, disporder, displayprop = '', tabMeta = '' }) => {
+    const effectiveLength = length || getDefaultLength(typeno)
     const lengthTag = typeno === '5' ? '<Length>18</Length>'
-      : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '15' && length)
-      ? `<Length>${length}</Length>` : ''
+      : (typeno !== '3' && typeno !== '6' && typeno !== '7' && typeno !== '15' && effectiveLength)
+      ? `<Length>${effectiveLength}</Length>` : ''
     const dp = displayprop || `<BClr>${bgr(255, 255, 255)}</BClr>`
     return `<Field><FieldNo>${fieldno}</FieldNo><ColName>${colname}</ColName>${xmlCaption(caption)}<TypeNo>${typeno}</TypeNo>${lengthTag}<Width>${width}</Width><Height>${height}</Height><PosX>${posx}</PosX><PosY>${posy}</PosY><TabOrderPos>${taborder}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${disporder}</DispOrderPos>${xmlRegEx()}<Links></Links><Id>${newGuid()}</Id><DisplayProp>${dp}</DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${fieldid}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter>${tabMeta}</Field>`
   }
@@ -1481,6 +1482,21 @@ export default function CategoryBuilder() {
           'table': '10', 'tab': '13'
         }
         return typeMap[String(fieldType || '').toLowerCase().trim()] || '1'
+      }
+
+      // Get default length for field type
+      const getDefaultLength = (typeNo) => {
+        const lengths = {
+          '1': 100,   // StringField
+          '2': 18,    // IntField
+          '3': 10,    // DateField (YYYY-MM-DD)
+          '5': 18,    // MoneyField
+          '6': 1,     // LogicalField
+          '7': 19,    // DateTimeField
+          '10': 0,    // TableField (no length)
+          '13': 0     // TabControl (no length)
+        }
+        return lengths[String(typeNo)] || 100
       }
 
       const cat = categories[0]
