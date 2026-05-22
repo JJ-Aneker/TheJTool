@@ -1386,6 +1386,21 @@ export default function CategoryBuilder() {
     return Math.round(Math.min(scaledWidth, 400))  // máximo 400px
   }
 
+  // Get default length for field type
+  const getDefaultLength = (typeNo) => {
+    const lengths = {
+      '1': 100,   // StringField
+      '2': 18,    // IntField
+      '3': 10,    // DateField (YYYY-MM-DD)
+      '5': 18,    // MoneyField
+      '6': 1,     // LogicalField
+      '7': 19,    // DateTimeField
+      '10': 0,    // TableField (no length)
+      '13': 0     // TabControl (no length)
+    }
+    return lengths[String(typeNo)] || 100
+  }
+
   const makeDataField = ({ fieldno, colname, fieldid, caption, typeno, length, width, height, posx, posy, taborder, disporder, displayprop = '', tabMeta = '' }) => {
     const effectiveLength = length || getDefaultLength(typeno)
     const lengthTag = typeno === '5' ? '<Length>18</Length>'
@@ -1482,21 +1497,6 @@ export default function CategoryBuilder() {
           'table': '10', 'tab': '13'
         }
         return typeMap[String(fieldType || '').toLowerCase().trim()] || '1'
-      }
-
-      // Get default length for field type
-      const getDefaultLength = (typeNo) => {
-        const lengths = {
-          '1': 100,   // StringField
-          '2': 18,    // IntField
-          '3': 10,    // DateField (YYYY-MM-DD)
-          '5': 18,    // MoneyField
-          '6': 1,     // LogicalField
-          '7': 19,    // DateTimeField
-          '10': 0,    // TableField (no length)
-          '13': 0     // TabControl (no length)
-        }
-        return lengths[String(typeNo)] || 100
       }
 
       const cat = categories[0]
