@@ -1507,7 +1507,7 @@ export default function CategoryBuilder() {
 
       let globalFieldNo = -1
       let globalLabelNo = -50
-      let globalColNo = -202
+      let globalColNo = -200
 
       const categoryBlocks = categories.map((cat, catIdx) => {
         const nombre = cat.name.trim()
@@ -1530,12 +1530,19 @@ export default function CategoryBuilder() {
         const pal = COLOR_PALETTES[cat.palette || 'Therefore Azul']
 
         // ── BUILD CATEGORY XML ──────────────────────────────────────────
+        // Reserve unique field numbers for this category
+        const catStartFieldNo = globalFieldNo
+        const catStartLabelNo = globalLabelNo
+        const catStartColNo = globalColNo
+
         const TAB_NO = globalFieldNo--
         const TABLE_NO = globalFieldNo--
         let colNo = globalColNo, fieldNo = globalFieldNo, labelNo = globalLabelNo
-        globalColNo -= 100  // Reserve space for table columns
-        globalFieldNo -= 100  // Reserve space for fields
-        globalLabelNo -= 50   // Reserve space for labels
+
+        // Reserve space for fields in this category (1000 per category is plenty)
+        globalFieldNo -= 1000
+        globalLabelNo -= 500
+        globalColNo -= 500
 
         let fieldsXml = '', dispOrder = 1, tabOrder = 1
         const tm = n => `<BelongsToTable>${n}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>1</ShowInTabNo>`
