@@ -1534,9 +1534,10 @@ export default function CategoryBuilder() {
         const pal = COLOR_PALETTES[cat.palette || 'Therefore Azul']
 
         // ── BUILD CATEGORY XML ──────────────────────────────────────────
-        // Use GLOBAL field numbers so each FieldNo is unique across ALL categories
-        const TAB_NO = globalFieldNo--
-        const TABLE_NO = globalFieldNo--
+        // TAB_NO and TABLE_NO are local to each category (internal references)
+        const TAB_NO = -200
+        const TABLE_NO = -201
+        // Data fields use GLOBAL numbers so each FieldNo is unique across ALL categories
         let colNo = globalColNo--, fieldNo = globalFieldNo--, labelNo = globalLabelNo--
 
         let fieldsXml = '', dispOrder = 1, tabOrder = 1
