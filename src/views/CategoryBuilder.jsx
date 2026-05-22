@@ -1509,8 +1509,11 @@ export default function CategoryBuilder() {
       let globalFieldNo = -1
       let globalLabelNo = -50
       let globalColNo = -200
+      let globalCtgryNo = -1
 
       const categoryBlocks = categories.map((cat, catIdx) => {
+        // Each category gets a unique CtgryNo
+        const categoryCtgryNo = globalCtgryNo--
         const nombre = cat.name.trim()
         const ctgry_id = sanitizeName(cat.name)
         const tableName = sanitizeName(nombre)
@@ -1617,7 +1620,7 @@ export default function CategoryBuilder() {
         const titleFlds = [-1, -2, -3].slice(0, Math.min(3, sections.flatMap(s => s.fields).length)).map(n => `<Fld>${n}</Fld>`).join('')
         const docTitles = `<DocTitles><DocTitlesArr><DocTitle><TitleType>1</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>100</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>0</ShowFieldNames></DocTitle><DocTitle><TitleType>2</TitleType><FieldNos>${titleFlds}</FieldNos><MaxLength>0</MaxLength><HideCtgryName>0</HideCtgryName><ShowFieldNames>1</ShowFieldNames></DocTitle></DocTitlesArr></DocTitles>`
 
-        return `<Category><CtgryNo>-1</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${tableColFields}${fieldsXml}${headerXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${pal.dlgBg}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgry_id}</CtgryID></Category>`
+        return `<Category><CtgryNo>${categoryCtgryNo}</CtgryNo><TableName>${tableName}</TableName><Name UPT="1"><TStr><T><L>1034</L><S>${escapeXml(nombre)}</S></T></TStr></Name><Version>0</Version><Fields>${tableColFields}${fieldsXml}${headerXml}${tabXml}</Fields><DataTypes></DataTypes><Title>${escapeXml(nombre)}</Title><Width>${DIALOG_W}</Width><Height>${dialogH}</Height><Watermark><DocNo>0</DocNo></Watermark><FulltextMode>1</FulltextMode><FulltextDate>18991230</FulltextDate><CheckInMode>1</CheckInMode><Description UPT="1"><TStr></TStr></Description><Header><Font></Font></Header><DlgBgColor>${pal.dlgBg}</DlgBgColor><EmptyDocMode>1</EmptyDocMode><CoverMode>1</CoverMode>${docTitles}<CtgryID>${ctgry_id}</CtgryID></Category>`
       }).filter(xml => xml)
 
       // Build complete XML with all categories
