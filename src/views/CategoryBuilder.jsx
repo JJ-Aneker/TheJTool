@@ -1505,6 +1505,11 @@ export default function CategoryBuilder() {
         return
       }
 
+      // Use global counters so FieldNo is unique across all categories
+      let globalFieldNo = -1
+      let globalLabelNo = -50
+      let globalColNo = -200
+
       const categoryBlocks = categories.map((cat, catIdx) => {
         const nombre = cat.name.trim()
         const ctgry_id = sanitizeName(cat.name)
@@ -1526,10 +1531,10 @@ export default function CategoryBuilder() {
         const pal = COLOR_PALETTES[cat.palette || 'Therefore Azul']
 
         // ── BUILD CATEGORY XML ──────────────────────────────────────────
-        // Each category gets its own local numbering (Therefore assigns global numbers on import)
-        let colNo = -202, fieldNo = -1, labelNo = -50
-        const TAB_NO = -200
-        const TABLE_NO = -201
+        // Use GLOBAL field numbers so each FieldNo is unique across ALL categories
+        const TAB_NO = globalFieldNo--
+        const TABLE_NO = globalFieldNo--
+        let colNo = globalColNo--, fieldNo = globalFieldNo--, labelNo = globalLabelNo--
 
         let fieldsXml = '', dispOrder = 1, tabOrder = 1
         const tm = n => `<BelongsToTable>${n}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>1</ShowInTabNo>`
@@ -1548,8 +1553,8 @@ export default function CategoryBuilder() {
                 const normalizedType = normalizeFieldType(col.tipo)
                 const lt = normalizedType === '5' ? '<Length>18</Length>' : (normalizedType !== '3' && normalizedType !== '6' && normalizedType !== '7') ? `<Length>${col.length || 50}</Length>` : ''
                 const colname = sanitizeName(col.nombre)
-                tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
-                colNo--
+                tableColFields += `<Field><FieldNo>${globalColNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                globalColNo--
                 allTableCols.push(col)
               })
             }
@@ -1561,7 +1566,7 @@ export default function CategoryBuilder() {
         const sectionWidth = hasTable ? DIALOG_W - TAB_MARGIN * 2 - 20 : DIALOG_W - 10
 
         sections.forEach((sec, si) => {
-          fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: pal.secText, bclr: pal.secBg, al: 4, pd: 6, tabMeta: hasTable ? tm(1) : '' })
+          fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Sec_${si}_${tableName}`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: yPos, bold: true, tclr: pal.secText, bclr: pal.secBg, al: 4, pd: 6, tabMeta: hasTable ? tm(1) : '' })
           yPos += SEC_GAP
 
           for (let i = 0; i < sec.fields.length; i += 2) {
@@ -1571,14 +1576,14 @@ export default function CategoryBuilder() {
             if (f1 && normalizeFieldType(f1.tipo) !== '10') {
               const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
               const normalizedType1 = normalizeFieldType(f1.tipo)
-              fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
-              fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: hasTable ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+              fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X1 + 5 : LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
+              fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: hasTable ? FLD_X1 + 5 : FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
             }
             if (f2 && normalizeFieldType(f2.tipo) !== '10') {
               const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
               const normalizedType2 = normalizeFieldType(f2.tipo)
-              fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
-              fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: hasTable ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
+              fieldsXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: hasTable ? LBL_X2 + 5 : LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: hasTable ? tm(1) : '' })
+              fieldsXml += makeDataField({ fieldno: globalFieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: hasTable ? FLD_X2 + 5 : FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: hasTable ? tm(1) : '' })
             }
             yPos += ROW_GAP
           }
@@ -1590,8 +1595,8 @@ export default function CategoryBuilder() {
         // Header (flat, no tabs)
         let headerXml = ''
         if (!hasTable) {
-          headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Title_${tableName}`, caption: nombre, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: pal.hdrText, bclr: pal.hdrBg, al: 4, pd: 5 })
-          headerXml += makeLabelField({ fieldno: labelNo--, fieldid: `Hdr_Sub_${tableName}`, caption: tableName, width: DIALOG_W - 10, height: 12, posx: 5, posy: 26, fsize: 9, tclr: pal.hdrSub, bclr: pal.hdrBg, al: 4, pd: 5 })
+          headerXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Hdr_Title_${tableName}`, caption: nombre, width: DIALOG_W - 10, height: 18, posx: 5, posy: 6, fsize: 14, bold: true, tclr: pal.hdrText, bclr: pal.hdrBg, al: 4, pd: 5 })
+          headerXml += makeLabelField({ fieldno: globalLabelNo--, fieldid: `Hdr_Sub_${tableName}`, caption: tableName, width: DIALOG_W - 10, height: 12, posx: 5, posy: 26, fsize: 9, tclr: pal.hdrSub, bclr: pal.hdrBg, al: 4, pd: 5 })
         }
 
         // Tab + Table control fields (if table exists)
