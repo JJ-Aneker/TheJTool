@@ -1316,6 +1316,7 @@ export default function CategoryBuilder() {
   // Map field types to Therefore TypeNo per official documentation
   // StringField(1), IntField(2), DateField(3), MoneyField(5), LogicalField(6), CustomField(99)
   const typeToTypeNo = {
+    'text': '1',       // StringField (default fallback)
     'string': '1',     // StringField
     'int': '2',        // IntField
     'date': '3',       // DateField
