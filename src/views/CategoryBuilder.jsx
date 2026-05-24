@@ -3121,13 +3121,34 @@ export default function CategoryBuilder() {
         </div>
       </Modal>
 
-      {/* Preview Modal - Grid Visualization */}
-      {previewModalOpen && (
-        <CategoryGridPreview
-          categories={categories}
-          onClose={() => setPreviewModalOpen(false)}
-        />
-      )}
+      {/* Preview Modal - Miniaturas gráficas de categorías */}
+      <Modal
+        title="📊 Vista Previa de Categorías"
+        open={previewModalOpen}
+        onCancel={() => setPreviewModalOpen(false)}
+        width="90vw"
+        style={{ maxWidth: '1400px' }}
+        footer={null}
+        bodyStyle={{ maxHeight: '80vh', overflow: 'auto', padding: '30px' }}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '30px' }}>
+          {categories.map((cat, idx) => (
+            <div key={idx} style={{ border: '2px solid #e5e7eb', borderRadius: '8px', padding: '15px', background: '#f9fafb' }}>
+              <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
+                {idx + 1}. {cat.name || 'Sin nombre'}
+              </div>
+              <DialogPreview
+                catName={cat.name}
+                sections={cat.sections}
+                hasTable={cat.sections.some(s =>
+                  s.fields.some(f => f.tipo === '10')
+                )}
+                palette={COLOR_PALETTES[cat.palette || 'Therefore Azul']}
+              />
+            </div>
+          ))}
+        </div>
+      </Modal>
 
       {/* CSV Importer Modal */}
       <CsvImporter isOpen={csvModalOpen} onClose={() => setCsvModalOpen(false)} onImport={handleCsvImport} />
