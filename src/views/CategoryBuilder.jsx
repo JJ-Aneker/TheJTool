@@ -1696,23 +1696,29 @@ export default function CategoryBuilder() {
 
     try {
       // Generate XML for all categories with unique offsets
+      // CRITICAL: Ranges must NOT overlap. Each category needs independent ranges.
+      // fieldNo: 200 slots per category (safety margin for labels + data fields + UI elements)
+      // tabNo: 100 slots per category
       let globalFieldNoOffset = -1
-      let globalLabelNoOffset = -50
-      let globalTabNoOffset = -200
+      let globalTabNoOffset = -500
 
       const categoryXmlBlocks = categories
         .filter(cat => cat.name.trim())
         .map((cat, idx) => {
+          // Each category: labelNo starts at (fieldNo - 150), providing 150 label slots
+          // This ensures no overlap: fieldNo and labelNo ranges are completely separate
+          const labelNoStart = globalFieldNoOffset - 150
+
           const catXml = generateCategoryXml(cat, idx, {
             fieldNoStart: globalFieldNoOffset,
-            labelNoStart: globalLabelNoOffset,
+            labelNoStart: labelNoStart,
             tabNo: globalTabNoOffset
           })
 
-          // Each category gets 100 fieldNo slots, 50 labelNo slots, 100 tabNo slots
-          globalFieldNoOffset -= 100
-          globalLabelNoOffset -= 50
-          globalTabNoOffset -= 100
+          // Each category gets 200 fieldNo slots (100 for data + 100 for labels buffer)
+          // Each category gets 200 tabNo slots
+          globalFieldNoOffset -= 200
+          globalTabNoOffset -= 200
 
           return catXml
         })
