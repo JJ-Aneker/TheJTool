@@ -1091,6 +1091,300 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
   )
 }
 
+// Enhanced Grid Preview - Visual card-based representation of categories
+function CategoryGridPreview({ categories, onClose }) {
+  const [expandedTab, setExpandedTab] = useState({})
+
+  const toggleTab = (catIdx, tabNo) => {
+    const key = `${catIdx}-${tabNo}`
+    setExpandedTab(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+
+  const TYPE_ICONS = {
+    '1': { icon: '📝', label: 'Texto' },
+    '2': { icon: '🔢', label: 'Número' },
+    '3': { icon: '📅', label: 'Fecha' },
+    '5': { icon: '💰', label: 'Dinero' },
+    '6': { icon: '✅', label: 'Sí/No' },
+    '7': { icon: '🕐', label: 'Fecha-Hora' },
+  }
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.7)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: '20px'
+    }}>
+      <div style={{
+        background: 'white',
+        borderRadius: '12px',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        overflow: 'auto',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        padding: '30px'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '30px',
+          borderBottom: '2px solid #e5e7eb',
+          paddingBottom: '15px'
+        }}>
+          <h2 style={{ margin: 0, color: '#1f2937', fontSize: '24px', fontWeight: 700 }}>
+            📊 Vista Previa de Categorías
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#ef4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 600
+            }}
+          >
+            ✕ Cerrar
+          </button>
+        </div>
+
+        {/* Categories Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
+          gap: '20px'
+        }}>
+          {categories.map((cat, catIdx) => {
+            const pal = COLOR_PALETTES[cat.palette || 'Therefore Azul']
+            const dlgBgHex = bgrToHex(pal.dlgBg)
+            const hdrBgHex = bgrToHex(pal.hdrBg)
+            const hdrTextHex = bgrToHex(pal.hdrText)
+            const secBgHex = bgrToHex(pal.secBg)
+            const secTextHex = bgrToHex(pal.secText)
+            const labelColorHex = bgrToHex(pal.labelColor || bgr(55, 65, 81))
+            const tabBgHex = bgrToHex(pal.tabBg || bgr(192, 192, 192))
+
+            // Get all pestañas for this category
+            const allPestañas = new Set()
+            cat.sections.forEach(sec => {
+              sec.fields.forEach(f => {
+                if (f.pestaña?.trim()) allPestañas.add(f.pestaña.trim())
+              })
+            })
+            const pestañaList = Array.from(allPestañas).sort()
+
+            return (
+              <div
+                key={catIdx}
+                style={{
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                  background: '#f9fafb',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)'
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                {/* Category Header */}
+                <div style={{
+                  background: hdrBgHex,
+                  color: hdrTextHex,
+                  padding: '16px 20px',
+                  fontWeight: 700,
+                  fontSize: '16px',
+                  borderBottom: '3px solid #e5e7eb'
+                }}>
+                  📁 {cat.name || 'Sin nombre'}
+                </div>
+
+                {/* Tabs (if exist) */}
+                {pestañaList.length > 0 && (
+                  <div style={{
+                    display: 'flex',
+                    gap: '4px',
+                    padding: '12px 16px',
+                    borderBottom: '1px solid #d1d5db',
+                    background: '#f3f4f6',
+                    flexWrap: 'wrap'
+                  }}>
+                    {pestañaList.map((pestaña, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => toggleTab(catIdx, idx)}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '6px 6px 0 0',
+                          border: 'none',
+                          background: expandedTab[`${catIdx}-${idx}`] ? dlgBgHex : tabBgHex,
+                          color: expandedTab[`${catIdx}-${idx}`] ? '#1f2937' : '#6b7280',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: expandedTab[`${catIdx}-${idx}`] ? 600 : 500,
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {pestaña}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Content */}
+                <div style={{ padding: '16px' }}>
+                  {pestañaList.length === 0 ? (
+                    // No tabs - show all sections
+                    cat.sections.map((sec, secIdx) => (
+                      <SectionCard
+                        key={secIdx}
+                        section={sec}
+                        hdrBgHex={hdrBgHex}
+                        secBgHex={secBgHex}
+                        secTextHex={secTextHex}
+                        labelColorHex={labelColorHex}
+                        TYPE_ICONS={TYPE_ICONS}
+                      />
+                    ))
+                  ) : (
+                    // Show sections for each expanded tab
+                    pestañaList.map((pestaña, tabIdx) => {
+                      const isExpanded = expandedTab[`${catIdx}-${tabIdx}`]
+                      const sectionsInTab = cat.sections
+                        .map(sec => ({
+                          ...sec,
+                          fieldsInTab: sec.fields.filter(f => f.pestaña?.trim() === pestaña && f.nombre.trim())
+                        }))
+                        .filter(sec => sec.fieldsInTab.length > 0)
+
+                      return (
+                        <div key={tabIdx} style={{ marginBottom: isExpanded ? '16px' : '0' }}>
+                          {isExpanded && sectionsInTab.map((sec, secIdx) => (
+                            <SectionCard
+                              key={secIdx}
+                              section={{ ...sec, fields: sec.fieldsInTab }}
+                              hdrBgHex={hdrBgHex}
+                              secBgHex={secBgHex}
+                              secTextHex={secTextHex}
+                              labelColorHex={labelColorHex}
+                              TYPE_ICONS={TYPE_ICONS}
+                            />
+                          ))}
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          marginTop: '30px',
+          paddingTop: '20px',
+          borderTop: '2px solid #e5e7eb',
+          textAlign: 'center',
+          color: '#6b7280',
+          fontSize: '13px'
+        }}>
+          ✨ Esta es una representación visual de cómo se verán las categorías en Therefore
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Section Card Component
+function SectionCard({ section, hdrBgHex, secBgHex, secTextHex, labelColorHex, TYPE_ICONS }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      {/* Section Header */}
+      <div style={{
+        background: secBgHex,
+        color: secTextHex,
+        padding: '8px 12px',
+        fontSize: '12px',
+        fontWeight: 700,
+        marginBottom: '8px',
+        borderRadius: '4px'
+      }}>
+        {section.name}
+      </div>
+
+      {/* Fields Grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '8px'
+      }}>
+        {section.fields
+          .filter(f => f.nombre?.trim())
+          .map((field, idx) => {
+            const typeInfo = TYPE_ICONS[field.tipo] || { icon: '❓', label: 'Otro' }
+            return (
+              <div
+                key={idx}
+                style={{
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  padding: '10px',
+                  background: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '12px'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>{typeInfo.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    color: '#1f2937',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {field.nombre}
+                  </div>
+                  <div style={{
+                    color: '#9ca3af',
+                    fontSize: '11px'
+                  }}>
+                    {typeInfo.label}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+      </div>
+    </div>
+  )
+}
+
 export default function CategoryBuilder() {
   const { user } = useAuth()
   const [categories, setCategories] = useState([
@@ -2827,27 +3121,13 @@ export default function CategoryBuilder() {
         </div>
       </Modal>
 
-      {/* Preview Modal */}
-      <Modal
-        title="👁 Vista Previa"
-        open={previewModalOpen}
-        onCancel={() => setPreviewModalOpen(false)}
-        width={700}
-        footer={null}
-      >
-        <div style={{ padding: '20px 0' }}>
-          {activeCategory < categories.length && (
-            <DialogPreview
-              catName={categories[activeCategory].name}
-              sections={categories[activeCategory].sections}
-              hasTable={categories[activeCategory].sections.some(s =>
-                s.fields.some(f => f.tipo === '10')
-              )}
-              palette={COLOR_PALETTES[categories[activeCategory].palette || 'Therefore Azul']}
-            />
-          )}
-        </div>
-      </Modal>
+      {/* Preview Modal - Grid Visualization */}
+      {previewModalOpen && (
+        <CategoryGridPreview
+          categories={categories}
+          onClose={() => setPreviewModalOpen(false)}
+        />
+      )}
 
       {/* CSV Importer Modal */}
       <CsvImporter isOpen={csvModalOpen} onClose={() => setCsvModalOpen(false)} onImport={handleCsvImport} />

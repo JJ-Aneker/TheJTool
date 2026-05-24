@@ -1,0 +1,10 @@
+Categoría,Pestaña,Sección,Nombre,Tipo,Longitud,Obligatorio
+PRL_Examenes,Datos Básicos,Examen,Código,String,50,Si
+PRL_Examenes,Datos Básicos,Examen,Fecha,Date,,Si
+PRL_Examenes,Resultados,Resultado,Puntuación,Integer,,No
+PRL_Preguntas,General,Pregunta,Enunciado,String,500,Si
+PRL_Preguntas,General,Pregunta,Opción A,String,200,Si
+PRL_Preguntas,Validación,Criterio,Respuesta Correcta,Integer,,Si
+PRL_Resultados,Datos,Resultado,Calificación,Money,,Si
+PRL_Resultados,Datos,Resultado,Aprobado,Boolean,,No
+PRL_Resultados,Análisis,Estadísticas,Promedio,Money,,No
