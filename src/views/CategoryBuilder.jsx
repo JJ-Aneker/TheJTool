@@ -1091,6 +1091,73 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
   )
 }
 
+// XML Parser - Extract categories structure from generated XML
+function parseXmlCategories(xmlString) {
+  try {
+    const parser = new DOMParser()
+    const xmlDoc = parser.parseFromString(xmlString, 'text/xml')
+
+    if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+      console.error('XML Parse Error:', xmlDoc.getElementsByTagName('parsererror')[0].textContent)
+      return []
+    }
+
+    const categories = []
+    const categoryElements = xmlDoc.getElementsByTagName('Category')
+
+    categoryElements.forEach((catEl) => {
+      const ctgryNo = catEl.querySelector('CtgryNo')?.textContent || ''
+      const nameEl = catEl.querySelector('Name > TStr')
+      const catName = nameEl?.textContent || catEl.querySelector('Name')?.textContent || 'Sin nombre'
+
+      // Extract fields grouped by section and tab
+      const sections = []
+      const fieldElements = catEl.querySelectorAll('Field')
+      let currentSection = null
+
+      fieldElements.forEach((fieldEl) => {
+        const typeNo = fieldEl.querySelector('TypeNo')?.textContent
+        const caption = fieldEl.querySelector('Caption > TStr')?.textContent || fieldEl.querySelector('Caption')?.textContent || ''
+        const fieldNo = fieldEl.querySelector('FieldNo')?.textContent
+
+        // TypeNo 4 = Section header (label)
+        if (typeNo === '4' && caption) {
+          currentSection = { name: caption, fields: [] }
+          sections.push(currentSection)
+        }
+        // Data fields
+        else if (typeNo && ['1', '2', '3', '5', '6', '7'].includes(typeNo)) {
+          if (!currentSection) {
+            currentSection = { name: 'GENERAL', fields: [] }
+            sections.push(currentSection)
+          }
+          const typeNames = { '1': 'String', '2': 'Integer', '3': 'Date', '5': 'Money', '6': 'Boolean', '7': 'DateTime' }
+          currentSection.fields.push({
+            nombre: caption,
+            tipo: typeNo,
+            fieldNo: fieldNo
+          })
+        }
+      })
+
+      if (sections.length === 0) {
+        sections.push({ name: 'GENERAL', fields: [] })
+      }
+
+      categories.push({
+        name: catName,
+        sections: sections,
+        palette: 'Therefore Azul'
+      })
+    })
+
+    return categories
+  } catch (err) {
+    console.error('Error parsing XML:', err)
+    return []
+  }
+}
+
 // Enhanced Grid Preview - Visual card-based representation of categories
 function CategoryGridPreview({ categories, onClose }) {
   const [expandedTab, setExpandedTab] = useState({})
@@ -1410,6 +1477,7 @@ export default function CategoryBuilder() {
   const [customColors, setCustomColors] = useState(COLOR_PRESETS.dark.colors)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [searchText, setSearchText] = useState('')
+  const [previewCategories, setPreviewCategories] = useState([])
 
   useEffect(() => {
     if (user?.id) loadTemplates()
@@ -2029,6 +2097,9 @@ export default function CategoryBuilder() {
       const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${allCategoriesXml}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
 
       setXml(xml)
+      // Parse XML to extract categories for preview
+      const parsedCats = parseXmlCategories(xml)
+      setPreviewCategories(parsedCats)
       setXmlModalOpen(true)
       message.success(`✅ XML generado con ${categoryXmlBlocks.length} categoría(s) (Therefore Native Format)`)
       return
@@ -3121,9 +3192,9 @@ export default function CategoryBuilder() {
         </div>
       </Modal>
 
-      {/* Preview Modal - Miniaturas gráficas de categorías */}
+      {/* Preview Modal - Miniaturas gráficas de categorías desde XML */}
       <Modal
-        title="📊 Vista Previa de Categorías"
+        title="📊 Vista Previa de Categorías (Desde XML)"
         open={previewModalOpen}
         onCancel={() => setPreviewModalOpen(false)}
         width="90vw"
@@ -3131,23 +3202,30 @@ export default function CategoryBuilder() {
         footer={null}
         bodyStyle={{ maxHeight: '80vh', overflow: 'auto', padding: '30px' }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '30px' }}>
-          {categories.map((cat, idx) => (
-            <div key={idx} style={{ border: '2px solid #e5e7eb', borderRadius: '8px', padding: '15px', background: '#f9fafb' }}>
-              <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
-                {idx + 1}. {cat.name || 'Sin nombre'}
+        {previewCategories.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+            <p>⚠️ Genera primero el XML con "⚡ Generar XML"</p>
+            <p style={{ fontSize: '12px' }}>Luego abre el Preview para ver las categorías como se verían importadas</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '30px' }}>
+            {previewCategories.map((cat, idx) => (
+              <div key={idx} style={{ border: '2px solid #e5e7eb', borderRadius: '8px', padding: '15px', background: '#f9fafb' }}>
+                <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
+                  {idx + 1}. {cat.name || 'Sin nombre'}
+                </div>
+                <DialogPreview
+                  catName={cat.name}
+                  sections={cat.sections}
+                  hasTable={cat.sections && cat.sections.some(s =>
+                    s.fields && s.fields.some(f => f.tipo === '10')
+                  )}
+                  palette={COLOR_PALETTES[cat.palette || 'Therefore Azul']}
+                />
               </div>
-              <DialogPreview
-                catName={cat.name}
-                sections={cat.sections}
-                hasTable={cat.sections.some(s =>
-                  s.fields.some(f => f.tipo === '10')
-                )}
-                palette={COLOR_PALETTES[cat.palette || 'Therefore Azul']}
-              />
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Modal>
 
       {/* CSV Importer Modal */}
