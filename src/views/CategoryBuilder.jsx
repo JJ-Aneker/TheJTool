@@ -838,21 +838,21 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
 
   const TYPE_ICON = { '1': 'abc', '2': '123', '3': '📅', '5': '€', '6': '✓', '7': '🕐', '15': '▾', '10': '📋' }
 
-  // Build visualization rows (excluding table fields from display)
+  // Build visualization rows (including table fields)
   // When hasTable (tabs), only show fields for the active tab
   const rows = []
   let yPos = hasTable ? 8 : HDR_Hp + SEC_GAPp
   sections.filter(s => s.fields.some(f => f.nombre)).forEach((sec) => {
-    // Determine which fields to show
+    // Determine which fields to show (regular + table fields)
     let fieldsToShow
     if (hasTable) {
-      // Show only fields matching the active tab, plus fields with no pestaña
+      // Show fields matching the active tab, plus fields with no pestaña (including tables)
       fieldsToShow = sec.fields.filter(f =>
-        f.nombre && f.tipo !== '10' && (!f.pestaña?.trim() || f.pestaña.trim() === activeTab)
+        f.nombre && (!f.pestaña?.trim() || f.pestaña.trim() === activeTab)
       )
     } else {
-      // Show all non-table fields
-      fieldsToShow = sec.fields.filter(f => f.nombre && f.tipo !== '10')
+      // Show all fields (regular and table)
+      fieldsToShow = sec.fields.filter(f => f.nombre)
     }
 
     if (fieldsToShow.length > 0) {
@@ -860,8 +860,19 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
       yPos += SEC_GAPp
     }
 
-    for (let i = 0; i < fieldsToShow.length; i += 2) {
-      rows.push({ type: 'row', y: yPos, f1: fieldsToShow[i], f2: fieldsToShow[i + 1] })
+    // Separate table and non-table fields
+    const normalFields = fieldsToShow.filter(f => f.tipo !== '10')
+    const tableFields = fieldsToShow.filter(f => f.tipo === '10')
+
+    // Render normal fields (2 per row)
+    for (let i = 0; i < normalFields.length; i += 2) {
+      rows.push({ type: 'row', y: yPos, f1: normalFields[i], f2: normalFields[i + 1] })
+      yPos += ROW_GAPp
+    }
+
+    // Render table fields (1 per row, with special indicator)
+    tableFields.forEach((tbl) => {
+      rows.push({ type: 'table', y: yPos, field: tbl })
       yPos += ROW_GAPp
     }
     yPos += 6
@@ -1004,6 +1015,50 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                         {row.label}
                       </span>
                     </div>
+                  ) : row.type === 'table' ? (
+                    <div key={ri} style={{
+                      position: 'absolute',
+                      left: (LX1 + 5) * SCALE,
+                      top: row.y * SCALE,
+                      width: (DW - 10 - 20 - 10) * SCALE,
+                      height: ROW_Hp * SCALE
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 1 * SCALE,
+                        width: (LW + 100) * SCALE,
+                        height: LBL_Hp * SCALE,
+                        fontSize: 7 * SCALE,
+                        color: labelColorHex,
+                        background: labelBgHex,
+                        textAlign: 'right',
+                        lineHeight: `${LBL_Hp * SCALE}px`,
+                        paddingRight: 3,
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {row.field.nombre}
+                      </div>
+                      <div style={{
+                        position: 'absolute',
+                        left: (LW + 100) * SCALE,
+                        top: 0,
+                        width: 80 * SCALE,
+                        height: ROW_Hp * SCALE,
+                        background: '#fef3c7',
+                        border: '1px solid #fcd34d',
+                        fontSize: 7 * SCALE,
+                        color: '#92400e',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 600
+                      }}>
+                        📋 Table
+                      </div>
+                    </div>
                   ) : (
                     <div key={ri}>
                       {row.f1 && (
@@ -1123,6 +1178,50 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
               <span style={{ fontSize: 7 * SCALE, fontWeight: 700, color: secTextHex }}>
                 {row.label}
               </span>
+            </div>
+          ) : row.type === 'table' ? (
+            <div key={ri} style={{
+              position: 'absolute',
+              left: LX1 * SCALE,
+              top: row.y * SCALE,
+              width: (DW - 10) * SCALE,
+              height: ROW_Hp * SCALE
+            }}>
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: 1 * SCALE,
+                width: (LW + 100) * SCALE,
+                height: LBL_Hp * SCALE,
+                fontSize: 7 * SCALE,
+                color: labelColorHex,
+                background: labelBgHex,
+                textAlign: 'right',
+                lineHeight: `${LBL_Hp * SCALE}px`,
+                paddingRight: 3,
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis'
+              }}>
+                {row.field.nombre}
+              </div>
+              <div style={{
+                position: 'absolute',
+                left: (LW + 100) * SCALE,
+                top: 0,
+                width: 80 * SCALE,
+                height: ROW_Hp * SCALE,
+                background: '#fef3c7',
+                border: '1px solid #fcd34d',
+                fontSize: 7 * SCALE,
+                color: '#92400e',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 600
+              }}>
+                📋 Table
+              </div>
             </div>
           ) : (
             <div key={ri}>
