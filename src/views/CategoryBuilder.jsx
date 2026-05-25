@@ -2605,12 +2605,6 @@ export default function CategoryBuilder() {
             ✎ Editor
           </button>
           <button
-            onClick={() => setActiveView('preview')}
-            className={activeView === 'preview' ? 'btn-primary' : 'btn-default'}
-          >
-            👁 Preview
-          </button>
-          <button
             onClick={() => setCsvModalOpen(true)}
             className="btn-default"
           >
@@ -3231,9 +3225,9 @@ export default function CategoryBuilder() {
         </div>
       </Modal>
 
-      {/* Preview Modal - Miniaturas gráficas de categorías desde XML */}
+      {/* Preview Modal - Miniaturas gráficas de categorías */}
       <Modal
-        title="📊 Vista Previa de Categorías (Desde XML)"
+        title="📊 Vista Previa de Categorías"
         open={previewModalOpen}
         onCancel={() => setPreviewModalOpen(false)}
         width="90vw"
@@ -3241,30 +3235,23 @@ export default function CategoryBuilder() {
         footer={null}
         bodyStyle={{ maxHeight: '80vh', overflow: 'auto', padding: '30px' }}
       >
-        {previewCategories.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
-            <p>⚠️ Genera primero el XML con "⚡ Generar XML"</p>
-            <p style={{ fontSize: '12px' }}>Luego abre el Preview para ver las categorías como se verían importadas</p>
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '30px' }}>
-            {previewCategories.map((cat, idx) => (
-              <div key={idx} style={{ border: '2px solid #e5e7eb', borderRadius: '8px', padding: '15px', background: '#f9fafb' }}>
-                <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
-                  {idx + 1}. {cat.name || 'Sin nombre'}
-                </div>
-                <DialogPreview
-                  catName={cat.name}
-                  sections={cat.sections}
-                  hasTable={cat.sections && cat.sections.some(s =>
-                    s.fields && s.fields.some(f => f.tipo === '10')
-                  )}
-                  palette={COLOR_PALETTES[cat.palette || 'Therefore Azul']}
-                />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '30px' }}>
+          {(previewCategories.length > 0 ? previewCategories : categories).map((cat, idx) => (
+            <div key={idx} style={{ border: '2px solid #e5e7eb', borderRadius: '8px', padding: '15px', background: '#f9fafb' }}>
+              <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
+                {idx + 1}. {cat.name || 'Sin nombre'}
               </div>
-            ))}
-          </div>
-        )}
+              <DialogPreview
+                catName={cat.name}
+                sections={cat.sections}
+                hasTable={cat.sections && cat.sections.some(s =>
+                  s.fields && s.fields.some(f => f.tipo === '10')
+                )}
+                palette={COLOR_PALETTES[cat.palette || 'Therefore Azul']}
+              />
+            </div>
+          ))}
+        </div>
       </Modal>
 
       {/* CSV Importer Modal */}
