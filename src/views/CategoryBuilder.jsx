@@ -2084,12 +2084,6 @@ export default function CategoryBuilder() {
     setCategories(updated)
   }
 
-  const addField = (secIdx) => {
-    const updated = [...categories]
-    updated[activeCategory].sections[secIdx].fields.push({ id: newGuid(), nombre: '', fieldKey: '', tipo: '1', required: false, pestaña: '', length: 100 })
-    setCategories(updated)
-  }
-
   const removeField = (secIdx, fieldIdx) => {
     const updated = [...categories]
     updated[activeCategory].sections[secIdx].fields = updated[activeCategory].sections[secIdx].fields.filter((_, i) => i !== fieldIdx)
