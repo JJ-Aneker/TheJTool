@@ -2473,22 +2473,25 @@ export default function CategoryBuilder() {
 
       sections.forEach(sec => {
           sec.fields.forEach(field => {
-            if (field.tipo === '10' && field.columnas && field.columnas.length > 0) {
+            if (field.tipo === '10') {
               hasTable = true
               const tableFieldNo = fieldNo--
               const tableName_key = sanitizeName(field.nombre)
-              tableMap[tableName_key] = { fieldNo: tableFieldNo, columns: field.columnas }
+              tableMap[tableName_key] = { fieldNo: tableFieldNo, columns: field.columnas || [] }
 
-              field.columnas.forEach(col => {
-                if (!col.nombre.trim()) return
-                const normalizedType = normalizeFieldType(col.tipo)
-                const lt = normalizedType === '5' ? '<Length>18</Length>' : (normalizedType !== '3' && normalizedType !== '6' && normalizedType !== '7') ? `<Length>${col.length || 50}</Length>` : ''
-                const colname = sanitizeName(col.nombre)
-                // CRITICAL FIX: BelongsToTable points to the real Table field, not TAB_NO
-                tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${tableFieldNo}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
-                colNo--
-                allTableCols.push(col)
-              })
+              // Generate column fields if they exist
+              if (field.columnas && field.columnas.length > 0) {
+                field.columnas.forEach(col => {
+                  if (!col.nombre.trim()) return
+                  const normalizedType = normalizeFieldType(col.tipo)
+                  const lt = normalizedType === '5' ? '<Length>18</Length>' : (normalizedType !== '3' && normalizedType !== '6' && normalizedType !== '7') ? `<Length>${col.length || 50}</Length>` : ''
+                  const colname = sanitizeName(col.nombre)
+                  // CRITICAL FIX: BelongsToTable points to the real Table field, not TAB_NO
+                  tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${tableFieldNo}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                  colNo--
+                  allTableCols.push(col)
+                })
+              }
             }
           })
         })
@@ -2521,7 +2524,9 @@ export default function CategoryBuilder() {
 
                   if (normalizedType1 === '10') {
                     // CRITICAL FIX: Generate actual Table field (TypeNo 10)
-                    const tableFieldNo = tableMap[colname1]?.fieldNo
+                    // For table lookup, use NOME (not fieldKey) to match tableMap key
+                    const tableFieldKey = sanitizeName(f1.nombre)
+                    const tableFieldNo = tableMap[tableFieldKey]?.fieldNo
                     fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f1.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${tabYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f1.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname1}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><BelongsToTable>${TAB_NO}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${pestañaToTabNo[pestaña]}</ShowInTabNo></Field>`
                     tabYPos += 100
                   } else {
@@ -2536,7 +2541,9 @@ export default function CategoryBuilder() {
 
                   if (normalizedType2 === '10') {
                     // CRITICAL FIX: Generate actual Table field (TypeNo 10)
-                    const tableFieldNo = tableMap[colname2]?.fieldNo
+                    // For table lookup, use NOME (not fieldKey) to match tableMap key
+                    const tableFieldKey = sanitizeName(f2.nombre)
+                    const tableFieldNo = tableMap[tableFieldKey]?.fieldNo
                     fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f2.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${tabYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f2.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname2}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><BelongsToTable>${TAB_NO}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${pestañaToTabNo[pestaña]}</ShowInTabNo></Field>`
                     tabYPos += 100
                   } else {
@@ -2569,7 +2576,9 @@ export default function CategoryBuilder() {
 
                 if (normalizedType1 === '10') {
                   // Generate Table field with no tab assignment
-                  const tableFieldNo = tableMap[colname1]?.fieldNo
+                  // For table lookup, use NOME (not fieldKey) to match tableMap key
+                  const tableFieldKey = sanitizeName(f1.nombre)
+                  const tableFieldNo = tableMap[tableFieldKey]?.fieldNo
                   fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f1.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${baseYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f1.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname1}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
                   baseYPos += 100
                 } else {
@@ -2584,7 +2593,9 @@ export default function CategoryBuilder() {
 
                 if (normalizedType2 === '10') {
                   // Generate Table field with no tab assignment
-                  const tableFieldNo = tableMap[colname2]?.fieldNo
+                  // For table lookup, use NOME (not fieldKey) to match tableMap key
+                  const tableFieldKey = sanitizeName(f2.nombre)
+                  const tableFieldNo = tableMap[tableFieldKey]?.fieldNo
                   fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f2.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${baseYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f2.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname2}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
                   baseYPos += 100
                 } else {
@@ -2613,7 +2624,9 @@ export default function CategoryBuilder() {
 
                 if (normalizedType1 === '10') {
                   // Generate Table field
-                  const tableFieldNo = tableMap[colname1]?.fieldNo
+                  // For table lookup, use NOME (not fieldKey) to match tableMap key
+                  const tableFieldKey = sanitizeName(f1.nombre)
+                  const tableFieldNo = tableMap[tableFieldKey]?.fieldNo
                   fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f1.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${yPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f1.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname1}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
                   yPos += 100
                 } else {
@@ -2628,7 +2641,9 @@ export default function CategoryBuilder() {
 
                 if (normalizedType2 === '10') {
                   // Generate Table field
-                  const tableFieldNo = tableMap[colname2]?.fieldNo
+                  // For table lookup, use NOME (not fieldKey) to match tableMap key
+                  const tableFieldKey = sanitizeName(f2.nombre)
+                  const tableFieldNo = tableMap[tableFieldKey]?.fieldNo
                   fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f2.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${yPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f2.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname2}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
                   yPos += 100
                 } else {
