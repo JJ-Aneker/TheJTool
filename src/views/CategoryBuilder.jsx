@@ -1634,7 +1634,7 @@ function SectionCard({ section, hdrBgHex, secBgHex, secTextHex, labelColorHex, T
 }
 
 // Separate component for field table to avoid re-creation on every render
-function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateField, removeField }) {
+function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateField, removeField, addField, secIdx }) {
   const columns = [
     {
       title: 'Nombre',
@@ -1705,7 +1705,7 @@ function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateFiel
         <div style={{ display: 'flex', gap: '4px' }}>
           {record.field.tipo === '10' && (
             <button
-              onClick={() => setExpandedRows(prev => ({ ...prev, [record.key]: !prev[record.key] }))}
+              onClick={() => setExpandedRows(prev => ({ ...prev, [record.rowKey]: !prev[record.rowKey] }))}
               style={{
                 fontSize: '12px',
                 padding: '2px 6px',
@@ -1715,7 +1715,7 @@ function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateFiel
                 color: 'var(--accent-primary)'
               }}
             >
-              {expandedRows[record.key] ? '▲' : '▼'}
+              {expandedRows[record.rowKey] ? '▲' : '▼'}
             </button>
           )}
           <button
@@ -1741,17 +1741,21 @@ function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateFiel
     <>
       <Table
         columns={columns}
-        dataSource={fields.map((f) => ({ ...f, key: `${f.secIdx}-${f.fieldIdx}` }))}
+        dataSource={fields.map((f) => {
+          const rowKey = `${f.secIdx}-${f.fieldIdx}`
+          return { ...f, key: rowKey, rowKey }
+        })}
         pagination={false}
         size="small"
         style={{ marginBottom: '12px' }}
         onRow={(record) => ({
-          style: { background: expandedRows[record.key] ? 'var(--bg-hover)' : 'transparent' }
+          style: { background: expandedRows[record.rowKey] ? 'var(--bg-hover)' : 'transparent' }
         })}
       />
       {/* Render Table field columns */}
       {fields.map((record) => {
-        if (record.field.tipo !== '10' || !expandedRows[record.key]) return null
+        const rowKey = `${record.secIdx}-${record.fieldIdx}`
+        if (record.field.tipo !== '10' || !expandedRows[rowKey]) return null
         return (
           <div key={`expanded-${record.key}`} style={{ marginBottom: '12px', padding: '12px', background: 'var(--bg-card)', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
             <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', marginBottom: '8px', textTransform: 'uppercase' }}>
@@ -1860,6 +1864,38 @@ function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateFiel
           </div>
         )
       })}
+      <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+        <button
+          onClick={() => addField(secIdx, '1')}
+          style={{
+            fontSize: '12px',
+            padding: '6px 12px',
+            background: 'var(--accent-primary)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: '500'
+          }}
+        >
+          + Campo Normal
+        </button>
+        <button
+          onClick={() => addField(secIdx, '10')}
+          style={{
+            fontSize: '12px',
+            padding: '6px 12px',
+            background: 'var(--accent-success)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: '500'
+          }}
+        >
+          + Campo Tabla
+        </button>
+      </div>
     </>
   )
 }
@@ -2066,6 +2102,21 @@ export default function CategoryBuilder() {
     setCategories(updated)
   }
 
+  const addField = (secIdx, tipo = '1') => {
+    const updated = [...categories]
+    const newField = {
+      id: newGuid(),
+      nombre: tipo === '10' ? 'Nueva_Tabla' : 'Nuevo_Campo',
+      fieldKey: tipo === '10' ? 'Nueva_Tabla' : 'Nuevo_Campo',
+      tipo,
+      required: false,
+      pestaña: '',
+      length: tipo === '1' ? 100 : ''
+    }
+    if (tipo === '10') newField.columnas = []
+    updated[activeCategory].sections[secIdx].fields.push(newField)
+    setCategories(updated)
+  }
 
   const updateFieldPestaña = (secIdx, fieldIdx, pestaña) => {
     const updated = [...categories]
@@ -3324,7 +3375,7 @@ export default function CategoryBuilder() {
                     <h4 style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-secondary)' }}>
                       CAMPOS SIN PESTAÑA
                     </h4>
-                    <FieldTableComponent fields={baseFields} expandedRows={expandedRows} setExpandedRows={setExpandedRows} updateField={updateField} removeField={removeField} />
+                    <FieldTableComponent fields={baseFields} expandedRows={expandedRows} setExpandedRows={setExpandedRows} updateField={updateField} removeField={removeField} addField={addField} secIdx={0} />
                   </div>
                 )}
 
@@ -3332,11 +3383,15 @@ export default function CategoryBuilder() {
                 {tabs.length > 0 && (
                   <div>
                     <Tabs
-                      items={tabs.map(tabName => ({
-                        key: tabName,
-                        label: tabName,
-                        children: <FieldTableComponent fields={getFieldsForTab(tabName)} expandedRows={expandedRows} setExpandedRows={setExpandedRows} updateField={updateField} removeField={removeField} />
-                      }))}
+                      items={tabs.map(tabName => {
+                        const tabFields = getFieldsForTab(tabName)
+                        const firstSecIdx = tabFields.length > 0 ? tabFields[0].secIdx : 0
+                        return {
+                          key: tabName,
+                          label: tabName,
+                          children: <FieldTableComponent fields={tabFields} expandedRows={expandedRows} setExpandedRows={setExpandedRows} updateField={updateField} removeField={removeField} addField={addField} secIdx={firstSecIdx} />
+                        }
+                      })}
                     />
                   </div>
                 )}
