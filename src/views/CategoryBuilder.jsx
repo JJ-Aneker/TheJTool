@@ -302,13 +302,35 @@ function parseCsv(raw) {
     pestaña: headers.findIndex(h => ['pestaña', 'pestaña', 'tab', 'tabs', 'tab'].includes(h)),
     categoria: headers.findIndex(h => ['categoria', 'categoría', 'category', 'tab', 'categoria'].includes(h)),
     length: headers.findIndex(h => ['length', 'longitud', 'tamaño', 'size', 'largo'].includes(h)),
+    tablaparent: headers.findIndex(h => ['tablaparent', 'tabla_parent', 'tabla parent', 'parenttable', 'parent table', 'tabla'].includes(h)),
   }
 
   if (idx.nombre === -1) return { error: 'No se encontró la columna "Nombre".' }
 
   const categoryMap = {}
   const warnings = []
+  const tableColumnMap = {} // Para mapear TablaParent → lista de columnas
 
+  // Primera pasada: identificar campos Table y recolectar sus columnas
+  lines.slice(1).forEach((line, li) => {
+    const cols = line.split(sep).map(c => c.trim())
+    const nombre = cols[idx.nombre] || ''
+    if (!nombre) return
+
+    const tipo = idx.tipo >= 0 ? (TYPE_ALIAS[cols[idx.tipo]?.toLowerCase()] || 'text') : 'text'
+    const tablaParent = idx.tablaparent >= 0 ? (cols[idx.tablaparent] || '').trim() : ''
+
+    // Si tiene TablaParent y el tipo NO es Table, es una columna de tabla
+    if (tablaParent && tipo !== '10') {
+      if (!tableColumnMap[tablaParent]) tableColumnMap[tablaParent] = []
+      const fieldKey = idx.fieldkey >= 0 ? (cols[idx.fieldkey] || toCamelKey(nombre)) : toCamelKey(nombre)
+      const length = idx.length >= 0 ? (cols[idx.length] || '').trim() : ''
+      const required = idx.obligatorio >= 0 ? ['1', 'si', 'sí', 'yes', 'true'].includes((cols[idx.obligatorio] || '').toLowerCase()) : false
+      tableColumnMap[tablaParent].push({ id: newGuid(), nombre, fieldKey, tipo, required, length })
+    }
+  })
+
+  // Segunda pasada: procesar campos normales
   lines.slice(1).forEach((line, li) => {
     const cols = line.split(sep).map(c => c.trim())
     const nombre = cols[idx.nombre] || ''
@@ -321,10 +343,21 @@ function parseCsv(raw) {
     const seccion = idx.seccion >= 0 ? (cols[idx.seccion] || 'GENERAL').toUpperCase() : 'GENERAL'
     const pestaña = idx.pestaña >= 0 ? (cols[idx.pestaña] || '').trim() : ''
     const length = idx.length >= 0 ? (cols[idx.length] || '').trim() : ''
+    const tablaParent = idx.tablaparent >= 0 ? (cols[idx.tablaparent] || '').trim() : ''
+
+    // Ignorar campos que son columnas de tabla (tienen TablaParent y no son Table)
+    if (tablaParent && tipo !== '10') return
+
+    const field = { id: newGuid(), nombre, fieldKey, tipo, required, pestaña, length }
+
+    // Si es un Table, agregar sus columnas si existen
+    if (tipo === '10' && tableColumnMap[nombre]) {
+      field.columnas = tableColumnMap[nombre]
+    }
 
     if (!categoryMap[categoria]) categoryMap[categoria] = {}
     if (!categoryMap[categoria][seccion]) categoryMap[categoria][seccion] = []
-    categoryMap[categoria][seccion].push({ id: newGuid(), nombre, fieldKey, tipo, required, pestaña, length })
+    categoryMap[categoria][seccion].push(field)
   })
 
   if (!Object.keys(categoryMap).length) return { error: 'No se procesó ningún campo válido.' }
@@ -372,9 +405,12 @@ function CsvImporter({ isOpen, onClose, onImport }) {
       width={700}
     >
       <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-        <div style={{ marginBottom: '8px' }}>Columnas: <strong>Categoría ; Pestaña ; Sección ; Nombre ; Tipo ; Longitud ; Obligatorio</strong></div>
+        <div style={{ marginBottom: '8px' }}>Columnas: <strong>Categoría ; Pestaña ; Sección ; Nombre ; Tipo ; Longitud ; Obligatorio ; TablaParent</strong></div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-          Pestaña, Longitud y Obligatorio son opcionales. Máx texto: 4000 caracteres.
+          Pestaña, Longitud, Obligatorio y TablaParent son opcionales. Máx texto: 4000 caracteres.
+        </div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px' }}>
+          <strong>TablaParent:</strong> indica en qué campo Table va incluida esta fila (para columnas de tabla). Si Tipo=Table, dejar vacío.
         </div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
           Tipos Therefore: <strong>text</strong> (1-4000), <strong>email</strong> (1-4000), <strong>phone</strong> (texto),
