@@ -92,7 +92,8 @@
 /* Form Controls */
 .category-input,
 .category-select,
-.category-textarea {
+.category-textarea,
+select {
   width: 100%;
   background: var(--bg-input) !important;
   border: 1px solid var(--border-default) !important;
@@ -108,9 +109,23 @@
 
 .category-input:focus,
 .category-select:focus,
-.category-textarea:focus {
+.category-textarea:focus,
+select:focus {
   border-color: var(--accent-primary) !important;
   background: var(--bg-input) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1) !important;
+}
+
+/* Native Select Option */
+select option {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+}
+
+.category-select-compact {
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-default) !important;
+  color: var(--text-primary) !important;
 }
 
 .category-textarea {

@@ -702,7 +702,7 @@ function FieldRow({ field, onChange, onRemove, allPestañas, onPestañaChange })
                       boxSizing: 'border-box'
                     }}
                   >
-                    {FIELD_TYPES.filter(t => t.value !== '10').map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    {FIELD_TYPES.filter(t => t.value !== '10').map(t => <option key={t.value} value={t.value} style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>{t.label}</option>)}
                   </select>
                   <input
                     type="number"
@@ -3032,14 +3032,14 @@ export default function CategoryBuilder() {
                         padding: '6px 10px',
                         fontSize: '12px',
                         borderRadius: '4px',
-                        border: 'none',
-                        background: 'rgba(255,255,255,0.2)',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        background: 'rgba(255,255,255,0.1)',
                         color: 'white',
                         cursor: 'pointer'
                       }}
                     >
                       {Object.keys(COLOR_PALETTES).map(palName => (
-                        <option key={palName} value={palName}>{palName}</option>
+                        <option key={palName} value={palName} style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>{palName}</option>
                       ))}
                     </select>
                   </div>
