@@ -2956,33 +2956,40 @@ export default function CategoryBuilder() {
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {/* Category header - Minimal single line */}
                 <div style={{
-                  padding: '8px 0',
+                  padding: '12px 0',
                   marginBottom: '16px',
                   display: 'flex',
-                  gap: '12px',
+                  gap: '16px',
                   alignItems: 'center',
-                  borderBottom: '1px solid var(--border-default)'
+                  borderBottom: '2px solid var(--border-default)'
                 }}>
-                  {/* Editable title */}
+                  {/* Editable title - PRIMARY */}
                   <input
                     value={cat.name}
                     onChange={e => updateCategoryName(activeCategory, e.target.value)}
                     style={{
                       flex: 1,
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      padding: '4px 8px',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      padding: '8px 12px',
                       borderRadius: '4px',
-                      border: '1px solid var(--border-default)',
+                      border: '2px solid var(--border-default)',
                       background: 'var(--bg-input)',
                       color: 'var(--text-primary)',
-                      minWidth: '0',
-                      outline: 'none'
+                      minWidth: '200px',
+                      outline: 'none',
+                      transition: 'border-color 200ms'
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = 'var(--accent-primary)'
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = 'var(--border-default)'
                     }}
                     placeholder="Nombre de categoría"
                   />
 
-                  {/* Palette selector - Compact */}
+                  {/* Palette selector - WIDER */}
                   <select
                     value={cat.palette || 'Therefore Azul'}
                     onChange={e => {
@@ -2991,14 +2998,22 @@ export default function CategoryBuilder() {
                       setCategories(updated)
                     }}
                     style={{
-                      padding: '4px 8px',
-                      fontSize: '11px',
+                      padding: '8px 12px',
+                      fontSize: '12px',
                       borderRadius: '4px',
-                      border: '1px solid var(--border-default)',
+                      border: '2px solid var(--border-default)',
                       background: 'var(--bg-input)',
                       color: 'var(--text-primary)',
                       cursor: 'pointer',
-                      minWidth: '120px'
+                      minWidth: '200px',
+                      outline: 'none',
+                      transition: 'border-color 200ms'
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = 'var(--accent-primary)'
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = 'var(--border-default)'
                     }}
                   >
                     {Object.keys(COLOR_PALETTES).map(palName => (
@@ -3011,22 +3026,24 @@ export default function CategoryBuilder() {
                     <button
                       onClick={() => removeCategory(activeCategory)}
                       style={{
-                        padding: '4px 10px',
+                        padding: '8px 14px',
                         background: 'transparent',
-                        border: '1px solid var(--accent-error)',
+                        border: '2px solid var(--accent-error)',
                         borderRadius: '4px',
                         color: 'var(--accent-error)',
                         cursor: 'pointer',
                         fontSize: '12px',
-                        fontWeight: '600',
+                        fontWeight: '700',
                         transition: 'all 200ms',
                         whiteSpace: 'nowrap'
                       }}
                       onMouseEnter={e => {
-                        e.currentTarget.style.background = 'rgba(255,80,80,0.1)'
+                        e.currentTarget.style.background = 'rgba(255,80,80,0.15)'
+                        e.currentTarget.style.borderColor = 'var(--accent-error)'
                       }}
                       onMouseLeave={e => {
                         e.currentTarget.style.background = 'transparent'
+                        e.currentTarget.style.borderColor = 'var(--accent-error)'
                       }}
                       title="Eliminar esta categoría"
                     >
