@@ -803,6 +803,17 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
   const pestañaList = Array.from(allPestañas).sort()
 
   const [activeTab, setActiveTab] = useState(pestañaList.length > 0 ? pestañaList[0] : 'Datos')
+
+  // Update activeTab when pestañaList changes
+  useEffect(() => {
+    if (pestañaList.length > 0) {
+      // If current activeTab is no longer in the list, switch to first
+      if (!pestañaList.includes(activeTab)) {
+        setActiveTab(pestañaList[0])
+      }
+    }
+  }, [pestañaList, activeTab])
+
   const pal = palette || COLOR_PALETTES['Therefore Azul']
 
   // Convert BGR colors to hex for CSS
