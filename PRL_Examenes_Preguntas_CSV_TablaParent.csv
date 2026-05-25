@@ -1,0 +1,34 @@
+Categoría;Pestaña;Sección;Nombre;Tipo;Longitud;Obligatorio;TablaParent
+PRL_Examenes;;Identificación;ID_Examen;NumericCounter;;Sí;
+PRL_Examenes;;Identificación;Titulo;String;200;Sí;
+PRL_Examenes;General;Identificación;Descripcion;String;1000;No;
+PRL_Examenes;General;Configuración;Tiempo_Max_Min;Int;;Sí;
+PRL_Examenes;General;Configuración;Aprobado_Min_Pct;Int;;Sí;
+PRL_Examenes;General;Configuración;Activo;Logical;;No;
+PRL_Examenes;Preguntas;Preguntas del examen;Preguntas_Examen;Table;;No;
+PRL_Examenes;Preguntas;Preguntas del examen;ID_Pregunta_Ref;Int;;Sí;Preguntas_Examen
+PRL_Examenes;Preguntas;Preguntas del examen;Orden;Int;;No;Preguntas_Examen
+PRL_Preguntas;General;Identificación;ID_Pregunta;NumericCounter;;Sí;
+PRL_Preguntas;General;Identificación;Enunciado;String;500;Sí;
+PRL_Preguntas;General;Clasificación;Bloque;Keyword;;No;
+PRL_Preguntas;General;Clasificación;Activo;Logical;;No;
+PRL_Preguntas;Opciones;Opciones de respuesta;Opciones;Table;;No;
+PRL_Preguntas;Opciones;Opciones de respuesta;Texto_Opcion;String;300;Sí;Opciones
+PRL_Preguntas;Opciones;Opciones de respuesta;Valor_Opcion;String;50;Sí;Opciones
+PRL_Preguntas;Opciones;Opciones de respuesta;Es_Correcta;Logical;;No;Opciones
+PRL_Resultados;General;Identificación;ID_Resultado;NumericCounter;;Sí;
+PRL_Resultados;General;Identificación;ID_Examen_Ref;Int;;Sí;
+PRL_Resultados;General;Identificación;Titulo_Examen;String;200;No;
+PRL_Resultados;General;Alumno;Nombre_Alumno;String;150;Sí;
+PRL_Resultados;General;Alumno;DNI;String;15;Sí;
+PRL_Resultados;General;Alumno;Empresa;String;200;No;
+PRL_Resultados;General;Alumno;Puesto;String;100;No;
+PRL_Resultados;Resultado;Evaluación;Fecha_Realizacion;Date;;Sí;
+PRL_Resultados;Resultado;Evaluación;Nota;Decimal;;Sí;
+PRL_Resultados;Resultado;Evaluación;Apto;Keyword;;Sí;
+PRL_Resultados;Resultado;Evaluación;Tiempo_Empleado_Seg;Int;;No;
+PRL_Resultados;Resultado;Evaluación;Observaciones_Evaluador;String;500;No;
+PRL_Resultados;Detalle;Detalle de respuestas;Detalle_Respuestas;Table;;No;
+PRL_Resultados;Detalle;Detalle de respuestas;ID_Pregunta_Ref;Int;;Sí;Detalle_Respuestas
+PRL_Resultados;Detalle;Detalle de respuestas;Valor_Respondido;String;50;No;Detalle_Respuestas
+PRL_Resultados;Detalle;Detalle de respuestas;Es_Correcta;Logical;;No;Detalle_Respuestas
