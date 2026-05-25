@@ -874,7 +874,8 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
     tableFields.forEach((tbl) => {
       rows.push({ type: 'table', y: yPos, field: tbl })
       yPos += ROW_GAPp
-    }
+    })
+
     yPos += 6
   })
 
