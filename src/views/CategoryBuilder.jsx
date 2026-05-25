@@ -2985,7 +2985,7 @@ export default function CategoryBuilder() {
             }
 
             const FieldTable = ({ fields, isBaseTab = false }) => {
-              const [expandedRows, setExpandedRows] = React.useState({})
+              const [expandedRows, setExpandedRows] = useState({})
 
               const columns = [
                 {
