@@ -1633,6 +1633,237 @@ function SectionCard({ section, hdrBgHex, secBgHex, secTextHex, labelColorHex, T
   )
 }
 
+// Separate component for field table to avoid re-creation on every render
+function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateField, removeField }) {
+  const columns = [
+    {
+      title: 'Nombre',
+      key: 'nombre',
+      width: '25%',
+      render: (_, record) => (
+        <input
+          value={record.field.nombre}
+          onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, nombre: e.target.value })}
+          className="form-input"
+          style={{ fontSize: '12px', padding: '4px' }}
+        />
+      )
+    },
+    {
+      title: 'Tipo',
+      key: 'tipo',
+      width: '20%',
+      render: (_, record) => (
+        <select
+          value={record.field.tipo}
+          onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, tipo: e.target.value })}
+          className="form-input"
+          style={{ fontSize: '12px', padding: '4px' }}
+        >
+          <option value="1">📝 String</option>
+          <option value="2">🔢 Int</option>
+          <option value="3">📅 Date</option>
+          <option value="5">💰 Decimal</option>
+          <option value="6">✅ Logical</option>
+          <option value="7">📌 Keyword</option>
+          <option value="10">📋 Table</option>
+        </select>
+      )
+    },
+    {
+      title: 'Longitud',
+      key: 'length',
+      width: '12%',
+      render: (_, record) => (
+        <input
+          type="number"
+          value={record.field.length || ''}
+          onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, length: e.target.value ? parseInt(e.target.value) : null })}
+          className="form-input"
+          style={{ fontSize: '12px', padding: '4px' }}
+        />
+      )
+    },
+    {
+      title: 'Req',
+      key: 'required',
+      width: '8%',
+      render: (_, record) => (
+        <input
+          type="checkbox"
+          checked={record.field.required}
+          onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, required: e.target.checked })}
+          style={{ width: '16px', height: '16px' }}
+        />
+      )
+    },
+    {
+      title: 'Acciones',
+      key: 'actions',
+      width: '10%',
+      render: (_, record) => (
+        <div style={{ display: 'flex', gap: '4px' }}>
+          {record.field.tipo === '10' && (
+            <button
+              onClick={() => setExpandedRows(prev => ({ ...prev, [record.key]: !prev[record.key] }))}
+              style={{
+                fontSize: '12px',
+                padding: '2px 6px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--accent-primary)'
+              }}
+            >
+              {expandedRows[record.key] ? '▲' : '▼'}
+            </button>
+          )}
+          <button
+            onClick={() => removeField(record.secIdx, record.fieldIdx)}
+            className="btn-icon"
+            style={{
+              fontSize: '14px',
+              padding: '2px 4px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            🗑
+          </button>
+        </div>
+      )
+    }
+  ]
+
+  return (
+    <>
+      <Table
+        columns={columns}
+        dataSource={fields.map((f) => ({ ...f, key: `${f.secIdx}-${f.fieldIdx}` }))}
+        pagination={false}
+        size="small"
+        style={{ marginBottom: '12px' }}
+        onRow={(record) => ({
+          style: { background: expandedRows[record.key] ? 'var(--bg-hover)' : 'transparent' }
+        })}
+      />
+      {/* Render Table field columns */}
+      {fields.map((record) => {
+        if (record.field.tipo !== '10' || !expandedRows[record.key]) return null
+        return (
+          <div key={`expanded-${record.key}`} style={{ marginBottom: '12px', padding: '12px', background: 'var(--bg-card)', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', marginBottom: '8px', textTransform: 'uppercase' }}>
+              📋 Columnas de {record.field.nombre}
+            </div>
+            {!record.field.columnas && (updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: [] }))}
+            {(record.field.columnas || []).map((col, colIdx) => (
+              <div key={col.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '6px', marginBottom: '6px', alignItems: 'center' }}>
+                <input
+                  value={col.nombre}
+                  onChange={e => {
+                    const newCols = [...(record.field.columnas || [])]
+                    newCols[colIdx].nombre = e.target.value
+                    updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
+                  }}
+                  placeholder="Nombre columna"
+                  style={{
+                    width: '100%',
+                    padding: '4px 6px',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '3px',
+                    fontSize: '11px',
+                    backgroundColor: 'var(--bg-canvas)',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'monospace'
+                  }}
+                />
+                <select
+                  value={col.tipo || '1'}
+                  onChange={e => {
+                    const newCols = [...(record.field.columnas || [])]
+                    newCols[colIdx].tipo = e.target.value
+                    updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '4px 6px',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '3px',
+                    fontSize: '11px',
+                    backgroundColor: 'var(--bg-canvas)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  <option value="1">String</option>
+                  <option value="2">Int</option>
+                  <option value="3">Date</option>
+                  <option value="5">Decimal</option>
+                  <option value="6">Logical</option>
+                </select>
+                <input
+                  type="number"
+                  value={col.length || ''}
+                  onChange={e => {
+                    const newCols = [...(record.field.columnas || [])]
+                    newCols[colIdx].length = e.target.value ? parseInt(e.target.value) : ''
+                    updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
+                  }}
+                  placeholder="Longitud"
+                  style={{
+                    width: '100%',
+                    padding: '4px 6px',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '3px',
+                    fontSize: '11px',
+                    backgroundColor: 'var(--bg-canvas)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    const newCols = (record.field.columnas || []).filter((_, idx) => idx !== colIdx)
+                    updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
+                  }}
+                  style={{
+                    padding: '2px 4px',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)',
+                    fontSize: '12px'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => {
+                const newCols = [...(record.field.columnas || []), { id: newGuid(), nombre: '', tipo: '1', length: '' }]
+                updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
+              }}
+              style={{
+                marginTop: '8px',
+                fontSize: '11px',
+                padding: '4px 8px',
+                background: 'var(--accent-primary)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '3px',
+                cursor: 'pointer'
+              }}
+            >
+              + Columna
+            </button>
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
 export default function CategoryBuilder() {
   const { user } = useAuth()
   const [categories, setCategories] = useState([
@@ -2985,230 +3216,6 @@ export default function CategoryBuilder() {
               return allFields.filter(f => f.field.pestaña?.trim() === tabName)
             }
 
-            const FieldTable = ({ fields, isBaseTab = false }) => {
-
-              const columns = [
-                {
-                  title: 'Nombre',
-                  key: 'nombre',
-                  width: '25%',
-                  render: (_, record) => (
-                    <input
-                      value={record.field.nombre}
-                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, nombre: e.target.value })}
-                      className="form-input"
-                      style={{ fontSize: '12px', padding: '4px' }}
-                    />
-                  )
-                },
-                {
-                  title: 'Tipo',
-                  key: 'tipo',
-                  width: '15%',
-                  render: (_, record) => (
-                    <select
-                      value={record.field.tipo}
-                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, tipo: e.target.value })}
-                      className="form-select"
-                      style={{ fontSize: '12px', padding: '4px' }}
-                    >
-                      {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                    </select>
-                  )
-                },
-                {
-                  title: 'Longitud',
-                  key: 'length',
-                  width: '12%',
-                  render: (_, record) => (
-                    <input
-                      type="number"
-                      value={record.field.length || ''}
-                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, length: e.target.value })}
-                      placeholder={record.field.tipo === '1' ? '100' : '-'}
-                      disabled={record.field.tipo !== '1'}
-                      className="form-input"
-                      style={{ fontSize: '12px', padding: '4px' }}
-                    />
-                  )
-                },
-                {
-                  title: 'Sección',
-                  key: 'section',
-                  width: '18%',
-                  render: (_, record) => (
-                    <input
-                      value={record.section.name}
-                      onChange={e => { const updated = [...categories]; updated[activeCategory].sections[record.secIdx].name = e.target.value; setCategories(updated) }}
-                      className="form-input"
-                      style={{ fontSize: '12px', padding: '4px' }}
-                    />
-                  )
-                },
-                {
-                  title: 'Req',
-                  key: 'required',
-                  width: '8%',
-                  render: (_, record) => (
-                    <input
-                      type="checkbox"
-                      checked={record.field.required}
-                      onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, required: e.target.checked })}
-                      style={{ width: '16px', height: '16px' }}
-                    />
-                  )
-                },
-                {
-                  title: 'Acciones',
-                  key: 'actions',
-                  width: '10%',
-                  render: (_, record) => (
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      {record.field.tipo === '10' && (
-                        <button
-                          onClick={() => setExpandedRows(prev => ({ ...prev, [record.key]: !prev[record.key] }))}
-                          style={{
-                            fontSize: '12px',
-                            padding: '2px 6px',
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: 'var(--accent-primary)'
-                          }}
-                        >
-                          {expandedRows[record.key] ? '▲' : '▼'}
-                        </button>
-                      )}
-                      <button
-                        onClick={() => removeField(record.secIdx, record.fieldIdx)}
-                        className="btn-icon"
-                        style={{
-                          fontSize: '14px',
-                          padding: '2px 4px',
-                          background: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: 'var(--text-secondary)'
-                        }}
-                      >
-                        🗑
-                      </button>
-                    </div>
-                  )
-                }
-              ]
-
-              return (
-                <>
-                  <Table
-                    columns={columns}
-                    dataSource={fields.map((f, i) => ({ ...f, key: `${f.secIdx}-${f.fieldIdx}` }))}
-                    pagination={false}
-                    size="small"
-                    style={{ marginBottom: '12px' }}
-                    onRow={(record) => ({
-                      style: { background: expandedRows[record.key] ? 'var(--bg-hover)' : 'transparent' }
-                    })}
-                  />
-                  {/* Render Table field columns */}
-                  {fields.map((record) => {
-                    if (record.field.tipo !== '10' || !expandedRows[record.key]) return null
-                    return (
-                      <div key={`expanded-${record.key}`} style={{ marginBottom: '12px', padding: '12px', background: 'var(--bg-card)', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
-                        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', marginBottom: '8px', textTransform: 'uppercase' }}>
-                          📋 Columnas de {record.field.nombre}
-                        </div>
-                        {!record.field.columnas && (updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: [] }))}
-                        {(record.field.columnas || []).map((col, colIdx) => (
-                          <div key={col.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '6px', marginBottom: '6px', alignItems: 'center' }}>
-                            <input
-                              value={col.nombre}
-                              onChange={e => {
-                                const newCols = [...(record.field.columnas || [])]
-                                newCols[colIdx].nombre = e.target.value
-                                updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
-                              }}
-                              placeholder="Nombre columna"
-                              style={{
-                                width: '100%',
-                                padding: '4px 6px',
-                                border: '1px solid var(--border-default)',
-                                borderRadius: '3px',
-                                fontSize: '11px',
-                                backgroundColor: 'var(--bg-canvas)',
-                                color: 'var(--text-primary)',
-                                boxSizing: 'border-box'
-                              }}
-                            />
-                            <select
-                              value={col.tipo || '1'}
-                              onChange={e => {
-                                const newCols = [...(record.field.columnas || [])]
-                                newCols[colIdx].tipo = e.target.value
-                                updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
-                              }}
-                              style={{
-                                width: '100%',
-                                padding: '4px 6px',
-                                border: '1px solid var(--border-default)',
-                                borderRadius: '3px',
-                                fontSize: '11px',
-                                backgroundColor: 'var(--bg-canvas)',
-                                color: 'var(--text-primary)',
-                                boxSizing: 'border-box'
-                              }}
-                            >
-                              {FIELD_TYPES.filter(t => t.value !== '10').map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                            </select>
-                            <input
-                              type="number"
-                              value={col.length || 100}
-                              onChange={e => {
-                                const newCols = [...(record.field.columnas || [])]
-                                newCols[colIdx].length = parseInt(e.target.value)
-                                updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
-                              }}
-                              placeholder="Longitud"
-                              style={{
-                                width: '100%',
-                                padding: '4px 6px',
-                                border: '1px solid var(--border-default)',
-                                borderRadius: '3px',
-                                fontSize: '11px',
-                                backgroundColor: 'var(--bg-canvas)',
-                                color: 'var(--text-primary)',
-                                boxSizing: 'border-box'
-                              }}
-                            />
-                            <button
-                              onClick={() => {
-                                const newCols = (record.field.columnas || []).filter((_, i) => i !== colIdx)
-                                updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
-                              }}
-                              className="btn-default btn-sm"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
-                        <button
-                          onClick={() => {
-                            const newCols = [...(record.field.columnas || [])]
-                            newCols.push({ id: newGuid(), nombre: '', tipo: '1', length: 100 })
-                            updateField(record.secIdx, record.fieldIdx, { ...record.field, columnas: newCols })
-                          }}
-                          className="btn-default"
-                          style={{ width: '100%', marginTop: '6px' }}
-                        >
-                          + Columna
-                        </button>
-                      </div>
-                    )
-                  })}
-                </>
-              )
-            }
-
             return (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {/* Category header - Aligned with action buttons */}
@@ -3317,7 +3324,7 @@ export default function CategoryBuilder() {
                     <h4 style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-secondary)' }}>
                       CAMPOS SIN PESTAÑA
                     </h4>
-                    <FieldTable fields={baseFields} isBaseTab={true} />
+                    <FieldTableComponent fields={baseFields} expandedRows={expandedRows} setExpandedRows={setExpandedRows} updateField={updateField} removeField={removeField} />
                   </div>
                 )}
 
@@ -3328,7 +3335,7 @@ export default function CategoryBuilder() {
                       items={tabs.map(tabName => ({
                         key: tabName,
                         label: tabName,
-                        children: <FieldTable fields={getFieldsForTab(tabName)} />
+                        children: <FieldTableComponent fields={getFieldsForTab(tabName)} expandedRows={expandedRows} setExpandedRows={setExpandedRows} updateField={updateField} removeField={removeField} />
                       }))}
                     />
                   </div>
