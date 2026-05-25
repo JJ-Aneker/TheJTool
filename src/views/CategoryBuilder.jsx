@@ -971,7 +971,7 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
         )}
 
         {/* Tab content container */}
-        {hasTable && (
+        {hasTable && activeTab && (
           <div style={{
             position: 'absolute',
             left: 5 * SCALE,
@@ -983,8 +983,7 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
             borderRadius: 3 * SCALE,
             overflow: 'hidden'
           }}>
-            {activeTab === 1 && (
-              <div style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
+            <div style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
                 {rows.map((row, ri) =>
                   row.type === 'sec' ? (
                     <div
@@ -1101,21 +1100,6 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                   )
                 )}
               </div>
-            )}
-            {activeTab === 2 && (
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#9ca3af',
-                fontSize: 9 * SCALE,
-                fontFamily: 'Arial'
-              }}>
-                📋 Historial
-              </div>
-            )}
           </div>
         )}
 
