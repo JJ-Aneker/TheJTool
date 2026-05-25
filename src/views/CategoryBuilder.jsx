@@ -2124,6 +2124,37 @@ export default function CategoryBuilder() {
               tabYPos += 6
             })
           })
+
+          // CRITICAL FIX: Generate fields WITHOUT pestaña (Sin Pestaña) - they should NOT have ShowInTabNo
+          let baseYPos = yPos
+          sections.forEach((sec, si) => {
+            const baseFields = sec.fields.filter(f => !f.pestaña?.trim() && f.nombre.trim() && normalizeFieldType(f.tipo) !== '10')
+            if (baseFields.length === 0) return
+
+            fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Sec_${si}_${tableName}_base`, caption: sec.name, width: sectionWidth, height: SEC_H, posx: 5, posy: baseYPos, bold: true, tclr: pal.secText, bclr: pal.secBg, al: 4, pd: 6, tabMeta: '' })
+            baseYPos += SEC_GAP
+
+            for (let i = 0; i < baseFields.length; i += 2) {
+              const f1 = baseFields[i]
+              const f2 = baseFields[i + 1]
+
+              if (f1) {
+                const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
+                const normalizedType1 = normalizeFieldType(f1.tipo)
+                fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1 + 5, posy: baseYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
+                fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: FLD_X1 + 5, posy: baseYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+              }
+              if (f2) {
+                const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
+                const normalizedType2 = normalizeFieldType(f2.tipo)
+                fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2 + 5, posy: baseYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
+                fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: FLD_X2 + 5, posy: baseYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+              }
+              baseYPos += ROW_GAP
+            }
+            baseYPos += 6
+          })
+          yPos = baseYPos
         } else {
           // No pestaña: render all sections in the main view
           sections.forEach((sec, si) => {
