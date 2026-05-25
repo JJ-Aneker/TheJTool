@@ -2797,87 +2797,33 @@ export default function CategoryBuilder() {
               paddingTop: '12px'
             }}>
               {categories.map((cat, idx) => (
-                <div
+                <button
                   key={cat.id}
                   onClick={() => setActiveCategory(idx)}
+                  className="btn-default"
                   style={{
                     display: 'flex',
                     gap: '8px',
                     alignItems: 'center',
-                    padding: '10px 12px',
+                    padding: '8px 12px',
                     borderRadius: '6px',
-                    background: activeCategory === idx
-                      ? 'var(--accent-primary)'
-                      : 'var(--bg-card)',
-                    border: activeCategory === idx
-                      ? '2px solid var(--accent-primary)'
-                      : '1px solid var(--border-default)',
+                    background: activeCategory === idx ? 'var(--accent-primary)' : 'var(--bg-card)',
+                    color: activeCategory === idx ? 'white' : 'var(--text-primary)',
+                    border: activeCategory === idx ? 'none' : '1px solid var(--border-default)',
                     cursor: 'pointer',
                     transition: 'all 200ms',
-                    boxShadow: activeCategory === idx
-                      ? '0 4px 12px rgba(102, 102, 255, 0.25)'
-                      : 'none'
+                    fontSize: '12px',
+                    fontWeight: activeCategory === idx ? '600' : '400',
+                    width: '100%',
+                    textAlign: 'left',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}
+                  title={cat.name}
                 >
-                  {/* Active indicator */}
-                  {activeCategory === idx && (
-                    <div style={{
-                      width: '4px',
-                      height: '16px',
-                      background: 'var(--accent-primary)',
-                      borderRadius: '2px',
-                      flexShrink: 0
-                    }} />
-                  )}
-
-                  <input
-                    value={cat.name}
-                    onChange={e => { e.stopPropagation(); updateCategoryName(idx, e.target.value) }}
-                    onClick={e => e.stopPropagation()}
-                    placeholder={`Categoría ${idx + 1}`}
-                    className="form-input"
-                    style={{
-                      flex: 1,
-                      fontSize: '12px',
-                      padding: '4px 8px',
-                      background: activeCategory === idx ? 'rgba(255,255,255,0.15)' : 'transparent',
-                      color: activeCategory === idx ? 'white' : 'var(--text-primary)',
-                      border: activeCategory === idx ? '1px solid rgba(255,255,255,0.3)' : 'none'
-                    }}
-                  />
-
-                  {categories.length > 1 && (
-                    <button
-                      onClick={e => { e.stopPropagation(); removeCategory(idx) }}
-                      style={{
-                        fontSize: '16px',
-                        padding: '4px 8px',
-                        background: 'var(--accent-error)',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'all 200ms',
-                        opacity: activeCategory === idx ? 1 : 0.5,
-                        transform: activeCategory === idx ? 'scale(1)' : 'scale(0.9)'
-                      }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.opacity = '1'
-                        e.currentTarget.style.transform = 'scale(1.1)'
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.opacity = activeCategory === idx ? '1' : '0.5'
-                        e.currentTarget.style.transform = activeCategory === idx ? 'scale(1)' : 'scale(0.9)'
-                      }}
-                      title="Eliminar categoría"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
+                  {cat.name || `Categoría ${idx + 1}`}
+                </button>
               ))}
             </div>
           </div>
@@ -3008,41 +2954,88 @@ export default function CategoryBuilder() {
 
             return (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {/* Category header */}
+                {/* Category header - Single line */}
                 <div style={{
-                  padding: '16px',
+                  padding: '12px 16px',
                   background: 'var(--accent-primary)',
                   color: 'white',
                   borderRadius: '6px',
-                  marginBottom: '16px'
+                  marginBottom: '16px',
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'center'
                 }}>
-                  <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px' }}>
-                    {cat.name || 'Sin nombre'}
-                  </div>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600' }}>Paleta Therefore:</label>
-                    <select
-                      value={cat.palette || 'Therefore Azul'}
-                      onChange={e => {
-                        const updated = [...categories]
-                        updated[activeCategory].palette = e.target.value
-                        setCategories(updated)
-                      }}
+                  {/* Editable title */}
+                  <input
+                    value={cat.name}
+                    onChange={e => updateCategoryName(activeCategory, e.target.value)}
+                    style={{
+                      flex: 1,
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      padding: '6px 8px',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      background: 'rgba(255,255,255,0.1)',
+                      color: 'white',
+                      minWidth: '0'
+                    }}
+                    placeholder="Nombre de categoría"
+                  />
+
+                  {/* Palette selector */}
+                  <select
+                    value={cat.palette || 'Therefore Azul'}
+                    onChange={e => {
+                      const updated = [...categories]
+                      updated[activeCategory].palette = e.target.value
+                      setCategories(updated)
+                    }}
+                    style={{
+                      padding: '6px 10px',
+                      fontSize: '12px',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      background: 'rgba(255,255,255,0.1)',
+                      color: 'white',
+                      cursor: 'pointer',
+                      minWidth: '150px'
+                    }}
+                  >
+                    {Object.keys(COLOR_PALETTES).map(palName => (
+                      <option key={palName} value={palName} style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>{palName}</option>
+                    ))}
+                  </select>
+
+                  {/* Delete button */}
+                  {categories.length > 1 && (
+                    <button
+                      onClick={() => removeCategory(activeCategory)}
                       style={{
                         padding: '6px 10px',
-                        fontSize: '12px',
+                        background: 'rgba(255,80,80,0.3)',
+                        border: '1px solid rgba(255,80,80,0.5)',
                         borderRadius: '4px',
-                        border: '1px solid rgba(255,255,255,0.3)',
-                        background: 'rgba(255,255,255,0.1)',
                         color: 'white',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        transition: 'all 200ms',
+                        whiteSpace: 'nowrap'
                       }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(255,80,80,0.5)'
+                        e.currentTarget.style.borderColor = 'rgba(255,80,80,0.7)'
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'rgba(255,80,80,0.3)'
+                        e.currentTarget.style.borderColor = 'rgba(255,80,80,0.5)'
+                      }}
+                      title="Eliminar esta categoría"
                     >
-                      {Object.keys(COLOR_PALETTES).map(palName => (
-                        <option key={palName} value={palName} style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>{palName}</option>
-                      ))}
-                    </select>
-                  </div>
+                      ✕ Eliminar
+                    </button>
+                  )}
                 </div>
 
                 {/* Base fields table */}
