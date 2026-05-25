@@ -1315,7 +1315,7 @@ function CategoryGridPreview({ categories, onClose }) {
       padding: '20px'
     }}>
       <div style={{
-        background: 'white',
+        background: 'var(--bg-card)',
         borderRadius: '12px',
         maxWidth: '90vw',
         maxHeight: '90vh',
@@ -1332,7 +1332,7 @@ function CategoryGridPreview({ categories, onClose }) {
           borderBottom: '2px solid #e5e7eb',
           paddingBottom: '15px'
         }}>
-          <h2 style={{ margin: 0, color: '#1f2937', fontSize: '24px', fontWeight: 700 }}>
+          <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '24px', fontWeight: 700 }}>
             📊 Vista Previa de Categorías
           </h2>
           <button
@@ -1537,10 +1537,10 @@ function SectionCard({ section, hdrBgHex, secBgHex, secTextHex, labelColorHex, T
               <div
                 key={idx}
                 style={{
-                  border: '1px solid #d1d5db',
+                  border: '1px solid var(--border-default)',
                   borderRadius: '6px',
                   padding: '10px',
-                  background: '#ffffff',
+                  background: 'var(--bg-card)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
@@ -1550,7 +1550,7 @@ function SectionCard({ section, hdrBgHex, secBgHex, secTextHex, labelColorHex, T
                 <span style={{ fontSize: '18px' }}>{typeInfo.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    color: '#1f2937',
+                    color: 'var(--text-primary)',
                     fontWeight: 600,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -1559,7 +1559,7 @@ function SectionCard({ section, hdrBgHex, secBgHex, secTextHex, labelColorHex, T
                     {field.nombre}
                   </div>
                   <div style={{
-                    color: '#9ca3af',
+                    color: 'var(--text-secondary)',
                     fontSize: '11px'
                   }}>
                     {typeInfo.label}
@@ -1592,10 +1592,8 @@ export default function CategoryBuilder() {
   const [loading, setLoading] = useState(false)
   const [managerOpen, setManagerOpen] = useState(false)
   const [xmlModalOpen, setXmlModalOpen] = useState(false)
-  const [colorModalOpen, setColorModalOpen] = useState(false)
   const [previewModalOpen, setPreviewModalOpen] = useState(false)
   const [csvModalOpen, setCsvModalOpen] = useState(false)
-  const [customColors, setCustomColors] = useState(COLOR_PRESETS.dark.colors)
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [searchText, setSearchText] = useState('')
   const [previewCategories, setPreviewCategories] = useState([])
@@ -2699,12 +2697,6 @@ export default function CategoryBuilder() {
             📁 Mis Plantillas
           </button>
           <button
-            onClick={() => setColorModalOpen(true)}
-            className="btn-default"
-          >
-            🎨 Colores
-          </button>
-          <button
             onClick={generateXml}
             className="btn-default"
           >
@@ -2832,7 +2824,7 @@ export default function CategoryBuilder() {
                     <div style={{
                       width: '4px',
                       height: '16px',
-                      background: 'white',
+                      background: 'var(--accent-primary)',
                       borderRadius: '2px',
                       flexShrink: 0
                     }} />
@@ -3183,130 +3175,6 @@ export default function CategoryBuilder() {
         )}
       </Modal>
 
-      {/* Color Palette Modal */}
-      <Modal
-        title="🎨 Paleta de Colores"
-        open={colorModalOpen}
-        onCancel={() => setColorModalOpen(false)}
-        width={700}
-        footer={null}
-      >
-        <div style={{ padding: '20px 0' }}>
-          <h3 style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>Presets Estándar</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
-            {Object.entries(COLOR_PRESETS).map(([key, preset]) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setCustomColors(preset.colors)
-                  message.success(`Aplicado: ${preset.name}`)
-                }}
-                style={{
-                  padding: '12px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.3s'
-                }}
-              >
-                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '6px' }}>
-                  {preset.name}
-                </div>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  {Object.values(preset.colors).slice(0, 4).map((color, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        width: '24px',
-                        height: '24px',
-                        background: color,
-                        borderRadius: '4px',
-                        border: '1px solid var(--border-default)'
-                      }}
-                    />
-                  ))}
-                </div>
-              </button>
-            ))}
-          </div>
-
-          <h3 style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>Personalizado</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            {[
-              { label: 'Primario', key: 'primary' },
-              { label: 'Fondo Canvas', key: 'bgCanvas' },
-              { label: 'Fondo Card', key: 'bgCard' },
-              { label: 'Texto Principal', key: 'textMain' },
-              { label: 'Texto Secundario', key: 'textSec' },
-              { label: 'Borde', key: 'border' },
-            ].map(color => (
-              <div key={color.key} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                  {color.label}
-                </label>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <input
-                    type="color"
-                    value={customColors[color.key]?.replace(/[rgba()]/g, '').split(',')[0] || '#9ad1ff'}
-                    onChange={(e) => {
-                      setCustomColors({ ...customColors, [color.key]: e.target.value })
-                    }}
-                    style={{
-                      width: '40px',
-                      height: '32px',
-                      border: '1px solid var(--border-default)',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  />
-                  <input
-                    type="text"
-                    value={customColors[color.key] || ''}
-                    onChange={(e) => {
-                      setCustomColors({ ...customColors, [color.key]: e.target.value })
-                    }}
-                    style={{
-                      flex: 1,
-                      padding: '6px 8px',
-                      border: '1px solid var(--border-default)',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontFamily: 'monospace',
-                      backgroundColor: 'var(--bg-canvas)',
-                      color: 'var(--text-primary)',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--border-default)' }}>
-            <button
-              onClick={() => {
-                message.success('Colores aplicados')
-                setColorModalOpen(false)
-              }}
-              style={{
-                background: 'var(--accent-primary)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '10px 20px',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: '600'
-              }}
-            >
-              ✓ Aplicar Colores
-            </button>
-          </div>
-        </div>
-      </Modal>
-
       {/* Preview Modal - Miniaturas gráficas de categorías */}
       <Modal
         title="📊 Vista Previa de Categorías"
@@ -3319,8 +3187,8 @@ export default function CategoryBuilder() {
       >
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '30px' }}>
           {categories.map((cat, idx) => (
-            <div key={idx} style={{ border: '2px solid #e5e7eb', borderRadius: '8px', padding: '15px', background: '#f9fafb' }}>
-              <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
+            <div key={idx} style={{ border: '2px solid var(--border-default)', borderRadius: '8px', padding: '15px', background: 'var(--bg-card)' }}>
+              <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {idx + 1}. {cat.name || 'Sin nombre'}
               </div>
               <DialogPreview
