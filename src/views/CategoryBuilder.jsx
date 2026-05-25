@@ -2064,20 +2064,27 @@ export default function CategoryBuilder() {
         }
 
       // Table column fields (if any table exists)
+      // Map: tableName → { fieldNo, columns }
       let tableColFields = ''
       let hasTable = false
+      const tableMap = {} // Track table field numbers for proper column BelongsToTable
       const allTableCols = []
 
       sections.forEach(sec => {
           sec.fields.forEach(field => {
             if (field.tipo === '10' && field.columnas && field.columnas.length > 0) {
               hasTable = true
+              const tableFieldNo = fieldNo--
+              const tableName_key = sanitizeName(field.nombre)
+              tableMap[tableName_key] = { fieldNo: tableFieldNo, columns: field.columnas }
+
               field.columnas.forEach(col => {
                 if (!col.nombre.trim()) return
                 const normalizedType = normalizeFieldType(col.tipo)
                 const lt = normalizedType === '5' ? '<Length>18</Length>' : (normalizedType !== '3' && normalizedType !== '6' && normalizedType !== '7') ? `<Length>${col.length || 50}</Length>` : ''
                 const colname = sanitizeName(col.nombre)
-                tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TABLE_NO}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                // CRITICAL FIX: BelongsToTable points to the real Table field, not TAB_NO
+                tableColFields += `<Field><FieldNo>${colNo}</FieldNo><ColName>${colname}</ColName>${xmlCaption(col.nombre)}<TypeNo>${normalizedType}</TypeNo>${lt}<Width>${col.width || 150}</Width><Height>0</Height><PosX>0</PosX><PosY>0</PosY><DontLoadValues>1</DontLoadValues><DispOrderPos>${allTableCols.length + 1}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${tableFieldNo}</BelongsToTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>2</ParentFieldType><TabInfo FactoryType="0"></TabInfo><FieldID>${colname}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
                 colNo--
                 allTableCols.push(col)
               })
@@ -2107,19 +2114,36 @@ export default function CategoryBuilder() {
                 const f1 = fieldsInTab[i]
                 const f2 = fieldsInTab[i + 1]
 
-                if (f1 && normalizeFieldType(f1.tipo) !== '10') {
+                if (f1) {
                   const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
                   const normalizedType1 = normalizeFieldType(f1.tipo)
-                  fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: getTabMeta(pestaña) })
-                  fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: FLD_X1 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: getTabMeta(pestaña) })
+
+                  if (normalizedType1 === '10') {
+                    // CRITICAL FIX: Generate actual Table field (TypeNo 10)
+                    const tableFieldNo = tableMap[colname1]?.fieldNo
+                    fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f1.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${tabYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f1.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname1}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><BelongsToTable>${TAB_NO}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${pestañaToTabNo[pestaña]}</ShowInTabNo></Field>`
+                    tabYPos += 100
+                  } else {
+                    fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: getTabMeta(pestaña) })
+                    fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: FLD_X1 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: getTabMeta(pestaña) })
+                    tabYPos += ROW_GAP
+                  }
                 }
-                if (f2 && normalizeFieldType(f2.tipo) !== '10') {
+                if (f2) {
                   const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
                   const normalizedType2 = normalizeFieldType(f2.tipo)
-                  fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: getTabMeta(pestaña) })
-                  fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: FLD_X2 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: getTabMeta(pestaña) })
+
+                  if (normalizedType2 === '10') {
+                    // CRITICAL FIX: Generate actual Table field (TypeNo 10)
+                    const tableFieldNo = tableMap[colname2]?.fieldNo
+                    fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f2.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${tabYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f2.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname2}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter><BelongsToTable>${TAB_NO}</BelongsToTable><ParentFieldType>3</ParentFieldType><ShowInTabNo>${pestañaToTabNo[pestaña]}</ShowInTabNo></Field>`
+                    tabYPos += 100
+                  } else {
+                    fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2 + 5, posy: tabYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: getTabMeta(pestaña) })
+                    fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: FLD_X2 + 5, posy: tabYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: getTabMeta(pestaña) })
+                    tabYPos += ROW_GAP
+                  }
                 }
-                tabYPos += ROW_GAP
               }
               tabYPos += 6
             })
@@ -2141,16 +2165,33 @@ export default function CategoryBuilder() {
               if (f1) {
                 const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
                 const normalizedType1 = normalizeFieldType(f1.tipo)
-                fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1 + 5, posy: baseYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
-                fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: FLD_X1 + 5, posy: baseYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+
+                if (normalizedType1 === '10') {
+                  // Generate Table field with no tab assignment
+                  const tableFieldNo = tableMap[colname1]?.fieldNo
+                  fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f1.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${baseYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f1.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname1}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                  baseYPos += 100
+                } else {
+                  fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1 + 5, posy: baseYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
+                  fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: FLD_X1 + 5, posy: baseYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+                  baseYPos += ROW_GAP
+                }
               }
               if (f2) {
                 const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
                 const normalizedType2 = normalizeFieldType(f2.tipo)
-                fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2 + 5, posy: baseYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
-                fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: FLD_X2 + 5, posy: baseYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+
+                if (normalizedType2 === '10') {
+                  // Generate Table field with no tab assignment
+                  const tableFieldNo = tableMap[colname2]?.fieldNo
+                  fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f2.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${baseYPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f2.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname2}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                  baseYPos += 100
+                } else {
+                  fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2 + 5, posy: baseYPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
+                  fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: FLD_X2 + 5, posy: baseYPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+                  baseYPos += ROW_GAP
+                }
               }
-              baseYPos += ROW_GAP
             }
             baseYPos += 6
           })
@@ -2165,19 +2206,36 @@ export default function CategoryBuilder() {
               const f1 = sec.fields[i]
               const f2 = sec.fields[i + 1]
 
-              if (f1 && normalizeFieldType(f1.tipo) !== '10') {
+              if (f1) {
                 const colname1 = sanitizeName(f1.fieldKey || f1.nombre)
                 const normalizedType1 = normalizeFieldType(f1.tipo)
-                fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
-                fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+
+                if (normalizedType1 === '10') {
+                  // Generate Table field
+                  const tableFieldNo = tableMap[colname1]?.fieldNo
+                  fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f1.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${yPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f1.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname1}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                  yPos += 100
+                } else {
+                  fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname1}`, caption: f1.nombre, width: LBL_W, height: LBL_H, posx: LBL_X1, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
+                  fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname1, fieldid: colname1, caption: f1.nombre, typeno: normalizedType1, length: f1.length, width: FLD_W, height: ROW_H, posx: FLD_X1, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+                  yPos += ROW_GAP
+                }
               }
-              if (f2 && normalizeFieldType(f2.tipo) !== '10') {
+              if (f2) {
                 const colname2 = sanitizeName(f2.fieldKey || f2.nombre)
                 const normalizedType2 = normalizeFieldType(f2.tipo)
-                fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
-                fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+
+                if (normalizedType2 === '10') {
+                  // Generate Table field
+                  const tableFieldNo = tableMap[colname2]?.fieldNo
+                  fieldsXml += `<Field><FieldNo>${tableFieldNo}</FieldNo>${xmlCaption(f2.nombre)}<TypeNo>10</TypeNo><Width>580</Width><Height>92</Height><PosX>20</PosX><PosY>${yPos}</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><ForeignTable>TheIxTable_${toCamel(f2.nombre)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><TabInfo FactoryType="0"></TabInfo><FieldID>${colname2}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
+                  yPos += 100
+                } else {
+                  fieldsXml += makeLabelField({ fieldno: labelNo--, fieldid: `Lbl_${colname2}`, caption: f2.nombre, width: LBL_W, height: LBL_H, posx: LBL_X2, posy: yPos + 1, fsize: 8, al: 4, tclr: pal.labelColor, tabMeta: '' })
+                  fieldsXml += makeDataField({ fieldno: fieldNo--, colname: colname2, fieldid: colname2, caption: f2.nombre, typeno: normalizedType2, length: f2.length, width: FLD_W2, height: ROW_H, posx: FLD_X2, posy: yPos, taborder: tabOrder++, disporder: dispOrder++, displayprop: `<TClr>${pal.fieldText}</TClr><BClr>${pal.fieldBg}</BClr>`, tabMeta: '' })
+                  yPos += ROW_GAP
+                }
               }
-              yPos += ROW_GAP
             }
             yPos += 6
           })
@@ -2194,26 +2252,15 @@ export default function CategoryBuilder() {
 
       // Tab + Table control fields (if table or pestaña exists)
       let tabXml = ''
-      if (hasTable || hasPestañas) {
-          const tableW = DIALOG_W - TAB_MARGIN * 2 - 10
-          const tableH = Math.max(contentH, 240) - 30
+      if (hasPestañas) {
           const tabH2 = Math.max(contentH + 20, 260)
 
-          // Table field (only if hasTable)
-          if (hasTable) {
-            tabXml += `<Field><FieldNo>${TABLE_NO}</FieldNo>${xmlCaption('Historial')}<TypeNo>10</TypeNo><Width>${tableW}</Width><Height>${tableH}</Height><PosX>5</PosX><PosY>5</PosY><TabOrderPos>${tabOrder++}</TabOrderPos><DontLoadValues>1</DontLoadValues><DispOrderPos>${dispOrder++}</DispOrderPos>${xmlRegEx()}<Links></Links><BelongsToTable>${TAB_NO}</BelongsToTable><ForeignTable>TheIxTable_${toCamel(tableName)}_Hist</ForeignTable><Id>${newGuid()}</Id><DisplayProp></DisplayProp><ParentFieldType>3</ParentFieldType><TabInfo FactoryType="0"></TabInfo><ShowInTabNo>${hasPestañas ? sortedPestañas.length + 2 : 2}</ShowInTabNo><FieldID>Historial_${toCamel(tableName)}</FieldID><DisplayPropCond></DisplayPropCond><Filter></Filter></Field>`
-          }
-
-          // Build tabs XML - include pestaña tabs + optional Historial if table exists
+          // Build tabs XML - include only pestaña tabs (Table fields are generated separately)
           let tabsXml = ''
           sortedPestañas.forEach((pestañaName, idx) => {
             const tabNo = idx + 1
             tabsXml += `<T FactoryType="1"><TabNo>${tabNo}</TabNo><TabPos>${tabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>${escapeXml(pestañaName)}</S></T></TStr></TabCapt></T>`
           })
-          if (hasTable) {
-            const histTabNo = sortedPestañas.length + 2
-            tabsXml += `<T FactoryType="1"><TabNo>${histTabNo}</TabNo><TabPos>${histTabNo}</TabPos><TabCapt><TStr><T><L>1034</L><S>Historial</S></T></TStr></TabCapt></T>`
-          }
 
           // Tab control field
           const firstTabName = hasPestañas ? sortedPestañas[0] : 'Datos'
