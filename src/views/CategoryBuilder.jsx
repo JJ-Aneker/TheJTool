@@ -1769,15 +1769,20 @@ function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateFiel
       title: 'Longitud',
       key: 'length',
       width: '12%',
-      render: (_, record) => (
-        <input
-          type="number"
-          value={record.field.length || ''}
-          onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, length: e.target.value ? parseInt(e.target.value) : null })}
-          className="form-input"
-          style={{ fontSize: '12px', padding: '4px' }}
-        />
-      )
+      render: (_, record) => {
+        const isFixedType = ['2', '3', '5', '6', '7'].includes(record.field.tipo)
+        return (
+          <input
+            type="number"
+            value={record.field.length || ''}
+            onChange={e => updateField(record.secIdx, record.fieldIdx, { ...record.field, length: e.target.value ? parseInt(e.target.value) : null })}
+            className="form-input"
+            style={{ fontSize: '12px', padding: '4px' }}
+            disabled={isFixedType}
+            placeholder={isFixedType ? '-' : ''}
+          />
+        )
+      }
     },
     {
       title: 'Req',
