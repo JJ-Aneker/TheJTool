@@ -2963,7 +2963,7 @@ export default function CategoryBuilder() {
                   alignItems: 'center',
                   borderBottom: '2px solid var(--border-default)'
                 }}>
-                  {/* Editable title - PRIMARY */}
+                  {/* Editable title - FLEX to fill available space */}
                   <input
                     value={cat.name}
                     onChange={e => updateCategoryName(activeCategory, e.target.value)}
@@ -2976,7 +2976,7 @@ export default function CategoryBuilder() {
                       border: '2px solid var(--border-default)',
                       background: 'var(--bg-input)',
                       color: 'var(--text-primary)',
-                      minWidth: '200px',
+                      minWidth: '100px',
                       outline: 'none',
                       transition: 'border-color 200ms'
                     }}
@@ -2989,7 +2989,7 @@ export default function CategoryBuilder() {
                     placeholder="Nombre de categoría"
                   />
 
-                  {/* Palette selector - WIDER */}
+                  {/* Palette selector - FIXED 200px */}
                   <select
                     value={cat.palette || 'Therefore Azul'}
                     onChange={e => {
@@ -3005,7 +3005,8 @@ export default function CategoryBuilder() {
                       background: 'var(--bg-input)',
                       color: 'var(--text-primary)',
                       cursor: 'pointer',
-                      minWidth: '200px',
+                      width: '200px',
+                      flexShrink: 0,
                       outline: 'none',
                       transition: 'border-color 200ms'
                     }}
