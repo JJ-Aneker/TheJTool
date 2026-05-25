@@ -1657,6 +1657,7 @@ export default function CategoryBuilder() {
   const [selectedTemplate, setSelectedTemplate] = useState(null)
   const [searchText, setSearchText] = useState('')
   const [previewCategories, setPreviewCategories] = useState([])
+  const [expandedRows, setExpandedRows] = useState({})
 
   useEffect(() => {
     if (user?.id) loadTemplates()
@@ -2985,7 +2986,6 @@ export default function CategoryBuilder() {
             }
 
             const FieldTable = ({ fields, isBaseTab = false }) => {
-              const [expandedRows, setExpandedRows] = useState({})
 
               const columns = [
                 {
