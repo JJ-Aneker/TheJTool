@@ -57,7 +57,8 @@ const COLOR_PALETTES = {
     tabBg: bgr(160, 160, 160),
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
-    labelColor: bgr(55, 65, 81)
+    labelColor: bgr(55, 65, 81),
+    labelBg: bgr(240, 240, 240)
   },
   'Therefore Azul': {
     name: 'Therefore Azul',
@@ -71,7 +72,8 @@ const COLOR_PALETTES = {
     tabBg: bgr(192, 192, 192),
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
-    labelColor: bgr(55, 65, 81)
+    labelColor: bgr(55, 65, 81),
+    labelBg: bgr(245, 248, 252)
   },
   'Verde Corporativo': {
     name: 'Verde Corporativo',
@@ -85,7 +87,8 @@ const COLOR_PALETTES = {
     tabBg: bgr(192, 192, 192),
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
-    labelColor: bgr(55, 65, 81)
+    labelColor: bgr(55, 65, 81),
+    labelBg: bgr(245, 252, 247)
   },
   'Rojo Institucional': {
     name: 'Rojo Institucional',
@@ -99,7 +102,8 @@ const COLOR_PALETTES = {
     tabBg: bgr(192, 192, 192),
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
-    labelColor: bgr(55, 65, 81)
+    labelColor: bgr(55, 65, 81),
+    labelBg: bgr(252, 245, 245)
   },
   'Gris Neutro': {
     name: 'Gris Neutro',
@@ -113,7 +117,8 @@ const COLOR_PALETTES = {
     tabBg: bgr(192, 192, 192),
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
-    labelColor: bgr(55, 65, 81)
+    labelColor: bgr(55, 65, 81),
+    labelBg: bgr(249, 250, 251)
   },
   'Morado': {
     name: 'Morado',
@@ -127,7 +132,8 @@ const COLOR_PALETTES = {
     tabBg: bgr(192, 192, 192),
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
-    labelColor: bgr(55, 65, 81)
+    labelColor: bgr(55, 65, 81),
+    labelBg: bgr(250, 245, 252)
   }
 }
 
@@ -697,6 +703,7 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
   const fieldBgHex = bgrToHex(pal.fieldBg || bgr(255, 255, 255))
   const fieldTextHex = bgrToHex(pal.fieldText || bgr(0, 0, 0))
   const labelColorHex = bgrToHex(pal.labelColor || bgr(55, 65, 81))
+  const labelBgHex = bgrToHex(pal.labelBg || bgr(240, 240, 240))
   const tabBgHex = bgrToHex(pal.tabBg || bgr(192, 192, 192))
 
   // Use 0.85 scale for better visual fidelity (matching old implementation)
@@ -878,6 +885,7 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                             height: LBL_Hp * SCALE,
                             fontSize: 7 * SCALE,
                             color: labelColorHex,
+                            background: labelBgHex,
                             textAlign: 'right',
                             lineHeight: `${LBL_Hp * SCALE}px`,
                             paddingRight: 3,
@@ -922,6 +930,7 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                             height: LBL_Hp * SCALE,
                             fontSize: 7 * SCALE,
                             color: labelColorHex,
+                            background: labelBgHex,
                             textAlign: 'right',
                             lineHeight: `${LBL_Hp * SCALE}px`,
                             paddingRight: 3,
@@ -1011,6 +1020,7 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                     height: LBL_Hp * SCALE,
                     fontSize: 7 * SCALE,
                     color: labelColorHex,
+                    background: labelBgHex,
                     textAlign: 'right',
                     lineHeight: `${LBL_Hp * SCALE}px`,
                     paddingRight: 3,
@@ -1055,6 +1065,7 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
                     height: LBL_Hp * SCALE,
                     fontSize: 7 * SCALE,
                     color: labelColorHex,
+                    background: labelBgHex,
                     textAlign: 'right',
                     lineHeight: `${LBL_Hp * SCALE}px`,
                     paddingRight: 3,
