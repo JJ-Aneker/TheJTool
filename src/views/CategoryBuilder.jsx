@@ -2954,16 +2954,14 @@ export default function CategoryBuilder() {
 
             return (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {/* Category header - Single line */}
+                {/* Category header - Minimal single line */}
                 <div style={{
-                  padding: '12px 16px',
-                  background: 'var(--accent-primary)',
-                  color: 'white',
-                  borderRadius: '6px',
+                  padding: '8px 0',
                   marginBottom: '16px',
                   display: 'flex',
                   gap: '12px',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  borderBottom: '1px solid var(--border-default)'
                 }}>
                   {/* Editable title */}
                   <input
@@ -2971,19 +2969,20 @@ export default function CategoryBuilder() {
                     onChange={e => updateCategoryName(activeCategory, e.target.value)}
                     style={{
                       flex: 1,
-                      fontSize: '14px',
+                      fontSize: '16px',
                       fontWeight: '600',
-                      padding: '6px 8px',
+                      padding: '4px 8px',
                       borderRadius: '4px',
-                      border: '1px solid rgba(255,255,255,0.3)',
-                      background: 'rgba(255,255,255,0.1)',
-                      color: 'white',
-                      minWidth: '0'
+                      border: '1px solid var(--border-default)',
+                      background: 'var(--bg-input)',
+                      color: 'var(--text-primary)',
+                      minWidth: '0',
+                      outline: 'none'
                     }}
                     placeholder="Nombre de categoría"
                   />
 
-                  {/* Palette selector */}
+                  {/* Palette selector - Compact */}
                   <select
                     value={cat.palette || 'Therefore Azul'}
                     onChange={e => {
@@ -2992,14 +2991,14 @@ export default function CategoryBuilder() {
                       setCategories(updated)
                     }}
                     style={{
-                      padding: '6px 10px',
-                      fontSize: '12px',
+                      padding: '4px 8px',
+                      fontSize: '11px',
                       borderRadius: '4px',
-                      border: '1px solid rgba(255,255,255,0.3)',
-                      background: 'rgba(255,255,255,0.1)',
-                      color: 'white',
+                      border: '1px solid var(--border-default)',
+                      background: 'var(--bg-input)',
+                      color: 'var(--text-primary)',
                       cursor: 'pointer',
-                      minWidth: '150px'
+                      minWidth: '120px'
                     }}
                   >
                     {Object.keys(COLOR_PALETTES).map(palName => (
@@ -3012,24 +3011,22 @@ export default function CategoryBuilder() {
                     <button
                       onClick={() => removeCategory(activeCategory)}
                       style={{
-                        padding: '6px 10px',
-                        background: 'rgba(255,80,80,0.3)',
-                        border: '1px solid rgba(255,80,80,0.5)',
+                        padding: '4px 10px',
+                        background: 'transparent',
+                        border: '1px solid var(--accent-error)',
                         borderRadius: '4px',
-                        color: 'white',
+                        color: 'var(--accent-error)',
                         cursor: 'pointer',
-                        fontSize: '14px',
+                        fontSize: '12px',
                         fontWeight: '600',
                         transition: 'all 200ms',
                         whiteSpace: 'nowrap'
                       }}
                       onMouseEnter={e => {
-                        e.currentTarget.style.background = 'rgba(255,80,80,0.5)'
-                        e.currentTarget.style.borderColor = 'rgba(255,80,80,0.7)'
+                        e.currentTarget.style.background = 'rgba(255,80,80,0.1)'
                       }}
                       onMouseLeave={e => {
-                        e.currentTarget.style.background = 'rgba(255,80,80,0.3)'
-                        e.currentTarget.style.borderColor = 'rgba(255,80,80,0.5)'
+                        e.currentTarget.style.background = 'transparent'
                       }}
                       title="Eliminar esta categoría"
                     >
