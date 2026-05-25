@@ -2954,14 +2954,15 @@ export default function CategoryBuilder() {
 
             return (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {/* Category header - Minimal single line */}
+                {/* Category header - Aligned with action buttons */}
                 <div style={{
-                  padding: '12px 0',
+                  padding: '8px 0',
                   marginBottom: '16px',
                   display: 'flex',
-                  gap: '16px',
+                  gap: '12px',
                   alignItems: 'center',
-                  borderBottom: '2px solid var(--border-default)'
+                  borderBottom: '2px solid var(--border-default)',
+                  height: '36px'
                 }}>
                   {/* Editable title - FLEX to fill available space */}
                   <input
