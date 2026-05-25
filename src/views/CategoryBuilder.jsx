@@ -1091,62 +1091,101 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
   )
 }
 
-// XML Parser - Extract categories structure from generated XML
+// XML Parser - Extract categories structure from generated XML (like parseThereforeXml)
 function parseXmlCategories(xmlString) {
   try {
     const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(xmlString, 'text/xml')
+    const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
 
-    if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
-      console.error('XML Parse Error:', xmlDoc.getElementsByTagName('parsererror')[0].textContent)
+    const parseErr = xmlDoc.querySelector('parsererror')
+    if (parseErr) {
+      console.error('XML Parse Error:', parseErr.textContent.slice(0, 120))
       return []
     }
 
+    const catNodes = xmlDoc.querySelectorAll('Configuration > Categories > Category')
+    if (!catNodes.length) {
+      console.warn('No categories found in XML')
+      return []
+    }
+
+    const VALID_TYPES = new Set(['1', '2', '3', '5', '6', '7', '9', '15'])
     const categories = []
-    const categoryElements = xmlDoc.getElementsByTagName('Category')
 
-    categoryElements.forEach((catEl) => {
-      const ctgryNo = catEl.querySelector('CtgryNo')?.textContent || ''
-      const nameEl = catEl.querySelector('Name > TStr')
-      const catName = nameEl?.textContent || catEl.querySelector('Name')?.textContent || 'Sin nombre'
+    catNodes.forEach((catNode) => {
+      // Extract category name from XML (looking for last T > S element in Name)
+      let catName = ''
+      const nameS = catNode.querySelectorAll(':scope > Name TStr T S')
+      if (nameS.length) {
+        catName = nameS[nameS.length - 1].textContent.trim()
+      }
+      if (!catName) {
+        catName = catNode.querySelector(':scope > Name')?.textContent.trim() || 'Sin nombre'
+      }
 
-      // Extract fields grouped by section and tab
+      const fieldNodes = catNode.querySelectorAll(':scope > Fields > Field')
       const sections = []
-      const fieldElements = catEl.querySelectorAll('Field')
       let currentSection = null
 
-      fieldElements.forEach((fieldEl) => {
-        const typeNo = fieldEl.querySelector('TypeNo')?.textContent
-        const caption = fieldEl.querySelector('Caption > TStr')?.textContent || fieldEl.querySelector('Caption')?.textContent || ''
-        const fieldNo = fieldEl.querySelector('FieldNo')?.textContent
+      fieldNodes.forEach((field) => {
+        const typeNo = field.querySelector(':scope > TypeNo')?.textContent.trim() || ''
+        const colName = field.querySelector(':scope > ColName')?.textContent.trim() || ''
+        const hasTable = !!field.querySelector(':scope > BelongsToTable')
+        const hasLinked = !!field.querySelector(':scope > BelongsTo')
 
-        // TypeNo 4 = Section header (label)
-        if (typeNo === '4' && caption) {
-          currentSection = { name: caption, fields: [] }
-          sections.push(currentSection)
-        }
-        // Data fields
-        else if (typeNo && ['1', '2', '3', '5', '6', '7'].includes(typeNo)) {
-          if (!currentSection) {
-            currentSection = { name: 'GENERAL', fields: [] }
+        // Section header: TypeNo 4, no ColName, has <BClr> in DisplayProp
+        if (typeNo === '4' && !colName) {
+          const hasBClr = !!field.querySelector(':scope > DisplayProp > BClr')
+          if (hasBClr) {
+            const capS = field.querySelectorAll(':scope > Caption TStr T S')
+            let secName = capS.length ? capS[capS.length - 1].textContent.trim().toUpperCase() : ''
+            if (!secName) {
+              secName = field.querySelector(':scope > Caption')?.textContent.trim().toUpperCase() || 'SECCIÓN'
+            }
+            currentSection = { name: secName, fields: [] }
             sections.push(currentSection)
           }
-          const typeNames = { '1': 'String', '2': 'Integer', '3': 'Date', '5': 'Money', '6': 'Boolean', '7': 'DateTime' }
-          currentSection.fields.push({
-            nombre: caption,
-            tipo: typeNo,
-            fieldNo: fieldNo
-          })
+          return
         }
+
+        // Skip layout, table columns, linked display fields
+        if (typeNo === '4' || hasTable || hasLinked) return
+
+        // Skip unsupported / negative TypeNos
+        if (!VALID_TYPES.has(typeNo)) return
+
+        // Data field must have ColName
+        if (!colName) return
+
+        // Caption: last <T><S> inside <Caption>
+        let caption = ''
+        const capS = field.querySelectorAll(':scope > Caption TStr T S')
+        if (capS.length) caption = capS[capS.length - 1].textContent.trim()
+        if (!caption) caption = field.querySelector(':scope > Caption')?.textContent.trim() || colName
+
+        if (!currentSection) {
+          currentSection = { name: 'DATOS IMPORTADOS', fields: [] }
+          sections.push(currentSection)
+        }
+
+        const mappedType = typeNo === '9' ? '1' : typeNo
+        currentSection.fields.push({
+          nombre: caption,
+          tipo: mappedType,
+          fieldKey: colName.toLowerCase()
+        })
       })
 
-      if (sections.length === 0) {
-        sections.push({ name: 'GENERAL', fields: [] })
+      // Filter out empty sections
+      const validSections = sections.filter(s => s.fields.length > 0)
+      if (!validSections.length) {
+        console.warn(`Category "${catName}" has no data fields`)
+        return
       }
 
       categories.push({
         name: catName,
-        sections: sections,
+        sections: validSections,
         palette: 'Therefore Azul'
       })
     })
