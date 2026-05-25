@@ -37,13 +37,19 @@ const FIELD_TYPES = [
 // BGR color helper (Blue-Green-Red format, Therefore standard)
 const bgr = (r, g, b) => b * 65536 + g * 256 + r
 const bgrToHex = (val) => {
+  // Handle invalid input gracefully
+  if (typeof val !== 'number' || val < 0 || val > 16777215) {
+    console.warn('Invalid BGR value:', val, '- using fallback #F0F0F0')
+    return '#F0F0F0'
+  }
   const b = (val >> 16) & 0xff
   const g = (val >> 8) & 0xff
   const r = val & 0xff
-  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+  const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+  return hex
 }
 
-// Therefore color palettes (official themes)
+// Therefore color palettes (official themes) — with descriptive color labels
 const COLOR_PALETTES = {
   'Corporativa': {
     name: 'Corporativa',
@@ -58,7 +64,18 @@ const COLOR_PALETTES = {
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
     labelColor: bgr(55, 65, 81),
-    labelBg: bgr(240, 240, 240)
+    labelBg: bgr(240, 240, 240),
+    // Palette metadata for UI display
+    colorLabels: {
+      secBg: 'Sección (Fondo)',
+      secText: 'Sección (Texto)',
+      hdrBg: 'Título (Fondo)',
+      hdrText: 'Título (Texto)',
+      fieldBg: 'Campos (Fondo)',
+      fieldText: 'Campos (Texto)',
+      labelColor: 'Etiqueta (Texto)',
+      dlgBg: 'Fondo de Categoría'
+    }
   },
   'Therefore Azul': {
     name: 'Therefore Azul',
@@ -73,7 +90,17 @@ const COLOR_PALETTES = {
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
     labelColor: bgr(55, 65, 81),
-    labelBg: bgr(245, 248, 252)
+    labelBg: bgr(245, 248, 252),
+    colorLabels: {
+      secBg: 'Sección (Fondo)',
+      secText: 'Sección (Texto)',
+      hdrBg: 'Título (Fondo)',
+      hdrText: 'Título (Texto)',
+      fieldBg: 'Campos (Fondo)',
+      fieldText: 'Campos (Texto)',
+      labelColor: 'Etiqueta (Texto)',
+      dlgBg: 'Fondo de Categoría'
+    }
   },
   'Verde Corporativo': {
     name: 'Verde Corporativo',
@@ -88,7 +115,17 @@ const COLOR_PALETTES = {
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
     labelColor: bgr(55, 65, 81),
-    labelBg: bgr(245, 252, 247)
+    labelBg: bgr(245, 252, 247),
+    colorLabels: {
+      secBg: 'Sección (Fondo)',
+      secText: 'Sección (Texto)',
+      hdrBg: 'Título (Fondo)',
+      hdrText: 'Título (Texto)',
+      fieldBg: 'Campos (Fondo)',
+      fieldText: 'Campos (Texto)',
+      labelColor: 'Etiqueta (Texto)',
+      dlgBg: 'Fondo de Categoría'
+    }
   },
   'Rojo Institucional': {
     name: 'Rojo Institucional',
@@ -103,7 +140,17 @@ const COLOR_PALETTES = {
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
     labelColor: bgr(55, 65, 81),
-    labelBg: bgr(252, 245, 245)
+    labelBg: bgr(252, 245, 245),
+    colorLabels: {
+      secBg: 'Sección (Fondo)',
+      secText: 'Sección (Texto)',
+      hdrBg: 'Título (Fondo)',
+      hdrText: 'Título (Texto)',
+      fieldBg: 'Campos (Fondo)',
+      fieldText: 'Campos (Texto)',
+      labelColor: 'Etiqueta (Texto)',
+      dlgBg: 'Fondo de Categoría'
+    }
   },
   'Gris Neutro': {
     name: 'Gris Neutro',
@@ -118,7 +165,17 @@ const COLOR_PALETTES = {
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
     labelColor: bgr(55, 65, 81),
-    labelBg: bgr(249, 250, 251)
+    labelBg: bgr(249, 250, 251),
+    colorLabels: {
+      secBg: 'Sección (Fondo)',
+      secText: 'Sección (Texto)',
+      hdrBg: 'Título (Fondo)',
+      hdrText: 'Título (Texto)',
+      fieldBg: 'Campos (Fondo)',
+      fieldText: 'Campos (Texto)',
+      labelColor: 'Etiqueta (Texto)',
+      dlgBg: 'Fondo de Categoría'
+    }
   },
   'Morado': {
     name: 'Morado',
@@ -133,7 +190,17 @@ const COLOR_PALETTES = {
     fieldBg: bgr(255, 255, 255),
     fieldText: bgr(0, 0, 0),
     labelColor: bgr(55, 65, 81),
-    labelBg: bgr(250, 245, 252)
+    labelBg: bgr(250, 245, 252),
+    colorLabels: {
+      secBg: 'Sección (Fondo)',
+      secText: 'Sección (Texto)',
+      hdrBg: 'Título (Fondo)',
+      hdrText: 'Título (Texto)',
+      fieldBg: 'Campos (Fondo)',
+      fieldText: 'Campos (Texto)',
+      labelColor: 'Etiqueta (Texto)',
+      dlgBg: 'Fondo de Categoría'
+    }
   }
 }
 
@@ -1103,7 +1170,8 @@ function DialogPreview({ catName, sections, hasTable, palette }) {
 }
 
 // XML Parser - Extract categories structure from generated XML (like parseThereforeXml)
-function parseXmlCategories(xmlString) {
+// sourceCategories: original categories array to preserve palette selections
+function parseXmlCategories(xmlString, sourceCategories = []) {
   try {
     const parser = new DOMParser()
     const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
@@ -1121,9 +1189,9 @@ function parseXmlCategories(xmlString) {
     }
 
     const VALID_TYPES = new Set(['1', '2', '3', '5', '6', '7', '9', '15'])
-    const categories = []
+    const parsedCategories = []
 
-    catNodes.forEach((catNode) => {
+    catNodes.forEach((catNode, catIdx) => {
       // Extract category name from XML (looking for last T > S element in Name)
       let catName = ''
       const nameS = catNode.querySelectorAll(':scope > Name TStr T S')
@@ -1194,14 +1262,17 @@ function parseXmlCategories(xmlString) {
         return
       }
 
-      categories.push({
+      // Preserve palette from original category at same index
+      const sourcePalette = sourceCategories[catIdx]?.palette || 'Therefore Azul'
+
+      parsedCategories.push({
         name: catName,
         sections: validSections,
-        palette: 'Therefore Azul'
+        palette: sourcePalette
       })
     })
 
-    return categories
+    return parsedCategories
   } catch (err) {
     console.error('Error parsing XML:', err)
     return []
@@ -1640,7 +1711,7 @@ export default function CategoryBuilder() {
 
   // Category operations
   const addCategory = () => {
-    setCategories([...categories, { id: newGuid(), name: `CATEGORÍA ${categories.length + 1}`, sections: [{ id: newGuid(), name: 'GENERAL', fields: [] }] }])
+    setCategories([...categories, { id: newGuid(), name: `CATEGORÍA ${categories.length + 1}`, palette: 'Therefore Azul', sections: [{ id: newGuid(), name: 'GENERAL', fields: [] }] }])
   }
 
   const updateCategoryName = (idx, name) => {
@@ -2147,8 +2218,8 @@ export default function CategoryBuilder() {
       const xml = `<?xml version="1.0" encoding="utf-8"?><Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories>${allCategoriesXml}</Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>`
 
       setXml(xml)
-      // Parse XML to extract categories for preview
-      const parsedCats = parseXmlCategories(xml)
+      // Parse XML to extract categories for preview, preserving palette from original categories
+      const parsedCats = parseXmlCategories(xml, categories)
       setPreviewCategories(parsedCats)
       setXmlModalOpen(true)
       message.success(`✅ XML generado con ${categoryXmlBlocks.length} categoría(s) (Therefore Native Format)`)
@@ -3247,7 +3318,7 @@ export default function CategoryBuilder() {
         bodyStyle={{ maxHeight: '80vh', overflow: 'auto', padding: '30px' }}
       >
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '30px' }}>
-          {(previewCategories.length > 0 ? previewCategories : categories).map((cat, idx) => (
+          {categories.map((cat, idx) => (
             <div key={idx} style={{ border: '2px solid #e5e7eb', borderRadius: '8px', padding: '15px', background: '#f9fafb' }}>
               <div style={{ marginBottom: '15px', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
                 {idx + 1}. {cat.name || 'Sin nombre'}
