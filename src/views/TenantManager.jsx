@@ -246,19 +246,20 @@ export default function TenantManager() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)' }}>
+      {/* HEADER */}
+      <div className="header-main">
+        <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
           <CloudOutlined /> Gestión de Tenants
         </h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={createNewTenant}
-          size="large"
-        >
-          Nuevo Tenant
-        </Button>
+        <div className="header-actions">
+          <button
+            onClick={createNewTenant}
+            className="btn-primary"
+          >
+            + Nuevo Tenant
+          </button>
+        </div>
       </div>
 
       <Spin spinning={loading} style={{ display: 'flex', flex: 1 }}>

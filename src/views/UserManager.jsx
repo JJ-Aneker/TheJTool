@@ -311,11 +311,29 @@ export default function UserManager() {
 
   const stats = getStatistics()
 
+  const createNewUser = () => {
+    setSelectedUser(null)
+    form.resetFields()
+    setIsModalVisible(true)
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%' }}>
-      <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-        <UserOutlined /> Gestión de Usuarios
-      </h1>
+    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)' }}>
+      {/* HEADER */}
+      <div className="header-main">
+        <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+          <UserOutlined /> Gestión de Usuarios
+        </h1>
+        <div className="header-actions">
+          <button
+            onClick={createNewUser}
+            className="btn-primary"
+          >
+            + Crear Nuevo Usuario
+          </button>
+        </div>
+      </div>
+
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
