@@ -311,12 +311,6 @@ export default function UserManager() {
 
   const stats = getStatistics()
 
-  const createNewUser = () => {
-    setSelectedUser(null)
-    form.resetFields()
-    setIsModalVisible(true)
-  }
-
   return (
     <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)' }}>
       {/* HEADER */}
