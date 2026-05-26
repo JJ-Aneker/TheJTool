@@ -63,7 +63,6 @@ export default function UserManager() {
     {
       title: 'Usuario',
       key: 'user',
-      width: 160,
       render: (_, record) => (
         <div style={{ fontWeight: '600', fontSize: '14px' }}>
           {record.name && record.surname ? `${record.name} ${record.surname}` : 'Sin nombre'}
@@ -74,14 +73,12 @@ export default function UserManager() {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      width: 180,
       render: (text) => <span style={{ color: 'var(--accent-primary)' }}>{text || '-'}</span>
     },
     {
       title: 'Rol',
       dataIndex: 'role',
       key: 'role',
-      width: 100,
       render: (role) => {
         const colors = {
           admin: 'red',
@@ -102,7 +99,6 @@ export default function UserManager() {
       title: 'Aprobado',
       dataIndex: 'approved',
       key: 'approved',
-      width: 100,
       render: (approved) => (
         <Tag icon={approved ? <CheckCircleOutlined /> : <CloseCircleOutlined />} color={approved ? 'green' : 'red'}>
           {approved ? 'Sí' : 'No'}
@@ -113,13 +109,13 @@ export default function UserManager() {
       title: 'Creado',
       dataIndex: 'created_at',
       key: 'created_at',
-      width: 130,
       render: (text) => text ? new Date(text).toLocaleString('es-ES') : '-'
     },
     {
       title: 'Acciones',
       key: 'actions',
-      width: 110,
+      fixed: 'right',
+      width: 100,
       render: (_, record) => (
         <Space>
           <Tooltip title="Editar usuario">
@@ -346,7 +342,7 @@ export default function UserManager() {
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
                     style={{ width: '100%' }}
-                    scroll={{ x: 900, y: 'calc(100vh - 280px)' }}
+                    scroll={{ y: 'calc(100vh - 280px)' }}
                     loading={loading}
                   />
                 </div>

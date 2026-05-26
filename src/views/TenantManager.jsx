@@ -62,35 +62,30 @@ export default function TenantManager() {
       title: 'Nombre del Tenant',
       dataIndex: 'nombre',
       key: 'nombre',
-      width: 150,
       render: (text) => <span style={{ fontWeight: '600', fontSize: '14px' }}>{text || '-'}</span>
     },
     {
       title: 'URL',
       dataIndex: 'url',
       key: 'url',
-      width: 180,
       render: (text) => <span style={{ color: 'var(--accent-primary)', fontSize: '13px' }}>{text || '-'}</span>
     },
     {
       title: 'Tenant ID',
       dataIndex: 'tenant',
       key: 'tenant',
-      width: 90,
       render: (text) => <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)', fontSize: '12px' }}>{text || '-'}</span>
     },
     {
       title: 'Usuario',
       dataIndex: 'usuario',
       key: 'usuario',
-      width: 120,
       render: (text) => <span>{text || '-'}</span>
     },
     {
       title: 'Compartido',
       dataIndex: 'shared',
       key: 'shared',
-      width: 85,
       render: (shared) => (
         <Tag icon={shared ? <GlobalOutlined /> : <LockOutlined />} color={shared ? 'blue' : 'default'}>
           {shared ? 'Público' : 'Privado'}
@@ -101,7 +96,6 @@ export default function TenantManager() {
       title: 'Creado',
       dataIndex: 'created_at',
       key: 'created_at',
-      width: 125,
       render: (text) => text ? new Date(text).toLocaleString('es-ES') : '-'
     },
     {
@@ -270,7 +264,7 @@ export default function TenantManager() {
           rowKey="id"
           pagination={{ pageSize: 10 }}
           style={{ width: '100%' }}
-          scroll={{ x: 950, y: 'calc(100vh - 280px)' }}
+          scroll={{ y: 'calc(100vh - 280px)' }}
           size="small"
           loading={loading}
         />

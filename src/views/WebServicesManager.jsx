@@ -43,14 +43,12 @@ export default function WebServicesManager() {
       title: 'Tenant',
       dataIndex: 'tenant_name',
       key: 'tenant_name',
-      width: 120,
       render: (text) => text || '-'
     },
     {
       title: 'URL Base',
       dataIndex: 'url_base',
       key: 'url_base',
-      width: 160,
       render: (text) => (
         <Tooltip title={text}>
           <a href={text} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px' }}>
@@ -63,14 +61,12 @@ export default function WebServicesManager() {
       title: 'Usuario',
       dataIndex: 'username',
       key: 'username',
-      width: 100,
       render: (text) => <code>{text}</code>
     },
     {
       title: 'Contraseña',
       dataIndex: 'password',
       key: 'password',
-      width: 100,
       render: (text, record) => (
         <Space size={0}>
           <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>
@@ -92,7 +88,6 @@ export default function WebServicesManager() {
       title: 'Creado',
       dataIndex: 'created_at',
       key: 'created_at',
-      width: 130,
       render: (text) => text ? new Date(text).toLocaleString('es-ES') : '-'
     },
     {
@@ -274,7 +269,7 @@ export default function WebServicesManager() {
             dataSource={services}
             rowKey="id"
             pagination={{ pageSize: 10 }}
-            scroll={{ x: 900 }}
+            scroll={{ y: 'calc(100vh - 280px)' }}
           />
         </Spin>
       </div>
