@@ -241,7 +241,7 @@ export default function WebServicesManager() {
 
   return (
     <>
-      <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)' }}>
+      <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', minWidth: 0, overflow: 'hidden' }}>
         {/* HEADER */}
         <div className="header-main">
           <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>

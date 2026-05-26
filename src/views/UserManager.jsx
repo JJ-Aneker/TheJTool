@@ -312,7 +312,7 @@ export default function UserManager() {
   const stats = getStatistics()
 
   return (
-    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%' }}>
+    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%', minWidth: 0, overflow: 'hidden' }}>
       {/* HEADER */}
       <div className="header-main">
         <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
@@ -331,7 +331,8 @@ export default function UserManager() {
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
-        style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}
+        contentStyle={{ display: 'flex', flex: 1, minHeight: 0, minWidth: 0, overflow: 'hidden' }}
         items={[
             {
               key: 'users',
