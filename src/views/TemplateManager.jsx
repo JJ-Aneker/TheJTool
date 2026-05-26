@@ -188,40 +188,46 @@ export default function TemplateManager() {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
-        <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-          <FileTextOutlined /> Gestión de Templates
-        </h1>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, flex: 1 }}>
-          <Space>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%', minWidth: 0, overflow: 'hidden' }}>
+        <div className="header-main">
+          <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+            <FileTextOutlined /> Gestión de Templates
+          </h1>
+          <div className="header-actions">
+            <button
+              className="btn-primary"
               onClick={() => {
                 setSelectedTemplate(null)
                 form.resetFields()
                 setIsModalVisible(true)
               }}
             >
-              Crear Template
-            </Button>
-            <Button
+              + Crear Template
+            </button>
+            <button
+              className="btn-default"
               onClick={loadTemplates}
-              loading={loading}
+              disabled={loading}
             >
-              Actualizar
-            </Button>
-          </Space>
+              🔄 Actualizar
+            </button>
+          </div>
+        </div>
 
-          <Spin spinning={loading} style={{ flex: 1, minHeight: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, minWidth: 0 }}>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <Spin size="large" />
+            </div>
+          ) : (
             <Table
               columns={columns}
               dataSource={templates}
               rowKey="id"
               pagination={{ pageSize: 10 }}
+              style={{ width: '100%' }}
             />
-          </Spin>
+          )}
         </div>
       </div>
 

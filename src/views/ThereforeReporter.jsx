@@ -578,7 +578,7 @@ export default function ThereforeReporter() {
                   <span className="meta-chip">📁 {(p.saved_cat_nos || []).length} cat.</span>
                   <span className="meta-chip">🗂 {(p.saved_fields || []).length} campos</span>
                 </div>
-                <Button type="primary" block onClick={() => executeProfile(p)}>▶ Ejecutar</Button>
+                <button className="btn-primary" style={{ width: '100%' }} onClick={() => executeProfile(p)}>▶ Ejecutar</button>
               </Card>
             ))}
           </div>
