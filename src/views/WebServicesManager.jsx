@@ -241,42 +241,42 @@ export default function WebServicesManager() {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
-        <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-          <CloudOutlined /> Gestión de Servicios Web
-        </h1>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minHeight: 0, flex: 1 }}>
-          <Space>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
+      <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)' }}>
+        {/* HEADER */}
+        <div className="header-main">
+          <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+            <CloudOutlined /> Gestión de Servicios Web
+          </h1>
+          <div className="header-actions">
+            <button
+              className="btn-primary"
               onClick={() => {
                 setSelectedService(null)
                 form.resetFields()
                 setIsModalVisible(true)
               }}
             >
-              Crear Servicio
-            </Button>
-            <Button
+              + Crear Servicio
+            </button>
+            <button
+              className="btn-default"
               onClick={loadServices}
-              loading={loading}
+              disabled={loading}
             >
-              Actualizar
-            </Button>
-          </Space>
-
-          <Spin spinning={loading} style={{ flex: 1, minHeight: 0 }}>
-            <Table
-              columns={columns}
-              dataSource={services}
-              rowKey="id"
-              pagination={{ pageSize: 10 }}
-              scroll={{ x: 1200 }}
-            />
-          </Spin>
+              🔄 Actualizar
+            </button>
+          </div>
         </div>
+
+        <Spin spinning={loading} style={{ flex: 1, minHeight: 0 }}>
+          <Table
+            columns={columns}
+            dataSource={services}
+            rowKey="id"
+            pagination={{ pageSize: 10 }}
+            scroll={{ x: 'max-content' }}
+          />
+        </Spin>
       </div>
 
       <Modal

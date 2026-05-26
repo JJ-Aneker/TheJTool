@@ -161,20 +161,23 @@ export default function EFormManager() {
   ]
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '20px', fontWeight: '600', margin: '0 0 16px 0' }}>
+    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)' }}>
+      {/* HEADER */}
+      <div className="header-main">
+        <h1 className="header-title" style={{ margin: 0 }}>
           📚 Mis Formularios
         </h1>
-        <Input
-          placeholder="Buscar por nombre o descripción..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          style={{ maxWidth: '400px', marginBottom: '16px' }}
-        />
-        <Button onClick={loadForms} loading={loading}>
-          Actualizar
-        </Button>
+        <div className="header-actions">
+          <Input
+            placeholder="Buscar por nombre o descripción..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ maxWidth: '300px' }}
+          />
+          <button onClick={loadForms} className="btn-default" disabled={loading}>
+            🔄 Actualizar
+          </button>
+        </div>
       </div>
 
       {loading ? (
