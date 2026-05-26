@@ -293,8 +293,7 @@ function Toggle({ on, onChange, label }) {
   )
 }
 
-function CsvImporter({ onImport }) {
-  const [open, setOpen] = useState(false)
+function CsvImporter({ isOpen, onClose, onImport }) {
   const [text, setText] = useState('')
   const [preview, setPreview] = useState(null)
 
@@ -304,72 +303,70 @@ function CsvImporter({ onImport }) {
     onImport(preview, mode)
     setText('')
     setPreview(null)
-    setOpen(false)
+    onClose()
   }
   const total = preview && !preview.error
     ? preview.sections.reduce((a, s) => a + s.fields.length, 0) : 0
 
   return (
-    <div className="eform-csv-importer">
-      <button className="eform-btn-expand" onClick={() => setOpen(o => !o)}>
-        {open ? '▲' : '▼'} Importar campos desde CSV
+    <Modal
+      title="📤 Importar campos desde CSV"
+      open={isOpen}
+      onCancel={onClose}
+      footer={null}
+      width={700}
+    >
+      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+        <div style={{ marginBottom: '8px' }}>Columnas: <code>Nombre ; Key ; Tipo ; Obligatorio ; Placeholder ; Default ; MaxLength ; Seccion ; Options</code></div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+          Solo <b>Nombre</b> es obligatorio. <b>Options</b> para select: separadas por <code>|</code>
+        </div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+          <strong>Tipos:</strong> text, email, phone, date, datetime, number, money, checkbox, select
+        </div>
+      </div>
+      <textarea
+        value={text}
+        onChange={e => { setText(e.target.value); setPreview(null) }}
+        placeholder={'Nombre;Key;Tipo;Obligatorio;Placeholder;Default;MaxLength;Seccion;Options\nNombre completo;nombre;Text;Si;Tu nombre completo;;100;DATOS PERSONALES\nCurso;curso;Select;Si;;;; ACADÉMICO;1ESO=1 ESO|2ESO=2 ESO'}
+        className="form-textarea"
+        style={{
+          height: '120px',
+          fontFamily: 'monospace',
+          marginBottom: '16px'
+        }}
+      />
+      <button
+        onClick={handleParse}
+        disabled={!text.trim()}
+        className="btn-default btn-sm"
+      >
+        Analizar →
       </button>
-      {open && (
-        <div className="eform-panel">
-          <div className="eform-panel-title">Importar CSV</div>
-          <div className="eform-csv-help">
-            Columnas: <code>Nombre ; Key ; Tipo ; Obligatorio ; Placeholder ; Default ; MaxLength ; Seccion ; Options</code><br />
-            <span>Solo <b>Nombre</b> es obligatorio. <b>Options</b> para select: separadas por <code>|</code></span>
-          </div>
-          <textarea
-            className="eform-textarea"
-            value={text}
-            onChange={e => { setText(e.target.value); setPreview(null) }}
-            placeholder={'Nombre;Key;Tipo;Obligatorio;Placeholder;Default;MaxLength;Seccion;Options\nNombre completo;nombre;Text;Si;Tu nombre completo;;100;DATOS PERSONALES\nCurso;curso;Select;Si;;;; ACADÉMICO;1ESO=1 ESO|2ESO=2 ESO'}
-          />
-          <button className="eform-btn-primary" onClick={handleParse} disabled={!text.trim()}>Analizar →</button>
-          {preview && (
-            <div className="eform-csv-preview">
-              {preview.error ? (
-                <div className="eform-error">⚠ {preview.error}</div>
-              ) : (
-                <>
-                  <div className="eform-preview-info">✓ {total} campos · {preview.sections.length} panel(es)</div>
-                  <div className="eform-table-header">
-                    <div className="eform-table-col">Nombre</div>
-                    <div className="eform-table-col">Key</div>
-                    <div className="eform-table-col">Tipo</div>
-                  </div>
-                  <div className="eform-sections-list">
-                    {preview.sections.map((sec, si) => (
-                      <div key={si}>
-                        <div className="eform-section-header-row">{sec.name}</div>
-                        {sec.fields.map((f, fi) => (
-                          <div key={fi} className="eform-table-row">
-                            <div className="eform-table-col">{f.nombre}</div>
-                            <div className="eform-table-col eform-table-key">{f.fieldKey}</div>
-                            <div className="eform-table-col eform-table-type">{f.tipo}{f.required ? ' ✱' : ''}</div>
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                  {preview.warnings?.length > 0 && (
-                    <div className="eform-warnings">
-                      {preview.warnings.map((w, i) => <div key={i}>⚠ {w}</div>)}
-                    </div>
-                  )}
-                  <div className="eform-csv-actions">
-                    <button className="eform-btn-primary" onClick={() => handleApply('replace')}>Reemplazar</button>
-                    <button className="eform-btn" onClick={() => handleApply('append')}>Añadir al final</button>
-                  </div>
-                </>
-              )}
+      {preview && (
+        <div style={{ marginTop: '16px' }}>
+          {preview.error ? (
+            <div className="alert-error" style={{ padding: '12px' }}>
+              ⚠ {preview.error}
             </div>
+          ) : (
+            <>
+              <div style={{ fontSize: '12px', color: 'var(--accent-primary)', marginBottom: '12px' }}>
+                ✓ {total} campos · {preview.sections.length} panel(es)
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={() => handleApply('replace')} className="btn-default btn-sm">
+                  Reemplazar
+                </button>
+                <button onClick={() => handleApply('append')} className="btn-default btn-sm">
+                  Añadir
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}
-    </div>
+    </Modal>
   )
 }
 
@@ -539,6 +536,7 @@ export default function EFormBuilder() {
   const [managerOpen, setManagerOpen] = useState(false)
   const [savedForms, setSavedForms] = useState([])
   const [loadingForms, setLoadingForms] = useState(false)
+  const [csvModalOpen, setCsvModalOpen] = useState(false)
 
   const newField = () => ({ id: newGuid(), nombre: '', fieldKey: '', tipo: 'text', required: false, readOnly: false, placeholder: '', defaultValue: '', maxLength: '', options: '' })
   const newSection = (name = 'GENERAL') => ({ id: newGuid(), name, fields: [newField()] })
@@ -807,6 +805,7 @@ export default function EFormBuilder() {
             ))}
           </div>
           {error && <div className="eform-error-inline">{error}</div>}
+          <button className="eform-btn" onClick={() => setCsvModalOpen(true)}>📤 Importar CSV</button>
           <button className="eform-btn" onClick={() => { setManagerOpen(true); loadSavedForms() }}>📚 Mis Formularios</button>
           <button className="eform-btn" onClick={generate}>📋 Generar XML</button>
         </div>
@@ -871,7 +870,6 @@ export default function EFormBuilder() {
         </div>
       ) : (
         <div className="eform-full-width">
-          <CsvImporter onImport={handleCsvImport} />
           <div className="eform-panel">
             <div className="eform-panel-header">
               <span className="eform-panel-title">Paneles y campos <span className="eform-badge">{totalFields} campos</span></span>
@@ -1036,6 +1034,9 @@ export default function EFormBuilder() {
           <textarea readOnly className="eform-textarea eform-xml-textarea" value={xml} onClick={e => e.target.select()} />
         </div>
       </Modal>
+
+      {/* CSV Importer Modal */}
+      <CsvImporter isOpen={csvModalOpen} onClose={() => setCsvModalOpen(false)} onImport={handleCsvImport} />
 
       <div className="eform-footer">
         Therefore eForms Builder v2.0 · Aneker · Genera Form.io JSON nativo para Therefore
