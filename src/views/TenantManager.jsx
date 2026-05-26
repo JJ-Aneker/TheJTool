@@ -62,35 +62,35 @@ export default function TenantManager() {
       title: 'Nombre del Tenant',
       dataIndex: 'nombre',
       key: 'nombre',
-      width: 140,
+      width: 150,
       render: (text) => <span style={{ fontWeight: '600', fontSize: '14px' }}>{text || '-'}</span>
     },
     {
       title: 'URL',
       dataIndex: 'url',
       key: 'url',
-      width: 160,
+      width: 180,
       render: (text) => <span style={{ color: 'var(--accent-primary)', fontSize: '13px' }}>{text || '-'}</span>
     },
     {
       title: 'Tenant ID',
       dataIndex: 'tenant',
       key: 'tenant',
-      width: 75,
+      width: 90,
       render: (text) => <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)', fontSize: '12px' }}>{text || '-'}</span>
     },
     {
       title: 'Usuario',
       dataIndex: 'usuario',
       key: 'usuario',
-      width: 100,
+      width: 120,
       render: (text) => <span>{text || '-'}</span>
     },
     {
       title: 'Compartido',
       dataIndex: 'shared',
       key: 'shared',
-      width: 75,
+      width: 85,
       render: (shared) => (
         <Tag icon={shared ? <GlobalOutlined /> : <LockOutlined />} color={shared ? 'blue' : 'default'}>
           {shared ? 'Público' : 'Privado'}
@@ -101,13 +101,13 @@ export default function TenantManager() {
       title: 'Creado',
       dataIndex: 'created_at',
       key: 'created_at',
-      width: 110,
+      width: 125,
       render: (text) => text ? new Date(text).toLocaleString('es-ES') : '-'
     },
     {
       title: 'Acciones',
       key: 'actions',
-      width: 90,
+      width: 110,
       fixed: 'right',
       render: (_, record) => {
         const isOwner = record.owner_id === user?.id
@@ -270,7 +270,7 @@ export default function TenantManager() {
           rowKey="id"
           pagination={{ pageSize: 10 }}
           style={{ width: '100%' }}
-          scroll={{ x: 800, y: 'calc(100vh - 280px)' }}
+          scroll={{ x: 950, y: 'calc(100vh - 280px)' }}
           size="small"
           loading={loading}
         />
