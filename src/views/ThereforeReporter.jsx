@@ -541,21 +541,27 @@ export default function ThereforeReporter() {
 
   // HOME VIEW
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: '100%', padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%', minWidth: 0, overflow: 'hidden' }}>
+      <div className="header-main">
+        <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
           <ThunderboltOutlined /> Therefore Reporter
         </h1>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => openEditor()} size="large">
-          Nuevo Perfil
-        </Button>
+        <div className="header-actions">
+          <button className="btn-primary" onClick={() => openEditor()}>
+            + Nuevo Perfil
+          </button>
+        </div>
       </div>
 
-      <Spin spinning={loading}>
-        {profiles.length === 0 ? (
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, minWidth: 0 }}>
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Spin size="large" />
+          </div>
+        ) : profiles.length === 0 ? (
           <Empty description="No hay perfiles creados" style={{ marginTop: '50px' }} />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '16px', overflow: 'auto', padding: '0' }}>
             {profiles.map(p => (
               <Card key={p.id} className="profile-card" hoverable>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -577,7 +583,7 @@ export default function ThereforeReporter() {
             ))}
           </div>
         )}
-      </Spin>
+      </div>
     </div>
   )
 }

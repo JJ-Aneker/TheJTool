@@ -811,22 +811,6 @@ export default function EFormBuilder() {
         </div>
       </div>
 
-      {/* Information Cards - Top */}
-      <div className="eform-info-cards">
-        <div className="eform-info-card">
-          <div className="eform-info-card-title">1. Estructura</div>
-          <p>Therefore eForms usa <strong>Form.io</strong>. El XML contiene el JSON en <code>&lt;FDef&gt;</code>.</p>
-        </div>
-        <div className="eform-info-card">
-          <div className="eform-info-card-title">2. Campos</div>
-          <p>Cada <strong>Panel</strong> → componente. El <strong>Key</strong> = <code>FieldID</code> en Therefore.</p>
-        </div>
-        <div className="eform-info-card">
-          <div className="eform-info-card-title">3. Publicar</div>
-          <p>Importa en Solution Designer → Publica → Verifica URL en IIS.</p>
-        </div>
-      </div>
-
       {/* Identity Panel */}
       <div className="eform-panel">
         <div className="eform-panel-title">Identidad del formulario</div>
