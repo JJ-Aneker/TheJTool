@@ -246,7 +246,7 @@ export default function TenantManager() {
   }
 
   return (
-    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)' }}>
+    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%' }}>
       {/* HEADER */}
       <div className="header-main">
         <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
@@ -262,14 +262,14 @@ export default function TenantManager() {
         </div>
       </div>
 
-      <Spin spinning={loading} style={{ display: 'flex', flex: 1 }}>
+      <Spin spinning={loading} style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
         <Table
           columns={columns}
           dataSource={tenants}
           rowKey="id"
           pagination={{ pageSize: 10 }}
           style={{ width: '100%' }}
-          scroll={{ x: 'max-content', y: 'calc(100vh - 250px)' }}
+          scroll={{ x: 'max-content', y: 'calc(100vh - 280px)' }}
           size="small"
         />
       </Spin>
