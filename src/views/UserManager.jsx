@@ -337,7 +337,7 @@ export default function UserManager() {
               key: 'users',
               label: 'Usuarios',
               children: (
-                <Spin spinning={loading} style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
+                <Spin spinning={loading} style={{ display: 'flex', flex: 1, minHeight: 0, minWidth: 0, width: '100%', overflow: 'auto' }}>
                   <Table
                     columns={columns}
                     dataSource={users}
