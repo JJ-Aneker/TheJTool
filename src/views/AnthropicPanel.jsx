@@ -26,9 +26,11 @@ export default function AnthropicPanel() {
   const [form] = Form.useForm()
 
   useEffect(() => {
-    loadStatus()
-    loadUsage()
-  }, [period])
+    if (session?.access_token) {
+      loadStatus()
+      loadUsage()
+    }
+  }, [period, session?.access_token])
 
   const getAuthHeaders = () => ({
     'Authorization': `Bearer ${session?.access_token}`,
@@ -40,10 +42,14 @@ export default function AnthropicPanel() {
       const resp = await fetch('/api/admin/anthropic/status', {
         headers: getAuthHeaders()
       })
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}: ${resp.statusText}`)
+      }
       const data = await resp.json()
       setStatus(data)
     } catch (err) {
-      message.error('Error loading API status: ' + err.message)
+      console.error('Error loading API status:', err)
+      setStatus({ hasKey: false, error: err.message })
     }
   }
 
@@ -59,13 +65,20 @@ export default function AnthropicPanel() {
         })
       ])
 
+      if (!usageResp.ok || !historyResp.ok) {
+        throw new Error(`API error: ${usageResp.status} / ${historyResp.status}`)
+      }
+
       const usageData = await usageResp.json()
       const historyData = await historyResp.json()
 
       setUsage(usageData)
       setHistory(historyData)
     } catch (err) {
-      message.error('Error loading usage: ' + err.message)
+      console.error('Error loading usage:', err)
+      // Don't show error message, just set empty state
+      setUsage(null)
+      setHistory(null)
     } finally {
       setLoading(false)
     }
@@ -158,15 +171,22 @@ export default function AnthropicPanel() {
       <Card title="API Key Status & Configuration" className="anthropic-card">
         <Space direction="vertical" style={{ width: '100%' }} size="large">
           {/* Status Badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
             {status?.hasKey ? (
               <Tag icon={<CheckCircleOutlined />} color="success">API Key Valid</Tag>
             ) : (
-              <Tag icon={<CloseCircleOutlined />} color="error">API Key Invalid</Tag>
+              <Tag icon={<CloseCircleOutlined />} color="error">
+                {status?.error ? 'API Unavailable' : 'API Key Invalid'}
+              </Tag>
             )}
             <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
               Last checked: {status?.timestamp ? new Date(status.timestamp).toLocaleString() : 'Never'}
             </span>
+            {status?.error && (
+              <span style={{ fontSize: '11px', color: 'var(--kpi-red)' }}>
+                ({status.error})
+              </span>
+            )}
           </div>
 
           {/* Key Display */}
