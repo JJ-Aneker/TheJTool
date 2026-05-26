@@ -338,16 +338,18 @@ export default function UserManager() {
               key: 'users',
               label: 'Usuarios',
               children: (
-                <Spin spinning={loading} style={{ display: 'flex', flex: 1, minHeight: 0, minWidth: 0, width: '100%', overflow: 'auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, minWidth: 0 }}>
+                  {loading && <Spin style={{ position: 'absolute', zIndex: 10 }} />}
                   <Table
                     columns={columns}
                     dataSource={users}
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
                     style={{ width: '100%' }}
-                    scroll={{ x: 'max-content', y: 'calc(100vh - 280px)' }}
+                    scroll={{ x: 1200, y: 'calc(100vh - 280px)' }}
+                    loading={loading}
                   />
-                </Spin>
+                </div>
               )
             },
             {
