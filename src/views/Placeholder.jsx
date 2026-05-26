@@ -13,13 +13,13 @@ export default function Placeholder({ icon: Icon, title, description, status = '
       <div style={{
         display: 'inline-block',
         padding: '8px 16px',
-        background: 'var(--kpi-amber)',
+        background: status === 'construction' ? 'var(--kpi-red)' : 'var(--kpi-amber)',
         borderRadius: '4px',
         color: 'var(--text-inverse)',
         marginBottom: '24px',
         fontSize: '12px'
       }}>
-        Estado: {status === 'development' ? '🔨 En Desarrollo' : status}
+        Estado: {status === 'construction' ? '🚧 En Construcción' : status === 'development' ? '🔨 En Desarrollo' : status}
       </div>
       <button
         className="btn-default"

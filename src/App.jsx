@@ -46,7 +46,7 @@ const { Sider, Content } = Layout
 
 // Menu items flat structure
 const getMenuItems = (isAdmin = false) => {
-  const allItems = [
+  const activeItems = [
     {
       key: 'home',
       icon: <HomeOutlined />,
@@ -86,18 +86,6 @@ const getMenuItems = (isAdmin = false) => {
       path: '/tenants'
     },
     {
-      key: 'api-explorer',
-      icon: <ApiOutlined />,
-      label: 'Explorador API REST',
-      path: '/api-explorer'
-    },
-    {
-      key: 'docs',
-      icon: <FileTextOutlined />,
-      label: 'Documentación de Proyectos',
-      path: '/docs'
-    },
-    {
       key: 'efdt',
       icon: <ThunderboltOutlined />,
       label: 'Generador EFDT',
@@ -110,12 +98,6 @@ const getMenuItems = (isAdmin = false) => {
       path: '/reporter'
     },
     {
-      key: 'workflows',
-      icon: <SettingOutlined />,
-      label: 'Configuración de Workflows',
-      path: '/workflows'
-    },
-    {
       key: 'web-services',
       icon: <CloudOutlined />,
       label: 'Servicios Web',
@@ -123,6 +105,31 @@ const getMenuItems = (isAdmin = false) => {
     }
   ]
 
+  const constructionItems = [
+    {
+      type: 'divider'
+    },
+    {
+      key: 'api-explorer',
+      icon: <ApiOutlined />,
+      label: 'Explorador API REST',
+      path: '/api-explorer'
+    },
+    {
+      key: 'workflows',
+      icon: <SettingOutlined />,
+      label: 'Configuración de Workflows',
+      path: '/workflows'
+    },
+    {
+      key: 'docs',
+      icon: <FileTextOutlined />,
+      label: 'Documentación de Proyectos',
+      path: '/docs'
+    }
+  ]
+
+  const allItems = [...activeItems, ...constructionItems]
   return allItems.filter(item => !item.adminOnly || isAdmin)
 }
 
@@ -395,12 +402,12 @@ function AppContent() {
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
             <Route path="/tenants" element={<TenantManager />} />
-            <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" description="Próximamente: Integración de tu API Explorer mejorado" />} />
-            <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" description="Próximamente: Documentación del proyecto" />} />
             <Route path="/efdt" element={<EFDTGenerator />} />
             <Route path="/reporter" element={<ThereforeReporter />} />
-            <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" description="Próximamente: Integración de tu Workflow Manager mejorado" />} />
             <Route path="/web-services" element={<WebServicesManager />} />
+            <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" status="construction" />} />
+            <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" status="construction" />} />
+            <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" status="construction" />} />
           </Routes>
         </Content>
       </div>
