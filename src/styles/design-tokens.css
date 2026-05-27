@@ -216,9 +216,9 @@ select:focus {
 
 /* Botón primario */
 .btn-primary {
-  background: var(--accent-primary);
-  color: white;
-  border: none;
+  background: rgba(54, 99, 255, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary);
   border-radius: var(--radius-md);
   padding: 8px 14px;
   font-size: 13px;
@@ -231,7 +231,7 @@ select:focus {
 }
 
 .btn-primary:hover {
-  background: #2850d4;
+  background: rgba(54, 99, 255, 0.25);
   box-shadow: var(--shadow-md);
 }
 
@@ -925,12 +925,13 @@ button:disabled, .btn:disabled {
 
 /* Botón primario */
 button.btn-primary {
-  background: var(--accent-primary);
-  color: white;
+  background: rgba(54, 99, 255, 0.15);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 button.btn-primary:hover:not(:disabled) {
-  background: #2850d4;
+  background: rgba(54, 99, 255, 0.25);
   box-shadow: var(--shadow-md);
 }
 
