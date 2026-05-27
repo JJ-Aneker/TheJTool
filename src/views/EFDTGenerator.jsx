@@ -271,7 +271,7 @@ export default function EFDTGenerator() {
         <div className="efdt-header-left">
           <div className="efdt-logo-icon"><ThunderboltOutlined /></div>
           <div>
-            <div className="efdt-title">Generador de Documentos EFDT</div>
+            <div className="header-title">Generador de Documentos EFDT</div>
             <div className="efdt-subtitle">Genera documentos avanzados desde requerimentos y prompts</div>
           </div>
         </div>
