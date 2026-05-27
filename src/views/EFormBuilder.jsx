@@ -805,9 +805,9 @@ export default function EFormBuilder() {
             ))}
           </div>
           {error && <div className="eform-error-inline">{error}</div>}
-          <button className="eform-btn-primary" onClick={() => setCsvModalOpen(true)}>📤 Importar CSV</button>
-          <button className="eform-btn-primary" onClick={() => { setManagerOpen(true); loadSavedForms() }}>📚 Mis Formularios</button>
-          <button className="eform-btn-primary" onClick={generate}>📋 Generar XML</button>
+          <button className="eform-btn" onClick={() => setCsvModalOpen(true)}>📤 Importar CSV</button>
+          <button className="eform-btn" onClick={() => { setManagerOpen(true); loadSavedForms() }}>📚 Mis Formularios</button>
+          <button className="eform-btn" onClick={generate}>📋 Generar XML</button>
         </div>
       </div>
 
