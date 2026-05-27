@@ -220,8 +220,8 @@ select:focus {
   color: var(--accent-primary);
   border: 1px solid var(--accent-primary);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
-  font-size: 13px;
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
@@ -925,13 +925,15 @@ button:disabled, .btn:disabled {
 
 /* Botón primario */
 button.btn-primary {
-  background: rgba(54, 99, 255, 0.15);
-  border: 1px solid var(--accent-primary);
-  color: var(--accent-primary);
+  background: rgba(54, 99, 255, 0.15) !important;
+  border: 1px solid var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
 }
 
 button.btn-primary:hover:not(:disabled) {
-  background: rgba(54, 99, 255, 0.25);
+  background: rgba(54, 99, 255, 0.25) !important;
   box-shadow: var(--shadow-md);
 }
 
@@ -940,6 +942,8 @@ button.btn-secondary {
   background: var(--btn-secondary-bg);
   color: var(--btn-secondary-text);
   border: 1px solid var(--border-default);
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 button.btn-secondary:hover:not(:disabled) {
@@ -1153,6 +1157,12 @@ button:disabled {
   background: transparent !important;
   border: 1px solid var(--border-default) !important;
   color: var(--text-primary) !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 }
 
 .btn-default:hover,
@@ -1167,8 +1177,8 @@ button:disabled {
   border: 1px solid var(--accent-primary) !important;
   color: var(--accent-primary) !important;
   font-weight: 600;
-  padding: 9px 18px !important;
-  font-size: 13px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
 }
 
 .btn-primary:hover {

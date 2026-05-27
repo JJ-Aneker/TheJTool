@@ -5,7 +5,7 @@ import {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, HeadingLevel, BorderStyle, WidthType, ShadingType,
   VerticalAlign, SimpleField, TableOfContents, LevelFormat, PageBreak,
-  Header, Footer, TabStopType,
+  Header, Footer, TabStopType, ImageRun, convertInchesToTwip,
 } from 'docx';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
@@ -248,7 +248,125 @@ const PAGE_PROPS = {
 
 // ── SECCIONES DEL DOCUMENTO ───────────────────────────────────────────────────
 
-function buildPortada(d) {
+// Construye portada con imagen PNG flotante (behindDocument: true)
+function buildPortadaWithImage(imgBase64, d) {
+  try {
+    // Limpiar base64 si viene con prefijo data:
+    const cleanBase64 = imgBase64.includes('base64,') ? imgBase64.split('base64,')[1] : imgBase64;
+    const imgBuffer = Buffer.from(cleanBase64, 'base64');
+
+    const titulo = d.proyecto?.titulo || 'Therefore';
+    const subtitulo = d.proyecto?.subtitulo || 'Digital';
+    const cliente = d.cliente?.nombre || 'Cliente';
+    const version = d.proyecto?.version || 'v1.0';
+    const fecha = d.proyecto?.fecha || '';
+
+    return [
+      new Paragraph({
+        children: [
+          new ImageRun({
+            data: imgBuffer,
+            transformation: { width: 794, height: 1123 },
+            floating: {
+              behindDocument: true,
+              allowOverlap: true,
+            },
+          }),
+        ],
+      }),
+      // Espacios para alinear texto en la parte inferior
+      ...Array.from({ length: 16 }, gap),
+      // Texto superpuesto en blanco
+      new Paragraph({
+        indent: { left: 1200 },
+        spacing: { after: 100 },
+        children: [new TextRun({
+          text: sc(titulo),
+          font: F.H1,
+          size: 128, // 64pt en half-points
+          color: C.WHITE,
+          bold: false,
+        })]
+      }),
+      new Paragraph({
+        indent: { left: 1200 },
+        spacing: { after: 100 },
+        children: [new TextRun({
+          text: subtitulo,
+          font: F.BODY,
+          size: 44, // 22pt
+          color: C.WHITE,
+          bold: false,
+        })]
+      }),
+      new Paragraph({
+        indent: { left: 1200 },
+        spacing: { after: 0 },
+        children: [new TextRun({
+          text: `${cliente} · ${version} · ${fecha}`,
+          font: F.BODY,
+          size: 36, // 18pt
+          color: C.WHITE,
+          bold: false,
+        })]
+      }),
+    ];
+  } catch (err) {
+    console.warn('Error inserting portada image:', err.message);
+    // Fallback a portada sin imagen
+    return buildPortada(d, true);
+  }
+}
+
+function buildPortada(d, forceNoImage = false) {
+  // Si hay portada PNG disponible y no se fuerza, usarla
+  if (d.portada?.imgBase64 && !forceNoImage) {
+    return buildPortadaWithImage(d.portada.imgBase64, d);
+  }
+
+  // Fallback: portada con barra roja Canon (si no hay PNG)
+  if (d.useDefaultPortada || !d.portada?.imgBase64) {
+    return [
+      new Table({
+        width: { size: PAGE_W - 2 * MAR_LAT, type: WidthType.DXA },
+        columnWidths: [PAGE_W - 2 * MAR_LAT],
+        rows: [
+          new TableRow({
+            height: { value: 600, rule: 'exact' },
+            children: [
+              new TableCell({
+                width: { size: PAGE_W - 2 * MAR_LAT, type: WidthType.DXA },
+                shading: { fill: C.RED, type: ShadingType.CLEAR },
+                borders: { top: NO_BDR, bottom: NO_BDR, left: NO_BDR, right: NO_BDR },
+                margins: { top: 0, bottom: 0, left: 0, right: 0 },
+                verticalAlign: VerticalAlign.CENTER,
+                children: [
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 0 },
+                    children: [new TextRun({
+                      text: 'CANON',
+                      font: F.H1,
+                      size: 96,
+                      color: C.WHITE,
+                      bold: false,
+                    })]
+                  }),
+                ]
+              })
+            ]
+          })
+        ]
+      }),
+      ...Array.from({ length: 8 }, gap),
+      p(d.proyecto?.titulo || 'Therefore', { font: F.H1, size: 96, color: C.DARK, sa: 0 }),
+      p(d.proyecto?.subtitulo || 'Digital', { font: F.H1, size: 56, color: C.DARK, sb: 80, sa: 400 }),
+      p(d.proyecto?.descripcion || 'Especificaciones funcionales y diseño técnico', { size: 22, bold: true, sa: 80 }),
+      p(`${d.cliente?.nombre || '<<CLIENTE>>'}  ·  ${d.proyecto?.version || 'v1.0'}  ·  ${d.proyecto?.fecha || ''}`, { size: 18, color: C.GREY, sa: 0 }),
+    ];
+  }
+
+  // Portada original (sin imagen, sin barra roja)
   return [
     ...Array.from({ length: 12 }, gap),
     p(d.proyecto?.titulo || 'Therefore', { font: F.H1, size: 96, color: C.DARK, sa: 0 }),
@@ -765,8 +883,20 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   try {
-    const { projectData } = req.body;
+    const { projectData, portada, useDefaultPortada } = req.body;
     if (!projectData) return res.status(400).json({ error: 'projectData requerido' });
+
+    // Agregar portada a projectData si existe
+    if (portada?.base64) {
+      projectData.portada = {
+        imgBase64: portada.base64,
+        width: portada.width,
+        height: portada.height,
+      };
+    }
+    if (useDefaultPortada) {
+      projectData.useDefaultPortada = true;
+    }
 
     const buffer = await buildDocument(projectData);
     const base64 = buffer.toString('base64');
