@@ -7,6 +7,8 @@ import { callAnthropic } from './anthropicClient.js'
 import { RATIOS } from './_lib/knowledge/ratios.js'
 import { TEXTOS } from './_lib/knowledge/textos_estandar.js'
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js'
+import { EFDT_EJEMPLOS } from './_lib/knowledge/efdt_ejemplos.js'
+import { EFDT_STYLE_GUIDE, QUALITY_CHECKLIST, PROMPTS_ENHANCEMENT } from './_lib/knowledge/efdt_prompts.js'
 
 export const config = { maxDuration: 120 }
 
@@ -165,6 +167,47 @@ Ejemplos:
 - El disclaimer de estimación se aplica globalmente, no por proceso.
 - Los importes se calculan como: (horas / 8) * 800. Ejemplo: 4h = 0,5 días = 400€.
 
+## ESTILOS Y FORMATO DEL DOCUMENTO
+
+### Tipografía y Sentence Case (CRÍTICO)
+Todos los títulos (H1, H2) deben estar en SENTENCE CASE (solo Tungsten Reveal EXT):
+- Correcto: "Estructura documental", "Flujo de trabajo del expediente"
+- Incorrecto: "ESTRUCTURA DOCUMENTAL", "Estructura Documental"
+Implementación: text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+
+### Tablas — Especificación Exacta
+- CONTENT_W = 8504 DXA (margen A4: 1701 DXA cada lado, NO usar 9360 DXA que es error)
+- Texto tablas: Montserrat 7pt (sz:14), color #404040
+- Cabeceras: Fondo #C00000 (Canon red), texto #FFFFFF, Montserrat 7pt bold
+- Filas alternas: #FFFFFF / #F2F2F2
+- Márgenes celda: top 80, bottom 80, left 120, right 120 (no variar)
+- Bordes: SINGLE tamaño 1, color #CCCCCC
+
+### Colores Corporativos
+- Rojo Canon: #C00000 (cabeceras tabla, líneas H1, barra portada)
+- Texto oscuro: #404040 (cuerpo, headings)
+- Gris medio: #7F7F7F (H4, pie de página)
+- Gris claro: #F2F2F2 (filas alternas tabla)
+
+## EJEMPLOS REALES — REFERENCIA DE CALIDAD
+
+### Estructura Típica de Workflow
+${JSON.stringify(EFDT_EJEMPLOS.WORKFLOW_EJEMPLO, null, 2)}
+
+### Categoría Principal Ejemplo
+${JSON.stringify(EFDT_EJEMPLOS.CATEGORIA_EJEMPLO, null, 2)}
+
+### Tabla Maestra Ejemplo
+${JSON.stringify(EFDT_EJEMPLOS.TABLA_MAESTRA_EJEMPLO, null, 2)}
+
+### Estimación Ejemplo
+${JSON.stringify(EFDT_EJEMPLOS.ESTIMACION_EJEMPLO, null, 2)}
+
+## LISTA DE VERIFICACIÓN — CALIDAD DE CONTENIDO
+
+Antes de generar la respuesta, valida que cumple TODOS estos puntos:
+${QUALITY_CHECKLIST.map(item => `- ${item}`).join('\n')}
+
 ## FORMATO DE RESPUESTA
 
 Devuelve ÚNICAMENTE un JSON válido con esta estructura. Sin markdown, sin explicaciones:
@@ -322,7 +365,7 @@ Solo JSON puro, sin texto adicional.`
     const userId = req.headers['x-user-id'] || null
 
     const data = await callAnthropic({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-opus-4-7',
       max_tokens: 6000,
       system: systemPrompt,
       messages: [{ role: 'user', content: userContent }],

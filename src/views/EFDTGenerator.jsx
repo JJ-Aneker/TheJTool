@@ -60,6 +60,9 @@ export default function EFDTGenerator() {
   const [docxFilename, setDocxFilename]         = useState(null)
   const [refinePrompt, setRefinePrompt]         = useState('')
   const [refining, setRefining]                 = useState(false)
+  const [portada, setPortada]                   = useState(null)
+  const [portadaPreview, setPortadaPreview]     = useState(null)
+  const [useDefaultPortada, setUseDefaultPortada] = useState(false)
 
   // ── FILE HANDLING ───────────────────────────────────────────────────────────
   const handleFileAdd = useCallback((file) => {
@@ -82,6 +85,36 @@ export default function EFDTGenerator() {
 
   const removeFile = (uid) => setFiles(prev => prev.filter(f => f.uid !== uid))
 
+  // ── PORTADA HANDLING ────────────────────────────────────────────────────────
+  const handlePortadaUpload = useCallback((file) => {
+    if (file.type !== 'image/png') {
+      message.error('Solo se aceptan archivos PNG para la portada')
+      return false
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const base64 = e.target.result.split(',')[1]
+      const img = new Image()
+      img.onload = () => {
+        if (img.width !== 794 || img.height !== 1123) {
+          message.warning(`Dimensiones detectadas: ${img.width}×${img.height}px. Recomendado: 794×1123px (A4 a 96dpi)`)
+        }
+        setPortada({ name: file.name, base64: e.target.result, width: img.width, height: img.height })
+        setPortadaPreview(e.target.result)
+        setUseDefaultPortada(false)
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+    return false
+  }, [])
+
+  const removePortada = () => {
+    setPortada(null)
+    setPortadaPreview(null)
+  }
+
   // ── ANALYZE ─────────────────────────────────────────────────────────────────
   const handleAnalyze = async () => {
     setAnalyzing(true)
@@ -94,7 +127,9 @@ export default function EFDTGenerator() {
           vertical: vertical || 'generico',
           tipoDoc,
           extraInstructions,
-          files: files.map(f => ({ name: f.name, type: f.type, base64: f.base64, textContent: f.textContent }))
+          files: files.map(f => ({ name: f.name, type: f.type, base64: f.base64, textContent: f.textContent })),
+          portada: portada ? { name: portada.name, base64: portada.base64, width: portada.width, height: portada.height } : null,
+          useDefaultPortada
         })
       })
       const data = await res.json()
@@ -196,7 +231,12 @@ export default function EFDTGenerator() {
       const res = await fetch('/api/build-docx', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectData, tipoDoc })
+        body: JSON.stringify({
+          projectData,
+          tipoDoc,
+          portada: portada ? { base64: portada.base64, width: portada.width, height: portada.height } : null,
+          useDefaultPortada
+        })
       })
       const data = await res.json()
       if (!res.ok || data.error) throw new Error(data.error || 'Error al generar el documento')
@@ -219,6 +259,7 @@ export default function EFDTGenerator() {
     setCurrentStep(0); setFiles([]); setVertical(null); setTipoDoc('efdt')
     setExtraInstructions(''); setAnalysisError(null); setProjectData(null)
     setBuildError(null); setDocxUrl(null); setDocxFilename(null)
+    setPortada(null); setPortadaPreview(null); setUseDefaultPortada(false)
   }
 
   // ── RENDER ──────────────────────────────────────────────────────────────────
@@ -307,6 +348,54 @@ export default function EFDTGenerator() {
                         </button>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Portada panel */}
+            <div className="efdt-panel">
+              <div className="efdt-panel-title">Portada corporativa (PNG)</div>
+              <div className="efdt-panel-body">
+                {portadaPreview ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ border: '1px solid var(--border-default)', borderRadius: 4, overflow: 'hidden', height: 160 }}>
+                      <img src={portadaPreview} alt="Portada preview" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#f5f5f5' }} />
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                      <div>{portada.name}</div>
+                      <div>{portada.width} × {portada.height} px</div>
+                    </div>
+                    <button className="btn-danger" style={{ fontSize: 12 }} onClick={removePortada}>
+                      <DeleteOutlined style={{ marginRight: 4 }} /> Remover portada
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <Dragger
+                      multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
+                      accept=".png" className="efdt-dragger" style={{ padding: '20px' }}
+                    >
+                      <p className="ant-upload-drag-icon">
+                        <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 32 }} />
+                      </p>
+                      <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', margin: '8px 0 4px' }}>
+                        Sube la portada corporativa
+                      </p>
+                      <p style={{ fontSize: 10, color: 'var(--text-secondary)', margin: 0 }}>
+                        PNG · Recomendado: 794 × 1123 px (A4 a 96dpi)
+                      </p>
+                    </Dragger>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input
+                        type="checkbox" id="use-default-portada"
+                        checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      <label htmlFor="use-default-portada" style={{ fontSize: 11, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
+                        Usar portada por defecto (barra roja Canon)
+                      </label>
+                    </div>
                   </div>
                 )}
               </div>
