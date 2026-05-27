@@ -1219,6 +1219,35 @@ button:disabled {
   font-size: 11px !important;
 }
 
+/* Button - Inline / Link style */
+.btn-link {
+  background: transparent !important;
+  border: none !important;
+  color: var(--accent-primary) !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.btn-link.danger {
+  color: var(--accent-error) !important;
+}
+
+.btn-link.danger:hover {
+  color: var(--kpi-red) !important;
+}
+
 /* Form Controls */
 .form-group {
   margin-bottom: 16px;

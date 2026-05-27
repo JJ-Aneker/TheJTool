@@ -110,23 +110,25 @@ export default function TenantManager() {
         const canModify = isOwner || isAdmin
 
         return (
-          <Space size="small" wrap>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <Tooltip title="Abrir en nueva ventana">
-              <Button
-                type="link"
-                size="small"
-                icon={<LinkOutlined />}
+              <button
+                className="btn-link"
                 onClick={() => window.open(record.url, '_blank')}
-              />
+                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <LinkOutlined style={{ fontSize: '12px' }} />
+              </button>
             </Tooltip>
             <Tooltip title={canModify ? 'Editar tenant' : 'Sin permiso'}>
-              <Button
-                type="link"
-                size="small"
-                icon={<EditOutlined />}
+              <button
+                className="btn-link"
                 disabled={!canModify}
                 onClick={() => editTenant(record)}
-              />
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: canModify ? 1 : 0.5, cursor: canModify ? 'pointer' : 'not-allowed' }}
+              >
+                <EditOutlined style={{ fontSize: '12px' }} />
+              </button>
             </Tooltip>
             <Popconfirm
               title="Eliminar tenant"
@@ -136,15 +138,15 @@ export default function TenantManager() {
               cancelText="No"
               disabled={!canModify}
             >
-              <Button
-                type="link"
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
+              <button
+                className="btn-link danger"
                 disabled={!canModify}
-              />
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: canModify ? 1 : 0.5, cursor: canModify ? 'pointer' : 'not-allowed' }}
+              >
+                <DeleteOutlined style={{ fontSize: '12px' }} />
+              </button>
             </Popconfirm>
-          </Space>
+          </div>
         )
       }
     }

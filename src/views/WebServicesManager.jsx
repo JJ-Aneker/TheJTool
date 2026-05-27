@@ -95,23 +95,21 @@ export default function WebServicesManager() {
       key: 'actions',
       width: 100,
       render: (_, record) => (
-        <Space>
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            className="btn-link"
             onClick={() => editService(record)}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
           >
-            Editar
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            icon={<LinkOutlined />}
+            <EditOutlined style={{ fontSize: '12px' }} /> Editar
+          </button>
+          <button
+            className="btn-link"
             onClick={() => testConnection(record)}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
           >
-            Probar
-          </Button>
+            <LinkOutlined style={{ fontSize: '12px' }} /> Probar
+          </button>
           <Popconfirm
             title="Eliminar servicio"
             description="¿Estás seguro de que quieres eliminar este servicio?"
@@ -119,14 +117,14 @@ export default function WebServicesManager() {
             okText="Sí"
             cancelText="No"
           >
-            <Button
-              type="link"
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            />
+            <button
+              className="btn-link danger"
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <DeleteOutlined style={{ fontSize: '12px' }} />
+            </button>
           </Popconfirm>
-        </Space>
+        </div>
       )
     }
   ]

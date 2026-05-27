@@ -566,10 +566,14 @@ export default function ThereforeReporter() {
               <Card key={p.id} className="profile-card" hoverable>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <h3 style={{ margin: 0 }}>{p.nombre}</h3>
-                  <Space size="small">
-                    <Button type="link" size="small" icon={<EditOutlined />} onClick={() => openEditor(p)} />
-                    <Button type="link" size="small" danger icon={<DeleteOutlined />} onClick={() => deleteProfile(p)} />
-                  </Space>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn-link" onClick={() => openEditor(p)} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <EditOutlined style={{ fontSize: '12px' }} />
+                    </button>
+                    <button className="btn-link danger" onClick={() => deleteProfile(p)} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <DeleteOutlined style={{ fontSize: '12px' }} />
+                    </button>
+                  </div>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
                   {tenants.find(t => t.id === p.tenant_id)?.url || '—'}

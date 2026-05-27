@@ -895,7 +895,7 @@ export default function EFormBuilder() {
         open={managerOpen}
         onCancel={() => setManagerOpen(false)}
         width="80%"
-        footer={<Button onClick={() => setManagerOpen(false)}>Cerrar</Button>}
+        footer={<button className="btn-default" onClick={() => setManagerOpen(false)}>Cerrar</button>}
       >
         <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
           {loadingForms ? (
@@ -939,23 +939,23 @@ export default function EFormBuilder() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    <Button
-                      type="primary"
-                      size="small"
+                    <button
+                      className="btn-link"
                       onClick={() => loadFormToEditor(form)}
+                      style={{ color: 'var(--accent-primary)' }}
                     >
                       ✎ Editar
-                    </Button>
-                    <Button
-                      size="small"
+                    </button>
+                    <button
+                      className="btn-link"
                       onClick={() => duplicateForm(form)}
                       title="Duplicar como copia"
                     >
                       📋 Duplicar
-                    </Button>
+                    </button>
                     {form.created_by === user?.id && (
-                      <Button
-                        size="small"
+                      <button
+                        className="btn-link"
                         onClick={async () => {
                           try {
                             await supabase
@@ -970,12 +970,11 @@ export default function EFormBuilder() {
                         }}
                       >
                         {form.compartido ? '🔗 Dejar de compartir' : '🔒 Compartir'}
-                      </Button>
+                      </button>
                     )}
                     {form.created_by === user?.id && (
-                      <Button
-                        danger
-                        size="small"
+                      <button
+                        className="btn-link danger"
                         onClick={async () => {
                           if (window.confirm(`¿Eliminar "${form.name}"?`)) {
                             try {
@@ -989,7 +988,7 @@ export default function EFormBuilder() {
                         }}
                       >
                         ✕
-                      </Button>
+                      </button>
                     )}
                   </div>
                 </div>

@@ -197,25 +197,28 @@ export default function AnthropicPanel() {
                 value={showKey ? 'sk-ant-' + Math.random().toString(36).substring(2, 15) : status.masked}
                 style={{ fontFamily: 'monospace', fontSize: '12px' }}
               />
-              <Button
-                icon={showKey ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+              <button
+                className="btn-link"
                 onClick={() => setShowKey(!showKey)}
-              />
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px' }}
+              >
+                {showKey ? <EyeInvisibleOutlined style={{ fontSize: '12px' }} /> : <EyeOutlined style={{ fontSize: '12px' }} />}
+              </button>
             </div>
           )}
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <Button
-              type="primary"
+            <button
+              className="btn-primary"
               onClick={handleTest}
-              loading={testLoading}
+              disabled={testLoading}
             >
-              Verify API Key
-            </Button>
-            <Button onClick={() => setIsModalVisible(true)}>
+              {testLoading ? '⏳ Testing...' : 'Verify API Key'}
+            </button>
+            <button className="btn-default" onClick={() => setIsModalVisible(true)}>
               Update Key
-            </Button>
+            </button>
           </div>
 
           {/* Test Result */}
@@ -515,14 +518,13 @@ function BalanceCard({ totalCost, budgetLimit, onBudgetChange, availableBalance,
               style={{ flex: 1 }}
             />
             {availableBalance && (
-              <Button
-                type="text"
-                size="small"
+              <button
+                className="btn-link"
                 onClick={() => onAvailableBalanceChange(null)}
-                style={{ color: 'var(--text-secondary)' }}
+                style={{ color: 'var(--text-secondary)', padding: '4px 8px' }}
               >
                 ✕
-              </Button>
+              </button>
             )}
           </div>
 
@@ -538,14 +540,13 @@ function BalanceCard({ totalCost, budgetLimit, onBudgetChange, availableBalance,
               style={{ flex: 1 }}
             />
             {budgetLimit && (
-              <Button
-                type="text"
-                size="small"
+              <button
+                className="btn-link"
                 onClick={() => onBudgetChange(null)}
-                style={{ color: 'var(--text-secondary)' }}
+                style={{ color: 'var(--text-secondary)', padding: '4px 8px' }}
               >
                 ✕
-              </Button>
+              </button>
             )}
           </div>
         </div>

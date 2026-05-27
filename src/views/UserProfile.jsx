@@ -306,23 +306,23 @@ export default function UserProfile() {
                 <Input disabled />
               </Form.Item>
 
-              <Button
-                type="primary"
-                htmlType="submit"
-                block
-                loading={loading}
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={loading}
+                style={{ width: '100%' }}
               >
-                Guardar Cambios
-              </Button>
+                {loading ? '⏳ Guardando...' : 'Guardar Cambios'}
+              </button>
             </Form>
 
-            <Button
-              type="link"
+            <button
+              className="btn-link"
               style={{ marginTop: '16px', display: 'block' }}
               onClick={() => setShowPasswordModal(true)}
             >
               Cambiar Contraseña
-            </Button>
+            </button>
           </Spin>
         )}
       </Modal>
@@ -369,14 +369,14 @@ export default function UserProfile() {
               <Input.Password placeholder="Repite la contraseña" />
             </Form.Item>
 
-            <Button
-              type="primary"
-              htmlType="submit"
-              block
-              loading={loading}
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading}
+              style={{ width: '100%' }}
             >
-              Cambiar Contraseña
-            </Button>
+              {loading ? '⏳ Cambiando...' : 'Cambiar Contraseña'}
+            </button>
           </Form>
         </Spin>
       </Modal>

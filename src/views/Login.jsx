@@ -104,16 +104,14 @@ export default function Login() {
         </Form.Item>
 
         <Form.Item style={{ marginBottom: '16px' }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            block
-            loading={loading}
-            style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={loading}
+            style={{ height: '40px', fontSize: '14px', fontWeight: '600', width: '100%' }}
           >
-            Entrar
-          </Button>
+            {loading ? '⏳ Entrando...' : 'Entrar'}
+          </button>
         </Form.Item>
 
         <div style={{ textAlign: 'center', fontSize: '13px' }}>
@@ -225,16 +223,14 @@ export default function Login() {
         </Form.Item>
 
         <Form.Item style={{ marginBottom: '16px' }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            block
-            loading={loading}
-            style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={loading}
+            style={{ height: '40px', fontSize: '14px', fontWeight: '600', width: '100%' }}
           >
-            Crear cuenta
-          </Button>
+            {loading ? '⏳ Creando...' : 'Crear cuenta'}
+          </button>
         </Form.Item>
 
         <div style={{ textAlign: 'center', fontSize: '13px' }}>
@@ -280,16 +276,14 @@ export default function Login() {
         </Form.Item>
 
         <Form.Item style={{ marginBottom: '16px' }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            block
-            loading={loading}
-            style={{ height: '40px', fontSize: '14px', fontWeight: '600' }}
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={loading}
+            style={{ height: '40px', fontSize: '14px', fontWeight: '600', width: '100%' }}
           >
-            Enviar enlace
-          </Button>
+            {loading ? '⏳ Enviando...' : 'Enviar enlace'}
+          </button>
         </Form.Item>
 
         <div style={{ textAlign: 'center', fontSize: '13px' }}>

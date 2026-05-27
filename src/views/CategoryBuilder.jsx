@@ -3596,11 +3596,11 @@ export default function CategoryBuilder() {
               {
                 title: 'Acciones', key: 'actions', width: '15%',
                 render: (_, record) => (
-                  <Space size="small">
-                    <Button size="small" onClick={() => loadTemplate(record)}>Cargar</Button>
-                    <Button size="small" onClick={() => downloadTemplate(record)}>Descar</Button>
-                    <Button danger size="small" onClick={() => deleteTemplate(record.id)}>✕</Button>
-                  </Space>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn-link" onClick={() => loadTemplate(record)}>Cargar</button>
+                    <button className="btn-link" onClick={() => downloadTemplate(record)}>Descar</button>
+                    <button className="btn-link danger" onClick={() => deleteTemplate(record.id)}>✕</button>
+                  </div>
                 )
               }
             ]}

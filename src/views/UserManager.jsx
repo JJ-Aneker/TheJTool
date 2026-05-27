@@ -117,22 +117,24 @@ export default function UserManager() {
       fixed: 'right',
       width: 100,
       render: (_, record) => (
-        <Space>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <Tooltip title="Editar usuario">
-            <Button
-              type="link"
-              size="small"
-              icon={<EditOutlined />}
+            <button
+              className="btn-link"
               onClick={() => editUser(record)}
-            />
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <EditOutlined style={{ fontSize: '12px' }} />
+            </button>
           </Tooltip>
           <Tooltip title="Cambiar contraseña">
-            <Button
-              type="link"
-              size="small"
-              icon={<LockOutlined />}
+            <button
+              className="btn-link"
               onClick={() => showPasswordReset(record)}
-            />
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <LockOutlined style={{ fontSize: '12px' }} />
+            </button>
           </Tooltip>
           <Popconfirm
             title="Eliminar usuario"
@@ -141,14 +143,14 @@ export default function UserManager() {
             okText="Sí"
             cancelText="No"
           >
-            <Button
-              type="link"
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            />
+            <button
+              className="btn-link danger"
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <DeleteOutlined style={{ fontSize: '12px' }} />
+            </button>
           </Popconfirm>
-        </Space>
+        </div>
       )
     }
   ]

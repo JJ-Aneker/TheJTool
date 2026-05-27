@@ -122,40 +122,45 @@ export default function EFormManager() {
       key: 'actions',
       width: '15%',
       render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="primary"
-            size="small"
-            icon={<EditOutlined />}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            className="btn-link"
             onClick={() => {
-              // TODO: Load form into EFormBuilder for editing
               message.info('Función en desarrollo')
             }}
             title="Editar"
-          />
-          <Button
-            size="small"
-            icon={<CopyOutlined />}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--accent-primary)' }}
+          >
+            <EditOutlined style={{ fontSize: '12px' }} />
+          </button>
+          <button
+            className="btn-link"
             onClick={() => handleDuplicate(record)}
             title="Duplicar"
-          />
-          <Button
-            size="small"
-            icon={<DownloadOutlined />}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            <CopyOutlined style={{ fontSize: '12px' }} />
+          </button>
+          <button
+            className="btn-link"
             onClick={() => handleDownload(record)}
             title="Descargar XML"
-          />
-          <Button
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            <DownloadOutlined style={{ fontSize: '12px' }} />
+          </button>
+          <button
+            className="btn-link danger"
             onClick={() => {
               setSelectedForm(record)
               setDeleteModalOpen(true)
             }}
             title="Eliminar"
-          />
-        </Space>
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            <DeleteOutlined style={{ fontSize: '12px' }} />
+          </button>
+        </div>
       )
     }
   ]
