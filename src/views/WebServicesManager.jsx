@@ -72,15 +72,16 @@ export default function WebServicesManager() {
           <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>
             {showPassword[record.id] ? text : '••••••••'}
           </span>
-          <Button
-            type="text"
-            size="small"
-            icon={showPassword[record.id] ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          <button
+            className="btn-link"
             onClick={() => setShowPassword({
               ...showPassword,
               [record.id]: !showPassword[record.id]
             })}
-          />
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px' }}
+          >
+            {showPassword[record.id] ? <EyeInvisibleOutlined style={{ fontSize: '12px' }} /> : <EyeOutlined style={{ fontSize: '12px' }} />}
+          </button>
         </Space>
       )
     },

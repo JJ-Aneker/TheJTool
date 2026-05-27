@@ -302,7 +302,9 @@ export default function EFDTGenerator() {
                         {getFileIcon(f.type)}
                         <span className="efdt-file-name">{f.name}</span>
                         <span className="efdt-file-size">{(f.size / 1024).toFixed(0)}KB</span>
-                        <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => removeFile(f.uid)} />
+                        <button className="btn-link danger" onClick={() => removeFile(f.uid)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px' }}>
+                          <DeleteOutlined style={{ fontSize: '12px' }} />
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -357,15 +359,14 @@ export default function EFDTGenerator() {
           {analysisError && <Alert type="error" message={analysisError} showIcon style={{ margin: '0 0 16px' }} />}
 
           <div className="efdt-actions">
-            <Button
-              type="primary" size="large"
-              icon={analyzing ? <Spin size="small" /> : <RobotOutlined />}
+            <button
+              className="btn-primary"
               onClick={handleAnalyze}
               disabled={analyzing || (files.length === 0 && !extraInstructions.trim())}
-              className="efdt-btn-primary"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}
             >
-              {analyzing ? 'Analizando briefing...' : 'Analizar y extraer datos'}
-            </Button>
+              {analyzing ? '⏳ Analizando briefing...' : '🤖 Analizar y extraer datos'}
+            </button>
             <Text style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
               {files.length === 0 && !extraInstructions ? 'Añade documentos o instrucciones para continuar' : `${files.length} fichero${files.length !== 1 ? 's' : ''} · vertical: ${vertical || 'auto-detectar'}`}
             </Text>
@@ -553,10 +554,13 @@ export default function EFDTGenerator() {
                           />
                         </td>
                         <td>
-                          <Button
-                            size="small" danger type="text" icon={<DeleteOutlined />}
+                          <button
+                            className="btn-link danger"
                             onClick={() => removeTarea(i)}
-                          />
+                            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px' }}
+                          >
+                            <DeleteOutlined style={{ fontSize: '12px' }} />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -578,12 +582,13 @@ export default function EFDTGenerator() {
                   </tfoot>
                 </table>
               </div>
-              <Button
-                size="small" icon={<PlusOutlined />} onClick={addTarea}
-                style={{ marginTop: 10 }}
+              <button
+                className="btn-default"
+                onClick={addTarea}
+                style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                Añadir tarea
-              </Button>
+                <PlusOutlined style={{ fontSize: '12px' }} /> Añadir tarea
+              </button>
             </Panel>
 
             {/* ── ESTRUCTURA ── */}
@@ -638,30 +643,35 @@ export default function EFDTGenerator() {
                 placeholder={`Ej: "Reduce la estimación a un máximo de 8 días", "El cliente tiene 3 CIFs, actualiza las premisas", "Añade un workflow de escalado por vencimiento", "La fecha es 20.05.2026"...`}
                 rows={3} style={{ fontSize: 12 }}
               />
-              <Button
-                type="default" icon={refining ? <Spin size="small" /> : <RobotOutlined />}
-                onClick={handleRefine} disabled={refining || !refinePrompt.trim()}
-                style={{ marginTop: 8 }}
+              <button
+                className="btn-default"
+                onClick={handleRefine}
+                disabled={refining || !refinePrompt.trim()}
+                style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                {refining ? 'Ajustando...' : 'Aplicar ajustes con IA'}
-              </Button>
+                {refining ? '⏳ Ajustando...' : '🤖 Aplicar ajustes con IA'}
+              </button>
             </div>
           </div>
 
           {buildError && <Alert type="error" message={buildError} showIcon style={{ margin: '12px 0 0' }} />}
 
-          <div className="efdt-actions" style={{ marginTop: 16 }}>
-            <Button size="large" icon={<ReloadOutlined />} onClick={() => setCurrentStep(0)}>
-              Volver
-            </Button>
-            <Button
-              type="primary" size="large"
-              icon={building ? <Spin size="small" /> : <FileTextOutlined />}
-              onClick={handleBuildDocx} disabled={building}
-              className="efdt-btn-primary"
+          <div className="efdt-actions" style={{ marginTop: 16, display: 'flex', gap: '12px' }}>
+            <button
+              className="btn-default"
+              onClick={() => setCurrentStep(0)}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '12px 20px', fontSize: '14px' }}
             >
-              {building ? 'Generando documento...' : 'Generar documento Word'}
-            </Button>
+              <ReloadOutlined style={{ fontSize: '14px' }} /> Volver
+            </button>
+            <button
+              className="btn-primary"
+              onClick={handleBuildDocx}
+              disabled={building}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '12px 20px', fontSize: '14px' }}
+            >
+              {building ? '⏳ Generando documento...' : '📄 Generar documento Word'}
+            </button>
           </div>
         </div>
       )}
@@ -678,16 +688,16 @@ export default function EFDTGenerator() {
               {docxFilename}
             </Text>
 
-            <Space direction="vertical" style={{ width: '100%', maxWidth: 400 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: 400 }}>
               <a href={docxUrl} download={docxFilename} style={{ display: 'block' }}>
-                <Button type="primary" size="large" icon={<DownloadOutlined />} block className="efdt-btn-primary">
-                  Descargar {docxFilename}
-                </Button>
+                <button className="btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}>
+                  <DownloadOutlined style={{ fontSize: '14px' }} /> Descargar {docxFilename}
+                </button>
               </a>
-              <Button size="large" icon={<ReloadOutlined />} onClick={handleReset} block>
-                Generar otro documento
-              </Button>
-            </Space>
+              <button className="btn-default" onClick={handleReset} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}>
+                <ReloadOutlined style={{ fontSize: '14px' }} /> Generar otro documento
+              </button>
+            </div>
 
             <div className="efdt-post-download-tips">
               <Text strong style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>Pasos finales en Word:</Text>

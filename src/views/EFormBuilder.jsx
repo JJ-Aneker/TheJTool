@@ -1006,10 +1006,10 @@ export default function EFormBuilder() {
         width="90%"
         style={{ maxWidth: '1200px' }}
         footer={[
-          <Button key="close" onClick={() => setXmlModalOpen(false)}>Cerrar</Button>,
-          <Button key="copy" type="primary" onClick={copy}>{copied ? '✓ Copiado' : '📋 Copiar XML'}</Button>,
-          <Button key="download" type="primary" onClick={download}>⬇ Descargar .xml</Button>,
-          <Button key="supabase" type="primary" onClick={saveToSupabase} loading={saving}>💾 Guardar en Supabase</Button>,
+          <button key="close" className="btn-default" onClick={() => setXmlModalOpen(false)} style={{ padding: '9px 18px' }}>Cerrar</button>,
+          <button key="copy" className="btn-primary" onClick={copy} style={{ padding: '9px 18px' }}>{copied ? '✓ Copiado' : '📋 Copiar XML'}</button>,
+          <button key="download" className="btn-primary" onClick={download} style={{ padding: '9px 18px' }}>⬇ Descargar .xml</button>,
+          <button key="supabase" className="btn-primary" onClick={saveToSupabase} disabled={saving} style={{ padding: '9px 18px' }}>💾 {saving ? 'Guardando...' : 'Guardar en Supabase'}</button>,
         ]}
       >
         <div className="eform-xml-modal-content">

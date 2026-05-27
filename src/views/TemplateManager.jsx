@@ -65,23 +65,21 @@ export default function TemplateManager() {
       key: 'actions',
       width: 200,
       render: (_, record) => (
-        <Space>
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            className="btn-link"
             onClick={() => editTemplate(record)}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
           >
-            Editar
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            icon={<DownloadOutlined />}
+            <EditOutlined style={{ fontSize: '12px' }} /> Editar
+          </button>
+          <button
+            className="btn-link"
             onClick={() => downloadTemplate(record)}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
           >
-            Descargar
-          </Button>
+            <DownloadOutlined style={{ fontSize: '12px' }} /> Descargar
+          </button>
           <Popconfirm
             title="Eliminar template"
             description="¿Estás seguro de que quieres eliminar este template?"
@@ -89,14 +87,14 @@ export default function TemplateManager() {
             okText="Sí"
             cancelText="No"
           >
-            <Button
-              type="link"
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            />
+            <button
+              className="btn-link danger"
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <DeleteOutlined style={{ fontSize: '12px' }} />
+            </button>
           </Popconfirm>
-        </Space>
+        </div>
       )
     }
   ]

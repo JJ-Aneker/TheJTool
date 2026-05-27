@@ -701,13 +701,13 @@ function EditorView(props) {
             />
           </div>
 
-          <Space size="small" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-            <Button size="small" onClick={onCancel}>Cancelar</Button>
-            <Button size="small" type="primary" loading={loading} onClick={onSave}>💾 Guardar</Button>
-            <Button size="small" loading={loading} onClick={onConnect} type="primary">
-              🔗 Conectar
-            </Button>
-          </Space>
+          <div style={{ display: 'flex', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <button className="btn-default" onClick={onCancel} disabled={loading}>Cancelar</button>
+            <button className="btn-primary" onClick={onSave} disabled={loading}>💾 {loading ? 'Guardando...' : 'Guardar'}</button>
+            <button className="btn-primary" onClick={onConnect} disabled={loading}>
+              🔗 {loading ? 'Conectando...' : 'Conectar'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -848,9 +848,11 @@ function ResultsView(props) {
 
           {/* Botones */}
           <div style={{ display: 'flex', gap: '8px', whiteSpace: 'nowrap' }}>
-            <Button icon={<ArrowLeftOutlined />} onClick={onBack}>Volver</Button>
-            <Button type="primary" onClick={onRun} loading={loading}>▶ Ejecutar</Button>
-            <Button onClick={onExport} type="default">⬇ CSV</Button>
+            <button className="btn-default" onClick={onBack} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <ArrowLeftOutlined style={{ fontSize: '12px' }} /> Volver
+            </button>
+            <button className="btn-primary" onClick={onRun} disabled={loading}>▶ {loading ? 'Ejecutando...' : 'Ejecutar'}</button>
+            <button className="btn-default" onClick={onExport} disabled={loading}>⬇ CSV</button>
           </div>
         </div>
 
@@ -964,13 +966,13 @@ function DashboardView(props) {
 
       {/* Detail toggle */}
       <div style={{ marginTop: '20px' }}>
-        <Button
+        <button
+          className="btn-default"
           onClick={() => setShowDetail(!showDetail)}
-          block
-          style={{ marginBottom: '10px' }}
+          style={{ width: '100%', marginBottom: '10px' }}
         >
           {showDetail ? '▼' : '▶'} {showDetail ? 'Ocultar' : 'Ver'} detalle ({rows.length.toLocaleString('es-ES')} registros)
-        </Button>
+        </button>
 
         {showDetail && (
           <div style={{ overflowX: 'auto', marginBottom: '10px' }}>
