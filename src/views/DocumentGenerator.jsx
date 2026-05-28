@@ -280,10 +280,10 @@ export default function DocumentGenerator() {
       {/* Header */}
       <div className="efdt-header">
         <div className="efdt-header-left">
-          <div className="efdt-logo-icon"><ThunderboltOutlined /></div>
-          <div>
-            <div className="header-title">Generador de Documentación</div>
-            <div className="efdt-subtitle">{tipoDoc && DOCUMENT_TYPES[tipoDoc] ? DOCUMENT_TYPES[tipoDoc].description : 'Genera documentos profesionales desde briefing'}</div>
+          <div className="efdt-logo-icon"><FileTextOutlined /></div>
+          <div className="efdt-header-content">
+            <div className="efdt-header-title">Generador de Documentación</div>
+            <div className="efdt-header-subtitle">{tipoDoc && DOCUMENT_TYPES[tipoDoc] ? DOCUMENT_TYPES[tipoDoc].description : 'Genera documentos profesionales desde briefing'}</div>
           </div>
         </div>
       </div>

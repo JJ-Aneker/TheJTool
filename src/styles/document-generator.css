@@ -30,29 +30,33 @@
 }
 
 .efdt-logo-icon {
-  width: 36px;
-  height: 36px;
-  background: var(--accent-error);
-  border-radius: var(--radius-md);
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 18px;
+  color: var(--text-primary);
+  font-size: 20px;
   flex-shrink: 0;
 }
 
-.efdt-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent-primary);
+.efdt-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.efdt-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
   margin: 0;
 }
 
-.efdt-subtitle {
+.efdt-header-subtitle {
   font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 4px;
+  margin: 0;
 }
 
 /* ── PROGRESS BAR ──────────────────────────────────────────────────────────────── */
