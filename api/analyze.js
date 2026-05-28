@@ -374,7 +374,7 @@ Solo JSON puro, sin texto adicional.`
 
     const data = await callAnthropic({
       model: 'claude-opus-4-7',
-      max_tokens: 8000,  // Increased from 6000 to allow longer JSON responses
+      max_tokens: 16000,  // Increased to handle complex project briefs with detailed analysis
       system: systemPrompt,
       messages: [{ role: 'user', content: userContent }],
     }, {
