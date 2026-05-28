@@ -399,14 +399,42 @@ Solo JSON puro, sin texto adicional.`
         }
       }
 
-      projectData = JSON.parse(clean)
+      // Intentar parsear
+      try {
+        projectData = JSON.parse(clean)
+      } catch (parseError) {
+        // Si falla, intentar limpiar caracteres problemáticos
+        // Remover caracteres de control y comillas desordenadas
+        clean = clean
+          .replace(/[\x00-\x1F\x7F]/g, ' ')  // Control characters
+          .replace(/(\r\n|\r|\n)/g, ' ')      // Newlines
+          .replace(/"/g, '"')                  // Normalize quotes
+          .replace(/"/g, '"')
+          .replace(/'/g, "'")
+          .replace(/—/g, '-')                  // Em-dash to dash
+
+        projectData = JSON.parse(clean)
+      }
     } catch (e) {
       console.error('Parse error:', e.message)
       console.error('Raw response:', rawText.substring(0, 1000))
-      return res.status(500).json({
-        error: 'Error al parsear respuesta de Claude: ' + e.message,
-        raw: rawText.substring(0, 500),
-      })
+
+      // Como último recurso, intentar extraer datos manuales del JSON parcial
+      try {
+        // Encontrar el último } válido y corttar ahí
+        let lastBrace = clean.lastIndexOf('}')
+        if (lastBrace > 0) {
+          let trimmed = clean.substring(0, lastBrace + 1)
+          projectData = JSON.parse(trimmed)
+        } else {
+          throw e
+        }
+      } catch (fallbackError) {
+        return res.status(500).json({
+          error: 'Error al parsear respuesta de Claude: ' + e.message,
+          raw: rawText.substring(0, 500),
+        })
+      }
     }
 
     projectData.meta = projectData.meta || {}
