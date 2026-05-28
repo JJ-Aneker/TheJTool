@@ -393,9 +393,9 @@ function buildFicha(d) {
   const c1 = Math.round(CONTENT_W * 0.32);
   const c2 = CONTENT_W - c1;
   const fichaRows = [
-    ['Título de documento',         d.proyecto?.descripcion || ''],
+    ['Título de documento',         d.proyecto?.titulo || ''],
     ['Fecha del documento',         d.proyecto?.fecha || ''],
-    ['Proyecto',                    d.proyecto?.titulo || ''],
+    ['Proyecto',                    d.proyecto?.descripcion || ''],
     ['Autor/es del documento',      'Jose-Juan Jiménez-Requena'],
     ['Cliente',                     d.cliente?.razonSocial || d.cliente?.nombre || '<<CLIENTE>>'],
     ['Interlocutor/es del cliente', d.cliente?.interlocutor || '<<INTERLOCUTOR>>'],
@@ -465,8 +465,9 @@ function buildIntroduccion(d) {
   ];
 }
 
-function buildDefinicion(d) {
+function buildDefinicion(d, tipoDoc = 'efdt') {
   const elements = [h1('Definición del proyecto')];
+  const isEFDT = tipoDoc === 'efdt';
 
   // Categorías principales
   if (d.estructura?.categoriasPrincipales?.length > 0) {
@@ -475,8 +476,8 @@ function buildDefinicion(d) {
       elements.push(h3(cat.nombre));
       if (cat.descripcion) elements.push(...parseTextWithImages(cat.descripcion));
 
-      // Tabla de campos si hay
-      if (cat.campos?.length > 0) {
+      // Tabla de campos SOLO para EFDT
+      if (isEFDT && cat.campos?.length > 0) {
         const c1 = Math.round(CONTENT_W * 0.35);
         const c2 = Math.round(CONTENT_W * 0.20);
         const c3 = CONTENT_W - c1 - c2;
@@ -502,8 +503,8 @@ function buildDefinicion(d) {
     }
   }
 
-  // Tablas maestras
-  if (d.estructura?.tablasMaestras?.length > 0) {
+  // Tablas maestras - SOLO para EFDT
+  if (isEFDT && d.estructura?.tablasMaestras?.length > 0) {
     elements.push(h2('Tablas maestras (master data)'));
     const vertData = VERTICALES[d.proyecto?.vertical];
     if (vertData?.tablas_maestras?.length > 0 || vertData?.tablasMaestras?.length > 0) {
@@ -519,8 +520,8 @@ function buildDefinicion(d) {
     elements.push(gap());
   }
 
-  // Workflows
-  if (d.estructura?.workflows?.length > 0) {
+  // Workflows - SOLO para EFDT
+  if (isEFDT && d.estructura?.workflows?.length > 0) {
     elements.push(h2('Flujos de trabajo'));
     elements.push(p('Los flujos de trabajo constituyen un elemento clave dentro del sistema, permitiendo automatizar los procesos asociados al ciclo de vida documental, garantizando la coherencia, trazabilidad y cumplimiento de los procedimientos internos.'));
     elements.push(gap());
@@ -783,6 +784,7 @@ function emptyFooter() {
 // ── DOCUMENT BUILDER ──────────────────────────────────────────────────────────
 async function buildDocument(projectData) {
   const d = projectData;
+  const tipoDoc = d.tipoDoc || 'efdt';
   const cabecera = d.proyecto?.cabecera || d.proyecto?.titulo || 'Therefore™';
 
   const doc = new Document({
@@ -845,7 +847,7 @@ async function buildDocument(projectData) {
           pageBreak(),
           ...buildIntroduccion(d),
           pageBreak(),
-          ...buildDefinicion(d),
+          ...buildDefinicion(d, tipoDoc),
           pageBreak(),
           ...buildLicencias(d),
           pageBreak(),
@@ -883,7 +885,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   try {
-    const { projectData, portada, useDefaultPortada } = req.body;
+    const { projectData, tipoDoc, portada, useDefaultPortada } = req.body;
     if (!projectData) return res.status(400).json({ error: 'projectData requerido' });
 
     // Agregar portada a projectData si existe
@@ -896,6 +898,9 @@ export default async function handler(req, res) {
     }
     if (useDefaultPortada) {
       projectData.useDefaultPortada = true;
+    }
+    if (tipoDoc) {
+      projectData.tipoDoc = tipoDoc;
     }
 
     const buffer = await buildDocument(projectData);
