@@ -61,6 +61,8 @@ export default function DocumentGenerator() {
   const [portada, setPortada]                   = useState(null)
   const [portadaPreview, setPortadaPreview]     = useState(null)
   const [useDefaultPortada, setUseDefaultPortada] = useState(false)
+  const [portadaDragActive, setPortadaDragActive] = useState(false)
+  const [filesDragActive, setFilesDragActive]   = useState(false)
 
   // ── FILE HANDLING ───────────────────────────────────────────────────────────
   const handleFileAdd = useCallback((file) => {
@@ -399,7 +401,11 @@ export default function DocumentGenerator() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <Dragger
                       multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
-                      accept=".png" className="efdt-dragger" style={{ padding: '8px' }}
+                      accept=".png" className={`efdt-dragger ${portadaDragActive ? 'efdt-dragger-active' : ''}`}
+                      style={{ padding: '8px' }}
+                      onDragEnter={() => setPortadaDragActive(true)}
+                      onDragLeave={() => setPortadaDragActive(false)}
+                      onDrop={() => setPortadaDragActive(false)}
                     >
                       <p className="ant-upload-drag-icon">
                         <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 18 }} />
@@ -429,7 +435,11 @@ export default function DocumentGenerator() {
               <div className="efdt-panel-body" style={{ gap: 6 }}>
                 <Dragger
                   multiple beforeUpload={handleFileAdd} showUploadList={false}
-                  accept=".pdf,.docx,.doc,.txt,.html,.eml" className="efdt-dragger" style={{ padding: '8px' }}
+                  accept=".pdf,.docx,.doc,.txt,.html,.eml" className={`efdt-dragger ${filesDragActive ? 'efdt-dragger-active' : ''}`}
+                  style={{ padding: '8px' }}
+                  onDragEnter={() => setFilesDragActive(true)}
+                  onDragLeave={() => setFilesDragActive(false)}
+                  onDrop={() => setFilesDragActive(false)}
                 >
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 18 }} />
