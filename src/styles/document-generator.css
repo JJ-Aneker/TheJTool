@@ -104,9 +104,36 @@
   gap: 12px;
 }
 
+/* Briefing step grid - asymmetric layout */
+.efdt-grid-briefing {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.efdt-panel-config {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+.efdt-panel-portada-mini {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.efdt-panel-files {
+  grid-column: 2;
+  grid-row: 2;
+}
+
 @media (max-width: 900px) {
   .efdt-grid-2 { grid-template-columns: 1fr; }
   .efdt-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .efdt-grid-briefing { grid-template-columns: 1fr; }
+  .efdt-panel-config { grid-column: 1; grid-row: auto; }
+  .efdt-panel-portada-mini { grid-column: 1; grid-row: auto; }
+  .efdt-panel-files { grid-column: 1; grid-row: auto; }
 }
 
 /* ── PANEL / CARD ─────────────────────────────────────────────────────────────── */
