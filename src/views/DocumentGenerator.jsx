@@ -47,6 +47,7 @@ export default function DocumentGenerator() {
   const [files, setFiles]                       = useState([])
   const [vertical, setVertical]                 = useState(null)
   const [tipoDoc, setTipoDoc]                   = useState('efdt')
+  const [otrosDocDescription, setOtrosDocDescription] = useState('')
   const [extraInstructions, setExtraInstructions] = useState('')
   const [analyzing, setAnalyzing]               = useState(false)
   const [analysisProgress, setAnalysisProgress] = useState(0)
@@ -117,6 +118,11 @@ export default function DocumentGenerator() {
 
   // ── ANALYZE ─────────────────────────────────────────────────────────────────
   const handleAnalyze = async () => {
+    if (tipoDoc === 'otros' && !otrosDocDescription.trim()) {
+      setAnalysisError('Por favor describe qué tipo de documento necesitas generar')
+      return
+    }
+
     setAnalyzing(true)
     setAnalysisProgress(0)
     setAnalysisError(null)
@@ -128,6 +134,10 @@ export default function DocumentGenerator() {
       })
     }, 300)
 
+    const finalInstructions = tipoDoc === 'otros'
+      ? `TIPO DE DOCUMENTO PERSONALIZADO: ${otrosDocDescription}\n\n${extraInstructions}`
+      : extraInstructions
+
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -135,7 +145,7 @@ export default function DocumentGenerator() {
         body: JSON.stringify({
           vertical: vertical || 'generico',
           tipoDoc,
-          extraInstructions,
+          extraInstructions: finalInstructions,
           files: files.map(f => ({ name: f.name, type: f.type, base64: f.base64, textContent: f.textContent })),
           portada: portada ? { name: portada.name, base64: portada.base64, width: portada.width, height: portada.height } : null,
           useDefaultPortada
@@ -306,7 +316,7 @@ export default function DocumentGenerator() {
             <button
               className="btn-primary"
               onClick={handleAnalyze}
-              disabled={analyzing || (files.length === 0 && !extraInstructions.trim())}
+              disabled={analyzing || (files.length === 0 && !extraInstructions.trim()) || (tipoDoc === 'otros' && !otrosDocDescription.trim())}
               style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', fontSize: '13px' }}
             >
               {analyzing ? '⏳ Analizando...' : '🤖 Analizar briefing'}
@@ -337,7 +347,23 @@ export default function DocumentGenerator() {
                       </Option>
                     ))}
                   </Select>
+                  <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: '6px', padding: '8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
+                    {DOCUMENT_TYPES[tipoDoc]?.description}
+                  </div>
                 </div>
+
+                {tipoDoc === 'otros' && (
+                  <div className="efdt-field">
+                    <label>Describe el tipo de documento que necesitas</label>
+                    <TextArea
+                      value={otrosDocDescription}
+                      onChange={e => setOtrosDocDescription(e.target.value)}
+                      placeholder="Ej: Propuesta técnica para migración de datos, Manual de usuario, Plan de testing, Documento de riesgos, etc."
+                      rows={3}
+                      style={{ fontSize: 12 }}
+                    />
+                  </div>
+                )}
 
                 <div className="efdt-field">
                   <label>Vertical del proyecto</label>

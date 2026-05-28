@@ -50,6 +50,16 @@ export const DOCUMENT_TYPES = {
     sections: ['cambios_solicitados', 'impacto', 'estimacion', 'riesgos'],
     tipoDuracion: '1-20 días (CR: 1-5, Evolutivo: 5-20)',
     color: '#722ED1'
+  },
+
+  otros: {
+    id: 'otros',
+    label: 'Otros documentos...',
+    description: 'Define qué tipo de documento necesitas generar',
+    icon: '📄',
+    sections: [],
+    tipoDuracion: 'Variable',
+    color: '#8C8C8C'
   }
 }
 
