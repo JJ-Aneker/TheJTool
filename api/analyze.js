@@ -94,10 +94,12 @@ Tu tarea es analizar los documentos de briefing del cliente y extraer de forma e
 
 El Análisis de Requerimientos captura los REQUERIMIENTOS del cliente ANTES de escribir la EFDT (que describe CÓMO se hace).
 
+IMPORTANTE - Firma Biométrica: Cuando el cliente mencione "firma biométrica" o similar, NO se refiere solo al hardware lector. Se refiere al PROCESO completo de firma digital utilizando autenticación biométrica (huella, facial, iris). Incluir requisitos de: autenticación biométrica, trazabilidad en auditoría, seguridad de datos biométricos, cumplimiento normativo (RGPD, leyes de firma digital).
+
 Estructura esperada:
 - Contexto: Cliente, escala, timeline, usuarios
-- Requerimientos Funcionales (RF-xxx): Qué debe hacer el sistema
-- Requerimientos Técnicos (RT-xxx): Integraciones, performance, disponibilidad
+- Requerimientos Funcionales (RF-xxx): Qué debe hacer el sistema (incluir procesos de firma)
+- Requerimientos Técnicos (RT-xxx): Integraciones, performance, disponibilidad, seguridad biométrica
 - Requerimientos de Datos: Volúmenes, origen, frecuencia
 - Criterios de Aceptación: Escenarios testables
 - Supuestos y Riesgos: Qué asumimos, qué puede salir mal`
@@ -160,11 +162,15 @@ Tu tarea es analizar los documentos de briefing del cliente y extraer toda la in
 
 La EFDT describe CÓMO se implementa exactamente la solución Therefore™.
 
+IMPORTANTE - Tareas de Estimación: Cada tarea DEBE tener una descripción clara y detallada. NO listar solo números. Las tareas deben ser específicas: "Análisis funcional", "Configuración de categoría Contratos", "Diseño de workflow Aprobación + Firma", etc.
+
+IMPORTANTE - Firma Biométrica: Cuando se mencione "firma biométrica", incluir como tareas separadas: "Integración con sistema de firma digital", "Validación de datos biométricos", "Auditoría y logs de firma biométrica", "Conformidad normativa". No confundir con solo "lector biométrico".
+
 Estructura esperada:
 - Cliente y proyecto: Contexto, verticales, timing
 - Alcance: Qué se incluye, qué no
 - Estructura: Categorías, campos, tablas maestras, workflows
-- Estimación: Desglose por tarea, ratios validados
+- Estimación: Desglose por tarea (CON descripción detallada), ratios validados
 - Riesgos y supuestos: Qué asumimos, qué puede salir mal`
   }
 
@@ -251,7 +257,10 @@ ${JSON.stringify(
     alcance: { descripcionGeneral: '', clavesProyecto: [], exclusiones: [] },
     estructura: { categoriasPrincipales: [], tablasMaestras: [], workflows: [] },
     licencias: { servidor: 1, concurrentes: 0, nominativas: 0, readOnly: 0, modulosAdicionales: [] },
-    estimacion: { tareas: [], totalDias: 0, totalHoras: 0, totalImporte: 0, totalConIva: 0, iva: 21 },
+    estimacion: {
+      tareas: [{ descripcion: 'Nombre de la tarea', dias: 1, horas: 8, importe: 800, pendiente: false }],
+      totalDias: 0, totalHoras: 0, totalImporte: 0, totalConIva: 0, iva: 21
+    },
     riesgos: [],
     meta: { datosIncompletos: [], advertencias: [], confianza: '' }
   },
