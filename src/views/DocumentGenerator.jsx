@@ -49,6 +49,7 @@ export default function DocumentGenerator() {
   const [tipoDoc, setTipoDoc]                   = useState('efdt')
   const [extraInstructions, setExtraInstructions] = useState('')
   const [analyzing, setAnalyzing]               = useState(false)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
   const [analysisError, setAnalysisError]       = useState(null)
   const [projectData, setProjectData]           = useState(null)
   const [building, setBuilding]                 = useState(false)
@@ -115,7 +116,16 @@ export default function DocumentGenerator() {
   // ── ANALYZE ─────────────────────────────────────────────────────────────────
   const handleAnalyze = async () => {
     setAnalyzing(true)
+    setAnalysisProgress(0)
     setAnalysisError(null)
+
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        if (prev >= 90) return 90
+        return prev + Math.random() * 20
+      })
+    }, 300)
+
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -129,14 +139,18 @@ export default function DocumentGenerator() {
           useDefaultPortada
         })
       })
+      clearInterval(progressInterval)
+      setAnalysisProgress(100)
       const data = await res.json()
       if (!res.ok || data.error) throw new Error(data.error || 'Error al analizar')
       setProjectData(data.data)
       setCurrentStep(1)
     } catch (err) {
       setAnalysisError(err.message)
+      clearInterval(progressInterval)
     } finally {
       setAnalyzing(false)
+      setTimeout(() => setAnalysisProgress(0), 500)
     }
   }
 
@@ -272,12 +286,14 @@ export default function DocumentGenerator() {
             <div className="efdt-subtitle">{tipoDoc && DOCUMENT_TYPES[tipoDoc] ? DOCUMENT_TYPES[tipoDoc].description : 'Genera documentos profesionales desde briefing'}</div>
           </div>
         </div>
-        <div className="efdt-header-right">
-          <Badge status="processing" />
-          <Text style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 6 }}>Claude Opus 4.7</Text>
-          <Tag color="red" style={{ marginLeft: 8, fontSize: 10 }}>Therefore™</Tag>
-        </div>
       </div>
+
+      {/* Progress bar during analysis */}
+      {analyzing && (
+        <div className="efdt-progress-bar">
+          <div className="efdt-progress-fill" style={{ width: `${analysisProgress}%` }}></div>
+        </div>
+      )}
 
       {/* Steps */}
       <div className="efdt-steps-bar">
@@ -291,6 +307,23 @@ export default function DocumentGenerator() {
       {/* ── STEP 0: BRIEFING ──────────────────────────────────────────────── */}
       {currentStep === 0 && (
         <div className="efdt-content">
+          {/* Top action bar */}
+          <div className="efdt-top-actions">
+            <button
+              className="btn-primary"
+              onClick={handleAnalyze}
+              disabled={analyzing || (files.length === 0 && !extraInstructions.trim())}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', fontSize: '13px' }}
+            >
+              {analyzing ? '⏳ Analizando...' : '🤖 Analizar briefing'}
+            </button>
+            {files.length > 0 && (
+              <Text style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                {files.length} fichero{files.length !== 1 ? 's' : ''} · vertical: {vertical || 'auto-detectar'}
+              </Text>
+            )}
+          </div>
+
           <div className="efdt-grid-2">
 
             {/* Config panel */}
@@ -360,44 +393,44 @@ export default function DocumentGenerator() {
             {/* Portada panel */}
             <div className="efdt-panel">
               <div className="efdt-panel-title">Portada corporativa (PNG)</div>
-              <div className="efdt-panel-body">
+              <div className="efdt-panel-body" style={{ gap: 10 }}>
                 {portadaPreview ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div style={{ border: '1px solid var(--border-default)', borderRadius: 4, overflow: 'hidden', height: 160 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ border: '1px solid var(--border-default)', borderRadius: 4, overflow: 'hidden', height: 100 }}>
                       <img src={portadaPreview} alt="Portada preview" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#f5f5f5' }} />
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>
                       <div>{portada.name}</div>
                       <div>{portada.width} × {portada.height} px</div>
                     </div>
-                    <button className="btn-danger" style={{ fontSize: 12 }} onClick={removePortada}>
-                      <DeleteOutlined style={{ marginRight: 4 }} /> Remover portada
+                    <button className="btn-danger" style={{ fontSize: 11, padding: '6px 8px' }} onClick={removePortada}>
+                      <DeleteOutlined style={{ marginRight: 4 }} /> Remover
                     </button>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <Dragger
                       multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
-                      accept=".png" className="efdt-dragger" style={{ padding: '20px' }}
+                      accept=".png" className="efdt-dragger" style={{ padding: '12px' }}
                     >
                       <p className="ant-upload-drag-icon">
-                        <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 32 }} />
+                        <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 24 }} />
                       </p>
-                      <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', margin: '8px 0 4px' }}>
-                        Sube la portada corporativa
+                      <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', margin: '4px 0 2px' }}>
+                        Sube portada
                       </p>
-                      <p style={{ fontSize: 10, color: 'var(--text-secondary)', margin: 0 }}>
-                        PNG · Recomendado: 794 × 1123 px (A4 a 96dpi)
+                      <p style={{ fontSize: 9, color: 'var(--text-secondary)', margin: 0 }}>
+                        PNG (794×1123px)
                       </p>
                     </Dragger>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <input
                         type="checkbox" id="use-default-portada"
                         checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: 'pointer', width: 14, height: 14 }}
                       />
-                      <label htmlFor="use-default-portada" style={{ fontSize: 11, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
-                        Usar portada por defecto (barra roja Canon)
+                      <label htmlFor="use-default-portada" style={{ fontSize: 10, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
+                        Usar default (roja)
                       </label>
                     </div>
                   </div>
@@ -408,62 +441,47 @@ export default function DocumentGenerator() {
             {/* Upload panel */}
             <div className="efdt-panel">
               <div className="efdt-panel-title">Documentos de briefing</div>
-              <div className="efdt-panel-body">
+              <div className="efdt-panel-body" style={{ gap: 8 }}>
                 <Dragger
                   multiple beforeUpload={handleFileAdd} showUploadList={false}
-                  accept=".pdf,.docx,.doc,.txt,.html,.eml" className="efdt-dragger"
+                  accept=".pdf,.docx,.doc,.txt,.html,.eml" className="efdt-dragger" style={{ padding: '12px' }}
                 >
                   <p className="ant-upload-drag-icon">
-                    <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 36 }} />
+                    <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 28 }} />
                   </p>
-                  <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', margin: '8px 0 4px' }}>
-                    Arrastra aquí los documentos del proyecto
+                  <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', margin: '4px 0 2px' }}>
+                    Arrastra documentos aquí
                   </p>
-                  <p style={{ fontSize: 11, color: 'var(--text-secondary)', margin: 0 }}>
-                    PDF · Word · HTML (email) · TXT · múltiples ficheros
+                  <p style={{ fontSize: 9, color: 'var(--text-secondary)', margin: 0 }}>
+                    PDF · Word · HTML · TXT
                   </p>
                 </Dragger>
 
-                <div className="efdt-hints">
+                <div className="efdt-hints" style={{ gap: 6 }}>
                   {[
-                    { icon: <MailOutlined />,      text: 'Email del cliente con requisitos (.html, .eml)' },
-                    { icon: <FilePdfOutlined />,   text: 'Cualificación de oportunidad (PDF)' },
-                    { icon: <FileWordOutlined />,  text: 'Propuesta anterior o documento de referencia' },
-                    { icon: <FileTextOutlined />,  text: 'Notas de reunión o descripción del proyecto' },
+                    { icon: <MailOutlined />,      text: 'Email cliente' },
+                    { icon: <FilePdfOutlined />,   text: 'Cualificación (PDF)' },
+                    { icon: <FileWordOutlined />,  text: 'Propuesta anterior' },
+                    { icon: <FileTextOutlined />,  text: 'Notas de reunión' },
                   ].map((h, i) => (
                     <div key={i} className="efdt-hint-row">
-                      <span style={{ color: 'var(--accent-primary)', fontSize: 13 }}>{h.icon}</span>
-                      <Text style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{h.text}</Text>
+                      <span style={{ color: 'var(--accent-primary)', fontSize: 12 }}>{h.icon}</span>
+                      <Text style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{h.text}</Text>
                     </div>
                   ))}
                 </div>
 
                 <div className="efdt-tip">
-                  <InfoCircleOutlined style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
-                  <Text style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-                    Claude analizará los documentos y extraerá automáticamente los datos del proyecto.
-                    Cuanta más información proporciones, más completo será el EFDT generado.
+                  <InfoCircleOutlined style={{ color: 'var(--accent-primary)', flexShrink: 0, fontSize: 12 }} />
+                  <Text style={{ fontSize: 10, color: 'var(--text-secondary)' }}>
+                    Se extraerán datos automáticamente al analizar.
                   </Text>
                 </div>
               </div>
             </div>
           </div>
 
-          {analysisError && <Alert type="error" message={analysisError} showIcon style={{ margin: '0 0 16px' }} />}
-
-          <div className="efdt-actions">
-            <button
-              className="btn-primary"
-              onClick={handleAnalyze}
-              disabled={analyzing || (files.length === 0 && !extraInstructions.trim())}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}
-            >
-              {analyzing ? '⏳ Analizando briefing...' : '🤖 Analizar y extraer datos'}
-            </button>
-            <Text style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-              {files.length === 0 && !extraInstructions ? 'Añade documentos o instrucciones para continuar' : `${files.length} fichero${files.length !== 1 ? 's' : ''} · vertical: ${vertical || 'auto-detectar'}`}
-            </Text>
-          </div>
+          {analysisError && <Alert type="error" message={analysisError} showIcon style={{ marginTop: 16 }} />}
         </div>
       )}
 
