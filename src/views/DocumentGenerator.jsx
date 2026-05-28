@@ -402,16 +402,19 @@ export default function DocumentGenerator() {
                     <Dragger
                       multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
                       accept=".png" className={`efdt-dragger ${portadaDragActive ? 'efdt-dragger-active' : ''}`}
-                      style={{ padding: '8px' }}
+                      style={{ padding: '12px', minHeight: '220px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}
                       onDragEnter={() => setPortadaDragActive(true)}
                       onDragLeave={() => setPortadaDragActive(false)}
                       onDrop={() => setPortadaDragActive(false)}
                     >
                       <p className="ant-upload-drag-icon">
-                        <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 18 }} />
+                        <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 24 }} />
                       </p>
-                      <p style={{ fontSize: 9, fontWeight: 500, color: 'var(--text-primary)', margin: '2px 0 0' }}>
-                        Sube portada
+                      <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', margin: '6px 0 0', textAlign: 'center' }}>
+                        Sube portada PNG
+                      </p>
+                      <p style={{ fontSize: 9, color: 'var(--text-secondary)', margin: '4px 0 0', textAlign: 'center' }}>
+                        (794×1123 px recomendado)
                       </p>
                     </Dragger>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
