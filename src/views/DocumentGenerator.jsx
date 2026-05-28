@@ -1,4 +1,4 @@
-// src/views/EFDTGenerator.jsx
+// src/views/DocumentGenerator.jsx
 import { useState, useCallback } from 'react'
 import {
   Upload, Button, Select, Input, Steps, Tag, Alert, Spin,
@@ -12,7 +12,7 @@ import {
   ReloadOutlined, FileOutlined, InfoCircleOutlined, ThunderboltOutlined,
   PlusOutlined, SaveOutlined, SendOutlined
 } from '@ant-design/icons'
-import '../styles/efdt-generator.css'
+import '../styles/document-generator.css'
 
 const { Title, Text, Paragraph } = Typography
 const { TextArea } = Input
@@ -45,7 +45,7 @@ const getFileIcon = (type) => {
 }
 
 // ── MAIN COMPONENT ────────────────────────────────────────────────────────────
-export default function EFDTGenerator() {
+export default function DocumentGenerator() {
   const [currentStep, setCurrentStep]           = useState(0)
   const [files, setFiles]                       = useState([])
   const [vertical, setVertical]                 = useState(null)

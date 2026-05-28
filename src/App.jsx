@@ -37,7 +37,7 @@ import TenantManager from './views/TenantManager'
 import WebServicesManager from './views/WebServicesManager'
 import EFormBuilder from './views/EFormBuilder'
 import CategoryBuilder from './views/CategoryBuilder'
-import EFDTGenerator from './views/EFDTGenerator'
+import DocumentGenerator from './views/DocumentGenerator'
 import ThereforeReporter from './views/ThereforeReporter'
 import AnthropicPanel from './views/AnthropicPanel'
 import Placeholder from './views/Placeholder'
@@ -86,10 +86,10 @@ const getMenuItems = (isAdmin = false) => {
       path: '/tenants'
     },
     {
-      key: 'efdt',
+      key: 'document-generator',
       icon: <ThunderboltOutlined />,
-      label: 'Generador EFDT',
-      path: '/efdt'
+      label: 'Generador de Documentación',
+      path: '/document-generator'
     },
     {
       key: 'reporter',
@@ -402,7 +402,7 @@ function AppContent() {
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
             <Route path="/tenants" element={<TenantManager />} />
-            <Route path="/efdt" element={<EFDTGenerator />} />
+            <Route path="/document-generator" element={<DocumentGenerator />} />
             <Route path="/reporter" element={<ThereforeReporter />} />
             <Route path="/web-services" element={<WebServicesManager />} />
             <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" status="construction" />} />
