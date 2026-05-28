@@ -385,11 +385,26 @@ Solo JSON puro, sin texto adicional.`
     const rawText = data.content[0].text
     let projectData
     try {
-      const clean = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      // Intentar parsear directamente primero
+      let clean = rawText.trim()
+
+      // Remover backticks de markdown si existen
+      clean = clean.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+
+      // Si sigue habiendo markdown, extraer solo el JSON
+      if (!clean.startsWith('{')) {
+        const jsonMatch = clean.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          clean = jsonMatch[0]
+        }
+      }
+
       projectData = JSON.parse(clean)
     } catch (e) {
+      console.error('Parse error:', e.message)
+      console.error('Raw response:', rawText.substring(0, 1000))
       return res.status(500).json({
-        error: 'Error al parsear respuesta de Claude',
+        error: 'Error al parsear respuesta de Claude: ' + e.message,
         raw: rawText.substring(0, 500),
       })
     }
