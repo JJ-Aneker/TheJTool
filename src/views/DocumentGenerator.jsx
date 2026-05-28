@@ -12,6 +12,7 @@ import {
   ReloadOutlined, FileOutlined, InfoCircleOutlined, ThunderboltOutlined,
   PlusOutlined, SaveOutlined, SendOutlined
 } from '@ant-design/icons'
+import { DOCUMENT_TYPES, getDocumentTypeOptions } from '../constants/documentTypes.js'
 import '../styles/document-generator.css'
 
 const { Title, Text, Paragraph } = Typography
@@ -30,12 +31,8 @@ const VERTICALES = [
   { value: 'generico',  label: '📄 Proyecto Genérico',           desc: 'Otro tipo de proyecto Therefore™' },
 ]
 
-const TIPOS_DOC = [
-  { value: 'efdt',       label: 'EFDT — Especificaciones Funcionales y Diseño Técnico' },
-  { value: 'propuesta',  label: 'Propuesta Comercial' },
-  { value: 'estimacion', label: 'Estimación de Esfuerzo' },
-  { value: 'cr',         label: 'Change Request' },
-]
+// Document type options (generated from constants)
+const TIPOS_DOC = getDocumentTypeOptions()
 
 const getFileIcon = (type) => {
   if (type === 'application/pdf') return <FilePdfOutlined style={{ color: '#ff4d4f' }} />
@@ -271,13 +268,13 @@ export default function DocumentGenerator() {
         <div className="efdt-header-left">
           <div className="efdt-logo-icon"><ThunderboltOutlined /></div>
           <div>
-            <div className="header-title">Generador de Documentos EFDT</div>
-            <div className="efdt-subtitle">Genera documentos avanzados desde requerimentos y prompts</div>
+            <div className="header-title">Generador de Documentación</div>
+            <div className="efdt-subtitle">{tipoDoc && DOCUMENT_TYPES[tipoDoc] ? DOCUMENT_TYPES[tipoDoc].description : 'Genera documentos profesionales desde briefing'}</div>
           </div>
         </div>
         <div className="efdt-header-right">
           <Badge status="processing" />
-          <Text style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 6 }}>Claude Sonnet 4</Text>
+          <Text style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 6 }}>Claude Opus 4.7</Text>
           <Tag color="red" style={{ marginLeft: 8, fontSize: 10 }}>Therefore™</Tag>
         </div>
       </div>
@@ -287,7 +284,7 @@ export default function DocumentGenerator() {
         <Steps current={currentStep} size="small" items={[
           { title: 'Briefing',   description: 'Sube documentos',       icon: <InboxOutlined /> },
           { title: 'Revisión',   description: 'Revisa y ajusta',        icon: <EditOutlined /> },
-          { title: 'Documento',  description: 'Descarga el EFDT',       icon: <DownloadOutlined /> },
+          { title: 'Documento',  description: `Descarga tu ${tipoDoc && DOCUMENT_TYPES[tipoDoc] ? DOCUMENT_TYPES[tipoDoc].label.split('—')[0].trim() : 'documento'}`,       icon: <DownloadOutlined /> },
         ]} />
       </div>
 
@@ -304,7 +301,14 @@ export default function DocumentGenerator() {
                 <div className="efdt-field">
                   <label>Tipo de documento</label>
                   <Select value={tipoDoc} onChange={setTipoDoc} style={{ width: '100%' }} size="small">
-                    {TIPOS_DOC.map(t => <Option key={t.value} value={t.value}>{t.label}</Option>)}
+                    {TIPOS_DOC.map(t => (
+                      <Option key={t.value} value={t.value}>
+                        <div style={{ lineHeight: 1.3 }}>
+                          <div>{t.label}</div>
+                          <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{t.description}</div>
+                        </div>
+                      </Option>
+                    ))}
                   </Select>
                 </div>
 
