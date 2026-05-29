@@ -409,23 +409,6 @@ export default function DocumentGenerator() {
                     rows={6} style={{ fontSize: 12 }}
                   />
                 </div>
-
-                {/* File list */}
-                {files.length > 0 && (
-                  <div className="efdt-file-list">
-                    <div className="efdt-file-list-title">{files.length} fichero{files.length > 1 ? 's' : ''} adjunto{files.length > 1 ? 's' : ''}</div>
-                    {files.map(f => (
-                      <div key={f.uid} className="efdt-file-item">
-                        {getFileIcon(f.type)}
-                        <span className="efdt-file-name">{f.name}</span>
-                        <span className="efdt-file-size">{(f.size / 1024).toFixed(0)}KB</span>
-                        <button className="btn-link danger" onClick={() => removeFile(f.uid)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px' }}>
-                          <DeleteOutlined style={{ fontSize: '12px' }} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
 
