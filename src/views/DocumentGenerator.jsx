@@ -431,8 +431,8 @@ export default function DocumentGenerator() {
 
             {/* Portada panel - A4 vertical */}
             <div className="efdt-panel efdt-panel-portada-mini">
-              <div className="efdt-panel-title">Portada (A4 vertical)</div>
-              <div className="efdt-panel-body" style={{ gap: 6, padding: '12px' }}>
+              <div className="efdt-panel-title">Portada</div>
+              <div className="efdt-panel-body" style={{ gap: 4, padding: '8px' }}>
                 {portadaPreview ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div className="efdt-portada-container">
@@ -454,24 +454,21 @@ export default function DocumentGenerator() {
                         onDrop={() => setPortadaDragActive(false)}
                       >
                         <p className="ant-upload-drag-icon">
-                          <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 24 }} />
+                          <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 16 }} />
                         </p>
-                        <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', margin: '6px 0 0', textAlign: 'center' }}>
-                          Arrastra PNG aquí
-                        </p>
-                        <p style={{ fontSize: 9, color: 'var(--text-secondary)', margin: '4px 0 0', textAlign: 'center' }}>
-                          A4 vertical (794×1123 px)
+                        <p style={{ fontSize: 9, fontWeight: 500, color: 'var(--text-primary)', margin: '3px 0 0', textAlign: 'center' }}>
+                          PNG A4
                         </p>
                       </Dragger>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '0 4px' }}>
                       <input
                         type="checkbox" id="use-default-portada"
                         checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
-                        style={{ cursor: 'pointer', width: 12, height: 12 }}
+                        style={{ cursor: 'pointer', width: 11, height: 11 }}
                       />
-                      <label htmlFor="use-default-portada" style={{ fontSize: 9, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
-                        Usar portada predeterminada
+                      <label htmlFor="use-default-portada" style={{ fontSize: 8, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
+                        Default
                       </label>
                     </div>
                   </div>
