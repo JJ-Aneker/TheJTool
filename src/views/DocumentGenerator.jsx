@@ -65,6 +65,18 @@ export default function DocumentGenerator() {
   const [portadaDragActive, setPortadaDragActive] = useState(false)
   const [filesDragActive, setFilesDragActive]   = useState(false)
 
+  // Progress messages
+  const analysisMessages = [
+    'Analizando briefing...',
+    'Extrayendo requerimientos...',
+    'Estructura del proyecto...',
+    'Generando alcance...',
+    'Diseñando workflow...',
+    'Estimando esfuerzo...',
+    'Finalizando análisis...'
+  ]
+  const [analysisMessageIdx, setAnalysisMessageIdx] = useState(0)
+
   // ── FILE HANDLING ───────────────────────────────────────────────────────────
   const handleFileAdd = useCallback((file) => {
     const reader = new FileReader()
@@ -126,13 +138,15 @@ export default function DocumentGenerator() {
     setAnalyzing(true)
     setAnalysisProgress(0)
     setAnalysisError(null)
+    setAnalysisMessageIdx(0)
 
     const progressInterval = setInterval(() => {
       setAnalysisProgress(prev => {
         if (prev >= 90) return 90
         return prev + Math.random() * 20
       })
-    }, 300)
+      setAnalysisMessageIdx(prev => (prev + 1) % analysisMessages.length)
+    }, 400)
 
     const finalInstructions = tipoDoc === 'otros'
       ? `TIPO DE DOCUMENTO PERSONALIZADO: ${otrosDocDescription}\n\n${extraInstructions}`
@@ -301,8 +315,14 @@ export default function DocumentGenerator() {
 
       {/* Progress bar during analysis */}
       {analyzing && (
-        <div className="efdt-progress-bar">
-          <div className="efdt-progress-fill" style={{ width: `${analysisProgress}%` }}></div>
+        <div className="efdt-progress-container">
+          <div className="efdt-progress-bar">
+            <div className="efdt-progress-fill" style={{ width: `${analysisProgress}%` }}></div>
+          </div>
+          <div className="efdt-progress-message">
+            <span>{analysisMessages[analysisMessageIdx]}</span>
+            <span className="efdt-progress-percent">{Math.round(analysisProgress)}%</span>
+          </div>
         </div>
       )}
 
@@ -409,47 +429,49 @@ export default function DocumentGenerator() {
               </div>
             </div>
 
-            {/* Portada panel - mini */}
+            {/* Portada panel - A4 vertical */}
             <div className="efdt-panel efdt-panel-portada-mini">
-              <div className="efdt-panel-title">Portada</div>
-              <div className="efdt-panel-body" style={{ gap: 6 }}>
+              <div className="efdt-panel-title">Portada (A4 vertical)</div>
+              <div className="efdt-panel-body" style={{ gap: 6, padding: '12px' }}>
                 {portadaPreview ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div style={{ border: '1px solid var(--border-default)', borderRadius: 3, overflow: 'hidden', height: 60 }}>
-                      <img src={portadaPreview} alt="Portada preview" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#f5f5f5' }} />
+                    <div className="efdt-portada-container">
+                      <img src={portadaPreview} alt="Portada preview" className="efdt-portada-image" />
                     </div>
-                    <button className="btn-danger" style={{ fontSize: 10, padding: '4px 6px' }} onClick={removePortada}>
-                      <DeleteOutlined style={{ marginRight: 3, fontSize: '10px' }} /> Quitar
+                    <button className="btn-danger" style={{ fontSize: 10, padding: '4px 6px', width: '100%' }} onClick={removePortada}>
+                      <DeleteOutlined style={{ marginRight: 3, fontSize: '10px' }} /> Quitar portada
                     </button>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <Dragger
-                      multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
-                      accept=".png" className={`efdt-dragger ${portadaDragActive ? 'efdt-dragger-active' : ''}`}
-                      style={{ padding: '12px', minHeight: '220px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}
-                      onDragEnter={() => setPortadaDragActive(true)}
-                      onDragLeave={() => setPortadaDragActive(false)}
-                      onDrop={() => setPortadaDragActive(false)}
-                    >
-                      <p className="ant-upload-drag-icon">
-                        <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 24 }} />
-                      </p>
-                      <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', margin: '6px 0 0', textAlign: 'center' }}>
-                        Sube portada PNG
-                      </p>
-                      <p style={{ fontSize: 9, color: 'var(--text-secondary)', margin: '4px 0 0', textAlign: 'center' }}>
-                        (794×1123 px recomendado)
-                      </p>
-                    </Dragger>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div className="efdt-portada-dropzone">
+                      <Dragger
+                        multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
+                        accept=".png" className={`efdt-dragger ${portadaDragActive ? 'efdt-dragger-active' : ''}`}
+                        style={{ padding: 0, minHeight: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', border: 'none', background: 'transparent' }}
+                        onDragEnter={() => setPortadaDragActive(true)}
+                        onDragLeave={() => setPortadaDragActive(false)}
+                        onDrop={() => setPortadaDragActive(false)}
+                      >
+                        <p className="ant-upload-drag-icon">
+                          <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 24 }} />
+                        </p>
+                        <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-primary)', margin: '6px 0 0', textAlign: 'center' }}>
+                          Arrastra PNG aquí
+                        </p>
+                        <p style={{ fontSize: 9, color: 'var(--text-secondary)', margin: '4px 0 0', textAlign: 'center' }}>
+                          A4 vertical (794×1123 px)
+                        </p>
+                      </Dragger>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 8px' }}>
                       <input
                         type="checkbox" id="use-default-portada"
                         checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
                         style={{ cursor: 'pointer', width: 12, height: 12 }}
                       />
                       <label htmlFor="use-default-portada" style={{ fontSize: 9, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
-                        Default
+                        Usar portada predeterminada
                       </label>
                     </div>
                   </div>
@@ -503,6 +525,25 @@ export default function DocumentGenerator() {
       {/* ── STEP 1: REVISIÓN Y EDICIÓN ───────────────────────────────────── */}
       {currentStep === 1 && projectData && (
         <div className="efdt-content">
+
+          {/* Top action bar */}
+          <div className="efdt-top-actions">
+            <button
+              className="btn-primary"
+              onClick={handleBuildDocx}
+              disabled={building}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', fontSize: '13px' }}
+            >
+              {building ? '⏳ Generando...' : '📄 Generar documento'}
+            </button>
+            <button
+              className="btn-default"
+              onClick={() => setCurrentStep(0)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', fontSize: '13px' }}
+            >
+              🔄 Volver a editar briefing
+            </button>
+          </div>
 
           {/* Meta / confianza */}
           {projectData.meta && (
@@ -781,24 +822,6 @@ export default function DocumentGenerator() {
           </div>
 
           {buildError && <Alert type="error" message={buildError} showIcon style={{ margin: '12px 0 0' }} />}
-
-          <div className="efdt-actions" style={{ marginTop: 16, display: 'flex', gap: '12px' }}>
-            <button
-              className="btn-default"
-              onClick={() => setCurrentStep(0)}
-              style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '12px 20px', fontSize: '14px' }}
-            >
-              <ReloadOutlined style={{ fontSize: '14px' }} /> Volver
-            </button>
-            <button
-              className="btn-primary"
-              onClick={handleBuildDocx}
-              disabled={building}
-              style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '12px 20px', fontSize: '14px' }}
-            >
-              {building ? '⏳ Generando documento...' : '📄 Generar documento Word'}
-            </button>
-          </div>
         </div>
       )}
 
