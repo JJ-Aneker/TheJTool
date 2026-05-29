@@ -42,9 +42,16 @@ const NO_BDR  = { style: BorderStyle.NONE, size: 0, color: 'auto' };
 const NO_BDRS = { top: NO_BDR, bottom: NO_BDR, left: NO_BDR, right: NO_BDR };
 const CM = { top: 80, bottom: 80, left: 120, right: 120 };
 
-function sc(str) {
+// Format Tungsten titles: first letter uppercase, rest lowercase
+function scTungsten(str) {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+// Uppercase formatter (fallback)
+function sc(str) {
+  if (!str) return '';
+  return str.toUpperCase();
 }
 
 function p(text, opts = {}) {
@@ -65,16 +72,18 @@ function p(text, opts = {}) {
 function h1(text) {
   return new Paragraph({
     heading: HeadingLevel.HEADING_1,
+    alignment: AlignmentType.LEFT,
     spacing: { before: 400, after: 200 },
-    children: [new TextRun({ text: sc(text), font: F.H1, size: 52, color: C.DARK, bold: false })]
+    children: [new TextRun({ text: scTungsten(text), font: F.H1, size: 52, color: C.DARK, bold: false })]
   });
 }
 
 function h2(text) {
   return new Paragraph({
     heading: HeadingLevel.HEADING_2,
+    alignment: AlignmentType.LEFT,
     spacing: { before: 320, after: 120 },
-    children: [new TextRun({ text: sc(text), font: F.H2, size: 32, color: C.DARK, bold: false })]
+    children: [new TextRun({ text: scTungsten(text), font: F.H2, size: 32, color: C.DARK, bold: false })]
   });
 }
 
@@ -256,8 +265,10 @@ function buildPortadaWithImage(imgBase64, d) {
     const imgBuffer = Buffer.from(cleanBase64, 'base64');
 
     const titulo = d.proyecto?.titulo || 'Therefore';
-    const subtitulo = d.proyecto?.subtitulo || 'Digital';
-    const cliente = d.cliente?.nombre || 'Cliente';
+    const cliente = d.cliente?.razonSocial || d.cliente?.nombre || 'Cliente';
+    const tipoDoc = d.tipoDoc || 'efdt';
+    const tipoDocLabel = tipoDoc === 'efdt' ? 'Aproximación económica' : tipoDoc === 'requirements' ? 'Análisis de requerimientos' : 'Documento técnico';
+    const docId = d.proyecto?.id || 'XXX';
     const version = d.proyecto?.version || 'v1.0';
     const fecha = d.proyecto?.fecha || '';
 
@@ -276,34 +287,39 @@ function buildPortadaWithImage(imgBase64, d) {
       }),
       // Espacios para alinear texto en la parte inferior
       ...Array.from({ length: 16 }, gap),
-      // Texto superpuesto en blanco
+      // Texto superpuesto en blanco - PROYECTO
       new Paragraph({
         indent: { left: 1200 },
+        alignment: AlignmentType.LEFT,
         spacing: { after: 100 },
         children: [new TextRun({
-          text: sc(titulo),
+          text: scTungsten(titulo),
           font: F.H1,
           size: 128, // 64pt en half-points
           color: C.WHITE,
           bold: false,
         })]
       }),
+      // Texto superpuesto en blanco - TÍTULO DE DOCUMENTO
       new Paragraph({
         indent: { left: 1200 },
+        alignment: AlignmentType.LEFT,
         spacing: { after: 100 },
         children: [new TextRun({
-          text: subtitulo,
+          text: `${cliente} - ${tipoDocLabel} - ${docId}`,
           font: F.BODY,
           size: 44, // 22pt
           color: C.WHITE,
           bold: false,
         })]
       }),
+      // Metadata
       new Paragraph({
         indent: { left: 1200 },
+        alignment: AlignmentType.LEFT,
         spacing: { after: 0 },
         children: [new TextRun({
-          text: `${cliente} · ${version} · ${fecha}`,
+          text: `${version} · ${fecha}`,
           font: F.BODY,
           size: 36, // 18pt
           color: C.WHITE,
@@ -324,57 +340,19 @@ function buildPortada(d, forceNoImage = false) {
     return buildPortadaWithImage(d.portada.imgBase64, d);
   }
 
-  // Fallback: portada con barra roja Canon (si no hay PNG)
-  if (d.useDefaultPortada || !d.portada?.imgBase64) {
-    return [
-      new Table({
-        width: { size: PAGE_W - 2 * MAR_LAT, type: WidthType.DXA },
-        columnWidths: [PAGE_W - 2 * MAR_LAT],
-        rows: [
-          new TableRow({
-            height: { value: 600, rule: 'exact' },
-            children: [
-              new TableCell({
-                width: { size: PAGE_W - 2 * MAR_LAT, type: WidthType.DXA },
-                shading: { fill: C.RED, type: ShadingType.CLEAR },
-                borders: { top: NO_BDR, bottom: NO_BDR, left: NO_BDR, right: NO_BDR },
-                margins: { top: 0, bottom: 0, left: 0, right: 0 },
-                verticalAlign: VerticalAlign.CENTER,
-                children: [
-                  new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spacing: { after: 0 },
-                    children: [new TextRun({
-                      text: 'CANON',
-                      font: F.H1,
-                      size: 96,
-                      color: C.WHITE,
-                      bold: false,
-                    })]
-                  }),
-                ]
-              })
-            ]
-          })
-        ]
-      }),
-      ...Array.from({ length: 8 }, gap),
-      p(d.proyecto?.titulo || 'Therefore', { font: F.H1, size: 96, color: C.DARK, sa: 0 }),
-      p(d.proyecto?.subtitulo || 'Digital', { font: F.H1, size: 56, color: C.DARK, sb: 80, sa: 400 }),
-      p(d.proyecto?.descripcion || 'Especificaciones funcionales y diseño técnico', { size: 22, bold: true, sa: 80 }),
-      p(`${d.cliente?.nombre || '<<CLIENTE>>'}  ·  ${d.proyecto?.version || 'v1.0'}  ·  ${d.proyecto?.fecha || ''}`, { size: 18, color: C.GREY, sa: 0 }),
-    ];
-  }
+  // Fallback: portada simple (si no hay PNG)
+  const cliente = d.cliente?.razonSocial || d.cliente?.nombre || '<<CLIENTE>>';
+  const tipoDoc = d.tipoDoc || 'efdt';
+  const tipoDocLabel = tipoDoc === 'efdt' ? 'Aproximación económica' : tipoDoc === 'requirements' ? 'Análisis de requerimientos' : 'Documento técnico';
+  const docId = d.proyecto?.id || 'XXX';
 
-  // Portada original (sin imagen, sin barra roja)
   return [
     ...Array.from({ length: 12 }, gap),
-    p(d.proyecto?.titulo || 'Therefore', { font: F.H1, size: 96, color: C.DARK, sa: 0 }),
-    p(d.proyecto?.subtitulo || 'Digital', { font: F.H1, size: 56, color: C.DARK, sb: 80, sa: 400 }),
+    p(scTungsten(d.proyecto?.titulo || 'Therefore'), { font: F.H1, size: 96, color: C.DARK, sa: 0 }),
+    ...Array.from({ length: 4 }, gap),
+    p(`${cliente} - ${tipoDocLabel} - ${docId}`, { font: F.BODY, size: 56, color: C.DARK, sb: 80, sa: 400 }),
     hline(),
-    p(d.proyecto?.descripcion || 'Especificaciones funcionales y diseño técnico', { size: 22, bold: true, sa: 80 }),
-    p(d.proyecto?.titulo ? d.alcance?.descripcionGeneral?.substring(0, 80) || '' : '', { size: 20, color: C.GREY, sa: 80 }),
-    p(`${d.cliente?.nombre || '<<CLIENTE>>'}  ·  ${d.proyecto?.version || 'v1.0'}  ·  ${d.proyecto?.fecha || ''}`, { size: 18, color: C.GREY, sa: 0 }),
+    p(`${d.proyecto?.version || 'v1.0'}  ·  ${d.proyecto?.fecha || ''}`, { size: 18, color: C.GREY, sa: 0 }),
   ];
 }
 
@@ -392,12 +370,15 @@ function buildContraportada() {
 function buildFicha(d) {
   const c1 = Math.round(CONTENT_W * 0.32);
   const c2 = CONTENT_W - c1;
+  const cliente = d.cliente?.razonSocial || d.cliente?.nombre || '<<CLIENTE>>';
+  const tipoDoc = d.tipoDoc || 'efdt';
+  const tipoDocLabel = tipoDoc === 'efdt' ? 'Aproximación económica' : tipoDoc === 'requirements' ? 'Análisis de requerimientos' : 'Documento técnico';
+  const docId = d.proyecto?.id || 'XXX';
   const fichaRows = [
-    ['Título de documento',         d.proyecto?.titulo || ''],
+    ['Título de documento',         `${cliente} - ${tipoDocLabel} - ${docId}`],
     ['Fecha del documento',         d.proyecto?.fecha || ''],
-    ['Proyecto',                    d.proyecto?.descripcion || ''],
     ['Autor/es del documento',      'Jose-Juan Jiménez-Requena'],
-    ['Cliente',                     d.cliente?.razonSocial || d.cliente?.nombre || '<<CLIENTE>>'],
+    ['Cliente',                     cliente],
     ['Interlocutor/es del cliente', d.cliente?.interlocutor || '<<INTERLOCUTOR>>'],
     ['Documentos relacionados',     '—'],
   ];
@@ -468,6 +449,27 @@ function buildIntroduccion(d) {
 function buildDefinicion(d, tipoDoc = 'efdt') {
   const elements = [h1('Definición del proyecto')];
   const isEFDT = tipoDoc === 'efdt';
+
+  // Alcance del proyecto
+  if (d.alcance) {
+    elements.push(h2('Alcance del proyecto'));
+    if (d.alcance.descripcionGeneral) {
+      elements.push(p(d.alcance.descripcionGeneral));
+    }
+    if (d.proyecto?.descripcion) {
+      elements.push(h3('Descripción técnica'));
+      elements.push(p(d.proyecto.descripcion));
+    }
+    if (d.alcance.clavesProyecto?.length > 0) {
+      elements.push(h3('Claves del proyecto'));
+      elements.push(...d.alcance.clavesProyecto.map(c => b1(c)));
+    }
+    if (d.alcance.exclusiones?.length > 0) {
+      elements.push(h3('Exclusiones'));
+      elements.push(...d.alcance.exclusiones.map(e => b1(e)));
+    }
+    elements.push(gap());
+  }
 
   // Categorías principales
   if (d.estructura?.categoriasPrincipales?.length > 0) {
