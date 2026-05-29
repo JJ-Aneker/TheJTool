@@ -3,7 +3,7 @@
 // y extrae datos estructurados del proyecto via Claude API
 
 import { createClient } from '@supabase/supabase-js'
-import { callAnthropic } from './anthropicClient.js'
+import { callBedrock } from './bedrockClient.js'
 import { RATIOS } from './_lib/knowledge/ratios.js'
 import { TEXTOS } from './_lib/knowledge/textos_estandar.js'
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js'
@@ -276,8 +276,8 @@ export default async function handler(req, res) {
   }
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' })
 
-  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
-  if (!ANTHROPIC_API_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY no configurada' })
+  const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID
+  if (!AWS_ACCESS_KEY) return res.status(500).json({ error: 'AWS_ACCESS_KEY_ID not configured' })
 
   try {
     const { vertical, tipoDoc, extraInstructions, files } = req.body
@@ -381,7 +381,7 @@ Solo JSON puro, sin texto adicional.`
     // ── LLAMADA A CLAUDE API ────────────────────────────────────────────────
     const userId = req.headers['x-user-id'] || null
 
-    const data = await callAnthropic({
+    const data = await callBedrock({
       model: 'claude-opus-4-7',
       max_tokens: 16000,  // Increased to handle complex project briefs with detailed analysis
       system: systemPrompt,

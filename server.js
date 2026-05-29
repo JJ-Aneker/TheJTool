@@ -20,6 +20,10 @@ import anthropicUsageHandler from './api/anthropic-usage.js';
 import anthropicApiKeyHandler from './api/anthropic-apikey.js';
 import anthropicTestHandler from './api/anthropic-test.js';
 import anthropicBalanceHandler from './api/anthropic-balance.js';
+import bedrockStatusHandler from './api/bedrock-status.js';
+import bedrockTestHandler from './api/bedrock-test.js';
+import bedrockCredentialsHandler from './api/bedrock-credentials.js';
+import bedrockUsageHandler from './api/bedrock-usage.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -87,6 +91,13 @@ app.get('/api/admin/anthropic/usage', verifyAdmin, anthropicUsageHandler);
 app.get('/api/admin/anthropic/usage/history', verifyAdmin, anthropicUsageHandler);
 app.put('/api/admin/anthropic/apikey', verifyAdmin, anthropicApiKeyHandler);
 app.post('/api/admin/anthropic/test', verifyAdmin, anthropicTestHandler);
+
+// AWS Bedrock API management routes (admin only)
+app.get('/api/admin/bedrock/status', verifyAdmin, bedrockStatusHandler);
+app.post('/api/admin/bedrock/test', verifyAdmin, bedrockTestHandler);
+app.put('/api/admin/bedrock/credentials', verifyAdmin, bedrockCredentialsHandler);
+app.get('/api/admin/bedrock/usage', verifyAdmin, bedrockUsageHandler);
+app.get('/api/admin/bedrock/usage/history', verifyAdmin, bedrockUsageHandler);
 
 // Start server
 app.listen(PORT, () => {

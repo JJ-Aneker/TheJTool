@@ -39,7 +39,7 @@ import EFormBuilder from './views/EFormBuilder'
 import CategoryBuilder from './views/CategoryBuilder'
 import DocumentGenerator from './views/DocumentGenerator'
 import ThereforeReporter from './views/ThereforeReporter'
-import AnthropicPanel from './views/AnthropicPanel'
+import BedrrockPanel from './views/BedrrockPanel'
 import Placeholder from './views/Placeholder'
 
 const { Sider, Content } = Layout
@@ -61,10 +61,10 @@ const getMenuItems = (isAdmin = false) => {
       adminOnly: true
     },
     {
-      key: 'anthropic',
-      icon: <KeyOutlined />,
-      label: 'API Anthropic',
-      path: '/anthropic',
+      key: 'bedrock',
+      icon: <CloudOutlined />,
+      label: 'AWS Bedrock',
+      path: '/bedrock',
       adminOnly: true
     },
     {
@@ -398,7 +398,7 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<AdminRoute><UserManager /></AdminRoute>} />
-            <Route path="/anthropic" element={<AdminRoute><AnthropicPanel /></AdminRoute>} />
+            <Route path="/bedrock" element={<AdminRoute><BedrrockPanel /></AdminRoute>} />
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
             <Route path="/tenants" element={<TenantManager />} />
