@@ -142,15 +142,19 @@ async function handleUsage(req, res) {
       .gte('created_at', startDate.toISOString())
       .order('created_at', { ascending: false })
 
-    if (usageError) throw usageError
+    if (usageError && usageError.code !== 'PGRST116') {
+      // PGRST116 = "The result contains no rows" - this is fine
+      throw usageError
+    }
 
     const isHistory = req.query.history === 'true'
+    const data = usageData || []
 
     if (isHistory) {
       // Daily history
       const dailyData = {}
 
-      usageData.forEach(row => {
+      data.forEach(row => {
         const dateKey = row.created_at.split('T')[0]
         if (!dailyData[dateKey]) {
           dailyData[dateKey] = { date: dateKey, cost: 0 }
@@ -171,7 +175,7 @@ async function handleUsage(req, res) {
     let totalCost = 0
     let totalCalls = 0
 
-    usageData.forEach(row => {
+    data.forEach(row => {
       const module = row.module || 'unknown'
       if (!byModule[module]) {
         byModule[module] = { module, calls: 0, inputTokens: 0, outputTokens: 0, cost: 0 }

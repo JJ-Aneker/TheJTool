@@ -158,7 +158,7 @@ export default function BedrrockPanel() {
           {
             key: 'usage',
             label: 'Usage & Costs',
-            children: <UsageTab loading={loading} usage={usage} history={history} period={period} setPeriod={setPeriod} periodOptions={periodOptions} />
+            children: <UsageTab loading={loading} usage={usage} history={history} period={period} setPeriod={setPeriod} periodOptions={periodOptions} onRefresh={loadUsage} />
           },
           {
             key: 'inference-profiles',
@@ -308,23 +308,33 @@ function StatusTab({ bedrockStatus, testLoading, testResult, handleTest, setIsMo
   )
 }
 
-function UsageTab({ loading, usage, history, period, setPeriod, periodOptions }) {
+function UsageTab({ loading, usage, history, period, setPeriod, periodOptions, onRefresh }) {
   return (
     <Spin spinning={loading}>
       <Space direction="vertical" style={{ width: '100%' }} size="large">
-        {/* Period Selector */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <label style={{ fontSize: '12px', fontWeight: 500 }}>Period:</label>
-          <Select
-            value={period}
-            onChange={setPeriod}
-            options={periodOptions}
-            style={{ width: '150px' }}
-          />
+        {/* Period Selector & Refresh */}
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <label style={{ fontSize: '12px', fontWeight: 500 }}>Period:</label>
+            <Select
+              value={period}
+              onChange={setPeriod}
+              options={periodOptions}
+              style={{ width: '150px' }}
+            />
+          </div>
+          <button
+            className="btn-default"
+            onClick={onRefresh}
+            disabled={loading}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            🔄 Refresh
+          </button>
         </div>
 
         {/* Stats Cards */}
-        {usage?.summary && (
+        {usage?.summary ? (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -351,10 +361,19 @@ function UsageTab({ loading, usage, history, period, setPeriod, periodOptions })
               color="purple"
             />
           </div>
-        )}
+          ) : (
+            <Card style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+                <div style={{ marginBottom: '12px' }}>📊 No usage data available for the selected period</div>
+                <button className="btn-default" onClick={onRefresh} disabled={loading}>
+                  {loading ? 'Loading...' : 'Load Usage Data'}
+                </button>
+              </div>
+            </Card>
+          )}
 
         {/* Tables */}
-        {usage && (
+        {usage?.summary && (
           <>
             {usage.byModel?.length > 0 && (
               <div>
