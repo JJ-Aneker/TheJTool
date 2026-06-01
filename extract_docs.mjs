@@ -1,5 +1,7 @@
 import fs from 'fs';
-import pdfParse from 'pdf-parse';
+import * as PDFJS from 'pdfjs-dist';
+
+PDFJS.GlobalWorkerOptions.workerSrc = './node_modules/pdfjs-dist/build/pdf.worker.min.js';
 
 const docsPath = './docs/ejemplos';
 const files = [
@@ -19,16 +21,20 @@ const files = [
     
     try {
       const buffer = fs.readFileSync(filepath);
-      const data = await pdfParse(buffer);
+      const pdf = await PDFJS.getDocument({ data: buffer }).promise;
       
-      // Extraer primeras 3000 caracteres
-      const text = data.text.substring(0, 3000);
-      console.log(text);
+      let text = '';
+      for (let i = 1; i <= Math.min(pdf.numPages, 5); i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join('') + '\n';
+      }
+      
+      console.log(text.substring(0, 2000));
       console.log('\n[... contenido continúa ...]');
       
-      // Guardar archivo completo
       const outfile = `${docsPath}/${file.replace('.pdf', '.txt')}`;
-      fs.writeFileSync(outfile, data.text);
+      fs.writeFileSync(outfile, text);
       console.log(`\n✓ Guardado: ${outfile}`);
       
     } catch (err) {

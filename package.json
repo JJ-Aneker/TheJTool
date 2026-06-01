@@ -34,6 +34,7 @@
     "concurrently": "^8.2.0",
     "nodemon": "^3.0.2",
     "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "^6.0.227",
     "vite": "^5.0.8"
   }
 }
