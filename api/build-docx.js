@@ -257,7 +257,7 @@ const PAGE_PROPS = {
 
 // ── SECCIONES DEL DOCUMENTO ───────────────────────────────────────────────────
 
-// Construye portada con imagen PNG como fondo (tabla con imagen de fondo)
+// Construye portada con imagen PNG como fondo (documento-level anchor)
 function buildPortadaWithImage(imgBase64, d) {
   try {
     // Limpiar base64 si viene con prefijo data:
@@ -272,81 +272,65 @@ function buildPortadaWithImage(imgBase64, d) {
     const version = d.proyecto?.version || 'v1.0';
     const fecha = d.proyecto?.fecha || '';
 
-    // Create a table with image as background and text overlay
+    // Imagen anclada detrás del documento (como en el ejemplo)
+    const imageRunWithFloating = new ImageRun({
+      data: imgBuffer,
+      transformation: { width: 794, height: 1123 }, // A4 en pixels (96 DPI)
+      floating: {
+        horizontalPosition: { offset: 0, relative: 'page' },
+        verticalPosition: { offset: 0, relative: 'page' },
+        allowOverlap: true,
+        behindDocument: true,
+        layoutInCell: true,
+        wrappingStyle: 'none',
+      },
+    });
+
     return [
-      new Table({
-        width: { size: PAGE_W, type: WidthType.DXA },
-        columnWidths: [PAGE_W],
-        rows: [
-          new TableRow({
-            height: { value: PAGE_H, rule: 'exact' },
-            children: [
-              new TableCell({
-                width: { size: PAGE_W, type: WidthType.DXA },
-                borders: { top: NO_BDR, bottom: NO_BDR, left: NO_BDR, right: NO_BDR },
-                shading: { fill: '000000', type: ShadingType.CLEAR },
-                margins: { top: 0, bottom: 0, left: 0, right: 0 },
-                verticalAlign: VerticalAlign.BOTTOM,
-                children: [
-                  // Imagen como fondo
-                  new Paragraph({
-                    children: [
-                      new ImageRun({
-                        data: imgBuffer,
-                        transformation: { width: PAGE_W, height: PAGE_H },
-                        floating: {
-                          behindDocument: true,
-                          allowOverlap: true,
-                        },
-                      }),
-                    ],
-                  }),
-                  // Espacios para posicionar texto en parte inferior
-                  ...Array.from({ length: 18 }, gap),
-                  // Texto blanco - PROYECTO
-                  new Paragraph({
-                    indent: { left: MAR_LAT },
-                    alignment: AlignmentType.LEFT,
-                    spacing: { after: 80 },
-                    children: [new TextRun({
-                      text: scTungsten(titulo),
-                      font: F.H1,
-                      size: 104, // 52pt
-                      color: C.WHITE,
-                      bold: false,
-                    })]
-                  }),
-                  // Texto blanco - DOCUMENTO TITLE
-                  new Paragraph({
-                    indent: { left: MAR_LAT },
-                    alignment: AlignmentType.LEFT,
-                    spacing: { after: 80 },
-                    children: [new TextRun({
-                      text: `${cliente} - ${tipoDocLabel} - ${docId}`,
-                      font: F.BODY,
-                      size: 40, // 20pt
-                      color: C.WHITE,
-                      bold: false,
-                    })]
-                  }),
-                  // Metadata
-                  new Paragraph({
-                    indent: { left: MAR_LAT },
-                    alignment: AlignmentType.LEFT,
-                    spacing: { after: MAR_BOT },
-                    children: [new TextRun({
-                      text: `${version} · ${fecha}`,
-                      font: F.BODY,
-                      size: 32, // 16pt
-                      color: C.WHITE,
-                      bold: false,
-                    })]
-                  }),
-                ],
-              })
-            ]
-          })
-        ]
+      // Párrafo con imagen anclada
+      new Paragraph({
+        children: [imageRunWithFloating],
+      }),
+      // Espacios para alinear texto en la parte inferior
+      ...Array.from({ length: 20 }, gap),
+      // Texto blanco - PROYECTO
+      new Paragraph({
+        indent: { left: MAR_LAT },
+        alignment: AlignmentType.LEFT,
+        spacing: { after: 100 },
+        children: [new TextRun({
+          text: scTungsten(titulo),
+          font: F.H1,
+          size: 128, // 64pt
+          color: C.WHITE,
+          bold: false,
+        })]
+      }),
+      // Texto blanco - TÍTULO DE DOCUMENTO
+      new Paragraph({
+        indent: { left: MAR_LAT },
+        alignment: AlignmentType.LEFT,
+        spacing: { after: 100 },
+        children: [new TextRun({
+          text: `${cliente} - ${tipoDocLabel} - ${docId}`,
+          font: F.BODY,
+          size: 44, // 22pt
+          color: C.WHITE,
+          bold: false,
+        })]
+      }),
+      // Metadata
+      new Paragraph({
+        indent: { left: MAR_LAT },
+        alignment: AlignmentType.LEFT,
+        spacing: { after: MAR_BOT },
+        children: [new TextRun({
+          text: `${version} · ${fecha}`,
+          font: F.BODY,
+          size: 36, // 18pt
+          color: C.WHITE,
+          bold: false,
+        })]
       }),
     ];
   } catch (err) {
