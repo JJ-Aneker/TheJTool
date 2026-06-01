@@ -811,6 +811,12 @@ async function buildDocument(projectData) {
   const tipoDoc = d.tipoDoc || 'efdt';
   const cabecera = d.proyecto?.cabecera || d.proyecto?.titulo || 'Therefore™';
 
+  // DEBUG: Log estructura data
+  console.log('[BUILD-DOCX] tipoDoc:', tipoDoc);
+  console.log('[BUILD-DOCX] estructura.categoriasPrincipales:', d.estructura?.categoriasPrincipales?.length || 0);
+  console.log('[BUILD-DOCX] estructura.tablasMaestras:', d.estructura?.tablasMaestras?.length || 0);
+  console.log('[BUILD-DOCX] estructura.workflows:', d.estructura?.workflows?.length || 0);
+
   const doc = new Document({
     styles: {
       default: { document: { run: { font: F.BODY, size: 18, color: C.DARK } } },
