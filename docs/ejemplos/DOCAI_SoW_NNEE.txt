@@ -1,0 +1,766 @@
+Implementación entornos NNEE
+
+
+
+
+
+
+
+
+
+
+
+Implementación de entornos NNEE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1
+
+
+
+Índice
+
+
+1 INTRODUCCIÓN	4
+1.2 ALCANCE DEL SOW	4
+1.3 PARTES INTERESADAS	4
+2 CONTEXTO Y OBJETIVO DEL PROYECTO	5
+2.2 REQUERIMIENTOS DEL NEGOCIO	6
+2.3 BENEFICIOS ESPERADOS	6
+3 ALCANCE DE LA IMPLEMENTACIÓN	7
+3.2 TIPOS DE NOTIFICACIONES A PROCESAR	8
+3.3 FUNCIONALIDADES INICIALES (CLASIFICACIÓN, EXTRACCIÓN DE DATOS)	8
+3.4 LIMITACIONES Y SUPOSICIONES	9
+4 ARQUITECTURA Y FLUJO DE INFORMACIÓN	11
+4.2 INTEGRACIÓN ENTRE IVNEOS, THEREFORE Y DOCAI	11
+4.3 FLUJOS DOCUMENTALES Y BPM EN THEREFORE	12
+4.4 INTERCAMBIO DE DATOS (FORMATOS, PROTOCOLOS)	12
+5 CRONOGRAMA Y PLANIFICACIÓN	14
+5.2 HITOS Y FECHAS CLAVE	15
+5.3 DEPENDENCIAS Y PRE-REQUISITOS	15
+6 ROLES Y RESPONSABILIDADES	17
+6.1 EQUIPO DOCAI	17
+6.2 EQUIPO BUILDINGCENTER	17
+7 MANTENIMIENTO, SOPORTE Y FORMACIÓN	18
+7.2 FORMACIÓN AL EQUIPO DE BUILDINGCENTER	18
+7.3 ACTUALIZACIONES FUTURAS Y ESCALABILIDAD	18
+8 GESTIÓN DE RIESGOS Y CONTINGENCIAS	19
+8.2 PLANES DE MITIGACIÓN	19
+8.3 ESCALAMIENTO DE INCIDENCIAS	20
+9 MODELO DE SOPORTE	21
+9.1 HORARIOS DE SOPORTE	22
+9.2 NIVELES DE SOPORTE	22
+9.3 ACUERDOS DE NIVEL DE SERVICIO (SLAS)	22
+9.4 CANALES DE COMUNICACIÓN	23
+9.5 PROCEDIMIENTOS DE SOPORTE	23
+9.6 INFORMES Y MÉTRICAS DE SOPORTE	24
+10 ANEXOS	24
+10.1 EJEMPLOS DE NOTIFICACIONES DE ENTRENAMIENTO	24
+10.2 ESPECIFICACIONES TÉCNICAS DE LAS APIS	25
+10.1 
+
+
+
+1 Introducción
+1.1 Objetivo del Documento
+
+El presente Statement of Work (SOW) tiene como objetivo describir de forma clara y detallada las actividades, responsabilidades, entregables, plazos y criterios de aceptación correspondientes a la implementación de la solución DocAI en BuildingCenter, enfocada inicialmente en el procesamiento automatizado de notificaciones electrónicas provenientes de la administración pública.
+Este SOW servirá de referencia durante todo el ciclo de vida del proyecto, guiando a los equipos técnicos, de negocio y de soporte, asegurando el entendimiento común de los objetivos y las tareas requeridas.
+
+
+1.2 Alcance del SOW
+
+Este documento se centra en:
+
+* Definir el alcance funcional de la integración entre Ivneos, Therefore y DocAI, con énfasis en la clasificación y extracción de datos de notificaciones.
+* Describir la arquitectura, las fases de ejecución, los entregables, el cronograma y las dependencias.
+
+* Establecer	las	responsabilidades	de	cada	parte	involucrada	(equipo	de DocAI/Proveedor, BuildingCenter, sistemas de terceros).
+* Determinar criterios claros de aceptación, indicadores de éxito y mecanismos de validación.
+
+* Cubrir las necesidades de formación y soporte post-implementación, así como delinear las bases para futuras extensiones de la solución.
+
+
+
+1.3 Partes Interesadas BuildingCenter:
+Organización cliente beneficiaria de la solución. Responsables de proveer el entorno, el acceso a sistemas y los ejemplos de notificaciones para el entrenamiento del modelo, así como validar el resultado de la implementación.
+
+Equipo Implementación:
+
+* Equipo DocAI:
+Encargado de la implementación técnica, configuración de DocAI, integración con Therefore, soporte técnico inicial y formación al equipo de BuildingCenter.
+
+* Equipo Ivneos:
+Plataforma existente que se ocupa de la conexión con las sedes electrónicas y la
+
+
+descarga de las notificaciones. Aunque no participará activamente en el desarrollo, su correcto funcionamiento y disponibilidad son fundamentales para el éxito del proyecto.
+* Equipo Therefore:
+Gestor documental con BPM que se integra con DocAI y con Ivneos. Su equipo de administración deberá implementar el flujo completo de comunicaciones de integración entre todos los sistemas y asegurar la correcta vinculación de flujos, documentos y metadatos.
+
+
+
+
+
+
+
+
+2 Contexto y Objetivo del Proyecto
+2.1 Descripción General del Proyecto
+
+BuildingCenter recibe periódicamente notificaciones electrónicas de la administración pública relacionadas con sus activos, tales como inmuebles y propiedades. Estas notificaciones pueden corresponder, por ejemplo, a impuestos municipales, requerimientos legales o sanciones administrativas.
+
+Actualmente, el procesamiento manual de estas notificaciones es lento, propenso a errores y requiere la dedicación de personal especializado.
+El proyecto consiste en automatizar la clasificación y extracción de datos de dichas notificaciones aprovechando la sinergia entre las siguientes herramientas:
+* Ivneos: Obtiene las notificaciones desde las sedes electrónicas, utilizando los certificados digitales de BuildingCenter para asegurar su autenticidad y validez.
+* 
+
+* Therefore: Recibe las notificaciones descargadas por Ivneos y las gestiona a través de sus flujos documentales (BPM), permitiendo la integración con sistemas externos.
+* DocAI: Proporciona la inteligencia para clasificar automáticamente la notificación según su tipo (por ejemplo “IBI”) y extraer la información relevante (fecha, organismo, referencia catastral, importe, etc.).
+La integración de estos tres componentes permitirá a BuildingCenter agilizar el flujo de trabajo, disminuir tareas manuales y mejorar la eficiencia en la gestión de sus notificaciones administrativas.
+
+
+2.2 Requerimientos del Negocio
+
+Los requerimientos clave que impulsan este proyecto son:
+
+* Agilizar el Proceso de Gestión de Notificaciones: Reducir el tiempo y esfuerzo dedicados a la clasificación y extracción manual de datos.
+* Asegurar la Calidad y la Precisión de la Información: Minimizar errores humanos en el registro de datos críticos (por ej., fecha de notificación, importe).
+* Escalabilidad y Extensibilidad: Facilitar la ampliación futura a otros tipos de notificaciones o documentos, aplicando la misma lógica de clasificación y extracción.
+* Mejora de la Trazabilidad y Cumplimiento Normativo: Contar con flujos auditables, información accesible y control sobre el ciclo de vida de las notificaciones, lo que contribuye a la conformidad con requisitos legales y de auditoría interna.
+
+
+
+
+
+
+
+
+2.3 Beneficios Esperados
+1.1 
+
+La implementación del proyecto aportará beneficios tangibles e intangibles a BuildingCenter:
+
+* Aumento de la Productividad: Liberar recursos humanos de tareas repetitivas permite que el personal se enfoque en labores de mayor valor, como la toma de decisiones o el análisis estratégico.
+* Reducción de Costes Operativos: La automatización disminuye la carga de trabajo manual y, en consecuencia, los costes asociados a la gestión documental.
+* Mejora en la Calidad del Servicio Interno: Las áreas que reciben la información (contabilidad, administración de propiedades, cumplimiento legal) dispondrán de datos precisos y oportunos, evitando demoras y posibles penalizaciones.
+* Mayor Flexibilidad: El diseño basado en herramientas modulables (Ivneos, Therefore, DocAI) posibilita adaptar el sistema rápidamente ante cambios normativos, nuevos tipos de notificaciones o la incorporación de otros documentos a procesar.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3 Alcance de la Implementación
+3.1 Entidades Involucradas (Ivneos, Therefore, DocAI)
+1.1 
+
+Ivneos:
+Herramienta que realiza la conexión con las sedes electrónicas de las administraciones públicas, utilizando certificados de BuildingCenter para autenticar el acceso. Ivneos descargará las notificaciones disponibles y las pondrá a disposición de Therefore.
+
+Therefore:
+Gestor documental y motor BPM que recibe las notificaciones provenientes de Ivneos. Therefore actuará como repositorio central para el almacenamiento, indexación y seguimiento de los documentos. Asimismo, sus flujos BPM se encargarán de orquestar el envío de las notificaciones a DocAI para su clasificación y extracción, así como de enrutarlas a los procesos internos una vez procesadas.
+
+DocAI:
+Plataforma de inteligencia artificial responsable de la clasificación automática de la notificación y de la extracción de los datos relevantes (ej. fecha, organismo, referencia catastral, importe, etc.). DocAI recibirá la notificación desde Therefore, procesará el documento y devolverá la información estructurada a Therefore para continuar con el flujo documental.
+
+
+
+
+3.2 Tipos de Notificaciones a Procesar
+
+La fase inicial se centrará en el procesamiento de notificaciones provenientes de las administraciones públicas. Esto servirá como caso de uso piloto para validar la configuración, el entrenamiento del modelo y la efectividad de la extracción de datos.
+
+No obstante, la solución está diseñada para ser flexible y escalable. La interfaz de administración de DocAI permitirá a BuildingCenter agregar, entrenar y configurar, sin asistencia técnica especializada, nuevos tipos de notificaciones o documentos a futuro. Por ejemplo:
+
+* Nuevos Tipos de Notificaciones: Multas, requerimientos, tasas, u otros impuestos.
+* Otros Documentos Administrativos: Comunicaciones internas, oficios, resoluciones.
+
+Esta capacidad de autogestión asegurará que la organización pueda adaptarse rápidamente a cambios normativos, incorporar nuevos flujos documentales o abordar distintos casos de uso, sin depender de personal técnico externo para la actualización o ampliación del alcance de la herramienta.
+
+De esta forma, BuildingCenter podrá ampliar progresivamente el ecosistema de documentos procesados con DocAI, incrementando el valor y la eficiencia del sistema con el tiempo.
+
+
+
+
+3.3 Funcionalidades Iniciales (Clasificación, Extracción de Datos)
+
+Durante esta primera fase de implementación se lograrán las siguientes funcionalidades clave:
+
+
+* Clasificación Automática:
+DocAI clasificará la notificación entrante basándose en ejemplos de entrenamiento proporcionados por BuildingCenter.
+
+
+
+* Extracción de Datos Relevantes:
+Una vez determinado el tipo de documento, DocAI extraerá los campos de interés definidos por BuildingCenter. Estos pueden ser fechas, identificadores (número de referencia, referencia catastral, NIF), importes monetarios, nombres de organismos emisores, direcciones, o cualquier otro campo relevante para el uso interno. La selección de campos no está predefinida ni cerrada; podrá adaptarse en función del tipo documental a abordar y de las necesidades de BuildingCenter.
+
+
+
+* Transformaciones y Formatos:
+El sistema se puede configurar para aplicar transformaciones definidas (ej. formateo de fecha en DD/MM/YYYY, normalización del importe con su símbolo monetario) para asegurar la consistencia de la información.
+
+
+
+
+
+
+
+
+
+3.4 Limitaciones y Suposiciones Limitaciones:
+1.1 
+
+* La calidad y representatividad de los documentos de entrenamiento impactará directamente en la precisión de la clasificación y extracción.
+* Los tiempos de respuesta dependerán de la infraestructura subyacente y las capacidades de escalado disponibles.
+
+Suposiciones:
+
+* BuildingCenter proporcionará ejemplos suficientes de notificaciones en distintos formatos (si aplica) para el entrenamiento inicial de DocAI.
+* Ivneos y Therefore estarán operativos, con acceso a las sedes electrónicas y configuración base del BPM listos, respectivamente, antes del inicio de la integración con DocAI.
+* La integración técnica (APIs, endpoints) entre DocAI y Therefore se realizará según las especificaciones acordadas, utilizando protocolos estándar (ej. REST), y existirá personal técnico disponible para resolver dudas y facilitar la integración.
+
+Con este alcance definido, se establecen las bases para el desarrollo de la solución, acotando las expectativas a la primera fase y garantizando un punto de partida sólido para futuras extensiones.
+
+
+4 Arquitectura y Flujo de Información
+4.1 Descripción de la Arquitectura
+
+
+La arquitectura propuesta es modular y se apoya en la interoperabilidad de los sistemas involucrados:
+
+1. Ivneos:
+o Responsable de la conexión con las sedes electrónicas de la administración pública.
+o Descarga de notificaciones a través de los certificados digitales de BuildingCenter.
+o Transmisión de estas notificaciones a Therefore.
+2. Therefore:
+o Actúa como repositorio central y motor BPM, almacenando las notificaciones en su sistema documental.
+o Invoca la capa de integración con DocAI para solicitar la clasificación y extracción de campos cuando llega una nueva notificación.
+o Une los resultados obtenidos de DocAI con sus propios flujos documentales, permitiendo el enrutamiento interno del documento al área o proceso correspondiente.
+3. DocAI:
+o Recibe la notificación desde Therefore a través de APIs configuradas.
+o Clasifica la notificación según el tipo definido (ej. impuesto, tasa, sanción, etc.) y extrae los campos requeridos.
+o Devuelve los datos estructurados a Therefore para su uso posterior en los flujos BPM.
+
+4.2 Integración entre Ivneos, Therefore y DocAI
+
+
+El intercambio de información se basa en protocolos y formatos estándar (ej. REST/JSON), lo que asegura una integración fluida:
+
+* Ingreso del Documento (Ivneos ? Therefore):
+Ivneos descarga la notificación y la deposita en Therefore, junto con los metadatos técnicos necesarios (tipo de documento, fecha de descarga, referencia a la sede electrónica).
+* Invocación de DocAI (Therefore ? DocAI):
+Cuando Therefore recibe una notificación nueva, el flujo BPM configurado desencadena la llamada a DocAI, enviando el documento o su contenido en el formato acordado.
+* Respuesta de DocAI (DocAI ? Therefore):
+DocAI procesa el documento, determina su clase y extrae los campos de interés, retornándolos a Therefore en un formato estructurado, listo para integrar en el flujo interno.
+
+
+
+
+
+
+
+
+
+
+
+
+4.3 Flujos Documentales y BPM en Therefore
+
+
+La funcionalidad BPM de Therefore gestionará el ciclo de vida de la notificación:
+
+* Recepción del Documento: El flujo BPM se inicia al recibir una nueva notificación.
+* Llamada a DocAI: Invoca el servicio de clasificación y extracción.
+* Enriquecimiento del Documento: Incorpora los datos devueltos por DocAI (tipo de notificación, campos extraídos) a los metadatos del documento.
+* Rutas Internas: Según el tipo de notificación identificado, el BPM decide qué proceso interno se debe continuar (por ejemplo, un flujo contable para impuestos, un flujo legal para sanciones, etc.).
+
+Este enfoque minimiza la intervención manual y garantiza que las notificaciones lleguen rápidamente a las áreas internas responsables de su gestión
+
+
+
+4.4 Intercambio de Datos (Formatos, Protocolos)
+1.1 
+
+* Protocolos de Comunicación: Se emplearán API REST sobre HTTPS para garantizar seguridad y compatibilidad con sistemas modernos.
+* Formatos de Datos: El intercambio de información entre Therefore y DocAI se basará en JSON, un formato ligero y legible, facilitando la integración y el parsing de datos.
+* Autenticación y Seguridad: Se implementarán mecanismos de autenticación (ej. OAuth2, JWT) y cifrado TLS para asegurar la privacidad e integridad de la información en tránsito.
+
+En conjunto, la arquitectura y el flujo de información propuestos permiten a BuildingCenter automatizar el procesamiento de notificaciones electrónicas, mejorando la eficiencia y calidad de sus operaciones documentales, y sentando las bases para escalabilidad y extensiones futuras.
+
+
+5 Cronograma y Planificación
+5.1 Fases del Proyecto
+
+1 Fase de Análisis y Diseño (Planificación Inicial):
+
+* Revisión de requerimientos y casos de uso.
+* Diseño técnico de la integración (documentación de APIs, formatos de datos, seguridad).
+* Definición de tipos de documentos a abordar inicialmente y campos a extraer.
+
+2 Fase de Configuración e Implementación:
+
+* Entrenamiento y configuración inicial del modelo de clasificación y extracción en DocAI.
+* Configuración de la integración con Therefore (endpoints, autenticación, mapeo de datos).
+* Ajustes y pruebas iniciales del flujo completo (Ivneos ? Therefore ? DocAI ?
+Therefore).
+
+3 Fase de Pruebas y Validación:
+
+* Pruebas funcionales de clasificación y extracción.
+* Validación con ejemplos reales proporcionados por BuildingCenter.
+* Ajustes a los prompts, campos y transformaciones según resultados de las pruebas.
+
+4 Fase de Puesta en Marcha:
+
+* Migración a entorno productivo o habilitación del entorno definitivo (PaaS/SaaS según lo acordado).
+* Ejecución de casos finales de validación en producción.
+* Capacitación a personal de BuildingCenter.
+
+5 Fase de Cierre:
+
+* Documentación final.
+* Validación de criterios de aceptación.
+* Entrega oficial de la solución y transición a mantenimiento y soporte.
+
+
+
+
+
+5.2 Hitos y Fechas Clave
+
+A modo ilustrativo y sujeto a revisión, se proponen los siguientes hitos:
+
+* Hito 1: Aprobación del Diseño Técnico (Fin de Fase de Análisis)
+o Entregable: Documento de Diseño de Integración.
+o Tiempo estimado: 1-2 semanas desde inicio del proyecto.
+* Hito 2: Configuración Inicial de DocAI (Fin de Fase de Configuración)
+o Entregables: Modelo inicial entrenado, integración técnica con Therefore.
+o Tiempo estimado: 3-5 semanas desde el inicio.
+* Hito 3: Validación Funcional (Fin de Fase de Pruebas)
+o Entregables: Informe de pruebas, ajustes realizados.
+o Tiempo estimado: 6-7 semanas desde el inicio.
+* Hito 4: Puesta en Producción y Capacitación (Fin de Fase de Puesta en Marcha)
+o Entregables: Entorno operativo, manual de usuario/administrador, sesiones de formación.
+o Tiempo estimado: 7-8 semanas desde el inicio.
+* Hito 5: Aceptación Final (Fin de Fase de Cierre)
+o Entregables: Documentación final, validación de criterios de aceptación.
+o Tiempo estimado: ~8-10 semanas desde el inicio.
+
+
+
+
+Estas estimaciones podrán ajustarse según las necesidades y disponibilidades reales de recursos humanos y tecnológicos, así como por la complejidad encontrada en la integración.
+
+
+
+
+5.3 Dependencias y Pre-requisitos
+1.1 
+
+* Disponibilidad de Ejemplos Reales de Documentos:
+BuildingCenter deberá proveer un conjunto representativo de notificaciones para entrenar y validar el modelo de clasificación y extracción.
+* Acceso a Ivneos y Therefore Operativos:
+Antes de iniciar la integración con DocAI, Ivneos deberá estar funcionando y proporcionando notificaciones a Therefore, y Therefore deberá contar con el BPM configurado a nivel básico.
+* Recursos Técnicos y Personal Clave:
+Se requerirá la participación de personal técnico de BuildingCenter para facilitar acceso a las APIs, entornos de prueba, credenciales y para tomar decisiones sobre configuraciones clave.
+
+
+6 Roles y Responsabilidades
+
+Este apartado define los distintos roles involucrados en el proyecto y las responsabilidades que asume cada una de las partes interesadas. Una asignación clara de funciones garantiza una comunicación efectiva, la toma de decisiones ágil y el cumplimiento de los plazos.
+
+
+
+
+
+6.1 Equipo DocAI
+
+Diseño e Implementación Técnica:
+Definir la arquitectura de integración, entrenar el modelo DocAI para clasificación y extracción, y configurar la infraestructura necesaria (en caso de PaaS/SaaS).
+
+Documentación y Capacitación:
+Brindar la formación al equipo de BuildingCenter para que puedan gestionar de manera autónoma la creación de nuevos tipos de documentos y el reentrenamiento de modelos.
+
+Soporte Técnico Inicial:
+Asistir durante el periodo de implantación, resolver incidencias técnicas, ajustar la configuración de campos y prompts, y colaborar en las pruebas de validación.
+
+
+6.2 Equipo BuildingCenter
+
+Provisión de Datos de Entrenamiento:
+Facilitar ejemplos de notificaciones (en el tipo inicial seleccionado y, posteriormente, otros tipos) que sirvan de base para el entrenamiento y mejora del modelo DocAI.
+
+Validación Funcional y Aceptación:
+Revisar los resultados de clasificación y extracción, validar que cumplen los requerimientos del negocio, y aprobar los entregables en las fases clave del proyecto.
+
+Gestión Interna de Entornos y Sistemas:
+Asegurar la disponibilidad de Ivneos y Therefore, proporcionar accesos y credenciales, garantizar el correcto funcionamiento del BPM y resolver aspectos internos que puedan afectar a la integración.
+
+Administración Posterior:
+Tras la puesta en marcha, el equipo de BuildingCenter asumirá la administración cotidiana de
+
+
+DocAI: agregar nuevos tipos de documentos, ajustar campos de extracción y reentrenar modelos según sea necesario.
+
+
+
+7 Mantenimiento, Soporte y Formación
+7.1 Período de Garantía y Soporte Post-Implementación
+
+Tras la puesta en producción, se establecerá un período de garantía (90 días) durante el cual el equipo DocA deberá:
+
+* Atenderá Incidencias Críticas: Resolverá rápidamente errores que impidan la clasificación o extracción de datos, o que comprometan la operatividad general del sistema.
+* Ajustará la Configuración: Realizará pequeños ajustes en la configuración de campos o prompts necesarios para mantener la precisión prevista.
+* Monitoreará el Rendimiento Inicial: Recomendando medidas para optimizar la carga, latencia o precisión, en caso de que se detecten desviaciones importantes.
+
+Posterior al período de garantía, se podrán establecer acuerdos de soporte adicionales con esquemas de mantenimiento preventivo o reactivo, según las necesidades de BuildingCenter.
+
+
+7.2 Formación al Equipo de BuildingCenter
+
+Uno de los objetivos clave del proyecto es la autogestión. Por ello, la formación incluye:
+
+* Sesiones Prácticas: Demostraciones en vivo sobre cómo crear nuevos tipos de documentos, añadir ejemplos de entrenamiento, modificar campos y ajustar prompts para la extracción de datos.
+* Manual de Usuario/Administrador: Una guía clara y detallada que documenta todos los pasos necesarios para administrar la plataforma.
+* Resolución de Dudas: Durante el período inicial de operación, el equipo DocAI/Proveedor responderá a las dudas del equipo de BuildingCenter, reforzando el conocimiento transferido.
+
+Con esta capacitación, BuildingCenter podrá adaptarse a nuevos escenarios documentales sin depender de asistencia técnica externa, lo que redunda en mayor agilidad y menor coste operativo a largo plazo.
+
+
+
+
+7.3 Actualizaciones Futuras y Escalabilidad
+
+La arquitectura modular y la capacidad de reentrenamiento continuo de DocAI facilitan:
+
+* Incorporación de Nuevos Tipos Documentales: BuildingCenter podrá expandir el alcance de la solución hacia otras notificaciones o documentos, sin necesidad de intervención técnica, añadiendo ejemplos y ajustando la configuración.
+* 
+
+* Evolución Tecnológica: En caso de que se introduzcan nuevas funcionalidades, mejoras en el motor de IA generativa, o integraciones con otros sistemas, se podrán gestionar como fases de actualización.
+* Escalabilidad: La solución está preparada para manejar mayores volúmenes de documentos si el negocio crece, pudiendo aumentar recursos o ajustar el despliegue en entornos cloud, manteniendo el rendimiento y la precisión.
+
+De esta manera, el mantenimiento, soporte y la formación garantizan no solo la operatividad continua de la solución, sino también su capacidad de adaptarse y mejorar con el tiempo, acompañando las necesidades cambiantes de BuildingCenter.
+
+
+
+8 Gestión de Riesgos y Contingencias
+8.1 Identificación de Riesgos
+
+Calidad Insuficiente de Datos de Entrenamiento:
+Si las notificaciones proporcionadas para el entrenamiento no son representativas o presentan una variabilidad limitada, la precisión de la clasificación y extracción podría verse afectada.
+
+Cambios Normativos o de Formato en las Notificaciones:
+Si las administraciones públicas modifican con frecuencia los formatos o contenidos de las notificaciones, podría requerirse un reentrenamiento frecuente y ajustes continuos de los prompts y campos.
+
+Disponibilidad de Sistemas Externos (Ivneos, Therefore):
+La indisponibilidad temporal de Ivneos o Therefore (por mantenimiento, fallos técnicos, problemas de red) podría impactar la capacidad de DocAI para recibir y procesar documentos en los plazos esperados.
+
+Lentitud en la Adopción Interna:
+Si el equipo interno de BuildingCenter no adopta la herramienta o no se apropia de sus capacidades de autogestión, la eficiencia esperada podría no alcanzarse plenamente.
+
+
+
+
+8.2 Planes de Mitigación
+1.1 
+
+Mejora Continua del Dataset de Entrenamiento:
+BuildingCenter proporcionará ejemplos variados, actualizando periódicamente el conjunto de entrenamiento con documentos recién recibidos o casos complejos. Esto mejorará la robustez del modelo frente a cambios.
+
+Monitorización de Nuevos Tipos de Notificaciones:
+Al detectar variaciones en la estructura de las notificaciones, se actualizarán las reglas de extracción y se reentrenarán los modelos con prontitud, evitando degradaciones significativas.
+
+Arquitectura Resiliente y Alertas Tempranas:
+Integrar alertas y monitoreo para detectar caídas o lentitud en Ivneos o Therefore, permitiendo aplicar planes de contingencia (como una cola temporal de documentos) hasta reestablecer el servicio.
+
+Formación y Apoyo Post-Implementación:
+Asegurar que el equipo de BuildingCenter reciba suficiente capacitación y apoyo inicial, motivando su participación. De ser necesario, planificar sesiones adicionales de refuerzo.
+
+
+
+
+
+
+
+
+
+
+
+
+8.3 Escalamiento de Incidencias
+1.1 
+
+En caso de que un riesgo se materialice y produzca un impacto significativo:
+
+* Contacto con el Equipo DocAI:
+Para problemas técnicos serios, se notificará de inmediato al equipo de soporte, priorizando la resolución rápida de la incidencia.
+* Comunicación Interna en BuildingCenter:
+Establecer un canal formal para informar a las áreas afectadas sobre incidentes, estimaciones de tiempo de recuperación y acciones provisionales.
+* Revisión Post-Incidencia:
+Analizar el incidente una vez resuelto, documentando las causas, acciones tomadas y mejoras a implementar para evitar recurrencias.
+
+Mediante esta gestión proactiva de riesgos y el establecimiento de planes de contingencia, el proyecto y la operación continua de DocAI se beneficiarán de una mayor estabilidad, reduciendo el impacto negativo de imprevistos y garantizando la consecución de los objetivos a largo plazo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9 Modelo de Soporte
+1 
+
+Este apartado detalla las características del modelo de soporte que se proporcionará durante y después de la implementación de la solución DocAI en BuildingCenter. Se establecen los horarios de atención, los niveles de servicio (SLAs) y los canales de comunicación disponibles para garantizar una asistencia eficiente y oportuna.
+
+9.1 Horarios de Soporte
+
+El soporte técnico se ofrecerá durante el horario laboral estándar, de lunes a viernes, de 09:00 a 18:00 (hora local). Fuera de este horario, no se brindará soporte técnico directo, pero se podrán enviar solicitudes que serán atendidas al siguiente día hábil.
+
+9.2 Niveles de Soporte
+
+Se establecerán diferentes niveles de soporte para gestionar eficazmente las incidencias según su gravedad y complejidad:
+
+* Nivel 1: Soporte Básico
+o Descripción: Asistencia para problemas comunes y consultas generales.
+o Tiempo de Respuesta: Dentro de las primeras 2 horas hábiles.
+o Tiempo de Resolución: Resolución en un plazo de 4 horas hábiles.
+o Canales Disponibles: Correo electrónico, sistema de tickets.
+* Nivel 2: Soporte Avanzado
+o Descripción: Asistencia para problemas técnicos complejos que no puedan ser resueltos por el Nivel 1.
+o Tiempo de Respuesta: Dentro de las primeras 4 horas hábiles.
+o Tiempo de Resolución: Resolución en un plazo de 8 horas hábiles.
+o Canales Disponibles: Correo electrónico, teléfono, sistema de tickets.
+* Nivel 3: Soporte Especializado
+o Descripción: Intervención de expertos para problemas críticos que requieren conocimiento profundo de la arquitectura y la integración.
+o Tiempo de Respuesta: Dentro de la primera hora hábil.
+o Tiempo de Resolución: Resolución en un plazo de 24 horas hábiles.
+o Canales Disponibles: Teléfono directo, videoconferencias.
+
+9.3 Acuerdos de Nivel de Servicio (SLAs)
+
+Los SLAs establecen los compromisos de tiempo y calidad en la prestación del soporte técnico. A continuación, se detallan los principales SLAs acordados para el proyecto:
+
+* Tiempo de Respuesta Inicial:
+o Nivel 1: 2 horas hábiles.
+o Nivel 2: 4 horas hábiles.
+o Nivel 3: 1 hora hábil.
+* Tiempo de Resolución:
+o Nivel 1: 4 horas hábiles.
+o Nivel 2: 8 horas hábiles.
+o Nivel 3: 24 horas hábiles.
+* Disponibilidad del Soporte:
+o El soporte estará disponible durante el horario laboral establecido (lunes a viernes, 09:00 a 18:00).
+o Las solicitudes fuera de horario serán atendidas al siguiente día hábil.
+o 
+
+* Garantía de Escalamiento:
+o Si una incidencia no se resuelve dentro del tiempo establecido, se escalará automáticamente al siguiente nivel de soporte para asegurar una resolución rápida.
+
+9.4 Canales de Comunicación
+
+Para facilitar el acceso al soporte técnico, se ofrecerán múltiples canales de comunicación:
+
+* Correo Electrónico:
+o Dirección: soporte buildingcenter @docai.es
+o Uso: Envío de solicitudes de soporte, seguimiento de incidencias, recepción de actualizaciones.
+* Sistema de Tickets:
+o Plataforma: [Nombre de la Plataforma de Tickets, ej. Zendesk, Jira Service Desk]
+o Uso: Registro, seguimiento y gestión de incidencias de manera estructurada y priorizada.
+* Videoconferencias:
+o Plataforma: [Nombre de la Plataforma, Microsoft Teams]
+o Uso: Sesiones de resolución de problemas complejos, demostraciones técnicas y reuniones de seguimiento.
+
+9.5 Procedimientos de Soporte
+
+Para asegurar una gestión eficiente de las solicitudes de soporte, se seguirán los siguientes procedimientos:
+
+1. Registro de Incidencias:
+o Todas las solicitudes de soporte deben registrarse a través del sistema de tickets
+o enviando un correo electrónico al equipo de soporte.
+o Se debe proporcionar una descripción detallada del problema, incluyendo pasos para reproducirlo, capturas de pantalla y cualquier otra información relevante.
+2. Clasificación y Priorización:
+o El equipo de soporte evaluará cada incidencia para determinar su nivel (1, 2 o 3) y su prioridad (alta, media, baja).
+o Las incidencias críticas que afectan la operatividad del sistema serán tratadas con máxima prioridad.
+3. Resolución y Seguimiento:
+o El equipo de soporte trabajará para resolver la incidencia dentro de los tiempos establecidos por el SLA correspondiente.
+o Se mantendrá una comunicación continua con BuildingCenter, proporcionando actualizaciones sobre el estado de la incidencia y los pasos tomados para su resolución.
+4. Cierre de Incidencias:
+o Una vez resuelto el problema, se notificará a BuildingCenter para su confirmación.
+o Se cerrará la incidencia en el sistema de tickets, documentando la solución implementada.
+5. Revisión y Mejora Continua:
+o Se realizarán análisis periódicos de las incidencias reportadas para identificar patrones, áreas de mejora y oportunidades para optimizar el soporte técnico.
+o 
+
+o Se actualizarán las bases de conocimientos y se proporcionarán capacitaciones adicionales según sea necesario.
+
+9.6 Informes y Métricas de Soporte
+
+Para garantizar la transparencia y la mejora continua del servicio de soporte, se proporcionarán informes periódicos que incluyan:
+
+* Número de Incidencias Reportadas y Resueltas: Estadísticas sobre la cantidad de solicitudes recibidas y su estado de resolución.
+* Cumplimiento de SLAs: Porcentaje de incidencias resueltas dentro de los tiempos establecidos.
+* Tipos de Incidencias: Clasificación de problemas recurrentes para identificar áreas de mejora en la solución implementada.
+* Satisfacción del Cliente: Resultados de encuestas de satisfacción realizadas a BuildingCenter tras la resolución de incidencias.
+
+Estos informes serán compartidos de manera regular con BuildingCenter, permitiendo una evaluación continua de la calidad del soporte técnico y facilitando la toma de decisiones para optimizar el servicio.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10 Anexos
+
+
+10.1 Ejemplos de Notificaciones de Entrenamiento
+1.1 
+
+A continuación, se presentan ejemplos representativos de notificaciones electrónicas utilizadas para el entrenamiento y validación de los modelos de clasificación y extracción de DocAI. Estos ejemplos abarcan distintos formatos y estructuras para garantizar la robustez del sistema frente a la diversidad documental.
+
+
+
+
+
+
+
+
+
+
+10.2 Especificaciones Técnicas de las APIs Integración Therefore - DocAI:
+* Endpoint de Clasificación y Extracción:
+o URL: https:// buildingcenter.docai.es/v1/process
+o Método: POST
+o Autenticación: OAuth2 con tokens JWT
+o Formato de Solicitud (JSON):
+
+json
+Copiar código
+{
+"document_id": "DOC123456",
+"content": "Contenido completo del documento...", "metadata": {
+"tipo_documento": "Notificación", "fecha_ingreso": "2024-04-15T10:00:00Z"
+}
+}
+
+
+o Formato de Respuesta (JSON):
+
+json
+Copiar código
+{
+"document_id": "DOC123456", "tipo_notificacion": "IBI", "campos_extraidos": { "fecha_notificacion": "15/04/2024",
+"organismo_emisor": "Ayuntamiento de Madrid", "referencia_catastral": "1234567XY8901A",
+"importe": "350€"
+},
+"confidence_scores": { "tipo_notificacion": 0.95,
+"fecha_notificacion": 0.98,
+"organismo_emisor": 0.92,
+"referencia_catastral": 0.90,
+"importe": 0.93
+}
+}
+
+Protocolos y Seguridad:
+
+* Cifrado: Todas las comunicaciones se realizarán sobre HTTPS utilizando TLS 1.2 o superior.
+* Autenticación: Uso de OAuth2 con tokens JWT firmados digitalmente para garantizar que solo sistemas autorizados puedan acceder a las APIs.
+* Rate Limiting: Máximo de 1000 solicitudes por hora por cliente para evitar sobrecargas.
+* Versionado: Las APIs estarán versionadas (ej. /v1, /v2) para permitir actualizaciones sin afectar integraciones existentes.
+
+Manejo de Errores:
+
+* Códigos de Estado HTTP:
+o 200 OK: Solicitud procesada exitosamente.
+o 400 Bad Request: Solicitud mal formada o con datos inválidos.
+o 401 Unauthorized: Falta o invalidez del token de autenticación.
+o 500 Internal Server Error: Error inesperado en el servidor.
+* Formato de Error (JSON):
+
+json
+Copiar código
+{
+"error_code": "INVALID_REQUEST", "error_message": "El campo 'content' es obligatorio."
+}
+
+Estas especificaciones técnicas aseguran una integración robusta y segura entre Therefore y DocAI, facilitando la comunicación eficiente y confiable para el procesamiento de documentos.
+
+
+
+

@@ -28,6 +28,7 @@ All reference documentation is in the `docs/therefore/` folder of this project.
 | Solution Designer (categories, fields) | `docs/therefore/solution-designer-guide.md` |
 | **eForm XML import/export** | `docs/therefore/JJ_-_eform-import-export-guide.md` |
 | **eForm API calls, data loading, modals** | `docs/therefore/JJ-therefore-eforms-data-loading-guide.md` |
+| **External tools integration** | `docs/therefore/external-tools-integration.md` |
 | Terminology & concepts | `docs/therefore/therefore-glossary.md` |
 | Online documentation URLs | `docs/therefore/online-resources.md` |
 

@@ -1,0 +1,453 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Índice
+
+1  INTRODUCCIÓN	4
+1.2 VISIÓN GENERAL DEL DOCUMENTO	5
+1.3 AUDIENCIA OBJETIVO	5
+2  DESCRIPCIÓN GENERAL DEL SISTEMA	6
+2.2 COMPONENTES FUNCIONALES CLAVE	7
+2.3 ENTORNOS DE DESPLIEGUE SOPORTADOS (PAAS, SAAS)	8
+3  INGESTA Y PREPROCESAMIENTO DE DATOS	11
+3.2 PASOS DE NORMALIZACIÓN Y PREPROCESAMIENTO	11
+3.3 MANEJO DE ERRORES Y REGISTRO DE INCIDENCIAS (LOGGING)	12
+4  MÓDULO DE CLASIFICACIÓN DE DOCUMENTOS (MACHINE LEARNING TRADICIONAL)	14
+4.2 MÉTRICAS DE EVALUACIÓN Y MEJORA CONTINUA	15
+4.3 ESCALABILIDAD Y PROCESAMIENTO PARALELO DE GRANDES 	VOLÚMENES	16
+5  MÓDULO DE EXTRACCIÓN DE DATOS (IA GENERATIVA)	17
+5.1 ARQUITECTURA DEL MODELO GENERATIVO	17
+5.2 PROCESAMIENTO SEMÁNTICO Y CONTEXTUAL	18
+5.6 PERSONALIZACIÓN Y MAPEO DE CAMPOS	18
+6  CAPA DE INTEGRACIÓN	21
+6.2 AUTENTICACIÓN Y AUTORIZACIÓN (OAUTH2, JWT)	21
+6.3 PROTOCOLOS DE COMUNICACIÓN (HTTP, COLAS DE MENSAJES)	21
+6.4 GESTIÓN DE ERRORES, REINTENTOS Y MECANISMOS DE CIRCUIT BREAKER	22
+8  RENDIMIENTO Y ESCALABILIDAD	23
+8.1 METODOLOGÍAS DE PRUEBAS DE CARGA	23
+8.2 ENFOQUES DE ESCALADO HORIZONTAL Y VERTICAL	24
+9  SEGURIDAD Y CUMPLIMIENTO NORMATIVO	25
+9.1 CIFRADO DE DATOS EN REPOSO Y EN TRÁNSITO	25
+9.3 CUMPLIMIENTO CON GDPR, HIPAA U OTRAS NORMATIVAS	25
+9.4 AUDITORÍA, REGISTRO DE EVENTOS Y TRAZABILIDAD	26
+10  APÉNDICES	27
+
+
+
+
+
+
+1  Introducción
+1.1 Propósito y Alcance
+El propósito de este documento es describir las especificaciones del producto DocAI, desarrollado y propiedad de IO DIGITAL.
+Estas especificaciones abarcan los componentes de clasificación de documentos (basados en machine learning), la extracción de datos mediante IA generativa, así como las capas de integración, seguridad, rendimiento, escalabilidad y demás aspectos operativos.
+El alcance cubre la totalidad de las funcionalidades, arquitecturas y consideraciones tecnológicas involucradas en el ciclo completo del procesamiento de documentos
+
+* Ingesta, Preprocesamiento y Normalización: Métodos y protocolos para la recepción e interpretación de documentos en diversos formatos, aplicando validaciones, limpieza y estructuración de datos previos.
+* Clasificación de Documentos (ML): Definición y entrenamiento de modelos, metodologías de categorización, métricas de rendimiento y estrategias de mejora continua.
+* Extracción de Datos (IA Generativa): Arquitecturas de modelos generativos, procesos de entrenamiento, ajuste fino para distintos dominios, validación de resultados y aseguramiento de calidad.
+* Capa de Integración: Definición de APIs, autenticación, autorizaciones, comunicación con sistemas BPM, mensajería, event-driven architectures y flujos de datos a tiempo real.
+* Almacenamiento y Gestión de Datos: Estructuras de datos, índices, esquemas de bases de datos, políticas de archivado, respaldo y recuperación ante desastres.
+* Rendimiento, Escalabilidad y Seguridad: Estrategias de cacheo, escalado horizontal/vertical, cifrado, control de accesos, cumplimiento normativo y auditoría.
+* Despliegue y Operaciones: Integración continua, despliegues contenedorizados, orquestación, monitoreo, logging, trazabilidad y soporte.
+* Mantenimiento y Actualización de Modelos: Entrenamiento continuo, detección de deriva, reentrenamiento y control de versiones de modelos.
+
+1.2 Visión General del Documento
+Este documento se compone de secciones organizadas de forma lógica que abarcan todos los aspectos técnicos del sistema. Cada sección profundiza en un área específica de la solución, desde la arquitectura hasta las consideraciones de implementación y mantenimiento. Este enfoque holístico garantiza que el lector cuente con una guía integral para entender y evaluar el producto DocAI.
+
+1.3 Audiencia Objetivo
+El documento está dirigido a una audiencia técnica especializada con distintos roles dentro del ciclo de vida del producto:
+* Arquitectos de Software y Soluciones: Para comprender la arquitectura global, las tecnologías empleadas y la integración con otros sistemas.
+* Ingenieros de Machine Learning / Data Scientists: Para familiarizarse con la naturaleza de los modelos de clasificación, las técnicas de extracción generativa, el proceso de entrenamiento, validación y mejora continua.
+* Desarrolladores e Integradores: Para entender las APIs, protocolos de comunicación, mecanismos de autenticación, autorizaciones y flujos de datos hacia sistemas externos, como BPMs u otros sistemas empresariales.
+* Responsables de Seguridad y Cumplimiento: Para revisar e implementar las medidas de cifrado, control de accesos, auditorías, cumplimiento normativo y trazabilidad.
+ 
+
+
+
+2  Descripción General del Sistema
+2.1 Arquitectura a Alto Nivel
+La arquitectura de DocAI se concibe como un ecosistema modular y distribuido, capaz de procesar grandes volúmenes de documentos con altos niveles de eficiencia y resiliencia. En términos generales, la plataforma se compone de los siguientes estratos:
+* Capa de Ingesta y Preprocesamiento: Recepción de documentos a través de puntos de entrada definidos (APIs, colas de mensajería, almacenamiento en la nube, directorios locales, etc.), normalización de formatos, extracción de metadatos básicos y clasificación preliminar del tipo de documento.
+* Capa de Clasificación (ML Tradicional): Un conjunto de modelos entrenados sobre muestras etiquetadas, responsables de identificar el tipo de documento (factura, contrato, informe, expediente, etc.) mediante algoritmos de machine learning (ej. Random Forest, SVM, Redes Neuronales). Esta capa se integra con un servidor de modelos que ofrece inferencia escalable.
+* Capa de Extracción de Datos (IA Generativa): Módulos basados en modelos avanzados de deep learning (normalmente basados en Transformers, LLMs) que, una vez categorizado el documento, extraen la información relevante de manera contextual y semántica, generando salidas estructuradas (JSON, XML, CSV, etc.) con los campos clave solicitados.
+* Capa de Integración y Orquestación: API Gateway, buses de mensajería y componentes orientados a eventos que facilitan la conexión con sistemas externos (BPM, ERP, CRM, DMS, entre otros), garantizando la interoperabilidad y el intercambio seguro de datos. Aquí también se gestionan colas, tópicos de mensajería, escalado automático y mecanismos de reintento ante fallos.
+* Capa de Almacenamiento y Gestión de Datos: Bases de datos relacionales y/o NoSQL para almacenar metadatos de documentos, índices de búsqueda, configuraciones y resultados extraídos. Además, repositorios de objetos (Object Storage) para archivos binarios y entornos seguros de almacenamiento para datasets de entrenamiento.
+* Capa de Monitoreo, Seguridad y Cumplimiento: Soluciones de observabilidad (metrics, logs, traces), autenticación y autorización (OAuth2, JWT), cifrado (TLS, at-rest encryption) y controles de acceso granular (RBAC), junto con herramientas de auditoría y cumplimiento normativo.
+
+A este nivel, la arquitectura se diseña bajo principios de escalabilidad horizontal, resiliencia ante fallos (mediante redundancia, particionamiento y replicación), y modularidad, permitiendo así la evolución independiente de cada componente.
+
+
+2.2 Componentes Funcionales Clave
+Cada estrato del sistema se compone de componentes especializados que cumplen funciones específicas:
+* Ingestión:
+o Connectores de Entrada: Adaptadores para múltiples fuentes (APIs REST, colas de mensajería, S3 Buckets, FTP, SMB/NFS).
+o Módulo de Preprocesamiento: Extracción de metadatos técnicos, transformación de formatos (PDF, DOCX, TIFF, etc. a un estándar interno, como texto y features vectorizados).
+* Clasificación (ML Tradicional):
+o Servidor de Inferencia de Modelos Clásicos: Contiene uno o varios modelos entrenados con datos de ejemplo.
+o Control de Versionado de Modelos: Mecanismos para desplegar diferentes versiones del modelo y realizar test A/B o rollbacks controlados.
+* Extracción de Datos (IA Generativa):
+o Modelo de Lenguaje Avanzado (LLM o similar): Redes neuronales profundas basadas en transformadores (ej. BERT, GPT-like), adaptadas para comprender el contexto documental.
+o Adaptadores de Dominio: Fine-tuning para casos de uso específicos (facturas, contratos, informes médicos, etc.).
+o Validador de Resultados: Módulo que compara el output del LLM con reglas de negocio o patrones esperados, asignando niveles de confianza y notificando inconsistencias.
+* Integración y Orquestación:
+o API Gateway: Punto único de entrada para clientes externos, con políticas de seguridad, rate-limiting, y enrutamiento a microservicios internos.
+o Bus de Mensajes/Eventos: Kafka, RabbitMQ u otro middleware para intercambio asíncrono de datos y eventos en tiempo real.
+o Conectores BPM: Adaptadores para interactuar con sistemas de gestión de procesos empresariales, integrando la extracción y clasificación en flujos de trabajo automatizados.
+* Almacenamiento y Gestión de Datos:
+o Base de Datos Principal (SQL/NoSQL): Para metadatos, configuraciones de modelos, resultados de clasificación y extracción.
+o Repositorios de Objetos (S3 u otros): Para almacenar documentos de origen y datasets de entrenamiento.
+o Servicios de Indexación y Búsqueda (Elasticsearch u otro): Indexación de contenido para recuperación rápida y análisis.
+* Monitoreo, Seguridad, Cumplimiento:
+o Módulos de Observabilidad (Prometheus, Grafana, ELK Stack): Métricas de rendimiento, alertas, paneles de control.
+o Autorización, Autenticación y Cifrado: Integración con sistemas de IAM, TLS, cifrado de datos en reposo.
+o Auditoría y Logging Centralizado: Registro de transacciones, accesos y cambios para cumplir con normativas y estándares (ej. GDPR).
+
+
+2.3 Entornos de Despliegue Soportados (PaaS, SaaS)
+Doc.AI admite dos modalidades principales de despliegue, brindando flexibilidad para adaptarse a las necesidades, recursos y políticas de cada organización
+
+1. PaaS (Platform as a Service):	
+En este modelo, el sistema se implementa en la infraestructura del cliente con la asistencia del equipo técnico de Doc.AI durante la fase inicial.
+o Gestión y Operación: El cliente puede asumir el monitoreo y la operación en su totalidad o delegar estas actividades al equipo de Doc.AI.
+o Seguridad y Cumplimiento: El cliente mantiene control total sobre el entorno, aplicando sus propias políticas de seguridad, firewalls internos, segmentación de redes, autenticaciones locales y otras medidas según las regulaciones internas y externas pertinentes.
+
+2. SaaS (Software as a Service):	
+En el modelo SaaS, IO DIGITAL ofrece Doc.AI como servicio completamente gestionado, aprovisionando la infraestructura y manteniendo el software, lo que permite al cliente centrarse en el uso de la plataforma y no en su administración.
+o Aislamiento del Entorno (Tenant Aislado): Cada cliente cuenta con un tenant dedicado, segregado a nivel de red, almacenamiento y recursos computacionales, asegurando que ningún dato ni proceso se mezcle o interfiera con otros clientes.
+o Perímetro de Seguridad Endurecido: La infraestructura SaaS se despliega bajo un estricto control de seguridad, incluyendo firewalls de última generación, balanceadores de carga seguros, segmentación de VLANs, y acceso mediante túneles cifrados (VPN) donde sea necesario. Adicionalmente, se emplean sistemas de prevención y detección de intrusiones (IDS/IPS), protección ante ataques DDoS y monitoreo continuo de la red para detectar actividades anómalas.
+o Cifrado y Protección de Datos: Todo el tráfico entre el cliente y la plataforma SaaS viaja sobre canales cifrados (TLS), garantizando la confidencialidad de la información en tránsito. Los datos almacenados se encriptan en reposo (at-rest encryption) y se aplican controles de acceso basados en roles (RBAC), autenticación robusta y autorización granular.
+o Cumplimiento Normativo y Auditoría: El entorno SaaS se construye sobre infraestructuras que cumplen con estándares internacionales de seguridad y privacidad (ej. ISO 27001, SOC 2), contando con registro centralizado de eventos, trazabilidad completa de accesos y acciones, y la posibilidad de auditorías periódicas para verificar el cumplimiento.
+o Operación y Soporte Gestionados: El equipo de IO DIGITAL asume la responsabilidad del monitoreo, mantenimiento, escalado de la infraestructura, aplicación de parches de seguridad, respuesta ante incidentes y soporte técnico continuo, asegurando así un entorno seguro, estable y alineado con las mejores prácticas de ciberseguridad.
+
+
+
+
+
+
+
+
+
+
+
+
+3  Ingesta y Preprocesamiento de Datos
+3.1 Formatos de Entrada y Estándares Compatibles
+Doc.AI está diseñado para recibir y gestionar documentos en una variedad de formatos utilizados comúnmente en entornos empresariales. 
+Entre ellos se incluyen, pero no se limitan a:
+* Formatos Estándar de Documento: PDF, DOCX, PPTX.
+* Formatos Escaneados o Imágenes: Las imágenes de documentos escaneados como TIFF, PNG, JPEG.
+
+La plataforma puede ser extensible a otros formatos mediante la implementación de conectores o parsers personalizados. Además, se contemplan estándares comunes en la industria para la compatibilidad con sistemas externos (ej. HL7 en entornos médicos, UBL en facturación electrónica, XBRL en documentos financieros).
+
+3.2 Pasos de Normalización y Preprocesamiento
+Antes de que un documento llegue a las fases de clasificación y extracción de datos, pasa por una serie de pasos que garantizan su homogeneidad, fiabilidad y calidad:
+1. Validación de Integridad y Autenticidad:
+o Comprobación de que el documento no esté corrupto y que cumpla con el formato esperado.
+o Opcionalmente, verificación de firmas digitales, sellos de tiempo o códigos hash.
+2. Limpieza y Filtrado de Contenido:
+o Eliminación de caracteres inválidos, espacios en blanco excesivos, marcas de agua o metadatos irrelevantes.
+o Segmentación del documento en secciones lógicas (párrafos, páginas, secciones, tablas).
+3. OCR y Reconocimiento de Texto (si aplica):
+o En caso de documentos escaneados o imágenes, se aplica OCR para extraer el texto con una tasa de reconocimiento óptima.
+o Corrección de errores comunes en OCR (normalización de tildes, caracteres especiales, etc.).
+
+Todos estos pasos se parametrizan y se pueden ajustar según las necesidades del cliente o las particularidades del caso de uso.
+
+
+3.3 Manejo de Errores y Registro de Incidencias (Logging)
+La robustez del proceso de ingestión y preprocesamiento es esencial. Por ello, se implementan mecanismos de detección de errores, recuperación y trazabilidad.
+
+* Detección de Errores:	
+El sistema identifica documentos no procesables, formatos no soportados, fallos en la conexión con sistemas OCR externos, inconsistencias en metadatos o problemas de integridad en los archivos.
+* Registro Detallado (Logging):	
+Cada incidente se registra con detalles técnicos (timestamp, tipo de error, stack trace si aplica, documentos afectados, host o instancia del servicio que lo procesó) en un sistema de logging centralizado (ej. ELK Stack, Splunk).	
+Esto facilita la resolución de problemas, análisis forense y auditoría de eventos.
+* Mecanismos de Reintento y Colas de Reprocesamiento:	
+En caso de que un documento falle durante el preprocesamiento, puede reenviarse a una cola de reprocesamiento o marcárselo para revisiones manuales, dependiendo de la configuración y las políticas establecidas.
+Se pueden definir umbrales (máximo número de reintentos), tiempos de espera, y notificaciones a equipos de soporte.
+La combinación de validación, normalización, extracción de metadatos y logging detallado garantiza que la información entre a la fase de clasificación en condiciones óptimas, minimizando el ruido y maximizando la eficacia de los modelos posteriores. De este modo, la calidad del preprocesamiento impacta positivamente en la precisión de la clasificación y la efectividad de la extracción de datos.
+
+
+4  Módulo de Clasificación de Documentos (Machine Learning Tradicional)
+En esta sección se detallan los aspectos relacionados con el módulo de clasificación de documentos que emplea técnicas de machine learning. 
+Su función principal es categorizar los documentos en función de su tipo, estructura y contenido, para posteriormente dirigirlos a las etapas de extracción de datos. 
+Aquí se abordan la arquitectura del modelo, metodologías de entrenamiento, requisitos de datos, técnicas de extracción de características, métricas de evaluación, escalabilidad, y el control de versiones de los modelos.	
+
+4.1 Metodologías de Entrenamiento y Requerimientos de Datos
+
+* Conjunto de Entrenamiento:	
+Se requiere un conjunto representativo de documentos por cada clase (tipo de documento) a identificar. Un mínimo de 10 ejemplos por clase proporciona una base inicial; sin embargo, cuanta mayor sea la diversidad y el volumen, mejores serán los resultados.
+Es importante que las muestras reflejen la variabilidad real (diferentes formatos, lenguajes, calidades de escaneo, estructuras).
+
+* Etiquetado:
+El etiquetado se realiza manualmente o mediante herramientas semiautomáticas. Cada documento en el conjunto de entrenamiento se asocia a una etiqueta que corresponde a su clase (por ejemplo, “Factura”, “Contrato Laboral”, “Informe Médico”).
+
+* Entrenamiento Iterativo:	
+Tras el primer entrenamiento, se evalúa el rendimiento y se identifican clases confusas. Se pueden añadir más ejemplos o refinar las características. Este proceso iterativo mejora gradualmente la precisión.
+
+4.2 Métricas de Evaluación y Mejora Continua	
+
+Para medir la eficacia de la clasificación se aplican métricas estándar:
+* Exactitud (Accuracy): Porcentaje de documentos correctamente clasificados.
+* Precisión, Exhaustividad (Recall) y F1-Score: Métricas de clasificación individuales por clase, útiles cuando el equilibrio entre falsos positivos y falsos negativos es crítico.
+* Matriz de Confusión: Permite visualizar qué clases se confunden entre sí, orientando la mejora del entrenamiento y las features.
+* Curva ROC y AUC: Cuando las clases sean desbalanceadas, la AUC proporciona una medida más robusta de rendimiento.
+
+La mejora continua se basa en incorporar nuevos ejemplos, refinar las características, ajustar hiperparámetros (número de n-grams, tipo de algoritmo, regularización) y emplear técnicas de validación cruzada para minimizar el riesgo de sobreajuste.
+
+4.3 Escalabilidad y Procesamiento Paralelo de Grandes 	Volúmenes		
+
+Para procesar grandes lotes de documentos, el sistema debe ser escalable:
+* Paralelismo Horizontal: Distribuir la carga de clasificación sobre múltiples nodos o contenedores.
+* Batches y Streams: Procesar documentos en lotes (batch processing) o flujos continuos (streaming) empleando colas de mensajería y suscriptores paralelos.
+* Recursos Computacionales: Aumentar el cómputo con CPUs adicionales, GPUs (en caso de usar redes neuronales más complejas) o clusters de cómputo distribuido.
+La infraestructura de despliegue facilita la incorporación dinámica de recursos para adaptar el rendimiento a la demanda.
+
+
+
+
+
+5  Módulo de Extracción de Datos (IA Generativa)
+Esta sección describe el módulo encargado de extraer información específica y contextual de los documentos, haciendo uso de técnicas de IA generativa. 
+A diferencia de los modelos tradicionales que dependen de reglas predefinidas o características estáticas, la IA generativa emplea redes neuronales de última generación (basadas en transformadores, embeddings semánticos y atención contextual) para comprender el contenido del documento y producir salidas estructuradas con un alto grado de flexibilidad y precisión.
+
+5.1 Arquitectura del Modelo Generativo 
+La arquitectura base del módulo de extracción se sustenta en modelos de lenguaje avanzados (LLMs) entrenados sobre grandes corpus textuales para adquirir conocimientos semánticos, contextuales y lingüísticos. Estos modelos se caracterizan por:
+* Mecanismo de Atención: Permite al modelo enfocarse en partes relevantes del texto según la tarea, entendiendo relaciones a largo plazo entre tokens.
+* Entrenamiento Previo (Pretraining) y Ajuste Fino (Fine-Tuning): Inicialmente, el modelo se entrena sobre enormes cantidades de datos generales. Posteriormente, se adapta (fine-tune) con conjuntos de documentos específicos al dominio para mejorar la precisión y relevancia de las extracciones.
+* Context Windows y Prompt Engineering: Permite suministrar un contexto explícito (prompt) al modelo, indicando qué tipo de información extraer, qué campos son relevantes y en qué formato presentarlos.
+
+
+5.2 Procesamiento Semántico y Contextual
+La IA generativa no se limita a buscar patrones léxicos o sintácticos, sino que:
+* Comprende Contextos Amplios: Es capaz de interpretar relaciones entre distintas secciones del documento, conectando información dispersa (por ejemplo, extraer el “importe total” en una factura considerando sumas parciales en diferentes páginas).
+* Interpretación de Ambigüedades: Puede desambiguar términos polisémicos a partir del contexto o inferir información implícita (por ejemplo, si un contrato no menciona la fecha explícitamente pero contiene referencias que permiten deducirla).
+* Adaptabilidad a Diferentes Dominios: Mediante ajuste fino, el modelo puede aprender a extraer cláusulas legales, campos de interés en informes médicos, datos contables específicos, entre otros, con mínimos cambios de configuración.
+5.6 Personalización y Mapeo de Campos
+La IA generativa puede ser configurada para extraer diferentes campos según las necesidades específicas de cada cliente o proceso. 
+
+Para cada campo a extraer, se puede definir un conjunto de parámetros que permiten guiar el comportamiento del LLM y adaptar la salida a los formatos esperados:
+* Etiqueta:
+Identificador del campo (ej. “Fecha de Emisión”, “Importe Total”, “Nombre del Cliente”). Esta etiqueta sirve como referencia al momento de estructurar el resultado y facilita la integración con sistemas externos.
+* Tipo (Fecha, Texto, Importe, Moneda, etc.):	
+Clasificación del tipo de dato esperado. Por ejemplo, una fecha podría requerir una validación de formato, un importe deberá ser interpretado como valor numérico, o un texto podría ser un párrafo libre. Esta información ayuda al sistema a ajustar el post-procesamiento y las validaciones posteriores.
+* Prompt (Texto de Ayuda para la Extracción):	
+El prompt es una instrucción o conjunto de instrucciones que se le proporcionan al LLM para guiar la extracción de información. Por ejemplo, se puede indicar: “Extrae la fecha de emisión del documento. La fecha suele aparecer en el encabezado, cerca del número de documento.” Este prompt orienta al LLM sobre qué buscar y dónde buscarlo dentro del texto.
+* Transformación (Formateo y Normalización):	
+Una vez el LLM extrae el dato, se pueden aplicar transformaciones adicionales para presentar el resultado en el formato deseado. Por ejemplo, al extraer una fecha se puede convertir su formato interno al estándar “DD/MM/YYYY”. De igual manera, para un importe se podría agregar un símbolo monetario (ej. “€”) o formatear el número a un estándar contable. Esta capa de transformación se configura previamente, de modo que el sistema aplique de forma consistente las mismas reglas a cada extracción.
+Importante: La versatilidad del módulo de extracción permite que el prompt, la etiqueta, el tipo y las transformaciones sean definidos para cada campo de manera independiente. Esto facilita la adaptación del sistema a una variedad de escenarios, documentos y requisitos.
+Soporte Multilingüe y Traducción Semántica
+Un aspecto fundamental es que el LLM subyacente posee capacidades multilingües y semánticas que le permiten trabajar con prompts y documentos en distintos idiomas:
+* Independencia del Idioma del Prompt y del Documento:
+El sistema puede procesar un documento en un idioma (ej. español) mientras recibe el prompt en otro idioma (ej. inglés), o viceversa. Gracias a las capacidades de modelos de lenguaje multilingües, se realiza una traducción semántica interna sin necesidad de herramientas adicionales, lo que significa que el LLM comprende el significado del prompt sin importar el idioma en que está redactado, y lo aplica al contenido del documento, sea cual sea su lengua original.
+* Traducción Semántica Interna:	
+El LLM no se limita a una traducción literal. Su entrenamiento masivo en múltiples idiomas le permite captar matices semánticos, interpretando el prompt en el contexto del documento, independientemente de las diferencias idiomáticas. Por ejemplo, si el prompt solicita “Extract the invoice issue date” y el documento está en alemán, el LLM comprende que debe buscar el equivalente a la “fecha de emisión de la factura” en el texto, sin que el usuario tenga que proveer traducciones explícitas.
+* Consistencia en la Extracción Multilingüe:	
+Si la misma plantilla de extracción (con sus etiquetas, tipos, prompts y transformaciones) se aplica a documentos en distintos idiomas, el LLM puede realizar el mismo tipo de extracción sin requerir un cambio en las instrucciones. Esto facilita la escalabilidad y la expansión del sistema a mercados internacionales o a conjuntos de documentos heterogéneos en cuanto a lenguaje.
+* Formato Unificado del Resultado:	
+Independientemente del idioma del documento o del prompt, el resultado se entrega en el formato y el idioma definidos en las transformaciones. Por ejemplo, si se requiere un formato de fecha “DD/MM/YYYY” y el documento está en francés, la salida seguirá el estándar solicitado, manteniendo la coherencia a través de distintos idiomas.
+
+
+
+
+
+
+6  Capa de Integración
+6.1 Especificaciones de las APIs (REST)
+* RESTful APIs:	
+Doc.AI expone un conjunto de endpoints REST con métodos HTTP estándar (GET, POST, PUT, DELETE) para la ingesta de documentos, la recuperación de resultados de clasificación y extracción, así como la gestión de configuraciones y metadatos.
+Se emplean formatos de intercambio de datos ligeros y ampliamente soportados (JSON). Los clientes externos pueden integrar estas APIs en lenguajes y frameworks diversos.
+
+* Versionado de APIs:	
+Las APIs se versionan (por ejemplo, /v1, /v2) para mantener la compatibilidad retroactiva y permitir evoluciones graduales sin afectar a los clientes existentes.
+
+6.2 Autenticación y Autorización (OAuth2, JWT)
+* Autenticación:
+La capa de integración implementa flujos de autenticación seguros, como OAuth2, para gestionar tokens de acceso y refresco, o JWT (JSON Web Tokens) firmados digitalmente. Esto garantiza que solo clientes autorizados puedan interactuar con el sistema.
+
+* Autorización Basada en Roles (RBAC):	
+Se pueden asignar permisos específicos según el rol (ej. “Administrador”, “Usuario Avanzado”, “Integrador”) para restringir el acceso a funciones determinadas de la herramienta (funciones de clasificación (maestro de tipos), uso de playground, envio de documentos, monitorización de cola de procesamiento, etc….
+
+
+6.3 Protocolos de Comunicación (HTTP, Colas de Mensajes)
+* HTTP/HTTPS:
+La comunicación principal se realiza sobre HTTP seguro (HTTPS), garantizando el cifrado de datos en tránsito mediante TLS/SSL.
+* Mensajería Asíncrona (MQ, Pub/Sub):	
+Para integraciones más complejas o de alto rendimiento, Doc.AI puede conectarse a buses de mensajería (ej. Kafka, RabbitMQ, ActiveMQ) o arquitecturas pub/sub. Esto resulta útil para integrar en tiempo real la clasificación y extracción en flujos BPM, donde los documentos se procesan según llegan y se dispara automáticamente la siguiente fase del proceso.
+
+
+6.4 Gestión de Errores, Reintentos y Mecanismos de Circuit Breaker
+* Manejo de Errores en Integraciones:	
+Si un sistema externo (ej. BPM) no responde a tiempo o devuelve un error, Doc.AI aplica políticas de reintento exponencial, colas de espera, o circuit breakers para evitar congestión.
+
+* Circuit Breakers y Timeouts:	
+Se implementan patrones de resiliencia (circuit breaker) que evitan bloquear la plataforma cuando un sistema externo se encuentra saturado o caído. Una vez detectado el problema, se detienen temporalmente las llamadas hasta que el sistema remoto se recupere.
+
+* Registro y Auditoría de Integraciones:	
+Todas las solicitudes, respuestas y errores se registran de manera centralizada, permitiendo la trazabilidad, la auditoría y el análisis forense. Esto facilita la resolución de problemas, la identificación de cuellos de botella y la mejora continua en la integración.
+
+
+
+
+
+8  Rendimiento y Escalabilidad
+La capacidad del sistema para manejar grandes volúmenes de documentos, altos niveles de concurrencia y demandas variables es un aspecto crítico en DocAI. Esta sección describe las estrategias, metodologías de prueba, patrones arquitectónicos y herramientas empleadas para garantizar un rendimiento óptimo, así como la escalabilidad horizontal y vertical del sistema ante picos de carga.
+
+8.1 Metodologías de Pruebas de Carga
+Pruebas de Carga y Estrés:
+Se utilizan herramientas especializadas (JMeter, Gatling, Locust) para simular escenarios de alto tráfico, generando solicitudes simultáneas de ingestión, clasificación y extracción a fin de observar el comportamiento del sistema bajo estrés.
+Pruebas de Rendimiento por Componentes:
+Antes de probar el sistema de forma integral, se evalúan los componentes críticos (API Gateway, clasificación, extracción, almacenamiento, integración con BPM) de forma aislada. Esto permite identificar cuellos de botella específicos y aplicar optimizaciones focalizadas.
+Pruebas Escalonadas:
+Se incrementa gradualmente la carga para determinar en qué punto el rendimiento comienza a degradarse, identificando así el umbral de capacidad base. Estos resultados orientan las estrategias de escalamiento y dimensionamiento de recursos.
+
+
+
+8.2 Enfoques de Escalado Horizontal y Vertical
+Escalado Horizontal (Addición de Nodos):	
+Doc.AI está diseñado para ejecutarse en entornos orquestados (Kubernetes, ECS, etc.). Añadir más réplicas de servicios críticos (clasificación, extracción, API Gateway) aumenta la capacidad para manejar peticiones concurrentes. La escalabilidad horizontal es especialmente útil en entornos cloud, donde el aprovisionamiento de recursos es dinámico.
+Escalado Vertical (Mejorar Recursos Existentes):	
+En entornos on-premise o híbridos, se puede incrementar la memoria, CPU o GPUs de los nodos existentes para soportar cargas mayores. Esto se realiza ajustando las instancias según las necesidades del negocio.
+Autoescalado Dinámico:	
+Los clústeres pueden configurarse para monitorear métricas (uso de CPU, latencia, cola de mensajes) y desencadenar automáticamente el aprovisionamiento o reducción de recursos en función de la demanda. Esto garantiza la eficiencia de costos y el desempeño sostenido.
+
+
+
+9  Seguridad y Cumplimiento Normativo
+La seguridad y el cumplimiento normativo son elementos transversales en DocAI. 
+La plataforma se diseña e implementa siguiendo las mejores prácticas de seguridad de la información, con el objetivo de proteger la confidencialidad, integridad y disponibilidad de los datos, así como de garantizar la conformidad con marcos regulatorios y estándares internacionales.
+
+9.1 Cifrado de Datos en Reposo y en Tránsito	
+Cifrado en Tránsito (Transport Layer Security - TLS):	
+Toda comunicación entre clientes externos, módulos internos, integraciones y bases de datos se realiza a través de canales cifrados (HTTPS/TLS) para impedir la interceptación o manipulación de datos en tránsito.
+Cifrado en Reposo (At-Rest Encryption):	
+Los documentos, metadatos, resultados y datasets de entrenamiento se almacenan cifrados en reposo utilizando claves gestionadas por el cliente (en entornos On-Premise/PaaS) o por IO DIGITAL (en entornos SaaS), con rotación periódica de claves y políticas de acceso restringidas.
+
+
+9.3 Cumplimiento con GDPR, HIPAA u Otras Normativas
+Privacidad de Datos Personales:	
+Si se procesan datos personales, el sistema incorpora mecanismos para anonimizar, seudonimizar o enmascarar información sensible según las regulaciones de privacidad (ej. GDPR en la Unión Europea).
+Se pueden habilitar funciones para eliminar datos a petición del cliente (“derecho al olvido”) o mantener registros de consentimiento.
+Registros y Trazabilidad (Auditoría):	
+Doc.AI mantiene un historial detallado de accesos, consultas, extracciones y modificaciones, permitiendo auditorías completas. Esto es clave en sectores regulados (finanzas, salud, gobierno), donde es necesario demostrar el cumplimiento normativo.
+Los registros incluyen timestamps, identidades de usuarios, acciones realizadas y resultados, almacenándose en sistemas centralizados inmutables (WORM storage, por ejemplo).
+Adecuación a Estándares Internacionales:	
+La plataforma puede alinearse con marcos y certificaciones reconocidas (ISO 27001, SOC 2, PCI-DSS, HIPAA) mediante la adopción de controles de seguridad, políticas y procedimientos documentados. Las prácticas de auditoría externa pueden validar el cumplimiento.
+
+9.4 Auditoría, Registro de Eventos y Trazabilidad
+Logging Centralizado y Normalizado:	
+Todas las acciones del sistema (ingesta de documentos, clasificación, extracción, accesos a APIs, fallos, integraciones con BPM) se registran en una plataforma de logging centralizada, con enriquecimiento de metadatos (ID de instancia, ID de transacción, tags de entorno).
+Mecanismos de Detección de Intrusiones (IDS/IPS):	
+La plataforma puede integrarse con sistemas de detección y prevención de intrusiones, así como con herramientas SIEM (Security Information and Event Management), para monitorear actividades sospechosas, generar alertas y responder a incidentes de manera automatizada.
+Alertas y Notificaciones de Seguridad:	
+Ante eventos críticos (intentos de acceso no autorizado, anomalías en patrones de uso, brechas potenciales), se generan alertas en tiempo real que notifiquen a los equipos de seguridad o cumplan con procedimientos predefinidos de contención.
+
+10  Apéndices	
+10.1 Glosario de Términos	
+
+Active Learning (Aprendizaje Activo):	
+Método de entrenamiento iterativo donde el sistema identifica datos poco confiables o ejemplos confusos para solicitar correcciones o etiquetado manual, mejorando así la calidad del modelo con el mínimo esfuerzo humano.
+API (Application Programming Interface):	
+Interfaz que define cómo interactúan diferentes componentes de software, facilitando la comunicación entre aplicaciones, servicios o sistemas.
+API Gateway:	
+Punto único de entrada para acceder a las APIs de un sistema, ofreciendo enrutamiento, seguridad, autenticación, control de tráfico y otras funcionalidades de integración.
+At-Rest Encryption (Cifrado en Reposo):	
+Cifrado aplicado a datos almacenados en disco, bases de datos o repositorios de objetos, con el fin de evitar su acceso no autorizado incluso si se comprometen los soportes de almacenamiento.
+Auditoría y Trazabilidad:	
+Capacidad para registrar, rastrear y revisar las acciones realizadas en el sistema, incluyendo accesos, modificaciones y eventos operacionales, para cumplir con normativas, análisis forenses o mejoras de seguridad.
+Autoescalado (Autoscaling):	
+Mecanismo por el cual la infraestructura ajusta automáticamente recursos (nodos, contenedores, CPU, memoria) en función de métricas de carga, demanda o umbrales predefinidos, optimizando rendimiento y costos.
+BPM (Business Process Management):	
+Conjunto de prácticas, herramientas y sistemas orientados a modelar, ejecutar y optimizar procesos de negocio, coordinando tareas humanas y automatizadas para mejorar eficiencia y control.
+Caché:
+Memoria de acceso rápido donde se almacenan datos frecuentemente solicitados para acelerar su entrega y mejorar el rendimiento. 
+Circuit Breaker (Cortacircuitos):	
+Patrón de resiliencia que evita enviar peticiones a un servicio externo cuando éste está fallando, reduciendo el impacto en el sistema y permitiendo una recuperación más rápida.
+Fine-Tuning:
+Proceso de ajuste fino de un modelo de IA preentrenado en un conjunto de datos específico del dominio, mejorando su rendimiento en tareas concretas sin tener que entrenarlo desde cero.
+LLM (Large Language Model):	
+Modelo de lenguaje a gran escala, típicamente basado en transformadores, entrenado con enormes volúmenes de texto para entender semántica, contexto y generar o interpretar contenidos con alta precisión.
+Machine Learning:	
+Técnicas de ML clásicas (ej. regresión logística, árboles de decisión, SVM) que dependen de features definidas manualmente y entrenadas sobre datos etiquetados, a diferencia de las arquitecturas profundas usadas en IA generativa.
+Metadatos:
+Datos sobre datos. Información descriptiva sobre documentos (ej. fecha de creación, autor, formato, tipo de documento) que facilita la indexación, búsqueda y gestión de la información.
+Microservicios:
+Arquitectura que descompone una aplicación compleja en pequeños servicios independientes, cada uno con su responsabilidad, permitiendo escalado, despliegue y evolución individuales.
+OCR (Optical Character Recognition):	
+Tecnología que convierte imágenes escaneadas o fotografías de texto (ej. documentos en papel) en texto digital procesable por computadoras. 
+Prompt:
+Instrucción proporcionada a un LLM para guiar su respuesta. En el contexto de la extracción de datos, el prompt indica qué información extraer y cómo presentarla.
+RBAC (Role-Based Access Control):	
+Mecanismo de autorización que asigna permisos a roles definidos, y luego los usuarios asumen esos roles. Esto facilita la administración de accesos complejos de manera centralizada.
+RTO (Recovery Time Objective) / RPO (Recovery Point Objective):
+Parámetros clave de resiliencia y recuperación: el RTO define el tiempo máximo tolerable de inactividad, mientras que el RPO determina la pérdida máxima aceptable de datos tras un incidente.
+SaaS (Software as a Service):	
+Modelo de entrega de software donde el proveedor aloja la aplicación en su infraestructura y el cliente la utiliza a través de internet, pagando por uso o suscripción, sin preocuparse por su mantenimiento o despliegue.
+Trazabilidad:
+Habilidad de rastrear la historia, aplicación o ubicación de un ítem (documento, solicitud, evento) a través de registros y metadatos, asegurando transparencia y responsabilidad.
+Transformación (en la Extracción de Datos):	
+Operaciones aplicadas a la información extraída para formatearla o enriquecerla según las necesidades (ej. cambiar el formato de fecha, añadir un símbolo monetario, normalizar unidades de medida).
+Versionado de Modelos:	
+Práctica de asignar identificadores únicos a distintas iteraciones de un modelo (v1, v2, etc.), registrando sus características, dataset, métricas y fecha, permitiendo reproducir entrenamientos y comparar rendimientos en el tiempo.
+Con este glosario, se facilita la comprensión de los términos técnicos y conceptuales utilizados a lo largo del documento, promoviendo un entendimiento claro y común entre todos los actores involucrados en el diseño, implementación y operación de DocAI.
+
+			Documento Especificaciones Técnicas
+
+
+
+
+
+
+4
+		
+
