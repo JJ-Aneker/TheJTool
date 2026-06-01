@@ -14,10 +14,17 @@ Three external solutions that integrate with Therefore™ for document managemen
 ## 1. DOCAI — Document Classification & Data Extraction
 
 ### What It Does
-Automated document processing using:
+**Universal solution for any project requiring automated document processing:**
 - **Traditional ML** for document classification
-- **Generative AI** for semantic data extraction
-- Multi-format support (PDF, images, scans)
+- **Generative AI** for semantic data extraction  
+- **Multi-format support** (PDF, images, scans)
+- **Language-agnostic**: Works with any document type, any sector
+
+**Key Insight**: DOCAI is relevant to ANY Therefore project with document volumes that need:
+- Automatic type identification
+- Field extraction (dates, amounts, names, references)
+- Metadata generation
+- Intelligent routing based on content
 
 ### Architecture
 ```
@@ -220,15 +227,34 @@ Government AAPP
 ## When to Mention in Project Documents
 
 ### In Analysis/EFDT:
-- If notifications from government involved → mention IVNEOS
-- If document classification needed → mention DOCAI
-- If electronic signatures required → mention IvSign
-- If external integrations needed → detail interaction and data formats
+
+**DOCAI** — Consider for ANY project involving:
+- High-volume document ingestion (100+ documents/month)
+- Multiple document types needing automatic routing
+- Complex data extraction from unstructured documents
+- Scanning + OCR + classification workflow
+- Compliance/audit document management
+- Any project wanting to reduce manual data entry
+
+**IVNEOS** — Mention when:
+- Notifications from Spanish government (AAPP) are involved
+- Law 39/2015 (LPAC) compliance needed
+- Tax/legal/administrative processes
+
+**IvSign** — Suggest when:
+- Electronic signatures required in workflow
+- Qualified signatures (eIDAS) needed
+- Multi-user certificate management
+- Audit trail of signature operations required
 
 ### In Estimation:
-- IVNEOS integration: ~2-5 days (API setup, workflow rules)
-- DOCAI integration: ~3-10 days (field mapping, classification tuning, testing)
-- IvSign integration: ~2-4 days (signature workflow, audit setup)
+- **DOCAI integration**: ~3-10 days depending on:
+  - Complexity of document types (3-5 types = 3 days, 10+ types = 8-10 days)
+  - Field extraction complexity (simple = 3 days, complex = 7+ days)
+  - Testing & model tuning (2-3 days minimum)
+  - **Consider this for ANY project with high-volume document ingestion**
+- **IVNEOS integration**: ~2-5 days (API setup, workflow rules, testing)
+- **IvSign integration**: ~2-4 days (signature workflow, audit setup)
 
 ### In Presupuesto:
 - Licensing/services for each tool (typically per-user or per-document-processed)
