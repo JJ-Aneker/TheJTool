@@ -274,7 +274,7 @@ function AppContent() {
               <div style={{
                 fontSize: '13px',
                 fontWeight: '500',
-                color: 'var(--text-primary)',
+                color: 'white',
                 whiteSpace: 'nowrap',
                 flex: 1,
                 marginLeft: '12px',
@@ -287,7 +287,7 @@ function AppContent() {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: 'var(--text-secondary)',
+                  color: 'rgba(255, 255, 255, 0.45)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -296,8 +296,8 @@ function AppContent() {
                   transition: 'color 200ms ease',
                   marginLeft: '8px'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)'}
               >
                 <MenuFoldOutlined size={18} />
               </button>
@@ -361,7 +361,7 @@ function AppContent() {
             {!collapsed && (
               <div style={{
                 fontSize: '11px',
-                color: 'var(--text-secondary)',
+                color: 'rgba(255, 255, 255, 0.55)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',

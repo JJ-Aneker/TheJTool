@@ -375,7 +375,7 @@ select:focus {
   line-height: 36px;
   margin-block: 2px;
   font-size: 13px;
-  font-weight: 400;
+  font-weight: 300;
   margin: 0;
   transition: all 200ms ease;
 }
@@ -391,6 +391,13 @@ select:focus {
 }
 
 /* Sidebar always dark - Light Theme override */
+[data-theme="light"] {
+  --text-sidebar-primary: rgba(255, 255, 255, 0.90);
+  --text-sidebar-secondary: rgba(255, 255, 255, 0.45);
+  --bg-sidebar-hover: #252a3d;
+  --border-sidebar: rgba(255, 255, 255, 0.08);
+}
+
 [data-theme="light"] .ant-menu {
   background: #25272D !important;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
