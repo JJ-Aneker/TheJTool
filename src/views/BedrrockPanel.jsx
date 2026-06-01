@@ -32,7 +32,7 @@ export default function BedrrockPanel() {
 
   const loadBedrockStatus = async () => {
     try {
-      const resp = await fetch('/api/admin/bedrock/status', {
+      const resp = await fetch('/api/bedrock?action=status', {
         headers: getAuthHeaders()
       })
       if (!resp.ok) {
@@ -50,10 +50,10 @@ export default function BedrrockPanel() {
     setLoading(true)
     try {
       const [usageResp, historyResp] = await Promise.all([
-        fetch(`/api/admin/bedrock/usage?days=${period}`, {
+        fetch(`/api/bedrock?action=usage&days=${period}`, {
           headers: getAuthHeaders()
         }),
-        fetch(`/api/admin/bedrock/usage/history?days=${period}`, {
+        fetch(`/api/bedrock?action=usage&days=${period}&history=true`, {
           headers: getAuthHeaders()
         })
       ])
@@ -80,7 +80,7 @@ export default function BedrrockPanel() {
     setTestLoading(true)
     setTestResult(null)
     try {
-      const resp = await fetch('/api/admin/bedrock/test', {
+      const resp = await fetch('/api/bedrock?action=test', {
         method: 'POST',
         headers: getAuthHeaders()
       })
@@ -104,7 +104,7 @@ export default function BedrrockPanel() {
   const handleUpdateCredentials = async (values) => {
     setLoading(true)
     try {
-      const resp = await fetch('/api/admin/bedrock/credentials', {
+      const resp = await fetch('/api/bedrock?action=credentials', {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
