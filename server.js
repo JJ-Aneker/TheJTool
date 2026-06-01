@@ -82,9 +82,26 @@ app.get('/api/bedrock', verifyAdmin, bedrockHandler);
 app.post('/api/bedrock', verifyAdmin, bedrockHandler);
 app.put('/api/bedrock', verifyAdmin, bedrockHandler);
 
+// Health check for Bedrock endpoint (for debugging)
+app.get('/api/bedrock-health', (req, res) => {
+  res.json({
+    status: 'ok',
+    env: {
+      AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID ? '***' : 'NOT SET',
+      AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY ? '***' : 'NOT SET',
+      AWS_REGION: process.env.AWS_REGION || 'NOT SET'
+    }
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`📍 API endpoint: http://localhost:${PORT}/api/analyze`);
   console.log(`📍 Build endpoint: http://localhost:${PORT}/api/build-docx`);
+  console.log(`📍 Bedrock endpoint: http://localhost:${PORT}/api/bedrock?action=status|test|credentials|usage`);
+  console.log(`📍 Health check: http://localhost:${PORT}/api/bedrock-health`);
+  console.log(`\n📋 Environment:`);
+  console.log(`   AWS_REGION: ${process.env.AWS_REGION || 'NOT SET'}`);
+  console.log(`   AWS_ACCESS_KEY_ID: ${process.env.AWS_ACCESS_KEY_ID ? '***' : 'NOT SET'}`);
 });
