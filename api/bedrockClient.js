@@ -121,14 +121,20 @@ export async function callBedrock(params, options = {}) {
   ;(async () => {
     try {
       const sb = getSupabaseClient()
-      await sb.from('anthropic_usage').insert({
+      const result = await sb.from('anthropic_usage').insert({
         user_id: userId,
         module,
         model: modelId,
         input_tokens: inputTokens,
         output_tokens: outputTokens,
-        cost_usd: cost
+        cost_usd: cost,
+        timestamp: new Date().toISOString()
       })
+      if (result.error) {
+        console.warn('Supabase insert error:', result.error)
+      } else {
+        console.log('[Bedrock Usage Logged]', { module, inputTokens, outputTokens, cost })
+      }
     } catch (err) {
       console.warn('Failed to log Bedrock usage:', err.message)
     }

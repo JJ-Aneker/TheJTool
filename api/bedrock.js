@@ -139,8 +139,8 @@ async function handleUsage(req, res) {
     const { data: usageData, error: usageError } = await sb
       .from('anthropic_usage')
       .select('*')
-      .gte('created_at', startDate.toISOString())
-      .order('created_at', { ascending: false })
+      .gte('timestamp', startDate.toISOString())
+      .order('timestamp', { ascending: false })
 
     if (usageError && usageError.code !== 'PGRST116') {
       // PGRST116 = "The result contains no rows" - this is fine
@@ -155,7 +155,7 @@ async function handleUsage(req, res) {
       const dailyData = {}
 
       data.forEach(row => {
-        const dateKey = row.created_at.split('T')[0]
+        const dateKey = (row.timestamp || row.created_at || new Date().toISOString()).split('T')[0]
         if (!dailyData[dateKey]) {
           dailyData[dateKey] = { date: dateKey, cost: 0 }
         }
