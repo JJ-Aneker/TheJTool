@@ -330,8 +330,8 @@ function AppContent() {
         <Dropdown menu={{ items: userMenuItems }} placement="topLeft" trigger={['click']}>
           <div style={{
             padding: '12px',
-            borderTop: '1px solid var(--border-default)',
-            background: 'var(--bg-sidebar)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: '#25272D',
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
@@ -340,8 +340,8 @@ function AppContent() {
             transition: 'background 200ms ease',
             flexShrink: 0
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-sidebar)'}
+          onMouseEnter={(e) => e.currentTarget.style.background = '#252a3d'}
+          onMouseLeave={(e) => e.currentTarget.style.background = '#25272D'}
           >
             <div style={{
               width: '32px',
