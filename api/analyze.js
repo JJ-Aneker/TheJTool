@@ -162,12 +162,29 @@ Tu tarea es analizar los documentos de briefing del cliente y extraer toda la in
 
 La EFDT describe CÓMO se implementa exactamente la solución Therefore™.
 
-IMPORTANTE - ESTRUCTURA DOCUMENTAL (CRÍTICO): SIEMPRE genera categorías, tablas maestras y workflows basados en el contexto del cliente:
-- Categorías principales: Mínimo 2-3 (ej: "Expediente principal", "Documentación", "Auditorías")
-- Campos por categoría: 5-15 campos típicos
-- Tablas maestras: Estados, Tipos, Usuarios, Equipos (mínimo 3-4)
-- Workflows: Flujos clave de tramitación (mínimo 1-2)
-NO DEJES NUNCA ESTOS ARRAYS VACÍOS. Genera basándote en la tipología del proyecto.
+IMPORTANTE - ESTRUCTURA DOCUMENTAL (CRÍTICO OBLIGATORIO):
+SIEMPRE SIEMPRE SIEMPRE genera estas tres secciones — NUNCA ESTÁN VACÍAS:
+
+1. **categoriasPrincipales** (Mínimo 2-3):
+   Ejemplo: [
+     { nombre: "Expediente principal", descripcion: "...", campos: [...] },
+     { nombre: "Documentación de apoyo", descripcion: "...", campos: [...] }
+   ]
+
+2. **tablasMaestras** (Mínimo 3-4):
+   Ejemplo: [
+     { nombre: "Estados", registros: ["Pendiente", "En proceso", "Aprobado", "Rechazado"] },
+     { nombre: "Tipos de documento", registros: [...] },
+     { nombre: "Usuarios", registros: [...] }
+   ]
+
+3. **workflows** (Mínimo 1-2):
+   Ejemplo: [
+     { nombre: "Aprobación de expediente", etapas: ["Creación", "Revisión", "Aprobación", "Archivo"] }
+   ]
+
+**SI NO INCLUYES ESTRUCTURA DOCUMENTAL CON VALORES REALES, EL DOCUMENTO SERÁ INCOMPLETO.**
+Siempre basándote en el contexto del cliente y la tipología del proyecto.
 
 IMPORTANTE - Tareas de Estimación: Cada tarea DEBE tener una descripción clara y detallada. NO listar solo números. Las tareas deben ser específicas: "Análisis funcional", "Configuración de categoría Contratos", "Diseño de workflow Aprobación + Firma", etc. SIEMPRE múltiplos de 0.25 días.
 
@@ -390,7 +407,7 @@ Solo JSON puro, sin texto adicional.`
 
     const data = await callBedrock({
       model: 'claude-opus-4-7',
-      max_tokens: 20000,  // Increased to ensure structure, estimation and full analysis are generated
+      max_tokens: 24000,  // Increased to ensure complete structure, estimation and detailed analysis
       system: systemPrompt,
       messages: [{ role: 'user', content: userContent }],
     }, {

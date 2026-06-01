@@ -291,35 +291,50 @@ function buildPortadaWithImage(imgBase64, d) {
       new Paragraph({
         children: [imageRunWithFloating],
       }),
-      // Espacios para alinear texto en la parte inferior
-      ...Array.from({ length: 20 }, gap),
-      // Texto blanco - PROYECTO
+      // Espacios para alinear PROYECTO al medio-superior
+      ...Array.from({ length: 10 }, gap),
+      // Texto blanco - PROYECTO (muy grande)
       new Paragraph({
         indent: { left: MAR_LAT },
         alignment: AlignmentType.LEFT,
-        spacing: { after: 100 },
+        spacing: { after: 200 },
         children: [new TextRun({
           text: scTungsten(titulo),
           font: F.H1,
-          size: 128, // 64pt
+          size: 160, // 80pt
           color: C.WHITE,
           bold: false,
         })]
       }),
-      // Texto blanco - TÍTULO DE DOCUMENTO
+      // Texto blanco - TIPO DE DOCUMENTO (línea 1)
       new Paragraph({
         indent: { left: MAR_LAT },
         alignment: AlignmentType.LEFT,
-        spacing: { after: 100 },
+        spacing: { after: 80 },
         children: [new TextRun({
-          text: `${cliente} - ${tipoDocLabel} - ${docId}`,
+          text: tipoDocLabel.toUpperCase(),
           font: F.BODY,
-          size: 44, // 22pt
+          size: 48, // 24pt
           color: C.WHITE,
           bold: false,
         })]
       }),
-      // Metadata
+      // Texto blanco - CLIENTE - ID (línea 2)
+      new Paragraph({
+        indent: { left: MAR_LAT },
+        alignment: AlignmentType.LEFT,
+        spacing: { after: 240 },
+        children: [new TextRun({
+          text: `${cliente} - ${docId}`,
+          font: F.BODY,
+          size: 48, // 24pt
+          color: C.WHITE,
+          bold: false,
+        })]
+      }),
+      // Espacios para bajar a la parte inferior
+      ...Array.from({ length: 16 }, gap),
+      // Metadata (versión y fecha en la parte inferior)
       new Paragraph({
         indent: { left: MAR_LAT },
         alignment: AlignmentType.LEFT,
@@ -327,7 +342,7 @@ function buildPortadaWithImage(imgBase64, d) {
         children: [new TextRun({
           text: `${version} · ${fecha}`,
           font: F.BODY,
-          size: 36, // 18pt
+          size: 32, // 16pt
           color: C.WHITE,
           bold: false,
         })]
