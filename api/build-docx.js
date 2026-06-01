@@ -37,7 +37,7 @@ const CONTENT_W = PAGE_W - 2 * MAR_LAT;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 const bdr   = (color = 'CCCCCC') => ({ style: BorderStyle.SINGLE, size: 1, color });
-const BDRS  = (color = 'CCCCCC') => ({ top: bdr(color), bottom: bdr(color), left: bdr(color), right: bdr(color), insideH: bdr(color), insideV: bdr(color) });
+const BDRS  = (color = 'CCCCCC') => ({ top: bdr(color), bottom: bdr(color), left: bdr(color), right: bdr(color) });
 const NO_BDR  = { style: BorderStyle.NONE, size: 0, color: 'auto' };
 const NO_BDRS = { top: NO_BDR, bottom: NO_BDR, left: NO_BDR, right: NO_BDR };
 const CM = { top: 80, bottom: 80, left: 120, right: 120 };
