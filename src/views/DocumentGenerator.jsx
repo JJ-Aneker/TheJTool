@@ -1,5 +1,6 @@
 // src/views/DocumentGenerator.jsx
 import { useState, useCallback } from 'react'
+import pako from 'pako'
 import {
   Upload, Button, Select, Input, Steps, Tag, Alert, Spin,
   Typography, Space, Badge, Collapse, Table, Tooltip, message,
@@ -153,17 +154,27 @@ export default function DocumentGenerator() {
       : extraInstructions
 
     try {
+      const payload = {
+        vertical: vertical || 'generico',
+        tipoDoc,
+        extraInstructions: finalInstructions,
+        files: files.map(f => ({ name: f.name, type: f.type, base64: f.base64, textContent: f.textContent })),
+        portada: portada ? { name: portada.name, base64: portada.base64, width: portada.width, height: portada.height } : null,
+        useDefaultPortada
+      }
+
+      // Compress payload for Vercel (4.5MB limit)
+      const jsonStr = JSON.stringify(payload)
+      const compressed = pako.gzip(jsonStr)
+      const base64Compressed = btoa(String.fromCharCode.apply(null, compressed))
+
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          vertical: vertical || 'generico',
-          tipoDoc,
-          extraInstructions: finalInstructions,
-          files: files.map(f => ({ name: f.name, type: f.type, base64: f.base64, textContent: f.textContent })),
-          portada: portada ? { name: portada.name, base64: portada.base64, width: portada.width, height: portada.height } : null,
-          useDefaultPortada
-        })
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Compressed': 'gzip'
+        },
+        body: JSON.stringify({ _compressed: base64Compressed })
       })
       clearInterval(progressInterval)
       setAnalysisProgress(100)

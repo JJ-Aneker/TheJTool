@@ -304,6 +304,24 @@ export default async function handler(req, res) {
   if (!AWS_ACCESS_KEY) return res.status(500).json({ error: 'AWS_ACCESS_KEY_ID not configured' })
 
   try {
+    // Handle compressed payload (for Vercel 4.5MB limit)
+    if (req.headers['x-compressed'] === 'gzip' && req.body._compressed) {
+      try {
+        const { default: pako } = await import('pako')
+        const binaryString = atob(req.body._compressed)
+        const bytes = new Uint8Array(binaryString.length)
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i)
+        }
+        const decompressed = pako.ungzip(bytes, { to: 'string' })
+        req.body = JSON.parse(decompressed)
+        console.log('[ANALYZE] Decompressed payload successfully')
+      } catch (err) {
+        console.error('[ANALYZE] Decompression error:', err)
+        return res.status(400).json({ error: 'Failed to decompress payload' })
+      }
+    }
+
     const { vertical, tipoDoc, extraInstructions, files } = req.body
     const verticalKey  = vertical || 'generico'
     const verticalData = VERTICALES[verticalKey] || VERTICALES.generico
