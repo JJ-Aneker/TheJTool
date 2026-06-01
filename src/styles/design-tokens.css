@@ -54,7 +54,7 @@
   --radius-full: 9999px;
 
   /* Sidebar */
-  --sidebar-expanded: 210px;
+  --sidebar-expanded: 240px;
   --sidebar-collapsed: 48px;
   --sidebar-transition: width 220ms ease;
 
@@ -89,7 +89,7 @@
 [data-theme="light"] {
   /* Fondos - Light */
   --bg-canvas: #f5f7fa;
-  --bg-sidebar: #ffffff;
+  --bg-sidebar: #25272D;
   --bg-card: #ffffff;
   --bg-hover: #f0f2f7;
   --bg-input: #f5f7fa;
@@ -375,7 +375,7 @@ select:focus {
   line-height: 36px;
   margin-block: 2px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   margin: 0;
   transition: all 200ms ease;
 }
@@ -388,6 +388,26 @@ select:focus {
 .ant-menu-dark .ant-menu-item-selected {
   background: var(--accent-primary);
   color: white;
+}
+
+/* Sidebar always dark - Light Theme override */
+[data-theme="light"] .ant-menu {
+  background: #25272D !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .ant-menu-dark .ant-menu-item {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+[data-theme="light"] .ant-menu-dark .ant-menu-item:hover {
+  color: rgba(255, 255, 255, 0.90) !important;
+  background: #252a3d !important;
+}
+
+[data-theme="light"] .ant-menu-dark .ant-menu-item-selected {
+  background: var(--accent-primary) !important;
+  color: white !important;
 }
 
 .ant-card {

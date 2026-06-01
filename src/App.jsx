@@ -232,7 +232,7 @@ function AppContent() {
           transition: 'var(--sidebar-transition)',
           display: 'flex',
           flexDirection: 'column',
-          width: collapsed ? 48 : 210,
+          width: collapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-expanded)',
           overflow: 'hidden'
         }}
       >
@@ -272,8 +272,8 @@ function AppContent() {
           {!collapsed && (
             <>
               <div style={{
-                fontSize: '14px',
-                fontWeight: '600',
+                fontSize: '13px',
+                fontWeight: '500',
                 color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
                 flex: 1,
@@ -360,12 +360,13 @@ function AppContent() {
             </div>
             {!collapsed && (
               <div style={{
-                fontSize: '12px',
+                fontSize: '11px',
                 color: 'var(--text-secondary)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 flex: 1,
+                fontWeight: '400',
                 transition: 'color 200ms ease'
               }}>
                 {user?.email || 'Usuario'}
@@ -377,7 +378,7 @@ function AppContent() {
 
       {/* Main Content Area */}
       <div style={{
-        marginLeft: collapsed ? 48 : 210,
+        marginLeft: collapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-expanded)',
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
