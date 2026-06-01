@@ -391,9 +391,7 @@ select:focus {
 .ant-menu-dark .ant-menu-item-selected {
   background: rgba(54, 99, 255, 0.25) !important;
   color: white !important;
-  margin-left: 8px !important;
-  margin-right: 4px !important;
-  border-radius: 6px !important;
+  border-radius: 0 6px 6px 0 !important;
 }
 
 /* Sidebar always dark - Light Theme override */
@@ -421,9 +419,7 @@ select:focus {
 [data-theme="light"] .ant-menu-dark .ant-menu-item-selected {
   background: rgba(54, 99, 255, 0.25) !important;
   color: white !important;
-  margin-left: 8px !important;
-  margin-right: 4px !important;
-  border-radius: 6px !important;
+  border-radius: 0 6px 6px 0 !important;
 }
 
 .ant-card {
