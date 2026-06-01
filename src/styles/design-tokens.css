@@ -371,12 +371,15 @@ select:focus {
 
 .ant-menu-dark .ant-menu-item {
   color: var(--text-muted);
-  height: 36px;
-  line-height: 36px;
+  height: 40px;
+  line-height: 40px;
   margin-block: 2px;
   font-size: 13px;
   font-weight: 300;
   margin: 0;
+  padding: 0 12px !important;
+  display: flex !important;
+  align-items: center !important;
   transition: all 200ms ease;
 }
 
