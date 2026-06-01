@@ -389,7 +389,7 @@ select:focus {
 }
 
 .ant-menu-dark .ant-menu-item-selected {
-  background: var(--accent-primary);
+  background: rgba(54, 99, 255, 0.25);
   color: white;
 }
 
@@ -416,7 +416,7 @@ select:focus {
 }
 
 [data-theme="light"] .ant-menu-dark .ant-menu-item-selected {
-  background: var(--accent-primary) !important;
+  background: rgba(54, 99, 255, 0.25) !important;
   color: white !important;
 }
 
