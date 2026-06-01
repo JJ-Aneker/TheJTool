@@ -162,15 +162,22 @@ Tu tarea es analizar los documentos de briefing del cliente y extraer toda la in
 
 La EFDT describe CÓMO se implementa exactamente la solución Therefore™.
 
-IMPORTANTE - Tareas de Estimación: Cada tarea DEBE tener una descripción clara y detallada. NO listar solo números. Las tareas deben ser específicas: "Análisis funcional", "Configuración de categoría Contratos", "Diseño de workflow Aprobación + Firma", etc.
+IMPORTANTE - ESTRUCTURA DOCUMENTAL (CRÍTICO): SIEMPRE genera categorías, tablas maestras y workflows basados en el contexto del cliente:
+- Categorías principales: Mínimo 2-3 (ej: "Expediente principal", "Documentación", "Auditorías")
+- Campos por categoría: 5-15 campos típicos
+- Tablas maestras: Estados, Tipos, Usuarios, Equipos (mínimo 3-4)
+- Workflows: Flujos clave de tramitación (mínimo 1-2)
+NO DEJES NUNCA ESTOS ARRAYS VACÍOS. Genera basándote en la tipología del proyecto.
+
+IMPORTANTE - Tareas de Estimación: Cada tarea DEBE tener una descripción clara y detallada. NO listar solo números. Las tareas deben ser específicas: "Análisis funcional", "Configuración de categoría Contratos", "Diseño de workflow Aprobación + Firma", etc. SIEMPRE múltiplos de 0.25 días.
 
 IMPORTANTE - Firma Biométrica: Cuando se mencione "firma biométrica", incluir como tareas separadas: "Integración con sistema de firma digital", "Validación de datos biométricos", "Auditoría y logs de firma biométrica", "Conformidad normativa". No confundir con solo "lector biométrico".
 
 Estructura esperada:
 - Cliente y proyecto: Contexto, verticales, timing
 - Alcance: Qué se incluye, qué no
-- Estructura: Categorías, campos, tablas maestras, workflows
-- Estimación: Desglose por tarea (CON descripción detallada), ratios validados
+- Estructura: Categorías, campos, tablas maestras, workflows (NUNCA VACÍO)
+- Estimación: Desglose por tarea (CON descripción detallada), ratios validados, SIEMPRE múltiplos de 0.25 días
 - Riesgos y supuestos: Qué asumimos, qué puede salir mal`
   }
 
@@ -383,7 +390,7 @@ Solo JSON puro, sin texto adicional.`
 
     const data = await callBedrock({
       model: 'claude-opus-4-7',
-      max_tokens: 16000,  // Increased to handle complex project briefs with detailed analysis
+      max_tokens: 20000,  // Increased to ensure structure, estimation and full analysis are generated
       system: systemPrompt,
       messages: [{ role: 'user', content: userContent }],
     }, {
@@ -393,6 +400,13 @@ Solo JSON puro, sin texto adicional.`
 
     const rawText = data.content[0].text
     let projectData
+
+    // Function to normalize effort to multiples of 0.25 days (2-hour increments)
+    function normalizeEffortToDays(dias) {
+      const normalized = Math.round(dias * 4) / 4; // Round to nearest 0.25
+      return Math.max(0.25, normalized); // Minimum 0.25 days (2 hours)
+    }
+
     try {
       // Intentar parsear directamente primero
       let clean = rawText.trim()
@@ -448,6 +462,25 @@ Solo JSON puro, sin texto adicional.`
 
     projectData.meta = projectData.meta || {}
     projectData.meta.referenciaUsada = refDoc ? refDoc.filename : null
+
+    // Normalize effort to multiples of 0.25 days (2-hour increments)
+    if (projectData.estimacion?.tareas) {
+      projectData.estimacion.tareas = projectData.estimacion.tareas.map(tarea => ({
+        ...tarea,
+        dias: normalizeEffortToDays(tarea.dias || 0),
+        horas: Math.round(normalizeEffortToDays(tarea.dias || 0) * 8),
+        importe: Math.round(normalizeEffortToDays(tarea.dias || 0) * 800)
+      }));
+
+      // Recalculate totals
+      const confirmedTasks = projectData.estimacion.tareas.filter(t => !t.pendiente);
+      projectData.estimacion.totalHoras = Math.round(
+        confirmedTasks.reduce((sum, t) => sum + (t.horas || 0), 0)
+      );
+      projectData.estimacion.totalDias = parseFloat((projectData.estimacion.totalHoras / 8).toFixed(2));
+      projectData.estimacion.totalImporte = Math.round(projectData.estimacion.totalDias * 800);
+      projectData.estimacion.totalConIva = Math.round(projectData.estimacion.totalImporte * 1.21);
+    }
 
     Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v))
     return res.status(200).json({ success: true, data: projectData })
