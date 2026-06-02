@@ -424,10 +424,12 @@ export default function VerticalesManager() {
         }}
         width={920}
         style={{ maxHeight: '90vh' }}
-        bodyStyle={{
-          maxHeight: 'calc(90vh - 200px)',
-          overflow: 'auto',
-          padding: '24px'
+        styles={{
+          body: {
+            maxHeight: 'calc(90vh - 200px)',
+            overflow: 'auto',
+            padding: '24px'
+          }
         }}
         confirmLoading={loading}
         okText="Guardar"
