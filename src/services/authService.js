@@ -56,15 +56,17 @@ export const authService = {
 
       if (error) throw error
 
-      // Check if user is approved in profiles table
+      // Check if user is approved using RPC function (bypasses RLS)
       if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('approved')
-          .eq('user_id', data.user.id)
-          .single()
+        const { data: isApproved, error: rpcError } = await supabase
+          .rpc('is_user_approved', { user_id: data.user.id })
 
-        if (profileError || !profile?.approved) {
+        if (rpcError) {
+          console.error('Error checking user approval:', rpcError)
+          throw new Error('Error al verificar estado de usuario')
+        }
+
+        if (!isApproved) {
           // Sign out user if not approved
           await supabase.auth.signOut()
           throw new Error('Tu cuenta no ha sido aprobada aún. Contacta con un administrador.')
