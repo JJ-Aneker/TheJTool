@@ -7,6 +7,7 @@ import { callBedrock } from './bedrockClient.js'
 import { RATIOS } from './_lib/knowledge/ratios.js'
 import { TEXTOS } from './_lib/knowledge/textos_estandar.js'
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js'
+import { VerticalesDb } from './_lib/database/verticalesDb.js'
 import { DOCUMENT_TYPES } from './_lib/knowledge/document-types.js'
 import { EFDT_EJEMPLOS } from './_lib/knowledge/efdt_ejemplos.js'
 import { EFDT_STYLE_GUIDE, QUALITY_CHECKLIST, PROMPTS_ENHANCEMENT } from './_lib/knowledge/efdt_prompts.js'
@@ -331,7 +332,13 @@ export default async function handler(req, res) {
 
     const { vertical, tipoDoc, extraInstructions, files } = req.body
     const verticalKey  = vertical || 'generico'
-    const verticalData = VERTICALES[verticalKey] || VERTICALES.generico
+
+    // Intentar obtener de BD, fallback a hardcoded
+    let verticalData = await VerticalesDb.buildVerticalObject(verticalKey);
+    if (!verticalData) {
+      console.log(`[ANALYZE] Vertical '${verticalKey}' not found in DB, using hardcoded`);
+      verticalData = VERTICALES[verticalKey] || VERTICALES.generico;
+    }
 
     // ── DESCARGAR DOCUMENTO DE REFERENCIA ──────────────────────────────────
     const refDoc = await fetchReferenceDoc(verticalKey)

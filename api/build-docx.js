@@ -14,6 +14,11 @@ import { TEXTOS } from './_lib/knowledge/textos_estandar.js';
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js';
 import { formatImporte } from './_lib/knowledge/ratios.js';
 
+// Helper para acceso a datos de vertical (con fallback a hardcoded)
+function getVerticalData(verticalKey) {
+  return VERTICALES[verticalKey] || VERTICALES.generico;
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const config = { maxDuration: 120 };
@@ -456,7 +461,7 @@ function buildConfidencialidad(d) {
 }
 
 function buildIntroduccion(d) {
-  const vertData = VERTICALES[d.proyecto?.vertical] || VERTICALES.generico;
+  const vertData = getVerticalData(d.proyecto?.vertical);
   return [
     h1('Introducción'),
     h2('Objetivos'),
@@ -526,7 +531,7 @@ function buildDefinicion(d, tipoDoc = 'efdt') {
   // Tablas maestras - SOLO para EFDT
   if (isEFDT && d.estructura?.tablasMaestras?.length > 0) {
     elements.push(h2('Tablas maestras (master data)'));
-    const vertData = VERTICALES[d.proyecto?.vertical];
+    const vertData = getVerticalData(d.proyecto?.vertical);
     if (vertData?.tablas_maestras?.length > 0 || vertData?.tablasMaestras?.length > 0) {
       elements.push(p('El servicio se fundamenta en el acceso a tablas maestras actualizadas, lo que simplifica la configuración y automatización de los procesos. Su correcta actualización es esencial para el funcionamiento del servicio en su totalidad.'));
     }
@@ -712,7 +717,7 @@ function buildRiesgos(d) {
   const c2 = Math.round(CONTENT_W * 0.52);
   const c3 = CONTENT_W - c1 - c2;
 
-  const vertData = VERTICALES[d.proyecto?.vertical];
+  const vertData = getVerticalData(d.proyecto?.vertical);
   const premisasEspecificas = vertData?.premisas_especificas || [];
   const todasPremisas = [...PREMISAS_COMUNES, ...premisasEspecificas, ...(d.riesgos || [])];
 
