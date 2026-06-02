@@ -9,9 +9,9 @@ AS $$
 DECLARE
   is_approved BOOLEAN;
 BEGIN
-  SELECT approved INTO is_approved
-  FROM profiles
-  WHERE user_id = $1
+  SELECT p.approved INTO is_approved
+  FROM profiles p
+  WHERE p.user_id = $1
   LIMIT 1;
 
   -- Return FALSE if user not found or not approved, TRUE if approved
