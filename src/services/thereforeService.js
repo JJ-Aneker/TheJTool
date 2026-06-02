@@ -247,7 +247,7 @@ class ThereforeService {
       'Content-Type': 'application/json',
       Accept: 'application/json'
     }
-    // Tenant name is required by Therefore server
+    // Include TenantName header only for cloud instances; on-premise instances may not need it
     if (tenantName) {
       basicHeaders.TenantName = tenantName
     }

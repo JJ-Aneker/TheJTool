@@ -159,18 +159,13 @@ export default function ThereforeReporter() {
       return
     }
 
-    if (!tenant.tenant) {
-      message.error('El tenant no tiene configurado el nombre de tenant. Revisa la configuración del servidor.')
-      return
-    }
-
     setLoading(true)
     try {
       const { headers, baseUrl } = await thereforeService.connect(
         tenant.url,
         tenant.usuario,
         tenant.password,
-        tenant.tenant
+        tenant.tenant || ''
       )
 
       const catTree = await thereforeService.getCategoryTree(baseUrl, headers)
@@ -399,7 +394,7 @@ export default function ThereforeReporter() {
         tenant.url,
         tenant.usuario,
         tenant.password,
-        tenant.tenant
+        tenant.tenant || ''
       )
 
       // Refresh catFieldOrder

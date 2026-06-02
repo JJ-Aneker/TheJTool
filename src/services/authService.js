@@ -14,27 +14,28 @@ export const authService = {
 
       if (error) throw error
 
-      // Create user profile in profiles table
+      // Profile is automatically created by Supabase trigger
+      // Upsert to ensure data consistency (handles case where trigger might not have fired yet)
       if (data.user) {
         const [name, surname] = (userData.fullName || '').split(' ', 2)
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              user_id: data.user.id,
-              email: data.user.email,
-              name: name || '',
-              surname: surname || '',
-              phone: userData.phone || '',
-              role: userData.role || 'user',
-              approved: false,
-              created_at: new Date().toISOString()
-            }
-          ])
 
-        if (profileError) {
-          console.error('Error creating profile:', profileError)
-          throw new Error(`Error al crear perfil: ${profileError.message}`)
+        const { error: upsertError } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: data.user.id,
+            email: data.user.email,
+            name: name || '',
+            surname: surname || '',
+            phone: userData.phone || '',
+            approved: false,
+            created_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id'
+          })
+
+        if (upsertError) {
+          console.error('Error creating profile:', upsertError)
+          throw new Error(`Error al crear perfil: ${upsertError.message}`)
         }
       }
 

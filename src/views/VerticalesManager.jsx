@@ -222,25 +222,27 @@ export default function VerticalesManager() {
       label: 'Información Básica',
       children: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Form.Item
-            label="Nombre (ID)"
-            name="nombre"
-            rules={[{ required: true, message: 'El nombre es requerido' }]}
-          >
-            <Input placeholder="ej: notifapp" disabled={!!selectedVertical} />
-          </Form.Item>
-          <Form.Item
-            label="Título"
-            name="titulo"
-            rules={[{ required: true, message: 'El título es requerido' }]}
-          >
-            <Input placeholder="ej: Aplicación de Notificaciones" />
-          </Form.Item>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-xl)' }}>
+            <Form.Item
+              label="Nombre (ID)"
+              name="nombre"
+              rules={[{ required: true, message: 'El nombre es requerido' }]}
+            >
+              <Input placeholder="ej: notifapp" disabled={!!selectedVertical} />
+            </Form.Item>
+            <Form.Item
+              label="Título"
+              name="titulo"
+              rules={[{ required: true, message: 'El título es requerido' }]}
+            >
+              <Input placeholder="ej: Aplicación de Notificaciones" />
+            </Form.Item>
+          </div>
           <Form.Item
             label="Descripción Introducción"
             name="descripcion_intro"
           >
-            <Input.TextArea rows={3} />
+            <Input.TextArea rows={3} placeholder="Descripción breve del vertical" />
           </Form.Item>
           <Form.Item
             name="activo"
@@ -255,24 +257,24 @@ export default function VerticalesManager() {
       key: '2',
       label: 'Estimación y Oferta',
       children: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--gap-xl)' }}>
           <Form.Item
             label="Tarifa Diaria ($)"
             name="tarifa_diaria"
           >
-            <InputNumber />
+            <InputNumber style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item
             label="Duración Típica (días)"
             name="duracion_tipica_dias"
           >
-            <InputNumber />
+            <InputNumber style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item
             label="Margen de Oferta (%)"
             name="margen_oferta_pct"
           >
-            <InputNumber />
+            <InputNumber style={{ width: '100%' }} />
           </Form.Item>
         </div>
       )
@@ -286,43 +288,43 @@ export default function VerticalesManager() {
             label="Descripción Implementación"
             name="descripcion_implementacion"
           >
-            <Input.TextArea rows={3} />
+            <Input.TextArea rows={3} placeholder="Descripción general de la implementación" />
           </Form.Item>
           <Form.Item
             label="Claves (JSON array)"
             name="claves"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["clave1", "clave2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Premisas Específicas (JSON array)"
             name="premisas_especificas"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["premisa1", "premisa2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Tablas Maestras (JSON array)"
             name="tablas_maestras"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["tabla1", "tabla2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Herramientas Recomendadas (JSON array)"
             name="herramientas_recomendadas"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["herramienta1", "herramienta2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Ejemplo Workflows (JSON array)"
             name="ejemplo_workflows"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["workflow1", "workflow2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Integraciones Comunes (JSON array)"
             name="integraciones_comunes"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["integracion1", "integracion2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
         </div>
       )
@@ -336,13 +338,13 @@ export default function VerticalesManager() {
             label="Casos de Prueba Típicos (JSON array)"
             name="casos_prueba_tipicos"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["caso1", "caso2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Criterios de Aceptación (JSON array)"
             name="criterios_aceptacion"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["criterio1", "criterio2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
         </div>
       )
@@ -356,25 +358,25 @@ export default function VerticalesManager() {
             label="Módulos Funcionales (JSON array)"
             name="modulos_funcionales"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["modulo1", "modulo2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Procesos Clave (JSON array)"
             name="procesos_clave"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["proceso1", "proceso2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Integraciones Usuario (JSON array)"
             name="integraciones_usuario"
           >
-            <Input.TextArea rows={3} fontFamily="monospace" />
+            <Input.TextArea rows={2} placeholder='["integracion1", "integracion2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
           <Form.Item
             label="Plantilla HTML Manual"
             name="plantilla_html_manual"
           >
-            <Input.TextArea rows={5} fontFamily="monospace" />
+            <Input.TextArea rows={4} placeholder="<html>...</html>" style={{ fontFamily: 'monospace', fontSize: '12px' }} />
           </Form.Item>
         </div>
       )
@@ -424,18 +426,27 @@ export default function VerticalesManager() {
           form.resetFields();
           setSelectedVertical(null);
         }}
-        width={800}
-        height={600}
+        width={900}
         style={{ maxHeight: '90vh' }}
-        bodyStyle={{ maxHeight: 'calc(90vh - 200px)', overflow: 'auto' }}
+        bodyStyle={{
+          maxHeight: 'calc(90vh - 200px)',
+          overflow: 'auto',
+          padding: '24px'
+        }}
         loading={loading}
+        okText="Guardar"
+        cancelText="Cancelar"
       >
         <Form
           form={form}
           layout="vertical"
           onFinish={handleModalOk}
+          style={{ marginTop: '-8px' }}
         >
-          <Collapse items={collapseSections} />
+          <Collapse
+            items={collapseSections}
+            style={{ background: 'transparent' }}
+          />
         </Form>
       </Modal>
     </div>
