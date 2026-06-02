@@ -307,9 +307,10 @@ export default function TenantManager() {
           <Form.Item
             label="Tenant ID"
             name="tenant"
-            rules={[{ required: true, message: 'Tenant ID requerido' }]}
+            rules={[]}
+            tooltip="Requerido solo para instancias cloud; dejar vacío para on-premise"
           >
-            <Input placeholder="buildingcenter" />
+            <Input placeholder="buildingcenter (opcional para on-premise)" />
           </Form.Item>
 
           <Form.Item
