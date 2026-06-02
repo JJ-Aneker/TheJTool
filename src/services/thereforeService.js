@@ -248,8 +248,9 @@ class ThereforeService {
       Accept: 'application/json'
     }
     // Include TenantName header only for cloud instances; on-premise instances may not need it
-    if (tenantName) {
-      basicHeaders.TenantName = tenantName
+    // Never send TenantName if empty, null, or undefined — on-premise Therefore doesn't support it
+    if (tenantName && tenantName.trim()) {
+      basicHeaders.TenantName = tenantName.trim()
     }
 
     try {
@@ -281,7 +282,7 @@ class ThereforeService {
         Accept: 'application/json',
         UseToken: '1'
       }
-      if (tenantName) headers.TenantName = tenantName
+      if (tenantName && tenantName.trim()) headers.TenantName = tenantName.trim()
 
       return { token: Token, headers, baseUrl: url }
     } catch (err) {
