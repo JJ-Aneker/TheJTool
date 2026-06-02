@@ -163,28 +163,35 @@ Tu tarea es analizar los documentos de briefing del cliente y extraer toda la in
 La EFDT describe CÓMO se implementa exactamente la solución Therefore™.
 
 IMPORTANTE - ESTRUCTURA DOCUMENTAL (CRÍTICO OBLIGATORIO):
-SIEMPRE SIEMPRE SIEMPRE genera estas tres secciones — NUNCA ESTÁN VACÍAS:
+SIEMPRE SIEMPRE SIEMPRE genera TODAS estas cuatro secciones — NUNCA ESTÁN VACÍAS:
 
 1. **categoriasPrincipales** (Mínimo 2-3):
    Ejemplo: [
-     { nombre: "Expediente principal", descripcion: "...", campos: [...] },
+     { nombre: "Expediente principal", descripcion: "...", campos: [{ nombre: "Ref", tipo: "texto", desc: "Referencia única del expediente" }] },
      { nombre: "Documentación de apoyo", descripcion: "...", campos: [...] }
    ]
 
-2. **tablasMaestras** (Mínimo 3-4):
+2. **tablasMaestras** (Mínimo 3-4, CON descripción):
    Ejemplo: [
-     { nombre: "Estados", registros: ["Pendiente", "En proceso", "Aprobado", "Rechazado"] },
-     { nombre: "Tipos de documento", registros: [...] },
-     { nombre: "Usuarios", registros: [...] }
+     { nombre: "Estados", descripcion: "Estados del proceso", campos: ["Pendiente", "En proceso", "Aprobado"] },
+     { nombre: "Tipos de documento", descripcion: "Clasificación de documentos", campos: [...] }
    ]
 
 3. **workflows** (Mínimo 1-2):
    Ejemplo: [
-     { nombre: "Aprobación de expediente", etapas: ["Creación", "Revisión", "Aprobación", "Archivo"] }
+     { nombre: "Aprobación de expediente", descripcion: "Flujo de tramitación", etapas: ["Creación", "Revisión", "Aprobación", "Archivo"] }
    ]
 
-**SI NO INCLUYES ESTRUCTURA DOCUMENTAL CON VALORES REALES, EL DOCUMENTO SERÁ INCOMPLETO.**
-Siempre basándote en el contexto del cliente y la tipología del proyecto.
+4. **herramientasExternas** (SI APLIQUE - detecta DOCAI, IVNEOS, IVSIGN):
+   Ejemplo: [
+     { nombre: "DOCAI", descripcion: "Clasificación automática de documentos y extracción de datos con IA generativa", funcionalidades: ["Clasificación ML", "Extracción de datos", "Mapeo a campos Therefore"] }
+   ]
+
+**IMPORTANTE**:
+- Incluye descripción BREVE en cada campo (no tabla, párrafos)
+- Mantén descripción en tablas maestras AUNQUE SEA OBVIO su uso
+- Detecta herramientas externas SI son relevantes
+- SI NO INCLUYAS ESTRUCTURA DOCUMENTAL COMPLETA, EL DOCUMENTO SERÁ INCOMPLETO.
 
 IMPORTANTE - Tareas de Estimación: Cada tarea DEBE tener una descripción clara y detallada. NO listar solo números. Las tareas deben ser específicas: "Análisis funcional", "Configuración de categoría Contratos", "Diseño de workflow Aprobación + Firma", etc. SIEMPRE múltiplos de 0.25 días.
 
@@ -279,7 +286,7 @@ ${JSON.stringify(
     cliente: { nombre: '', razonSocial: '', sector: '', interlocutor: '', cif: '' },
     proyecto: { titulo: '', subtitulo: '', descripcion: '', vertical: verticalKey, tipoDoc, fecha: '', version: 'v1.0' },
     alcance: { descripcionGeneral: '', clavesProyecto: [], exclusiones: [] },
-    estructura: { categoriasPrincipales: [], tablasMaestras: [], workflows: [] },
+    estructura: { categoriasPrincipales: [], tablasMaestras: [], workflows: [], herramientasExternas: [] },
     licencias: { servidor: 1, concurrentes: 0, nominativas: 0, readOnly: 0, modulosAdicionales: [] },
     estimacion: {
       tareas: [{ descripcion: 'Nombre de la tarea', dias: 1, horas: 8, importe: 800, pendiente: false }],

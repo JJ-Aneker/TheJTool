@@ -499,28 +499,25 @@ function buildDefinicion(d, tipoDoc = 'efdt') {
       elements.push(h3(cat.nombre));
       if (cat.descripcion) elements.push(...parseTextWithImages(cat.descripcion));
 
-      // Tabla de campos SOLO para EFDT
+      // Campos con explicación breve (NO tabla) - SOLO para EFDT
       if (isEFDT && cat.campos?.length > 0) {
-        const c1 = Math.round(CONTENT_W * 0.35);
-        const c2 = Math.round(CONTENT_W * 0.20);
-        const c3 = CONTENT_W - c1 - c2;
-        elements.push(new Table({
-          width: { size: CONTENT_W, type: WidthType.DXA },
-          columnWidths: [c1, c2, c3],
-          rows: [
-            new TableRow({ children: [hdrCell('Campo', c1), hdrCell('Tipo', c2), hdrCell('Descripción', c3)] }),
-            ...cat.campos.map((campo, i) => {
-              const nombre = typeof campo === 'string' ? campo : campo.campo || campo.nombre || '';
-              const tipo = typeof campo === 'object' ? campo.tipo || '' : '';
-              const desc = typeof campo === 'object' ? campo.desc || campo.descripcion || '' : '';
-              return new TableRow({ children: [
-                cell(nombre, c1, { alt: i % 2 === 1, bold: true }),
-                cell(tipo,   c2, { alt: i % 2 === 1, center: true }),
-                cell(desc,   c3, { alt: i % 2 === 1 }),
-              ]});
-            })
-          ]
-        }));
+        elements.push(h3('Campos principales'));
+        for (const campo of cat.campos) {
+          const nombre = typeof campo === 'string' ? campo : campo.campo || campo.nombre || '';
+          const tipo = typeof campo === 'object' ? campo.tipo || '' : '';
+          const desc = typeof campo === 'object' ? campo.desc || campo.descripcion || '' : '';
+
+          // Formato: Campo (tipo): descripción
+          let fieldText = nombre;
+          if (tipo) fieldText += ` (${tipo})`;
+          if (desc) fieldText += `: ${desc}`;
+
+          elements.push(new Paragraph({
+            numbering: { reference: 'bullet-l1', level: 0 },
+            spacing: { after: 80, line: 240 },
+            children: [new TextRun({ text: fieldText, font: F.BODY, size: 18, color: C.DARK })]
+          }));
+        }
         elements.push(gap());
       }
     }
@@ -553,6 +550,22 @@ function buildDefinicion(d, tipoDoc = 'efdt') {
       elements.push(...parseTextWithImages(wf.descripcion || ''));
       if (wf.etapas?.length > 0) {
         for (const etapa of wf.etapas) elements.push(b1(etapa));
+      }
+      elements.push(gap());
+    }
+  }
+
+  // Herramientas externas - SOLO para EFDT
+  if (isEFDT && d.estructura?.herramientasExternas?.length > 0) {
+    elements.push(h2('Herramientas externas e integraciones'));
+    for (const herr of d.estructura.herramientasExternas) {
+      elements.push(h3(herr.nombre));
+      if (herr.descripcion) elements.push(...parseTextWithImages(herr.descripcion));
+      if (herr.funcionalidades?.length > 0) {
+        elements.push(p('Funcionalidades principales:'));
+        for (const func of herr.funcionalidades) {
+          elements.push(b1(func));
+        }
       }
       elements.push(gap());
     }
