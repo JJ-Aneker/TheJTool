@@ -254,6 +254,12 @@ class ThereforeService {
     }
 
     try {
+      // Debug: Log headers being sent (excluding Authorization for security)
+      const headersToLog = { ...basicHeaders }
+      delete headersToLog.Authorization
+      console.log('🔐 thereforeService.connect - Headers sent:', headersToLog)
+      console.log('🔐 TenantName included:', 'TenantName' in basicHeaders)
+
       const resp = await fetch(url + '/GetConnectionToken', {
         method: 'POST',
         headers: basicHeaders,
@@ -266,10 +272,12 @@ class ThereforeService {
           errorMsg = 'Credenciales inválidas'
         } else if (resp.status === 500) {
           try {
-            const errorData = await resp.json()
+            const errorText = await resp.text()
+            console.error('💥 Therefore 500 response body:', errorText)
+            const errorData = JSON.parse(errorText)
             errorMsg = errorData.message || errorData.error || `Servidor error: ${resp.status}`
           } catch {
-            errorMsg = 'Error del servidor Therefore (500). Verifica credenciales y URL'
+            errorMsg = 'Error del servidor Therefore (500). Verifica credenciales, URL y parámetros enviados'
           }
         }
         throw new Error(errorMsg)
