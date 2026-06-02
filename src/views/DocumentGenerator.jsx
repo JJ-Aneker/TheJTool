@@ -166,7 +166,13 @@ export default function DocumentGenerator() {
       // Compress payload for Vercel (4.5MB limit)
       const jsonStr = JSON.stringify(payload)
       const compressed = pako.gzip(jsonStr)
-      const base64Compressed = btoa(String.fromCharCode.apply(null, compressed))
+
+      // Safe base64 conversion (avoids stack overflow on large data)
+      let binaryString = '';
+      for (let i = 0; i < compressed.length; i++) {
+        binaryString += String.fromCharCode(compressed[i]);
+      }
+      const base64Compressed = btoa(binaryString)
 
       const res = await fetch('/api/analyze', {
         method: 'POST',
