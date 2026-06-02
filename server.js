@@ -11,11 +11,13 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '.env') });
 
 import { createClient } from '@supabase/supabase-js';
+import { Router } from 'express';
 import analyzeHandler from './api/analyze.js';
 import buildDocxHandler from './api/build-docx.js';
 import executeSqlHandler from './api/execute-sql.js';
 import updateUserRoleHandler from './api/update-user-role.js';
 import bedrockHandler from './api/bedrock.js';
+import verticalesHandlers from './api/verticales.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -93,6 +95,13 @@ app.get('/api/bedrock-health', (req, res) => {
     }
   });
 });
+
+// Verticales management routes
+app.get('/api/verticales', verticalesHandlers.getAllVerticals);
+app.post('/api/verticales', verticalesHandlers.createVertical);
+app.get('/api/verticales/:id', verticalesHandlers.getVerticalById);
+app.put('/api/verticales/:id', verticalesHandlers.updateVertical);
+app.delete('/api/verticales/:id', verticalesHandlers.deleteVertical);
 
 // Start server
 app.listen(PORT, () => {

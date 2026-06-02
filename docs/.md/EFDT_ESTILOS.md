@@ -156,7 +156,7 @@ Todos los textos con fuente Tungsten Reveal EXT (H1, H2, títulos de portada) us
 - Sección independiente con **márgenes a cero** (top/bottom/left/right: 0) y sin header/footer.
 - Dimensiones de render: **794 × 1123 px** (A4 a 96 dpi).
 - Texto superpuesto en blanco (`#FFFFFF`) en zona inferior izquierda con `indent: { left: 1200 }`:
-  - Título: Tungsten Reveal EXT 64pt blanco (sentence case)
+  - Título: Tungsten Reveal EXT 48pt blanco (sentence case)
   - Subtítulo: Montserrat 22pt blanco
   - Datos cliente/versión: Montserrat 18pt blanco
 - La imagen **debe subirse al chat en cada sesión** — no se puede almacenar en el Knowledge como binario PNG.

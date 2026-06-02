@@ -33,6 +33,7 @@ import Home from './views/Home'
 import Login from './views/Login'
 import UserProfile from './views/UserProfile'
 import UserManager from './views/UserManager'
+import VerticalesManager from './views/VerticalesManager'
 import TenantManager from './views/TenantManager'
 import WebServicesManager from './views/WebServicesManager'
 import EFormBuilder from './views/EFormBuilder'
@@ -58,6 +59,13 @@ const getMenuItems = (isAdmin = false) => {
       icon: <UserOutlined />,
       label: 'Gestión de Usuarios',
       path: '/users',
+      adminOnly: true
+    },
+    {
+      key: 'verticales',
+      icon: <AppstoreOutlined />,
+      label: 'Gestión de Verticales',
+      path: '/verticales',
       adminOnly: true
     },
     {
@@ -399,6 +407,7 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/users" element={<AdminRoute><UserManager /></AdminRoute>} />
+            <Route path="/verticales" element={<AdminRoute><VerticalesManager /></AdminRoute>} />
             <Route path="/bedrock" element={<AdminRoute><BedrrockPanel /></AdminRoute>} />
             <Route path="/eforms" element={<EFormBuilder />} />
             <Route path="/category-builder" element={<CategoryBuilder />} />
