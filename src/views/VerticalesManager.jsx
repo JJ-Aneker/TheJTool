@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, Tooltip, Popconfirm, Collapse, InputNumber, Checkbox } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Modal, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Collapse, InputNumber, Checkbox } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
 
 export default function VerticalesManager() {
@@ -9,7 +9,6 @@ export default function VerticalesManager() {
   const [verticales, setVerticales] = useState([]);
   const [selectedVertical, setSelectedVertical] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState('list');
 
   useEffect(() => {
     loadVerticales();
@@ -170,7 +169,6 @@ export default function VerticalesManager() {
   const handleModalOk = async (values) => {
     setLoading(true);
     try {
-      // Parse JSON fields
       const data = {
         ...values,
         claves: JSON.parse(values.claves || '[]'),
@@ -187,7 +185,6 @@ export default function VerticalesManager() {
       };
 
       if (selectedVertical) {
-        // Actualizar
         await verticalesService.updateVertical(selectedVertical.id, data);
         setVerticales(verticales.map(v =>
           v.id === selectedVertical.id
@@ -196,7 +193,6 @@ export default function VerticalesManager() {
         ));
         message.success('Vertical actualizado');
       } else {
-        // Crear
         const newVertical = await verticalesService.createVertical(data);
         setVerticales([newVertical, ...verticales]);
         message.success('Vertical creado');
@@ -426,14 +422,14 @@ export default function VerticalesManager() {
           form.resetFields();
           setSelectedVertical(null);
         }}
-        width={900}
+        width={920}
         style={{ maxHeight: '90vh' }}
         bodyStyle={{
           maxHeight: 'calc(90vh - 200px)',
           overflow: 'auto',
           padding: '24px'
         }}
-        loading={loading}
+        confirmLoading={loading}
         okText="Guardar"
         cancelText="Cancelar"
       >
@@ -443,10 +439,7 @@ export default function VerticalesManager() {
           onFinish={handleModalOk}
           style={{ marginTop: '-8px' }}
         >
-          <Collapse
-            items={collapseSections}
-            style={{ background: 'transparent' }}
-          />
+          <Collapse items={collapseSections} />
         </Form>
       </Modal>
     </div>
