@@ -32,6 +32,8 @@ DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
 DROP POLICY IF EXISTS "Admins can update all profiles" ON profiles;
+DROP POLICY IF EXISTS "Authenticated users can create profile" ON profiles;
+DROP POLICY IF EXISTS "Admins can delete profiles" ON profiles;
 
 -- 5. CREATE HELPER FUNCTION (SECURITY DEFINER to bypass RLS)
 CREATE OR REPLACE FUNCTION public.is_user_admin()
@@ -63,7 +65,7 @@ CREATE POLICY "Authenticated users can create profile"
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
--- UPDATE: Users can update their own, admins can update all
+-- UPDATE: Users can update their own profile, admins can update all
 CREATE POLICY "Users can update own profile"
   ON profiles
   FOR UPDATE
