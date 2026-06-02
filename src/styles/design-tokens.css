@@ -214,6 +214,60 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1);
 }
 
+/* Ant Design Input Components - Dark Mode Enhancement */
+.ant-input,
+.ant-input-number-input,
+.ant-select-selector,
+textarea.ant-input {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-input::placeholder,
+.ant-input-number-input::placeholder,
+textarea.ant-input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.ant-input:hover,
+.ant-input-number-input:hover,
+.ant-select-selector:hover,
+textarea.ant-input:hover {
+  border-color: var(--border-hover) !important;
+  background-color: var(--bg-input) !important;
+}
+
+.ant-input:focus,
+.ant-input-number-input:focus,
+.ant-select-selector:focus,
+textarea.ant-input:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1) !important;
+}
+
+.ant-input-number {
+  background-color: var(--bg-input) !important;
+}
+
+.ant-input-number .ant-input-number-input {
+  background-color: transparent !important;
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1) !important;
+}
+
+/* Modal body inputs */
+.ant-modal-content .ant-form-item-label > label {
+  color: var(--text-secondary) !important;
+}
+
+.ant-modal-content .ant-form-item-label > label::after {
+  color: var(--accent-error) !important;
+}
+
 /* Botón primario */
 .btn-primary {
   background: rgba(54, 99, 255, 0.15);
