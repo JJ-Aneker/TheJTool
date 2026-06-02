@@ -29,20 +29,26 @@ export function useRole() {
         setLoading(true)
         const { data, error: err } = await supabase
           .from('profiles')
-          .select('role, approved')
+          .select('role, approved, user_id')
           .eq('user_id', user.id)
           .single()
 
         if (err) {
-          console.error('Error fetching profile:', err)
+          console.error('useRole: Error fetching profile:', err)
+          console.error('useRole: user.id =', user.id)
+          console.error('useRole: error details:', { code: err.code, message: err.message })
           setError(err)
           setProfile(null)
         } else if (data) {
+          console.log('useRole: Profile loaded successfully:', data)
           setProfile(data)
           setError(null)
+        } else {
+          console.warn('useRole: No data returned from query')
+          setProfile(null)
         }
       } catch (err) {
-        console.error('Unexpected error fetching profile:', err)
+        console.error('useRole: Unexpected error fetching profile:', err)
         setError(err)
       } finally {
         setLoading(false)
