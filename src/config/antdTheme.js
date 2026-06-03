@@ -1,7 +1,10 @@
 // Configuración de Ant Design - SOLO espaciado y tipografía
 // TODOS LOS COLORES vienen de src/styles/design-tokens.css
 
+import { theme } from 'antd'
+
 export const createTheme = (isDark) => ({
+  algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
   token: {
     // Tipografía
     fontSize: 13,

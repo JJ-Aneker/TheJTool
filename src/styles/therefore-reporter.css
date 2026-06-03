@@ -200,24 +200,20 @@
 }
 
 /* Dark Mode - Explicit styling */
-:root[data-theme='dark'] .metric-card,
-body.dark .metric-card {
+[data-theme='dark'] .metric-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
 }
 
-:root[data-theme='dark'] .metric-card:hover,
-body.dark .metric-card:hover {
+[data-theme='dark'] .metric-card:hover {
   border-color: var(--accent-primary);
 }
 
-:root[data-theme='dark'] .report-data,
-body.dark .report-data {
+[data-theme='dark'] .report-data {
   background: var(--bg-secondary);
 }
 
-:root[data-theme='dark'] .report-info,
-body.dark .report-info {
+[data-theme='dark'] .report-info {
   border-bottom-color: var(--border);
 }
 

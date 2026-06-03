@@ -83,6 +83,13 @@
   --label-color: var(--text-secondary);
   --required-color: var(--accent-error);
   --placeholder-color: var(--text-muted);
+
+  /* Aliases for compatibility (used in therefore-reporter.css & panels.css) */
+  --bg-primary: var(--bg-card);
+  --bg-secondary: var(--bg-hover);
+  --border: var(--border-default);
+  --text-hint: var(--text-muted);
+  --kpi-red: #f87171;
 }
 
 /* Light Theme */
@@ -129,6 +136,13 @@
   --shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.18);
   --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.25);
   --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.35);
+
+  /* Aliases for compatibility (used in therefore-reporter.css & panels.css) */
+  --bg-primary: var(--bg-card);
+  --bg-secondary: var(--bg-hover);
+  --border: var(--border-default);
+  --text-hint: var(--text-muted);
+  --kpi-red: #f87171;
 }
 
 /* Reset body */
