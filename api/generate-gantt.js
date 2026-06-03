@@ -1,41 +1,21 @@
 import ExcelJS from 'exceljs';
 
 /**
- * Colores profesionales por tipo de tarea y subtarea
+ * Colores profesionales y suaves
  */
 const COLORS = {
-  headerBg: 'FF1F2937',
-  headerText: 'FFFFFFFF',
-  summaryBg: 'FFFCF0F0',
-
-  // Colores para bloques principales
-  blockColors: [
-    'FF185FA5',  // Azul
-    'FF0F6E56',  // Verde
-    'FFBE123C',  // Rojo
-    'FFA16207',  // Naranja
-    'FF6B21A8',  // Púrpura
-    'FF0891B2'   // Cian
-  ],
-
-  // Colores para barras de Gantt (más claros)
-  barColors: [
-    'FF4F46E5',  // Azul claro
-    'FF059669',  // Verde claro
-    'FDF1360F',  // Rojo claro
-    'FFF97316',  // Naranja claro
-    'FFA855F7',  // Púrpura claro
-    'FF06B6D4'   // Cian claro
-  ],
-
-  subtaskWhite: 'FFFFFFFF',
-  subtaskGray: 'FFF2F2F2',
-  progressBg: 'FFE0E7FF',    // Fondo progreso
-  progressBar: 'FF3B82F6'     // Barra progreso
+  headerBg: 'FFE5E7EB',
+  headerText: 'FF374151',
+  summaryBg: 'FFF3F4F6',
+  taskRowBg: 'FFFAFAFA',
+  taskBorder: 'FFD1D5DB',
+  barCompleted: 'FF7C3AED',    // Púrpura oscuro - completado
+  barPending: 'FFE9D5FF',      // Púrpura claro - pendiente
+  alternateRow: 'FFFAFAFA'
 };
 
 /**
- * Convierte tareas del proyecto en estructura Gantt profesional con jerarquía
+ * Convierte tareas del proyecto en estructura Gantt
  */
 function buildTasksFromProjectData(projectData) {
   if (!projectData?.estimacion?.tareas || projectData.estimacion.tareas.length === 0) {
@@ -45,43 +25,18 @@ function buildTasksFromProjectData(projectData) {
   const projectName = projectData.proyecto?.nombre || 'Sin nombre';
   const tareas = projectData.estimacion.tareas.filter(t => !t.pendiente);
 
-  let blockIdx = 0;
-  let tasksByBlock = {};
-  const tasks = [];
-
-  // Agrupar tareas por conceptos (cada 2-3 tareas es un bloque)
-  let currentBlock = String.fromCharCode(65);
-  let blockTaskCount = 0;
-  let blockColor = COLORS.blockColors[0];
-  let barColor = COLORS.barColors[0];
-
-  tareas.forEach((tarea, idx) => {
-    // Crear subtareas si la descripción es larga (dividir en partes)
-    const isMainTask = idx % 2 === 0 || idx === 0;
-
-    if (isMainTask && idx > 0) {
-      blockIdx++;
-      currentBlock = String.fromCharCode(65 + (blockIdx % COLORS.blockColors.length));
-      blockColor = COLORS.blockColors[blockIdx % COLORS.blockColors.length];
-      barColor = COLORS.barColors[blockIdx % COLORS.barColors.length];
-    }
-
-    tasks.push({
-      id: isMainTask ? currentBlock : `${currentBlock}.${tasks.filter(t => t.id.startsWith(currentBlock)).length}`,
-      level: isMainTask ? 0 : 1,
-      name: tarea.descripcion || `Tarea ${idx + 1}`,
-      profile: 'General',
-      dias: Math.max(tarea.dias || 1, 0.5),
-      horas: tarea.horas || (tarea.dias * 8),
-      importe: tarea.importe || 0,
-      startDate: null,
-      endDate: null,
-      progress: 0, // 0-100
-      blockColor: blockColor,
-      barColor: barColor,
-      dependsOn: null
-    });
-  });
+  const tasks = tareas.map((tarea, idx) => ({
+    id: idx + 1,
+    name: tarea.descripcion || `Tarea ${idx + 1}`,
+    profile: 'General',
+    dias: Math.max(tarea.dias || 1, 0.5),
+    horas: tarea.horas || (tarea.dias * 8),
+    importe: tarea.importe || 0,
+    startDate: null,
+    endDate: null,
+    progress: 0,
+    dependsOn: null
+  }));
 
   return {
     projectName,
@@ -94,206 +49,205 @@ function buildTasksFromProjectData(projectData) {
 }
 
 /**
- * Calcula fechas de inicio/fin secuenciales basadas en días y dependencias
+ * Calcula fechas de forma secuencial
  */
-function calculateDates(tasks, startDate = new Date(2026, 7, 1)) {
-  const taskMap = new Map(tasks.map(t => [t.id, t]));
-
-  // Calcular fechas secuencialmente
+function calculateDates(tasks, startDate = new Date(2026, 2, 1)) {
   let currentDate = new Date(startDate);
 
-  tasks.forEach((task, idx) => {
+  tasks.forEach(task => {
     task.startDate = new Date(currentDate);
-
-    // Calcular fecha fin: startDate + días
-    const endDate = new Date(currentDate);
-    endDate.setDate(endDate.getDate() + Math.ceil(task.dias));
-    task.endDate = endDate;
-
-    // Siguiente tarea comienza después de esta
-    currentDate = new Date(endDate);
+    currentDate.setDate(currentDate.getDate() + Math.ceil(task.dias));
+    task.endDate = new Date(currentDate);
   });
 
   return tasks;
 }
 
 /**
- * Detecta rango de fechas del proyecto
+ * Obtiene rango de fechas del proyecto
  */
 function getProjectDateRange(tasks) {
-  if (tasks.length === 0) return { start: new Date(), end: new Date() };
+  if (tasks.length === 0) {
+    return { start: new Date(), end: new Date() };
+  }
 
   const dates = tasks
     .filter(t => t.startDate && t.endDate)
     .flatMap(t => [t.startDate, t.endDate]);
 
-  return {
-    start: new Date(Math.min(...dates.map(d => d.getTime()))),
-    end: new Date(Math.max(...dates.map(d => d.getTime())))
-  };
+  const start = new Date(Math.min(...dates.map(d => d.getTime())));
+  const end = new Date(Math.max(...dates.map(d => d.getTime())));
+
+  return { start, end };
 }
 
 /**
- * Calcula el día del proyecto (0-N) para una fecha
+ * Calcula posición de columna para una fecha
  */
-function getDayOfProject(date, projectStart) {
+function getColumnForDate(date, projectStart) {
   const diff = date.getTime() - projectStart.getTime();
   return Math.ceil(diff / (24 * 60 * 60 * 1000));
 }
 
 /**
- * Genera archivo Excel profesional con diagrama Gantt
+ * Genera el Gantt limpio y profesional
  */
 async function generateExcelGantt(tasksData) {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('Gantt');
 
-  // Configurar ancho de columnas
-  sheet.columns = [
-    { width: 5 },    // Blq.
-    { width: 38 },   // Descripción (más ancho)
-    { width: 11 },   // Perfil
+  const dateRange = getProjectDateRange(tasksData.tasks);
+  const projectStart = dateRange.start;
+  const projectEnd = dateRange.end;
+  const totalDays = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (24 * 60 * 60 * 1000)) + 2;
+
+  // ═══ CONFIGURAR COLUMNAS ═══
+  const columns = [
+    { width: 3 },    // Número
+    { width: 32 },   // Nombre tarea
+    { width: 10 },   // Inicio
+    { width: 10 },   // Fin
     { width: 6 },    // Días
-    { width: 6 },    // Horas
-    { width: 12 },   // Inicio
-    { width: 12 },   // Fin
-    { width: 8 },    // Progreso
-    ...Array.from({ length: 24 }, () => ({ width: 3.5 }))  // Más columnas de días
+    { width: 6 },    // Avance %
   ];
 
-  // ═══ FILA 1: Título del Proyecto ═══
-  const titleRow = sheet.addRow([`Diagrama de Gantt — ${tasksData.projectName}`]);
-  titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
-  titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC00000' } };
-  titleRow.getCell(1).alignment = { horizontal: 'left', vertical: 'center', wrapText: true };
-  titleRow.height = 24;
-  sheet.mergeCells(`A1:AH1`);
-
-  // ═══ FILA 2: Resumen ═══
-  const summary = `Estimación: ${tasksData.totalDias.toFixed(1)} jornadas · ${Math.round(tasksData.totalHoras)} h · ${tasksData.totalImporte.toLocaleString('es-ES')} € · ${tasksData.clientName}`;
-  const summaryRow = sheet.addRow([summary]);
-  summaryRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
-  summaryRow.getCell(1).alignment = { horizontal: 'left', vertical: 'center', wrapText: true };
-  summaryRow.height = 18;
-  sheet.mergeCells(`A2:AH2`);
-
-  // ═══ FILA 3: Espaciador ═══
-  sheet.addRow([]);
-
-  // ═══ FILA 4: Headers ═══
-  const startDate = tasksData.tasks[0]?.startDate || new Date(2026, 7, 1);
-  const headers = ['Blq.', 'Descripción de tarea', 'Perfil', 'Días', 'Horas', 'Inicio', 'Fin', '% Avance'];
-
-  // Agregar columnas de fechas (24 días)
-  for (let i = 0; i < 24; i++) {
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + i);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const dayName = ['L', 'M', 'X', 'J', 'V', 'S', 'D'][date.getDay()];
-    headers.push(`${dayName}\n${day}/${month}`);
+  // Agregar columnas de días
+  for (let i = 0; i < totalDays; i++) {
+    columns.push({ width: 2.5 });
   }
 
-  const headerRow = sheet.addRow(headers);
-  headerRow.height = 32;
+  sheet.columns = columns;
 
-  for (let i = 1; i <= headers.length; i++) {
+  // ═══ FILA 1: TÍTULO ═══
+  const titleRow = sheet.addRow([`Diagrama de Gantt — ${tasksData.projectName}`]);
+  titleRow.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1F2937' } };
+  titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
+  titleRow.height = 20;
+  sheet.mergeCells(`A1:${ExcelJS.utils.getExcelCellAddress(totalDays + 6, 1)}`);
+
+  // ═══ FILA 2: RESUMEN ═══
+  const summary = `${tasksData.totalDias.toFixed(1)} jornadas · ${Math.round(tasksData.totalHoras)}h · ${tasksData.totalImporte.toLocaleString('es-ES')} € · ${tasksData.clientName}`;
+  const summaryRow = sheet.addRow([summary]);
+  summaryRow.getCell(1).font = { size: 10, color: { argb: COLORS.headerText } };
+  summaryRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
+  summaryRow.height = 16;
+  sheet.mergeCells(`A2:${ExcelJS.utils.getExcelCellAddress(totalDays + 6, 1)}`);
+
+  // ═══ FILA 3: VACÍA ═══
+  sheet.addRow([]);
+
+  // ═══ FILA 4: HEADERS DE TABLA ═══
+  const headerData = ['Nº', 'Tarea', 'Inicio', 'Fin', 'Días', '%'];
+
+  // Agregar headers de fechas (semanas/días)
+  for (let i = 0; i < totalDays; i++) {
+    const date = new Date(projectStart);
+    date.setDate(date.getDate() + i);
+    const dayNames = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+    const dayName = dayNames[date.getDay()];
+    const dayNum = date.getDate();
+    headerData.push(`${dayNum}`);
+  }
+
+  const headerRow = sheet.addRow(headerData);
+  headerRow.height = 24;
+
+  // Aplicar estilos a headers
+  for (let i = 1; i <= headerData.length; i++) {
     const cell = headerRow.getCell(i);
-    cell.font = { bold: true, color: { argb: COLORS.headerText }, size: 10 };
+    cell.font = { bold: true, size: 9, color: { argb: COLORS.headerText } };
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
-    cell.alignment = { horizontal: 'center', vertical: 'center', wrapText: true };
+    cell.alignment = { horizontal: 'center', vertical: 'center' };
     cell.border = {
-      top: { style: 'thin', color: { argb: 'FF000000' } },
-      bottom: { style: 'thin', color: { argb: 'FF000000' } },
-      left: { style: 'thin', color: { argb: 'FF000000' } },
-      right: { style: 'thin', color: { argb: 'FF000000' } }
+      bottom: { style: 'thin', color: { argb: COLORS.taskBorder } }
     };
   }
 
-  // ═══ FILAS DE TAREAS CON BARRAS DE COLOR ═══
-  let rowIsWhite = true;
+  // ═══ FILAS DE TAREAS ═══
+  let rowIdx = 0;
 
   tasksData.tasks.forEach((task, idx) => {
-    const isMainTask = task.level === 0;
-    const bgColor = isMainTask ? task.blockColor : (rowIsWhite ? COLORS.subtaskWhite : COLORS.subtaskGray);
-    const textColor = isMainTask ? 'FFFFFFFF' : 'FF000000';
-    const indent = task.level > 0 ? '  ├─ ' : '';
-
     const rowData = [
-      task.id,
-      indent + task.name,
-      task.profile,
-      task.dias,
-      Math.round(task.horas),
-      task.startDate ? task.startDate.toLocaleDateString('es-ES', { year: '2-digit', month: '2-digit', day: '2-digit' }) : '',
-      task.endDate ? task.endDate.toLocaleDateString('es-ES', { year: '2-digit', month: '2-digit', day: '2-digit' }) : '',
+      idx + 1,
+      task.name,
+      task.startDate.toLocaleDateString('es-ES', { month: '2-digit', day: '2-digit' }),
+      task.endDate.toLocaleDateString('es-ES', { month: '2-digit', day: '2-digit' }),
+      task.dias.toFixed(1),
       `${task.progress}%`
     ];
 
-    // Agregar celdas de Gantt con barras de color sólido
-    for (let i = 0; i < 24; i++) {
-      const dayStart = new Date(startDate);
-      dayStart.setDate(dayStart.getDate() + i);
-
-      const dayEnd = new Date(dayStart);
-      dayEnd.setDate(dayEnd.getDate() + 1);
-
-      // Verificar si la tarea incluye este día
-      const taskStart = new Date(task.startDate);
-      const taskEnd = new Date(task.endDate);
-
-      const isInRange = taskStart < dayEnd && taskEnd > dayStart;
-
-      rowData.push(isInRange ? '█' : '');
+    // Llenar celdas de días (vacías, serán coloreadas después)
+    for (let i = 0; i < totalDays; i++) {
+      rowData.push('');
     }
 
     const row = sheet.addRow(rowData);
-    row.height = 22;
+    row.height = 20;
 
-    // Aplicar estilos a cada celda
-    for (let i = 1; i <= rowData.length; i++) {
+    // Estilos de fila
+    const bgColor = idx % 2 === 0 ? 'FFFFFFFF' : COLORS.alternateRow;
+
+    for (let i = 1; i <= 6; i++) {
       const cell = row.getCell(i);
-
-      // Celdas de datos (1-8)
-      if (i <= 8) {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
-        cell.font = { color: { argb: textColor }, size: i === 2 ? 10 : 9, bold: isMainTask };
-        cell.alignment = {
-          horizontal: i === 8 ? 'center' : (i === 2 ? 'left' : 'center'),
-          vertical: 'center',
-          wrapText: i === 2
-        };
-      }
-      // Celdas de Gantt (9+)
-      else {
-        const dayStart = new Date(startDate);
-        dayStart.setDate(dayStart.getDate() + (i - 9));
-        const dayEnd = new Date(dayStart);
-        dayEnd.setDate(dayEnd.getDate() + 1);
-
-        const isInRange = task.startDate < dayEnd && task.endDate > dayStart;
-
-        if (isInRange) {
-          // Color de barra según tarea
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: task.barColor } };
-          cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
-        } else {
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
-        }
-
-        cell.alignment = { horizontal: 'center', vertical: 'center' };
-      }
-
-      // Bordes
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+      cell.font = { size: 9 };
+      cell.alignment = { horizontal: i === 2 ? 'left' : 'center', vertical: 'center' };
       cell.border = {
-        top: { style: 'hair', color: { argb: 'FFD3D3D3' } },
-        bottom: { style: 'hair', color: { argb: 'FFD3D3D3' } },
-        left: { style: 'hair', color: { argb: 'FFD3D3D3' } },
-        right: { style: 'hair', color: { argb: 'FFD3D3D3' } }
+        top: { style: 'hair', color: { argb: COLORS.taskBorder } },
+        bottom: { style: 'hair', color: { argb: COLORS.taskBorder } },
+        right: i === 6 ? { style: 'thin', color: { argb: COLORS.taskBorder } } : undefined
       };
     }
 
-    rowIsWhite = !rowIsWhite;
+    // Calcular columnas de inicio y fin
+    const colStart = getColumnForDate(task.startDate, projectStart);
+    const colEnd = getColumnForDate(task.endDate, projectStart);
+    const colOffset = 6; // Primera columna de datos después de info
+
+    // Rellenar barras Gantt
+    for (let col = colStart; col < colEnd; col++) {
+      const cellCol = col + colOffset;
+      if (cellCol < headerData.length) {
+        const cell = row.getCell(cellCol);
+
+        // Determinar si esta parte está completada o pendiente
+        const progressPercentage = task.progress / 100;
+        const daysCompleted = Math.ceil((colEnd - colStart) * progressPercentage);
+
+        // Color según progreso
+        const isCompleted = col < colStart + daysCompleted;
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: isCompleted ? COLORS.barCompleted : COLORS.barPending }
+        };
+
+        cell.border = {
+          left: col === colStart ? { style: 'thin', color: { argb: '00000000' } } : undefined,
+          right: col === colEnd - 1 ? { style: 'thin', color: { argb: '00000000' } } : undefined,
+          top: { style: 'thin', color: { argb: '00000000' } },
+          bottom: { style: 'thin', color: { argb: '00000000' } }
+        };
+      }
+    }
+
+    // Estilos celdas de Gantt
+    for (let col = 0; col < totalDays; col++) {
+      const cellCol = col + colOffset;
+      const cell = row.getCell(cellCol);
+
+      if (!cell.fill || !cell.fill.fgColor) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+      }
+
+      cell.alignment = { horizontal: 'center', vertical: 'center' };
+      cell.border = {
+        top: { style: 'hair', color: { argb: COLORS.taskBorder } },
+        bottom: { style: 'hair', color: { argb: COLORS.taskBorder } },
+        left: { style: 'hair', color: { argb: COLORS.taskBorder } },
+        right: { style: 'hair', color: { argb: COLORS.taskBorder } }
+      };
+    }
   });
 
   // ═══ CONFIGURACIÓN DE IMPRESIÓN ═══
@@ -302,7 +256,7 @@ async function generateExcelGantt(tasksData) {
     orientation: 'landscape',
     fitToPage: true,
     fitToHeight: 1,
-    fitToWidth: 3,
+    fitToWidth: 2,
     horizontalDpi: 300,
     verticalDpi: 300
   };
@@ -317,10 +271,10 @@ async function generateExcelGantt(tasksData) {
   };
 
   sheet.headerFooter.firstHeader = `Diagrama de Gantt — ${tasksData.projectName}`;
-  sheet.headerFooter.firstFooter = `Generado: ${new Date().toLocaleDateString('es-ES')} | Página &P de &N`;
+  sheet.headerFooter.firstFooter = `Generado: ${new Date().toLocaleDateString('es-ES')}`;
 
-  // Congelar panes (mantener headers visibles)
-  sheet.views = [{ state: 'frozen', ySplit: 4, xSplit: 2 }];
+  // Congelar panes
+  sheet.views = [{ state: 'frozen', ySplit: 4, xSplit: 6 }];
 
   return workbook;
 }
@@ -340,23 +294,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'projectData is required' });
     }
 
-    // Convertir y procesar datos
+    // Procesar datos
     const tasksData = buildTasksFromProjectData(projectData);
-
-    // Calcular fechas
     calculateDates(tasksData.tasks);
 
     // Generar Excel
     const workbook = await generateExcelGantt(tasksData);
-
-    // Retornar como buffer
     const buffer = await workbook.xlsx.writeBuffer();
 
-    // Sanitizar nombre del proyecto para el filename
+    // Sanitizar nombre
     const safeName = tasksData.projectName
-      .replace(/[^a-zA-Z0-9\s]/g, '')  // Eliminar caracteres especiales
-      .replace(/\s+/g, '_')             // Reemplazar espacios
-      .substring(0, 50);                // Limitar longitud
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .replace(/\s+/g, '_')
+      .substring(0, 50);
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="Gantt_${safeName}.xlsx"`);
