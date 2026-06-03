@@ -423,14 +423,6 @@ export default function VerticalesManager() {
           setSelectedVertical(null);
         }}
         width={920}
-        style={{ maxHeight: '90vh' }}
-        styles={{
-          body: {
-            maxHeight: 'calc(90vh - 200px)',
-            overflow: 'auto',
-            padding: '24px'
-          }
-        }}
         confirmLoading={loading}
         okText="Guardar"
         cancelText="Cancelar"
