@@ -287,16 +287,7 @@ export default function DocumentGenerator() {
 
     setGeneratingGantt(true);
     try {
-      const projectDescription = `
-${projectData.proyecto?.descripcion || 'Proyecto sin descripción'}
-
-Cliente: ${projectData.cliente?.nombre || 'No especificado'}
-Duración estimada: ${projectData.estimacion?.totalDias || 'No estimada'} días
-Tareas:
-${(projectData.estimacion?.tareas || []).map(t => `- ${t.descripcion} (${t.dias} días)`).join('\n')}
-      `.trim();
-
-      await ganttService.generateGantt(projectDescription, vertical);
+      await ganttService.generateGantt(projectData);
       message.success('Diagrama Gantt generado y descargado exitosamente');
     } catch (err) {
       message.error('Error al generar Gantt: ' + err.message);

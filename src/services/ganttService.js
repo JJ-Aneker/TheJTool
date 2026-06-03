@@ -2,14 +2,13 @@
  * Servicio para generar y descargar diagramas Gantt
  */
 export const ganttService = {
-  async generateGantt(projectDescription, vertical = 'General') {
+  async generateGantt(projectData) {
     try {
       const response = await fetch('/api/generate-gantt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          projectDescription,
-          vertical
+          projectData
         })
       });
 

@@ -1,83 +1,40 @@
 import ExcelJS from 'exceljs';
-import { callBedrock } from './bedrockClient.js';
 
 /**
- * Analiza tareas del proyecto y genera estructura Gantt
+ * Convierte tareas del proyecto en estructura Gantt
  */
-async function analyzeTasks(projectDescription, vertical) {
-  const systemPrompt = `Eres un experto en gestión de proyectos. Analiza la descripción del proyecto y genera un plan de tareas detallado.
-
-Retorna SOLO un JSON válido con esta estructura:
-{
-  "projectName": "Nombre del Proyecto",
-  "projectDuration": "Duración total estimada en días",
-  "tasks": [
-    {
-      "id": "T1",
-      "name": "Nombre de la tarea",
-      "description": "Descripción clara",
-      "duration": 5,
-      "dependsOn": ["T0"],
-      "assignedTo": "Equipo/Rol",
-      "priority": "Alta|Media|Baja"
-    }
-  ],
-  "milestones": [
-    {
-      "id": "M1",
-      "name": "Hito importante",
-      "taskId": "T3"
-    }
-  ]
-}
-
-Asegúrate de:
-- Las duraciones sean realistas
-- Las dependencias sean correctas
-- Incluir tareas de análisis, desarrollo, testing y deployment
-- Total de tareas: 10-15`;
-
-  const response = await callBedrock({
-    model: 'claude-opus-4-7',
-    max_tokens: 2000,
-    system: systemPrompt,
-    messages: [
-      {
-        role: 'user',
-        content: `Proyecto: ${projectDescription}\n\nVertical: ${vertical}\n\nGenera un plan de tareas detallado en JSON.`
-      }
-    ]
-  });
-
-  try {
-    let text = response.content[0].text;
-
-    // Limpiar markdown
-    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-
-    // Extraer JSON
-    let jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON found');
-
-    let json = jsonMatch[0];
-
-    // Limpiar caracteres problemáticos
-    json = json
-      .replace(/[\x00-\x1F\x7F]/g, ' ')  // Control chars
-      .replace(/(?<=[^\\"]),(?=\s*[}\]])/g, '');  // Remove trailing commas
-
-    // Intentar parsear
-    try {
-      return JSON.parse(json);
-    } catch (e) {
-      // Si falla, intentar arreglar comillas simples por dobles
-      json = json.replace(/'/g, '"');
-      return JSON.parse(json);
-    }
-  } catch (err) {
-    console.error('Error parsing Bedrock response:', err);
-    throw new Error('Failed to parse task structure from Bedrock');
+function buildTasksFromProjectData(projectData) {
+  if (!projectData?.estimacion?.tareas || projectData.estimacion.tareas.length === 0) {
+    throw new Error('No tasks found in project data');
   }
+
+  const projectName = projectData.proyecto?.nombre || 'Sin nombre';
+  const tareas = projectData.estimacion.tareas.filter(t => !t.pendiente);
+
+  // Convertir tareas a formato Gantt
+  const tasks = tareas.map((tarea, idx) => ({
+    id: `T${idx + 1}`,
+    name: tarea.descripcion || `Tarea ${idx + 1}`,
+    description: tarea.descripcion || '',
+    duration: tarea.dias || 1,
+    dependsOn: [],
+    assignedTo: 'Equipo',
+    priority: 'Media',
+    startDay: 0,
+    endDay: tarea.dias || 1,
+    slack: 0,
+    isCritical: false,
+    progress: 0
+  }));
+
+  // Calcular duración total
+  const projectDuration = tasks.reduce((sum, t) => sum + t.duration, 0);
+
+  return {
+    projectName,
+    projectDuration,
+    tasks
+  };
 }
 
 /**
@@ -268,26 +225,26 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { projectDescription, vertical } = req.body;
+    const { projectData } = req.body;
 
-    if (!projectDescription) {
-      return res.status(400).json({ error: 'projectDescription is required' });
+    if (!projectData) {
+      return res.status(400).json({ error: 'projectData is required' });
     }
 
-    // Analizar tareas con Bedrock
-    const taskStructure = await analyzeTasks(projectDescription, vertical || 'General');
+    // Convertir tareas del projectData
+    const { projectName, projectDuration, tasks } = buildTasksFromProjectData(projectData);
 
     // Calcular timeline
-    const { tasks, projectDuration, criticalPath } = calculateTimeline(taskStructure.tasks);
+    const { tasks: calculatedTasks, projectDuration: finalDuration } = calculateTimeline(tasks);
 
     // Generar Excel
-    const workbook = await generateExcelGantt(tasks, taskStructure.projectName, projectDuration);
+    const workbook = await generateExcelGantt(calculatedTasks, projectName, finalDuration);
 
     // Retornar como buffer
     const buffer = await workbook.xlsx.writeBuffer();
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="Gantt_${taskStructure.projectName.replace(/\s+/g, '_')}.xlsx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Gantt_${projectName.replace(/\s+/g, '_')}.xlsx"`);
     res.send(buffer);
   } catch (error) {
     console.error('Error generating Gantt:', error);
@@ -295,4 +252,4 @@ export default async function handler(req, res) {
   }
 }
 
-export { analyzeTasks, calculateTimeline, generateExcelGantt };
+export { buildTasksFromProjectData, calculateTimeline, generateExcelGantt };
