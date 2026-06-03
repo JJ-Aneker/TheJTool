@@ -1,7 +1,22 @@
 import ExcelJS from 'exceljs';
 
 /**
- * Convierte tareas del proyecto en estructura Gantt
+ * Colores profesionales por tipo de tarea
+ */
+const COLORS = {
+  headerBg: 'FF1F2937',
+  headerText: 'FFFFFFFF',
+  summaryBg: 'FFFCF0F0',
+  blockMain: 'FF185FA5',
+  blockAlt1: 'FF0F6E56',
+  blockAlt2: 'FFBE123C',
+  blockAlt3: 'FFA16207',
+  subtaskWhite: 'FFFFFFFF',
+  subtaskGray: 'FFF2F2F2'
+};
+
+/**
+ * Convierte tareas del proyecto en estructura Gantt profesional
  */
 function buildTasksFromProjectData(projectData) {
   if (!projectData?.estimacion?.tareas || projectData.estimacion.tareas.length === 0) {
@@ -11,207 +26,198 @@ function buildTasksFromProjectData(projectData) {
   const projectName = projectData.proyecto?.nombre || 'Sin nombre';
   const tareas = projectData.estimacion.tareas.filter(t => !t.pendiente);
 
-  // Convertir tareas a formato Gantt
   const tasks = tareas.map((tarea, idx) => ({
-    id: `T${idx + 1}`,
+    id: `${String.fromCharCode(65 + Math.floor(idx / 10))}${idx % 10 || ''}`.substring(0, 3),
+    level: 0,
     name: tarea.descripcion || `Tarea ${idx + 1}`,
-    description: tarea.descripcion || '',
-    duration: tarea.dias || 1,
-    dependsOn: [],
-    assignedTo: 'Equipo',
-    priority: 'Media',
-    startDay: 0,
-    endDay: tarea.dias || 1,
-    slack: 0,
-    isCritical: false,
-    progress: 0
+    profile: 'General',
+    dias: Math.max(tarea.dias || 1, 0.5),
+    horas: tarea.horas || (tarea.dias * 8),
+    importe: tarea.importe || 0,
+    startDate: null,
+    endDate: null
   }));
-
-  // Calcular duración total
-  const projectDuration = tasks.reduce((sum, t) => sum + t.duration, 0);
 
   return {
     projectName,
-    projectDuration,
+    clientName: projectData.cliente?.nombre || '',
+    totalDias: projectData.estimacion?.totalDias || tareas.reduce((s, t) => s + (t.dias || 0), 0),
+    totalHoras: projectData.estimacion?.totalHoras || tareas.reduce((s, t) => s + (t.horas || 0), 0),
+    totalImporte: projectData.estimacion?.totalImporte || tareas.reduce((s, t) => s + (t.importe || 0), 0),
     tasks
   };
 }
 
 /**
- * Calcula fechas de inicio/fin y ruta crítica
+ * Calcula fechas de inicio/fin secuenciales
  */
-function calculateTimeline(tasks) {
-  const taskMap = new Map();
-  const processed = new Set();
+function calculateDates(tasks, startDate = new Date(2026, 6, 1)) {
+  let currentDate = new Date(startDate);
 
-  // Inicializar
   tasks.forEach(task => {
-    taskMap.set(task.id, {
-      ...task,
-      startDay: 0,
-      endDay: task.duration,
-      slack: 0
-    });
+    task.startDate = new Date(currentDate);
+    currentDate.setDate(currentDate.getDate() + task.dias);
+    task.endDate = new Date(currentDate);
   });
 
-  // Calcular startDay/endDay respetando dependencias
-  const calculateTask = (id) => {
-    if (processed.has(id)) return taskMap.get(id);
-
-    const task = taskMap.get(id);
-    if (!task.dependsOn || task.dependsOn.length === 0) {
-      task.startDay = 0;
-      task.endDay = task.duration;
-    } else {
-      const maxEnd = Math.max(
-        ...task.dependsOn.map(depId => {
-          const dep = calculateTask(depId);
-          return dep.endDay;
-        })
-      );
-      task.startDay = maxEnd;
-      task.endDay = maxEnd + task.duration;
-    }
-
-    processed.add(id);
-    return task;
-  };
-
-  tasks.forEach(task => calculateTask(task.id));
-
-  // Calcular projectDuration
-  const projectDuration = Math.max(...Array.from(taskMap.values()).map(t => t.endDay));
-
-  // Calcular slack (holgura) - versión simplificada
-  const criticalPath = findCriticalPath(Array.from(taskMap.values()));
-  Array.from(taskMap.values()).forEach(task => {
-    task.isCritical = criticalPath.includes(task.id);
-    task.slack = task.isCritical ? 0 : 2; // Holgura simplificada
-  });
-
-  return {
-    tasks: Array.from(taskMap.values()),
-    projectDuration,
-    criticalPath
-  };
-}
-
-function findCriticalPath(tasks) {
-  const taskMap = new Map(tasks.map(t => [t.id, t]));
-  let maxEnd = Math.max(...tasks.map(t => t.endDay));
-
-  const path = [];
-  let current = tasks.find(t => t.endDay === maxEnd);
-
-  while (current) {
-    path.unshift(current.id);
-    if (!current.dependsOn || current.dependsOn.length === 0) break;
-
-    const deps = current.dependsOn
-      .map(id => taskMap.get(id))
-      .filter(t => t && t.endDay === current.startDay);
-    current = deps[0];
-  }
-
-  return path;
+  return tasks;
 }
 
 /**
- * Genera archivo Excel con tareas y diagrama Gantt
+ * Genera archivo Excel profesional con diagrama Gantt
  */
-async function generateExcelGantt(tasks, projectName, projectDuration) {
+async function generateExcelGantt(tasksData) {
   const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('Gantt');
 
-  // SHEET 1: Tareas
-  const tasksSheet = workbook.addWorksheet('Tareas');
-  tasksSheet.columns = [
-    { header: 'ID', key: 'id', width: 8 },
-    { header: 'Nombre', key: 'name', width: 30 },
-    { header: 'Descripción', key: 'description', width: 35 },
-    { header: 'Días', key: 'duration', width: 8 },
-    { header: 'Depende de', key: 'dependsOn', width: 15 },
-    { header: 'Asignado', key: 'assignedTo', width: 15 },
-    { header: 'Inicio', key: 'startDay', width: 8 },
-    { header: 'Fin', key: 'endDay', width: 8 },
-    { header: 'Holgura', key: 'slack', width: 8 },
-    { header: 'Crítica', key: 'isCritical', width: 10 },
-    { header: '% Avance', key: 'progress', width: 10 }
+  // Configurar ancho de columnas
+  sheet.columns = [
+    { width: 5 },   // Blq.
+    { width: 35 },  // Descripción
+    { width: 12 },  // Perfil
+    { width: 6 },   // Días
+    { width: 6 },   // Horas
+    { width: 11 },  // Inicio
+    { width: 11 },  // Fin
+    ...Array.from({ length: 20 }, () => ({ width: 4.2 }))  // Columnas de días
   ];
 
-  // Agregar datos de tareas
-  tasks.forEach((task, index) => {
-    tasksSheet.addRow({
-      id: task.id,
-      name: task.name,
-      description: task.description,
-      duration: task.duration,
-      dependsOn: task.dependsOn?.join(', ') || '-',
-      assignedTo: task.assignedTo,
-      startDay: task.startDay,
-      endDay: task.endDay,
-      slack: task.slack,
-      isCritical: task.isCritical ? 'SÍ' : 'NO',
-      progress: 0
-    });
-  });
+  // ═══ FILA 1: Título del Proyecto ═══
+  const titleRow = sheet.addRow([`Diagrama de Gantt — ${tasksData.projectName}`]);
+  titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+  titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC00000' } };
+  titleRow.getCell(1).alignment = { horizontal: 'left', vertical: 'center', wrapText: true };
+  titleRow.height = 24;
+  sheet.mergeCells(`A1:X1`);
 
-  // Estilos
-  tasksSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-  tasksSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3663FF' } };
+  // ═══ FILA 2: Resumen ═══
+  const summary = `Estimación: ${tasksData.totalDias.toFixed(1)} jornadas · ${Math.round(tasksData.totalHoras)} h · ${tasksData.totalImporte.toLocaleString('es-ES')} € · ${tasksData.clientName}`;
+  const summaryRow = sheet.addRow([summary]);
+  summaryRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
+  summaryRow.getCell(1).alignment = { horizontal: 'left', vertical: 'center', wrapText: true };
+  summaryRow.height = 18;
+  sheet.mergeCells(`A2:X2`);
 
-  // SHEET 2: Gantt Visual
-  const ganttSheet = workbook.addWorksheet('Gantt');
-  ganttSheet.columns = [
-    { header: 'Tarea', key: 'name', width: 25 },
-    ...Array.from({ length: projectDuration }, (_, i) => ({
-      header: `D${i + 1}`,
-      key: `day${i + 1}`,
-      width: 3
-    }))
-  ];
+  // ═══ FILA 3: Espaciador ═══
+  sheet.addRow([]);
 
-  // Dibujar barras Gantt
-  tasks.forEach((task, index) => {
-    const row = ganttSheet.addRow({ name: task.name });
+  // ═══ FILA 4: Headers ═══
+  const startDate = tasksData.tasks[0]?.startDate || new Date(2026, 6, 1);
+  const headers = ['Blq.', 'Descripción de tarea', 'Perfil', 'Días', 'Horas', 'Inicio', 'Fin'];
 
-    for (let day = 1; day <= projectDuration; day++) {
-      const cell = row.getCell(`day${day}`);
+  // Agregar columnas de fechas
+  for (let i = 0; i < 20; i++) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    headers.push(`D${i + 1}\n${day}/${month}`);
+  }
 
-      if (day > task.startDay && day <= task.endDay) {
-        cell.value = '█';
-        cell.font = { color: { argb: task.isCritical ? 'FFFF5050' : 'FF3663FF' }, bold: true };
-        cell.alignment = { horizontal: 'center', vertical: 'center' };
-      }
+  const headerRow = sheet.addRow(headers);
+  headerRow.height = 30;
+
+  for (let i = 1; i <= headers.length; i++) {
+    const cell = headerRow.getCell(i);
+    cell.font = { bold: true, color: { argb: COLORS.headerText }, size: 11 };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
+    cell.alignment = { horizontal: 'center', vertical: 'center', wrapText: true };
+    cell.border = {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' }
+    };
+  }
+
+  // ═══ FILAS DE TAREAS ═══
+  const blockColors = [COLORS.blockMain, COLORS.blockAlt1, COLORS.blockAlt2, COLORS.blockAlt3];
+  let currentBlock = '';
+  let blockColorIdx = 0;
+  let rowIsWhite = true;
+
+  tasksData.tasks.forEach((task, idx) => {
+    const blockId = task.id.charAt(0);
+    if (blockId !== currentBlock) {
+      currentBlock = blockId;
+      blockColorIdx = (blockColorIdx + 1) % blockColors.length;
+      rowIsWhite = true;
     }
+
+    const blockColor = blockColors[blockColorIdx];
+    const bgColor = idx === 0 || task.id.length === 1 ? blockColor : (rowIsWhite ? COLORS.subtaskWhite : COLORS.subtaskGray);
+    const textColor = idx === 0 || task.id.length === 1 ? 'FFFFFFFF' : 'FF000000';
+
+    const rowData = [
+      task.id,
+      task.name,
+      task.profile,
+      task.dias,
+      Math.round(task.horas),
+      task.startDate ? task.startDate.toLocaleDateString('es-ES', { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }) : '',
+      task.endDate ? task.endDate.toLocaleDateString('es-ES', { weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit' }) : ''
+    ];
+
+    // Agregar celdas de Gantt (barras visuales)
+    for (let i = 0; i < 20; i++) {
+      const dayStart = new Date(startDate);
+      dayStart.setDate(dayStart.getDate() + i);
+
+      const dayEnd = new Date(dayStart);
+      dayEnd.setDate(dayEnd.getDate() + 1);
+
+      const isInRange = task.startDate && task.endDate &&
+                        task.startDate < dayEnd && task.endDate > dayStart;
+
+      rowData.push(isInRange ? '█' : '');
+    }
+
+    const row = sheet.addRow(rowData);
+    row.height = 20;
+
+    for (let i = 1; i <= rowData.length; i++) {
+      const cell = row.getCell(i);
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+      cell.font = { color: { argb: textColor }, size: i === 2 ? 10 : 9 };
+      cell.alignment = {
+        horizontal: i >= 8 ? 'center' : 'left',
+        vertical: 'center',
+        wrapText: i === 2
+      };
+      cell.border = {
+        top: { style: 'hair', color: { argb: 'FFD3D3D3' } },
+        bottom: { style: 'hair', color: { argb: 'FFD3D3D3' } },
+        left: { style: 'hair', color: { argb: 'FFD3D3D3' } },
+        right: { style: 'hair', color: { argb: 'FFD3D3D3' } }
+      };
+    }
+
+    rowIsWhite = !rowIsWhite;
   });
 
-  ganttSheet.getRow(1).font = { bold: true };
-  ganttSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8E8E8' } };
+  // Configurar imprenta
+  sheet.pageSetup = {
+    paperSize: 9,  // A4
+    orientation: 'landscape',
+    fitToPage: false,
+    fitToHeight: 1,
+    fitToWidth: 2,
+    horizontalDpi: 300,
+    verticalDpi: 300
+  };
 
-  // SHEET 3: Análisis
-  const analysisSheet = workbook.addWorksheet('Análisis');
-  analysisSheet.columns = [
-    { header: 'Métrica', key: 'metric', width: 25 },
-    { header: 'Valor', key: 'value', width: 30 }
-  ];
+  sheet.margins = {
+    left: 0.5,
+    right: 0.5,
+    top: 0.75,
+    bottom: 0.75,
+    header: 0.3,
+    footer: 0.3
+  };
 
-  const criticalTasks = tasks.filter(t => t.isCritical);
-  const totalHours = tasks.reduce((sum, t) => sum + (t.duration * 8), 0);
-  const avgTaskDuration = (tasks.reduce((sum, t) => sum + t.duration, 0) / tasks.length).toFixed(1);
-
-  analysisSheet.addRows([
-    { metric: 'Proyecto', value: projectName },
-    { metric: 'Duración Total', value: `${projectDuration} días` },
-    { metric: 'Total de Tareas', value: tasks.length },
-    { metric: 'Tareas en Ruta Crítica', value: criticalTasks.length },
-    { metric: 'Duración Promedio Tarea', value: `${avgTaskDuration} días` },
-    { metric: 'Total de Horas', value: `${totalHours} horas` },
-    { metric: 'Equipos Involucrados', value: [...new Set(tasks.map(t => t.assignedTo))].join(', ') },
-    { metric: 'Tareas de Alta Prioridad', value: tasks.filter(t => t.priority === 'Alta').length }
-  ]);
-
-  analysisSheet.getRow(1).font = { bold: true };
-  analysisSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8E8E8' } };
+  // Encabezado y pie de página
+  sheet.headerFooter.firstHeader = `Diagrama de Gantt — ${tasksData.projectName}`;
+  sheet.headerFooter.firstFooter = `Generado: ${new Date().toLocaleDateString('es-ES')} &P de &N`;
 
   return workbook;
 }
@@ -231,20 +237,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'projectData is required' });
     }
 
-    // Convertir tareas del projectData
-    const { projectName, projectDuration, tasks } = buildTasksFromProjectData(projectData);
+    // Convertir y procesar datos
+    const tasksData = buildTasksFromProjectData(projectData);
 
-    // Calcular timeline
-    const { tasks: calculatedTasks, projectDuration: finalDuration } = calculateTimeline(tasks);
+    // Calcular fechas
+    calculateDates(tasksData.tasks);
 
     // Generar Excel
-    const workbook = await generateExcelGantt(calculatedTasks, projectName, finalDuration);
+    const workbook = await generateExcelGantt(tasksData);
 
     // Retornar como buffer
     const buffer = await workbook.xlsx.writeBuffer();
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="Gantt_${projectName.replace(/\s+/g, '_')}.xlsx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Gantt_${tasksData.projectName.replace(/\s+/g, '_')}.xlsx"`);
     res.send(buffer);
   } catch (error) {
     console.error('Error generating Gantt:', error);
@@ -252,4 +258,4 @@ export default async function handler(req, res) {
   }
 }
 
-export { buildTasksFromProjectData, calculateTimeline, generateExcelGantt };
+export { buildTasksFromProjectData, calculateDates, generateExcelGantt };
