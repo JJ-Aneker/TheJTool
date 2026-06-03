@@ -90,6 +90,19 @@ function getColumnForDate(date, projectStart) {
 }
 
 /**
+ * Convierte número a letra Excel (1=A, 2=B, 27=AA, etc)
+ */
+function columnNumberToLetter(num) {
+  let letter = '';
+  while (num > 0) {
+    num--;
+    letter = String.fromCharCode(65 + (num % 26)) + letter;
+    num = Math.floor(num / 26);
+  }
+  return letter;
+}
+
+/**
  * Genera el Gantt limpio y profesional
  */
 async function generateExcelGantt(tasksData) {
@@ -123,7 +136,8 @@ async function generateExcelGantt(tasksData) {
   titleRow.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1F2937' } };
   titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
   titleRow.height = 20;
-  sheet.mergeCells(`A1:${ExcelJS.utils.getExcelCellAddress(totalDays + 6, 1)}`);
+  const lastCol = columnNumberToLetter(totalDays + 6);
+  sheet.mergeCells(`A1:${lastCol}1`);
 
   // ═══ FILA 2: RESUMEN ═══
   const summary = `${tasksData.totalDias.toFixed(1)} jornadas · ${Math.round(tasksData.totalHoras)}h · ${tasksData.totalImporte.toLocaleString('es-ES')} € · ${tasksData.clientName}`;
@@ -131,7 +145,7 @@ async function generateExcelGantt(tasksData) {
   summaryRow.getCell(1).font = { size: 10, color: { argb: COLORS.headerText } };
   summaryRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
   summaryRow.height = 16;
-  sheet.mergeCells(`A2:${ExcelJS.utils.getExcelCellAddress(totalDays + 6, 1)}`);
+  sheet.mergeCells(`A2:${lastCol}2`);
 
   // ═══ FILA 3: VACÍA ═══
   sheet.addRow([]);
