@@ -38,14 +38,15 @@ Asegúrate de:
 - Total de tareas: 10-15`;
 
   const response = await callBedrock({
+    model: 'claude-opus-4-7',
+    max_tokens: 2000,
+    system: systemPrompt,
     messages: [
       {
         role: 'user',
         content: `Proyecto: ${projectDescription}\n\nVertical: ${vertical}\n\nGenera un plan de tareas detallado en JSON.`
       }
-    ],
-    system: systemPrompt,
-    max_tokens: 2000
+    ]
   });
 
   try {
