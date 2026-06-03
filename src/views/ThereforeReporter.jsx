@@ -61,7 +61,7 @@ export default function ThereforeReporter() {
     if (editorState.connected && editorState.selectedCatNos.size > 0) {
       loadCategoryFields()
     }
-  }, [editorState.connected, editorState.selectedCatNos.size])
+  }, [editorState.connected, editorState.selectedCatNos]) // Fixed: Use full Set, not .size
 
   // ═══════════════════════════════════════════════════════════
   // DATA LOADING
@@ -71,7 +71,7 @@ export default function ThereforeReporter() {
     try {
       const { data, error } = await supabase
         .from('tenants')
-        .select('id, nombre, url, tenant, usuario, password, shared, owner_id')
+        .select('id, nombre, url, tenant, usuario, password, is_on_premise, shared, owner_id')
         .order('nombre', { ascending: true })
 
       if (error) throw error
@@ -165,7 +165,7 @@ export default function ThereforeReporter() {
         tenant.url,
         tenant.usuario,
         tenant.password,
-        tenant.tenant || ''
+        tenant.is_on_premise ? true : (tenant.tenant || '')
       )
 
       const catTree = await thereforeService.getCategoryTree(baseUrl, headers)
@@ -229,6 +229,16 @@ export default function ThereforeReporter() {
           catNo
         )
 
+        console.log(`🔍 Todos los campos de categoría ${catNo}:`)
+        console.table(fields.map(f => ({
+          ColName: f.ColName,
+          FieldType: f.FieldType,
+          Caption: f.Caption
+        })))
+
+        const uniqueTypes = [...new Set(fields.map(f => f.FieldType))]
+        console.log(`   Tipos únicos encontrados: ${uniqueTypes.join(', ')}`)
+
         newCatFieldOrder[catNo] = fields.map(f => f.ColName)
 
         fields.forEach(f => {
@@ -245,6 +255,21 @@ export default function ThereforeReporter() {
       const commonFields = [...fieldMap.entries()]
         .map(([name, v]) => ({ name, ...v }))
         .filter(f => f.name === 'DocNo' || f.catNos.length === total)
+
+      console.log('📋 Campos cargados:', {
+        totalFields: commonFields.length,
+        dateFields: commonFields.filter(f => f.type === 3 || f.type === 5),
+        allFieldTypes: commonFields.map(f => ({ name: f.name, type: f.type, caption: f.caption })),
+        fieldTypeCounts: {
+          type0: commonFields.filter(f => f.type === 0).length,
+          type1: commonFields.filter(f => f.type === 1).length,
+          type2: commonFields.filter(f => f.type === 2).length,
+          type3: commonFields.filter(f => f.type === 3).length,
+          type4: commonFields.filter(f => f.type === 4).length,
+          type5: commonFields.filter(f => f.type === 5).length,
+          typeUndefined: commonFields.filter(f => f.type === undefined).length,
+        }
+      })
 
       setEditorState(s => ({
         ...s,
@@ -267,9 +292,7 @@ export default function ThereforeReporter() {
       newSelectedCatNos.delete(catNo)
     }
     setEditorState(s => ({ ...s, selectedCatNos: newSelectedCatNos }))
-
-    // Schedule fields reload
-    setTimeout(loadCategoryFields, 700)
+    // Note: loadCategoryFields will be called automatically by useEffect
   }
 
   const saveProfile = async () => {
@@ -394,7 +417,7 @@ export default function ThereforeReporter() {
         tenant.url,
         tenant.usuario,
         tenant.password,
-        tenant.tenant || ''
+        tenant.is_on_premise ? true : (tenant.tenant || '')
       )
 
       // Refresh catFieldOrder
@@ -542,6 +565,14 @@ export default function ThereforeReporter() {
           <ThunderboltOutlined /> Therefore Reporter
         </h1>
         <div className="header-actions">
+          <button
+            className="btn-secondary"
+            onClick={loadTenants}
+            title="Recargar configuración de servidores"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <ReloadOutlined /> Recargar
+          </button>
           <button className="btn-primary" onClick={() => openEditor()}>
             + Nuevo Perfil
           </button>
@@ -793,11 +824,21 @@ function ResultsView(props) {
     captionMap
   } = props
 
-  // FieldType 3 = DateField, 5 = DateTimeField
+  // FieldType 3 = DateField, 5 = DateTimeField, 99 = Timestamp/DateTime (Therefore on-premise)
   const fieldTypes = resultsState.profile?.field_types || {}
   const dateFields = resultsState.profile?.saved_fields?.filter(f =>
-    f !== 'DocNo' && (fieldTypes[f] === 3 || fieldTypes[f] === 5)
+    f !== 'DocNo' && (fieldTypes[f] === 3 || fieldTypes[f] === 5 || fieldTypes[f] === 99)
   ) || []
+
+  // Debug logging
+  if (resultsState.profile && dateFields.length === 0 && resultsState.profile?.saved_fields?.length > 0) {
+    console.log('🔍 Field Types Debug:', {
+      profileName: resultsState.profile.nombre,
+      savedFields: resultsState.profile.saved_fields,
+      fieldTypes: fieldTypes,
+      hasFieldTypes: !!resultsState.profile.field_types
+    })
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0, height: '100%', minHeight: 0, boxSizing: 'border-box', overflow: 'hidden' }}>

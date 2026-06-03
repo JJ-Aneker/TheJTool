@@ -30,6 +30,7 @@ export default function TenantManager() {
         tenant: selectedTenant.tenant || '',
         usuario: selectedTenant.usuario || '',
         password: selectedTenant.password || '',
+        is_on_premise: selectedTenant.is_on_premise || false,
         shared: selectedTenant.shared || false
       })
     } else if (isModalVisible && !selectedTenant) {
@@ -75,6 +76,16 @@ export default function TenantManager() {
       dataIndex: 'tenant',
       key: 'tenant',
       render: (text) => <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)', fontSize: '12px' }}>{text || '-'}</span>
+    },
+    {
+      title: 'Tipo',
+      dataIndex: 'is_on_premise',
+      key: 'is_on_premise',
+      render: (isOnPremise) => (
+        <Tag color={isOnPremise ? 'default' : 'blue'}>
+          {isOnPremise ? 'On-Premise' : 'Cloud'}
+        </Tag>
+      )
     },
     {
       title: 'Usuario',
@@ -186,43 +197,77 @@ export default function TenantManager() {
     setLoading(true)
     try {
       if (selectedTenant) {
+        // Debug: Check auth info
+        const { data: authUser } = await supabase.auth.getUser()
+        console.log('👤 Auth UID actual:', authUser?.user?.id)
+        console.log('👤 Tenant owner_id:', selectedTenant.owner_id)
+        console.log('👤 ¿Es propietario?:', authUser?.user?.id === selectedTenant.owner_id)
+
         // Actualizar
-        const { error } = await supabase
+        const updateData = {
+          nombre: values.nombre,
+          url: values.url,
+          tenant: values.tenant,
+          usuario: values.usuario,
+          password: values.password,
+          shared: values.shared || false,
+          updated_at: new Date().toISOString()
+        }
+        // Only include is_on_premise if it exists in values
+        if ('is_on_premise' in values) {
+          updateData.is_on_premise = values.is_on_premise || false
+        }
+
+        console.log('📝 Actualizando tenant ID:', selectedTenant.id)
+        console.log('📝 Datos a guardar:', { ...updateData, password: '***' })
+
+        const { data, error } = await supabase
           .from('tenants')
-          .update({
-            nombre: values.nombre,
-            url: values.url,
-            tenant: values.tenant,
-            usuario: values.usuario,
-            password: values.password,
-            shared: values.shared || false,
-            updated_at: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('id', selectedTenant.id)
+          .select()
 
-        if (error) throw error
+        console.log('📝 Respuesta de UPDATE:', { data, error })
 
+        if (error) {
+          console.error('❌ Error en UPDATE:', error)
+          throw new Error(`Error al guardar: ${error.message} (${error.code})`)
+        }
+
+        if (!data || data.length === 0) {
+          console.warn('⚠️ UPDATE no afectó ningún registro')
+          throw new Error('El registro no fue actualizado (posible problema de RLS o permiso)')
+        }
+
+        console.log('✅ UPDATE exitoso:', data)
+
+        const updatedTenant = { ...selectedTenant, ...values, updated_at: new Date().toISOString() }
         setTenants(tenants.map(t =>
-          t.id === selectedTenant.id
-            ? { ...t, ...values, updated_at: new Date().toISOString() }
-            : t
+          t.id === selectedTenant.id ? updatedTenant : t
         ))
+        setSelectedTenant(updatedTenant)
         message.success('Tenant actualizado correctamente')
       } else {
         // Crear
+        const insertData = {
+          nombre: values.nombre,
+          url: values.url,
+          tenant: values.tenant,
+          usuario: values.usuario,
+          password: values.password,
+          shared: values.shared || false,
+          owner_id: user.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+        // Only include is_on_premise if it exists in values
+        if ('is_on_premise' in values) {
+          insertData.is_on_premise = values.is_on_premise || false
+        }
+
         const { data, error } = await supabase
           .from('tenants')
-          .insert([{
-            nombre: values.nombre,
-            url: values.url,
-            tenant: values.tenant,
-            usuario: values.usuario,
-            password: values.password,
-            shared: values.shared || false,
-            owner_id: user.id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }])
+          .insert([insertData])
           .select()
 
         if (error) throw error
@@ -327,6 +372,17 @@ export default function TenantManager() {
             rules={[{ required: true, message: 'Contraseña requerida' }]}
           >
             <Input.Password placeholder="Contraseña" />
+          </Form.Item>
+
+          <Form.Item
+            label="Tipo de instalación"
+            name="is_on_premise"
+            valuePropName="checked"
+            tooltip="Marca si es on-premise. Los on-premise no envían TenantName en la cabecera"
+          >
+            <Checkbox>
+              Esta es una instalación On-Premise (no usar TenantName)
+            </Checkbox>
           </Form.Item>
 
           <Form.Item

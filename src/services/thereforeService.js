@@ -235,8 +235,17 @@ class ThereforeService {
   /**
    * NEW: Connect to Therefore server and get auth headers + token
    * Used for profile creation/editing workflow
+   * @param {string} tenantUrl - Base URL of the Therefore instance
+   * @param {string} usuario - Username
+   * @param {string} password - Password
+   * @param {string|boolean} tenantNameOrIsOnPrem - TenantName (string) or isOnPremise flag (boolean)
    */
-  async connect(tenantUrl, usuario, password, tenantName = '') {
+  async connect(tenantUrl, usuario, password, tenantNameOrIsOnPrem = '') {
+    // Clean up credentials (trim whitespace)
+    tenantUrl = tenantUrl?.trim()
+    usuario = usuario?.trim()
+    password = password?.trim()
+
     if (!tenantUrl || !usuario || !password) {
       throw new Error('URL, usuario y contraseña son requeridos')
     }
@@ -247,24 +256,55 @@ class ThereforeService {
       'Content-Type': 'application/json',
       Accept: 'application/json'
     }
-    // Include TenantName header only for cloud instances; on-premise instances may not need it
-    // Never send TenantName if empty, null, or undefined — on-premise Therefore doesn't support it
-    if (tenantName && tenantName.trim()) {
+
+    // Handle both legacy (tenantName string) and new (isOnPremise boolean) patterns
+    // Never send TenantName if: boolean true (on-premise), empty string, null, or undefined
+    let tenantName = tenantNameOrIsOnPrem
+    if (typeof tenantNameOrIsOnPrem === 'boolean' && tenantNameOrIsOnPrem) {
+      // isOnPremise = true, don't send TenantName
+      tenantName = ''
+    }
+
+    if (tenantName && typeof tenantName === 'string' && tenantName.trim()) {
       basicHeaders.TenantName = tenantName.trim()
     }
 
     try {
       // Debug: Log headers being sent (excluding Authorization for security)
       const headersToLog = { ...basicHeaders }
+      const authHeader = headersToLog.Authorization
       delete headersToLog.Authorization
       console.log('🔐 thereforeService.connect - Headers sent:', headersToLog)
       console.log('🔐 TenantName included:', 'TenantName' in basicHeaders)
 
-      const resp = await fetch(url + '/GetConnectionToken', {
+      // Log auth info (masked for security)
+      const authParts = authHeader ? authHeader.split(' ') : []
+      const encodedCreds = authParts[1] || 'MISSING'
+      const decodedCreds = encodedCreds !== 'MISSING' ? atob(encodedCreds) : ''
+      const [sentUser, sentPass] = decodedCreds.split(':')
+
+      console.log('🔐 Authorization present:', !!authHeader)
+      console.log('🔐 Usuario en credenciales:', sentUser || 'MISSING')
+      console.log('🔐 Contraseña (primeros 3 chars):', sentPass ? sentPass.substring(0, 3) + '***' : 'MISSING')
+      console.log('🔐 URL destino:', url + '/GetConnectionToken')
+      console.log('🔐 Body enviado: {}')
+      console.log('🔐 Método: POST')
+
+      // Try with empty body first, some servers require JSON object
+      let resp = await fetch(url + '/GetConnectionToken', {
         method: 'POST',
         headers: basicHeaders,
         body: '{}'
       })
+
+      // If 500 error, try without body
+      if (!resp.ok && resp.status === 500) {
+        console.log('🔄 Retrying without body...')
+        resp = await fetch(url + '/GetConnectionToken', {
+          method: 'POST',
+          headers: basicHeaders
+        })
+      }
 
       if (!resp.ok) {
         let errorMsg = `HTTP ${resp.status}`
@@ -290,7 +330,9 @@ class ThereforeService {
         Accept: 'application/json',
         UseToken: '1'
       }
-      if (tenantName && tenantName.trim()) headers.TenantName = tenantName.trim()
+      if (tenantName && typeof tenantName === 'string' && tenantName.trim()) {
+        headers.TenantName = tenantName.trim()
+      }
 
       return { token: Token, headers, baseUrl: url }
     } catch (err) {

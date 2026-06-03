@@ -138,7 +138,12 @@ const getMenuItems = (isAdmin = false) => {
   ]
 
   const allItems = [...activeItems, ...constructionItems]
-  return allItems.filter(item => !item.adminOnly || isAdmin)
+  return allItems
+    .filter(item => !item.adminOnly || isAdmin)
+    .map(item => {
+      const { adminOnly, ...rest } = item
+      return rest
+    })
 }
 
 function AppContent() {

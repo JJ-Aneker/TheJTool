@@ -11,9 +11,10 @@ import {
   MailOutlined, DeleteOutlined, RobotOutlined, EditOutlined,
   DownloadOutlined, CheckCircleOutlined, WarningOutlined,
   ReloadOutlined, FileOutlined, InfoCircleOutlined, ThunderboltOutlined,
-  PlusOutlined, SaveOutlined, SendOutlined
+  PlusOutlined, SaveOutlined, SendOutlined, FileExcelOutlined
 } from '@ant-design/icons'
 import { DOCUMENT_TYPES, getDocumentTypeOptions } from '../constants/documentTypes.js'
+import { ganttService } from '../services/ganttService.js'
 import '../styles/document-generator.css'
 
 const { Title, Text, Paragraph } = Typography
@@ -58,6 +59,7 @@ export default function DocumentGenerator() {
   const [buildError, setBuildError]             = useState(null)
   const [docxUrl, setDocxUrl]                   = useState(null)
   const [docxFilename, setDocxFilename]         = useState(null)
+  const [generatingGantt, setGeneratingGantt]   = useState(false)
   const [refinePrompt, setRefinePrompt]         = useState('')
   const [refining, setRefining]                 = useState(false)
   const [portada, setPortada]                   = useState(null)
@@ -275,6 +277,33 @@ export default function DocumentGenerator() {
       setRefining(false)
     }
   }
+
+  // ── GENERATE GANTT ──────────────────────────────────────────────────────────
+  const handleGenerateGantt = async () => {
+    if (!projectData) {
+      message.error('No hay datos del proyecto para generar Gantt');
+      return;
+    }
+
+    setGeneratingGantt(true);
+    try {
+      const projectDescription = `
+${projectData.proyecto?.descripcion || 'Proyecto sin descripción'}
+
+Cliente: ${projectData.cliente?.nombre || 'No especificado'}
+Duración estimada: ${projectData.estimacion?.totalDias || 'No estimada'} días
+Tareas:
+${(projectData.estimacion?.tareas || []).map(t => `- ${t.descripcion} (${t.dias} días)`).join('\n')}
+      `.trim();
+
+      await ganttService.generateGantt(projectDescription, vertical);
+      message.success('Diagrama Gantt generado y descargado exitosamente');
+    } catch (err) {
+      message.error('Error al generar Gantt: ' + err.message);
+    } finally {
+      setGeneratingGantt(false);
+    }
+  };
 
   // ── BUILD DOCX ──────────────────────────────────────────────────────────────
   const handleBuildDocx = async () => {
@@ -840,6 +869,13 @@ export default function DocumentGenerator() {
                   <DownloadOutlined style={{ fontSize: '14px' }} /> Descargar {docxFilename}
                 </button>
               </a>
+              <button
+                className="btn-default"
+                onClick={handleGenerateGantt}
+                disabled={generatingGantt}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}>
+                <FileExcelOutlined style={{ fontSize: '14px' }} /> {generatingGantt ? 'Generando Gantt...' : 'Descargar Diagrama Gantt'}
+              </button>
               <button className="btn-default" onClick={handleReset} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}>
                 <ReloadOutlined style={{ fontSize: '14px' }} /> Generar otro documento
               </button>
