@@ -50,10 +50,30 @@ Asegúrate de:
   });
 
   try {
-    const text = response.content[0].text;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    let text = response.content[0].text;
+
+    // Limpiar markdown
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    // Extraer JSON
+    let jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('No JSON found');
-    return JSON.parse(jsonMatch[0]);
+
+    let json = jsonMatch[0];
+
+    // Limpiar caracteres problemáticos
+    json = json
+      .replace(/[\x00-\x1F\x7F]/g, ' ')  // Control chars
+      .replace(/(?<=[^\\"]),(?=\s*[}\]])/g, '');  // Remove trailing commas
+
+    // Intentar parsear
+    try {
+      return JSON.parse(json);
+    } catch (e) {
+      // Si falla, intentar arreglar comillas simples por dobles
+      json = json.replace(/'/g, '"');
+      return JSON.parse(json);
+    }
   } catch (err) {
     console.error('Error parsing Bedrock response:', err);
     throw new Error('Failed to parse task structure from Bedrock');
