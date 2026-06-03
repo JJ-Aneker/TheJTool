@@ -340,6 +340,47 @@ select:focus {
   background: var(--accent-primary);
 }
 
+/* Modal dark mode fix - Ant Design Collapse & Form */
+.ant-modal-content .ant-collapse {
+  background-color: transparent !important;
+  border-color: var(--border-default) !important;
+}
+
+.ant-modal-content .ant-collapse-item {
+  border-color: var(--border-default) !important;
+}
+
+.ant-modal-content .ant-collapse-header {
+  color: var(--text-primary) !important;
+  padding: 12px 16px !important;
+}
+
+.ant-modal-content .ant-collapse-header-text {
+  color: var(--text-primary) !important;
+}
+
+.ant-modal-content .ant-collapse-content {
+  background-color: transparent !important;
+  border-color: var(--border-default) !important;
+}
+
+.ant-modal-content .ant-collapse-content-box {
+  padding: 16px !important;
+}
+
+.ant-modal-content .ant-form-item-label > label {
+  color: var(--text-secondary) !important;
+}
+
+.ant-modal-content .ant-form-item {
+  color: var(--text-primary) !important;
+}
+
+.ant-modal-content .ant-form-item-label > label::after {
+  color: var(--accent-error) !important;
+}
+}
+
 /* Ant Design overrides */
 .ant-layout {
   background: var(--bg-canvas);
