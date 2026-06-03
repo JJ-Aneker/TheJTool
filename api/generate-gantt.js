@@ -249,8 +249,14 @@ export default async function handler(req, res) {
     // Retornar como buffer
     const buffer = await workbook.xlsx.writeBuffer();
 
+    // Sanitizar nombre del proyecto para el filename
+    const safeName = tasksData.projectName
+      .replace(/[^a-zA-Z0-9\s]/g, '')  // Eliminar caracteres especiales
+      .replace(/\s+/g, '_')             // Reemplazar espacios
+      .substring(0, 50);                // Limitar longitud
+
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="Gantt_${tasksData.projectName.replace(/\s+/g, '_')}.xlsx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Gantt_${safeName}.xlsx"`);
     res.send(buffer);
   } catch (error) {
     console.error('Error generating Gantt:', error);
