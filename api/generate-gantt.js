@@ -4,9 +4,9 @@ const COLORS = {
   headerBg: 'FFE5E7EB',
   headerText: 'FF374151',
   summaryBg: 'FFF3F4F6',
-  barCompleted: 'FF7C3AED',    // Púrpura oscuro
-  barPending: 'FFE9D5FF',      // Púrpura claro
-  editableBg: 'FFFEF3C7'       // Amarillo claro
+  barCompleted: '7C3AED',    // Púrpura oscuro
+  barPending: 'E9D5FF',      // Púrpura claro
+  editableBg: 'FEF3C7'       // Amarillo claro
 };
 
 function columnNumberToLetter(num) {
@@ -89,7 +89,7 @@ async function generateExcelGantt(tasksData) {
   // ═══ FILA 1: TÍTULO ═══
   const titleRow = sheet.addRow([`Diagrama de Gantt — ${tasksData.projectName}`]);
   titleRow.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1F2937' } };
-  titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
+  titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.summaryBg } };
   titleRow.height = 20;
   const lastCol = columnNumberToLetter(totalDays + 7);
   sheet.mergeCells(`A1:${lastCol}1`);
@@ -97,8 +97,8 @@ async function generateExcelGantt(tasksData) {
   // ═══ FILA 2: RESUMEN ═══
   const summary = `${tasksData.totalDias.toFixed(1)} jornadas · ${Math.round(tasksData.totalHoras)}h · ${tasksData.totalImporte.toLocaleString('es-ES')} € · ${tasksData.clientName}`;
   const summaryRow = sheet.addRow([summary]);
-  summaryRow.getCell(1).font = { size: 10, color: { argb: COLORS.headerText } };
-  summaryRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.summaryBg } };
+  summaryRow.getCell(1).font = { size: 10, color: { argb: 'FF' + COLORS.headerText } };
+  summaryRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.summaryBg } };
   summaryRow.height = 16;
   sheet.mergeCells(`A2:${lastCol}2`);
 
@@ -119,19 +119,18 @@ async function generateExcelGantt(tasksData) {
 
   for (let i = 1; i <= headers.length; i++) {
     const cell = headerRow.getCell(i);
-    cell.font = { bold: true, size: 9, color: { argb: COLORS.headerText } };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
+    cell.font = { bold: true, size: 9, color: { argb: 'FF' + COLORS.headerText } };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.headerBg } };
     cell.alignment = { horizontal: 'center', vertical: 'center', wrapText: true };
-    cell.border = { bottom: { style: 'thin', color: { argb: COLORS.headerText } } };
+    cell.border = { bottom: { style: 'thin', color: { argb: 'FF' + COLORS.headerText } } };
   }
 
-  // ═══ FILAS DE TAREAS ═══
+  // ═══ FILAS DE TAREAS CON FORMATO CONDICIONAL ═══
   const dataStartRow = 5;
   const dataColOffset = 7;
 
   tasksData.tasks.forEach((task, taskIdx) => {
     const rowIdx = dataStartRow + taskIdx;
-
     const row = sheet.getRow(rowIdx);
 
     // Datos básicos
@@ -142,51 +141,35 @@ async function generateExcelGantt(tasksData) {
     // INICIO (editable)
     row.getCell(4).value = task.startDate;
     row.getCell(4).numFmt = 'dd/mm/yyyy';
-    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.editableBg } };
+    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.editableBg } };
 
-    // FIN (FÓRMULA)
+    // FIN (FÓRMULA) = Inicio + Días
     row.getCell(5).value = {
       formula: `=D${rowIdx}+F${rowIdx}`,
       result: task.endDate
     };
     row.getCell(5).numFmt = 'dd/mm/yyyy';
 
-    // DÍAS
+    // DÍAS (fijo)
     row.getCell(6).value = task.dias;
     row.getCell(6).numFmt = '0.0';
 
     // % PROGRESO (editable)
     row.getCell(7).value = task.progress / 100;
     row.getCell(7).numFmt = '0%';
-    row.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.editableBg } };
+    row.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.editableBg } };
 
-    // ═══ BARRAS GANTT (COLOREADAS DIRECTAMENTE) ═══
-    const daysFromStart = Math.floor((task.startDate.getTime() - projectStart.getTime()) / (24 * 60 * 60 * 1000));
-    const barStart = Math.max(0, daysFromStart);
-    const barLength = Math.ceil(task.dias);
-    const completedDays = Math.ceil(barLength * (task.progress / 100));
-
+    // ═══ FORMATO CONDICIONAL PARA BARRAS GANTT ═══
     for (let dayCol = 0; dayCol < totalDays; dayCol++) {
       const cellCol = dataColOffset + dayCol;
+      const cellLetter = columnNumberToLetter(cellCol);
+      const cellRef = `${cellLetter}${rowIdx}`;
+
+      const dayDate = new Date(projectStart);
+      dayDate.setDate(dayDate.getDate() + dayCol);
+      const dateStr = `DATE(${dayDate.getFullYear()},${dayDate.getMonth() + 1},${dayDate.getDate()})`;
+
       const cell = row.getCell(cellCol);
-
-      // Determinar si esta celda debe tener color
-      if (dayCol >= barStart && dayCol < barStart + barLength) {
-        // Está en el rango de la tarea
-        if (dayCol < barStart + completedDays) {
-          // Parte completada
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.barCompleted } };
-          cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
-        } else {
-          // Parte pendiente
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.barPending } };
-        }
-      } else {
-        // Sin tarea en este día
-        const bgColor = taskIdx % 2 === 0 ? 'FFFFFFFF' : 'FFFAFAFA';
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
-      }
-
       cell.value = '';
       cell.alignment = { horizontal: 'center', vertical: 'center' };
       cell.border = {
@@ -195,6 +178,42 @@ async function generateExcelGantt(tasksData) {
         left: { style: 'hair', color: { argb: 'FFD1D5DB' } },
         right: { style: 'hair', color: { argb: 'FFD1D5DB' } }
       };
+
+      // Formato condicional: COMPLETADO
+      // Si fecha >= Inicio AND fecha < Fin AND (Fin-Inicio)*% >= (Fin-Inicio)-(fecha-Inicio)
+      sheet.addConditionalFormatting({
+        ref: cellRef,
+        rules: [
+          {
+            type: 'expression',
+            formulae: [
+              `AND(${dateStr}>=$D$${rowIdx},${dateStr}<$E$${rowIdx},DAYS(${dateStr},$D$${rowIdx})<=(($F$${rowIdx})*($G$${rowIdx})))`
+            ],
+            style: {
+              fill: {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF' + COLORS.barCompleted }
+              }
+            }
+          },
+          // Formato condicional: PENDIENTE
+          // Si fecha >= Inicio AND fecha < Fin AND (Fin-Inicio)*% < (Fin-Inicio)-(fecha-Inicio)
+          {
+            type: 'expression',
+            formulae: [
+              `AND(${dateStr}>=$D$${rowIdx},${dateStr}<$E$${rowIdx},DAYS(${dateStr},$D$${rowIdx})>(($F$${rowIdx})*($G$${rowIdx})))`
+            ],
+            style: {
+              fill: {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF' + COLORS.barPending }
+              }
+            }
+          }
+        ]
+      });
     }
 
     // Estilos de datos
