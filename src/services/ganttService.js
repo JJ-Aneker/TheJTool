@@ -13,16 +13,26 @@ export const ganttService = {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error generating Gantt');
+        try {
+          const error = await response.json();
+          throw new Error(error.error || `HTTP ${response.status}`);
+        } catch (e) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       }
 
       // Descargar archivo Excel
       const blob = await response.blob();
+
+      // Validar que sea un archivo Excel válido
+      if (blob.size === 0) {
+        throw new Error('El servidor devolvió un archivo vacío');
+      }
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Gantt_${Date.now()}.xlsx`;
+      link.download = `Gantt_${new Date().getTime()}.xlsx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -30,7 +40,8 @@ export const ganttService = {
 
       return { success: true };
     } catch (err) {
-      throw new Error(`Error: ${err.message}`);
+      console.error('Gantt generation error:', err);
+      throw new Error(`Error generando Gantt: ${err.message}`);
     }
   }
 };
