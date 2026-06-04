@@ -290,7 +290,19 @@ ${JSON.stringify(
     estructura: { categoriasPrincipales: [], tablasMaestras: [], workflows: [], herramientasExternas: [] },
     licencias: { servidor: 1, concurrentes: 0, nominativas: 0, readOnly: 0, modulosAdicionales: [] },
     estimacion: {
-      tareas: [{ descripcion: 'Nombre de la tarea', dias: 1, horas: 8, importe: 800, pendiente: false }],
+      tareas: [
+        {
+          descripcion: 'Nombre de la tarea principal',
+          dias: 1,
+          horas: 8,
+          importe: 800,
+          pendiente: false,
+          subtareas: [
+            { descripcion: 'Subtarea 1', dias: 0.5, horas: 4, importe: 400 },
+            { descripcion: 'Subtarea 2', dias: 0.5, horas: 4, importe: 400 }
+          ]
+        }
+      ],
       totalDias: 0, totalHoras: 0, totalImporte: 0, totalConIva: 0, iva: 21
     },
     riesgos: [],

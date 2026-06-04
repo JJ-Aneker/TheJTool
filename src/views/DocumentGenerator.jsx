@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons'
 import { DOCUMENT_TYPES, getDocumentTypeOptions } from '../constants/documentTypes.js'
 import { ganttService } from '../services/ganttService.js'
+import GanttViewer from '../components/GanttViewer.jsx'
 import '../styles/document-generator.css'
 
 const { Title, Text, Paragraph } = Typography
@@ -839,6 +840,10 @@ export default function DocumentGenerator() {
           </div>
 
           {buildError && <Alert type="error" message={buildError} showIcon style={{ margin: '12px 0 0' }} />}
+
+          {/* ── GANTT VIEWER ── */}
+          <Divider />
+          <GanttViewer projectData={projectData} />
         </div>
       )}
 
