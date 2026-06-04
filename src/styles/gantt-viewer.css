@@ -151,32 +151,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
   border-right: 1px solid #e8e8e8;
-  color: #d1d5db;
   user-select: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  background: transparent;
 }
 
 .gantt-bar:hover {
-  background: #f3f4f6;
+  opacity: 0.9;
 }
 
 .gantt-bar.completed {
   background: #7C3AED;
-  color: #fff;
-  font-weight: bold;
 }
 
 .gantt-bar.completed:hover {
   background: #6d28d9;
-  box-shadow: 0 0 4px rgba(124, 58, 237, 0.4);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
 }
 
 .gantt-bar.pending {
   background: #E9D5FF;
-  color: #7c3aed;
 }
 
 .gantt-bar.pending:hover {
@@ -185,8 +181,6 @@
 
 .gantt-bar.subtask {
   background: #10b981;
-  color: #fff;
-  font-weight: bold;
 }
 
 .gantt-bar.subtask:hover {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col } from 'antd'
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
 import '../styles/gantt-viewer.css'
@@ -13,7 +13,6 @@ function addWorkingDays(date, days) {
   while (daysAdded < days) {
     current.setDate(current.getDate() + 1)
     const dayOfWeek = current.getDay()
-    // 1 = Monday, 5 = Friday, 6 = Saturday, 0 = Sunday
     if (dayOfWeek >= 1 && dayOfWeek <= 5) {
       daysAdded++
     }
@@ -41,14 +40,20 @@ function countWorkingDays(start, end) {
 }
 
 export default function GanttViewer({ projectData }) {
-  const [tasks, setTasks] = useState(projectData?.estimacion?.tareas || [])
+  const [tasksState, setTasksState] = useState(
+    projectData?.estimacion?.tareas?.map((t, i) => ({
+      ...t,
+      id: `task-${i}`,
+      progress: t.progress || 0
+    })) || []
+  )
   const [projectStart] = useState(new Date(2026, 2, 1))
 
   // Recalcular fechas basadas en duración en días laborables
   const tasksWithDates = useMemo(() => {
     let currentDate = new Date(projectStart)
 
-    return tasks.map((task, idx) => {
+    return tasksState.map((task) => {
       const startDate = new Date(currentDate)
       const endDate = addWorkingDays(startDate, Math.ceil(task.dias))
 
@@ -65,13 +70,12 @@ export default function GanttViewer({ projectData }) {
 
       return {
         ...task,
-        id: `task-${idx}`,
         startDate,
         endDate,
         subtasks
       }
     })
-  }, [tasks, projectStart])
+  }, [tasksState, projectStart])
 
   // Rango de fechas para visualización
   const allDates = useMemo(() => {
@@ -94,18 +98,22 @@ export default function GanttViewer({ projectData }) {
   }, [tasksWithDates, projectStart])
 
   // Actualizar progreso
-  const handleProgressChange = (taskId, value) => {
-    setTasks(prev => prev.map(t =>
-      t.id === taskId ? { ...t, progress: value } : t
-    ))
-  }
+  const handleProgressChange = useCallback((taskId, value) => {
+    setTasksState(prev =>
+      prev.map(t =>
+        t.id === taskId ? { ...t, progress: value } : t
+      )
+    )
+  }, [])
 
   // Actualizar fecha inicio
-  const handleStartDateChange = (taskId, newDate) => {
-    setTasks(prev => prev.map(t =>
-      t.id === taskId ? { ...t, startDate: new Date(newDate) } : t
-    ))
-  }
+  const handleStartDateChange = useCallback((taskId, newDate) => {
+    setTasksState(prev =>
+      prev.map(t =>
+        t.id === taskId ? { ...t, startDate: new Date(newDate) } : t
+      )
+    )
+  }, [])
 
   if (!tasksWithDates.length) {
     return <Empty description="No hay tareas para mostrar" />
@@ -194,31 +202,15 @@ export default function GanttViewer({ projectData }) {
                 </div>
                 <div className="gantt-col-timeline">
                   {allDates.map((date, dateIdx) => {
-                    const isInRange =
-                      date >= task.startDate && date < task.endDate
-                    const isCompleted =
-                      isInRange &&
-                      countWorkingDays(task.startDate, date) <=
-                        Math.ceil(
-                          (task.dias * (task.progress || 0)) / 100
-                        )
+                    const isInRange = date >= task.startDate && date < task.endDate
+                    const daysFromStart = countWorkingDays(task.startDate, date)
+                    const totalDays = Math.ceil(task.dias)
+                    const completedDays = Math.ceil((totalDays * (task.progress || 0)) / 100)
+                    const isCompleted = isInRange && daysFromStart < completedDays
 
                     return (
-                      <Tooltip
-                        key={dateIdx}
-                        title={date.toLocaleDateString('es-ES')}
-                      >
-                        <div
-                          className={`gantt-bar ${
-                            isInRange
-                              ? isCompleted
-                                ? 'completed'
-                                : 'pending'
-                              : ''
-                          }`}
-                        >
-                          {isInRange && '█'}
-                        </div>
+                      <Tooltip key={dateIdx} title={date.toLocaleDateString('es-ES')}>
+                        <div className={`gantt-bar ${isInRange ? (isCompleted ? 'completed' : 'pending') : ''}`} />
                       </Tooltip>
                     )
                   })}
@@ -249,17 +241,8 @@ export default function GanttViewer({ projectData }) {
                         date < subtask.endDate
 
                       return (
-                        <Tooltip
-                          key={dateIdx}
-                          title={date.toLocaleDateString('es-ES')}
-                        >
-                          <div
-                            className={`gantt-bar ${
-                              isInRange ? 'subtask' : ''
-                            }`}
-                          >
-                            {isInRange && '—'}
-                          </div>
+                        <Tooltip key={dateIdx} title={date.toLocaleDateString('es-ES')}>
+                          <div className={`gantt-bar ${isInRange ? 'subtask' : ''}`} />
                         </Tooltip>
                       )
                     })}
