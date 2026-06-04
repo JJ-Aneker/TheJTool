@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col } from 'antd'
+import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, message } from 'antd'
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
+import { ganttService } from '../services/ganttService'
 import '../styles/gantt-viewer.css'
 
 /**
@@ -49,6 +50,7 @@ export default function GanttViewer({ projectData }) {
     })) || []
   )
   const [projectStart] = useState(new Date(2026, 2, 1))
+  const [isDownloading, setIsDownloading] = useState(false)
 
   // Recalcular fechas basadas en duración en días laborables
   const tasksWithDates = useMemo(() => {
@@ -123,6 +125,22 @@ export default function GanttViewer({ projectData }) {
     )
   }, [])
 
+  // Descargar Excel
+  const handleDownloadExcel = useCallback(async () => {
+    if (!projectData) return
+
+    setIsDownloading(true)
+    try {
+      await ganttService.generateGantt(projectData)
+      message.success('Gantt descargado correctamente')
+    } catch (error) {
+      message.error(error.message || 'Error al descargar Gantt')
+      console.error('Download error:', error)
+    } finally {
+      setIsDownloading(false)
+    }
+  }, [projectData])
+
   if (!tasksWithDates.length) {
     return <Empty description="No hay tareas para mostrar" />
   }
@@ -137,7 +155,12 @@ export default function GanttViewer({ projectData }) {
             <Button type="primary" icon={<ReloadOutlined />} size="small">
               Recalcular
             </Button>
-            <Button icon={<DownloadOutlined />} size="small">
+            <Button
+              icon={<DownloadOutlined />}
+              size="small"
+              loading={isDownloading}
+              onClick={handleDownloadExcel}
+            >
               Exportar Excel
             </Button>
           </Space>
