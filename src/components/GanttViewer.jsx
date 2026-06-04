@@ -44,6 +44,7 @@ export default function GanttViewer({ projectData }) {
     projectData?.estimacion?.tareas?.map((t, i) => ({
       ...t,
       id: `task-${i}`,
+      dias: t.dias || 1,  // Asegurar que tiene dias
       progress: t.progress || 0
     })) || []
   )
@@ -51,25 +52,32 @@ export default function GanttViewer({ projectData }) {
 
   // Recalcular fechas basadas en duración en días laborables
   const tasksWithDates = useMemo(() => {
+    if (!tasksState || tasksState.length === 0) return []
+
     let currentDate = new Date(projectStart)
 
     return tasksState.map((task) => {
+      const dias = Math.max(task.dias || 1, 0.5)
       const startDate = new Date(currentDate)
-      const endDate = addWorkingDays(startDate, Math.ceil(task.dias))
+      const endDate = addWorkingDays(startDate, Math.ceil(dias))
 
-      const subtasks = task.subtareas?.map((subtask, subIdx) => ({
-        ...subtask,
-        startDate: addWorkingDays(startDate, Math.ceil(subtask.dias * subIdx)),
-        endDate: addWorkingDays(
-          startDate,
-          Math.ceil(subtask.dias * (subIdx + 1))
-        )
-      })) || []
+      const subtasks = task.subtareas?.map((subtask, subIdx) => {
+        const subtaskDias = Math.max(subtask.dias || 0.5, 0.5)
+        return {
+          ...subtask,
+          startDate: addWorkingDays(startDate, Math.ceil(subtaskDias * subIdx)),
+          endDate: addWorkingDays(
+            startDate,
+            Math.ceil(subtaskDias * (subIdx + 1))
+          )
+        }
+      }) || []
 
       currentDate = endDate
 
       return {
         ...task,
+        dias,
         startDate,
         endDate,
         subtasks
