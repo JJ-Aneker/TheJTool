@@ -152,17 +152,17 @@ export default function GanttViewer({ projectData }) {
           </Col>
           <Col span={6}>
             <Tag color="green">
-              ⏱️ {Math.ceil(tasks.reduce((s, t) => s + (t.dias || 0), 0))} días
+              ⏱️ {Math.ceil(tasksWithDates.reduce((s, t) => s + (t.dias || 0), 0))} días
             </Tag>
           </Col>
           <Col span={6}>
             <Tag color="purple">
-              👥 {Math.round(tasks.reduce((s, t) => s + (t.horas || 0), 0))}h
+              👥 {Math.round(tasksWithDates.reduce((s, t) => s + (t.horas || 0), 0))}h
             </Tag>
           </Col>
           <Col span={6}>
             <Tag color="orange">
-              💰 {tasks.reduce((s, t) => s + (t.importe || 0), 0).toLocaleString('es-ES')}€
+              💰 {tasksWithDates.reduce((s, t) => s + (t.importe || 0), 0).toLocaleString('es-ES')}€
             </Tag>
           </Col>
         </Row>
