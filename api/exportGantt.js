@@ -310,8 +310,6 @@ export async function exportGantt(tasks, outputPath) {
 
     // Aplicar formato condicional a días laborables
     if (!task.isSubtask) {
-      const serialDay = dateToExcelSerial(day)
-
       days.forEach((day, dayIdx) => {
         const col = colStartDays + dayIdx
         const isWeekend = day.getDay() === 0 || day.getDay() === 6
