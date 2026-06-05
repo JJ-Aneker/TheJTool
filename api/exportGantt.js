@@ -301,66 +301,46 @@ export async function exportGantt(tasks, outputPath) {
                       right: { style: 'hair', color: { argb: 'FFBBBBBB' } } }
 
       const isWeekend = day.getDay() === 0 || day.getDay() === 6
+
       if (isWeekend) {
+        // Fines de semana siempre gris
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.weekendBgLight } }
+      } else if (!task.isSubtask && task.inicio) {
+        // Para tareas (no subtareas), colorear según progreso
+        const isInRange = day >= task.inicio && day < task.endDate
+        if (isInRange) {
+          const daysFromStart = Math.floor((day - task.inicio) / (24 * 60 * 60 * 1000))
+          const totalDaysTask = Math.ceil(task.dias)
+          const completedDays = Math.ceil((totalDaysTask * task.pct) / 100)
+
+          // Seleccionar color según progreso
+          let bgColor = COLORS.progressBg[1] // 0%
+          let fgColor = COLORS.progressText[1]
+
+          if (task.pct > 75) {
+            bgColor = COLORS.progressBg[5]
+            fgColor = COLORS.progressText[5]
+          } else if (task.pct > 50) {
+            bgColor = COLORS.progressBg[4]
+            fgColor = COLORS.progressText[4]
+          } else if (task.pct > 25) {
+            bgColor = COLORS.progressBg[3]
+            fgColor = COLORS.progressText[3]
+          } else if (task.pct > 0) {
+            bgColor = COLORS.progressBg[2]
+            fgColor = COLORS.progressText[2]
+          }
+
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + bgColor } }
+          cell.font = { color: { argb: 'FF' + fgColor } }
+        } else {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.weekdayBg } }
+        }
       } else {
+        // Subtareas y días sin tarea
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.weekdayBg } }
       }
     })
-
-    // Aplicar formato condicional a días laborables
-    if (!task.isSubtask) {
-      days.forEach((day, dayIdx) => {
-        const col = colStartDays + dayIdx
-        const isWeekend = day.getDay() === 0 || day.getDay() === 6
-
-        if (!isWeekend) {
-          const cellRef = `${String.fromCharCode(64 + col)}${rowNum}`
-          const serialDate = dateToExcelSerial(day)
-
-          worksheet.addConditionalFormatting({
-            ref: cellRef,
-            rules: [
-              {
-                type: 'formula',
-                formulae: [`AND($D$${rowNum}<=DATE(1899,12,31)+${serialDate},$E$${rowNum}>=DATE(1899,12,31)+${serialDate},$G$${rowNum}<=0)`],
-                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[1] } },
-                font: { color: { argb: 'FF' + COLORS.progressText[1] } },
-                stopIfTrue: true
-              },
-              {
-                type: 'formula',
-                formulae: [`AND($D$${rowNum}<=DATE(1899,12,31)+${serialDate},$E$${rowNum}>=DATE(1899,12,31)+${serialDate},$G$${rowNum}>0,$G$${rowNum}<=0.25)`],
-                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[2] } },
-                font: { color: { argb: 'FF' + COLORS.progressText[2] } },
-                stopIfTrue: true
-              },
-              {
-                type: 'formula',
-                formulae: [`AND($D$${rowNum}<=DATE(1899,12,31)+${serialDate},$E$${rowNum}>=DATE(1899,12,31)+${serialDate},$G$${rowNum}>0.25,$G$${rowNum}<=0.5)`],
-                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[3] } },
-                font: { color: { argb: 'FF' + COLORS.progressText[3] } },
-                stopIfTrue: true
-              },
-              {
-                type: 'formula',
-                formulae: [`AND($D$${rowNum}<=DATE(1899,12,31)+${serialDate},$E$${rowNum}>=DATE(1899,12,31)+${serialDate},$G$${rowNum}>0.5,$G$${rowNum}<=0.75)`],
-                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[4] } },
-                font: { color: { argb: 'FF' + COLORS.progressText[4] } },
-                stopIfTrue: true
-              },
-              {
-                type: 'formula',
-                formulae: [`AND($D$${rowNum}<=DATE(1899,12,31)+${serialDate},$E$${rowNum}>=DATE(1899,12,31)+${serialDate},$G$${rowNum}>0.75)`],
-                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[5] } },
-                font: { color: { argb: 'FF' + COLORS.progressText[5] } },
-                stopIfTrue: true
-              }
-            ]
-          })
-        }
-      })
-    }
   })
 
   // ═══ LEYENDA VERTICAL ═══
