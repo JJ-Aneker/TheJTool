@@ -159,61 +159,38 @@ async function generateExcelGantt(tasksData) {
     row.getCell(7).numFmt = '0%';
     row.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.editableBg } };
 
-    // ═══ FORMATO CONDICIONAL PARA BARRAS GANTT ═══
+    // ═══ BARRAS GANTT - COLOREADO DIRECTO ═══
     for (let dayCol = 0; dayCol < totalDays; dayCol++) {
       const cellCol = dataColOffset + dayCol;
-      const cellLetter = columnNumberToLetter(cellCol);
-      const cellRef = `${cellLetter}${rowIdx}`;
+      const cell = row.getCell(cellCol);
 
       const dayDate = new Date(projectStart);
       dayDate.setDate(dayDate.getDate() + dayCol);
-      const dateStr = `DATE(${dayDate.getFullYear()},${dayDate.getMonth() + 1},${dayDate.getDate()})`;
 
-      const cell = row.getCell(cellCol);
+      const isInRange = dayDate >= task.startDate && dayDate < task.endDate;
+
       cell.value = '';
       cell.alignment = { horizontal: 'center', vertical: 'center' };
       cell.border = {
-        top: { style: 'hair', color: { argb: 'FFD1D5DB' } },
-        bottom: { style: 'hair', color: { argb: 'FFD1D5DB' } },
-        left: { style: 'hair', color: { argb: 'FFD1D5DB' } },
-        right: { style: 'hair', color: { argb: 'FFD1D5DB' } }
+        top: { style: 'hair', color: { argb: 'FFE8E8E8' } },
+        bottom: { style: 'hair', color: { argb: 'FFE8E8E8' } },
+        left: { style: 'hair', color: { argb: 'FFE8E8E8' } },
+        right: { style: 'hair', color: { argb: 'FFE8E8E8' } }
       };
 
-      // Formato condicional: COMPLETADO
-      // Si fecha >= Inicio AND fecha < Fin AND (Fin-Inicio)*% >= (Fin-Inicio)-(fecha-Inicio)
-      sheet.addConditionalFormatting({
-        ref: cellRef,
-        rules: [
-          {
-            type: 'expression',
-            formulae: [
-              `AND(${dateStr}>=$D$${rowIdx},${dateStr}<$E$${rowIdx},DAYS(${dateStr},$D$${rowIdx})<=(($F$${rowIdx})*($G$${rowIdx})))`
-            ],
-            style: {
-              fill: {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'FF' + COLORS.barCompleted }
-              }
-            }
-          },
-          // Formato condicional: PENDIENTE
-          // Si fecha >= Inicio AND fecha < Fin AND (Fin-Inicio)*% < (Fin-Inicio)-(fecha-Inicio)
-          {
-            type: 'expression',
-            formulae: [
-              `AND(${dateStr}>=$D$${rowIdx},${dateStr}<$E$${rowIdx},DAYS(${dateStr},$D$${rowIdx})>(($F$${rowIdx})*($G$${rowIdx})))`
-            ],
-            style: {
-              fill: {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'FF' + COLORS.barPending }
-              }
-            }
-          }
-        ]
-      });
+      if (isInRange) {
+        const daysFromStart = Math.floor((dayDate - task.startDate) / (24 * 60 * 60 * 1000)) + 1;
+        const totalDaysTask = Math.ceil(task.dias);
+        const completedDays = Math.ceil((totalDaysTask * task.progress) / 100);
+
+        if (daysFromStart <= completedDays) {
+          // Completado
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.barCompleted } };
+        } else {
+          // Pendiente
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.barPending } };
+        }
+      }
     }
 
     // Estilos de datos

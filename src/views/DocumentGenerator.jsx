@@ -872,6 +872,12 @@ export default function DocumentGenerator() {
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}>
                 <FileExcelOutlined style={{ fontSize: '14px' }} /> {generatingGantt ? 'Generando Gantt...' : 'Descargar Diagrama Gantt'}
               </button>
+              <button
+                className="btn-default"
+                onClick={() => setCurrentStep(1)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}>
+                <ReloadOutlined style={{ fontSize: '14px' }} /> Volver al análisis
+              </button>
               <button className="btn-default" onClick={handleReset} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', fontSize: '14px' }}>
                 <ReloadOutlined style={{ fontSize: '14px' }} /> Generar otro documento
               </button>
