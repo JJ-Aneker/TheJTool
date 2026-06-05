@@ -4,7 +4,7 @@
 export const ganttService = {
   async generateGantt(projectData) {
     try {
-      const response = await fetch('/api/generate-gantt', {
+      const response = await fetch('/api/export-gantt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -29,10 +29,18 @@ export const ganttService = {
         throw new Error('El servidor devolvió un archivo vacío');
       }
 
+      // Obtener nombre del archivo del header
+      const contentDisposition = response.headers.get('content-disposition');
+      let filename = `Gantt_${new Date().getTime()}.xlsx`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (match) filename = match[1];
+      }
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Gantt_${new Date().getTime()}.xlsx`;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
