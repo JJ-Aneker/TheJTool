@@ -7,6 +7,24 @@ import fs from 'fs'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 /**
+ * Calcula solo días laborables
+ */
+function addWorkingDays(date, days) {
+  let current = new Date(date)
+  let daysAdded = 0
+
+  while (daysAdded < days) {
+    current.setDate(current.getDate() + 1)
+    const dayOfWeek = current.getDay()
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      daysAdded++
+    }
+  }
+
+  return current
+}
+
+/**
  * Mapea la estructura de projectData al formato requerido por exportGantt
  */
 function mapProjectDataToTasks(projectData) {
@@ -14,23 +32,41 @@ function mapProjectDataToTasks(projectData) {
     throw new Error('No hay tareas en los datos del proyecto')
   }
 
-  return projectData.estimacion.tareas.map(task => ({
-    n: task.n || 0,
-    tarea: task.descripcion || task.nombre || 'Sin nombre',
-    responsable: task.responsable || '',
-    inicio: task.fechaInicio ? new Date(task.fechaInicio) : new Date(),
-    dias: task.dias || task.duracion || 1,
-    pct: task.progreso || task.porcentaje || 0,
-    // Para subtareas
-    subtareas: (task.subtareas || []).map(subtask => ({
-      n: subtask.n || 0,
-      tarea: subtask.descripcion || subtask.nombre || 'Sin nombre',
-      responsable: subtask.responsable || '',
-      inicio: subtask.fechaInicio ? new Date(subtask.fechaInicio) : new Date(),
-      dias: subtask.dias || subtask.duracion || 0.5,
-      pct: subtask.progreso || subtask.porcentaje || 0
-    }))
-  }))
+  const projectStartDate = new Date(2026, 2, 1) // Marzo 1, 2026
+  let currentDate = new Date(projectStartDate)
+
+  return projectData.estimacion.tareas.map((task, idx) => {
+    const taskStartDate = new Date(currentDate)
+    const dias = task.dias || task.duracion || 1
+    const taskEndDate = addWorkingDays(taskStartDate, Math.ceil(dias))
+
+    // Actualizar fecha actual para la siguiente tarea
+    currentDate = new Date(taskEndDate)
+    currentDate.setDate(currentDate.getDate() + 1) // Un día después de que termine
+
+    return {
+      n: idx + 1,
+      tarea: task.descripcion || task.nombre || 'Sin nombre',
+      responsable: task.responsable || 'Equipo',
+      inicio: taskStartDate,
+      dias: dias,
+      pct: task.progreso || task.porcentaje || 0,
+      // Para subtareas
+      subtareas: (task.subtareas || []).map((subtask, subIdx) => {
+        const subtaskDias = subtask.dias || subtask.duracion || 0.5
+        const subtaskStartDate = addWorkingDays(taskStartDate, Math.ceil(subtaskDias * subIdx))
+
+        return {
+          n: 0, // Las subtareas no se numeran
+          tarea: subtask.descripcion || subtask.nombre || 'Sin nombre',
+          responsable: subtask.responsable || 'Equipo',
+          inicio: subtaskStartDate,
+          dias: subtaskDias,
+          pct: subtask.progreso || subtask.porcentaje || 0
+        }
+      })
+    }
+  })
 }
 
 /**
