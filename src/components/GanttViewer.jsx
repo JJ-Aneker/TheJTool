@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, message } from 'antd'
+import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, message, DatePicker } from 'antd'
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
+import dayjs from 'dayjs'
 import { ganttService } from '../services/ganttService'
 import '../styles/gantt-viewer.css'
 
@@ -51,6 +52,7 @@ export default function GanttViewer({ projectData }) {
   )
   const [projectStart] = useState(new Date(2026, 2, 1))
   const [isDownloading, setIsDownloading] = useState(false)
+  const [exportStartDate, setExportStartDate] = useState(dayjs(new Date(2026, 2, 1)))
 
   // Recalcular fechas basadas en duración en días laborables
   const tasksWithDates = useMemo(() => {
@@ -131,7 +133,8 @@ export default function GanttViewer({ projectData }) {
 
     setIsDownloading(true)
     try {
-      await ganttService.generateGantt(projectData)
+      const startDateStr = exportStartDate.format('YYYY-MM-DD')
+      await ganttService.generateGantt(projectData, startDateStr)
       message.success('Gantt descargado correctamente')
     } catch (error) {
       message.error(error.message || 'Error al descargar Gantt')
@@ -139,7 +142,7 @@ export default function GanttViewer({ projectData }) {
     } finally {
       setIsDownloading(false)
     }
-  }, [projectData])
+  }, [projectData, exportStartDate])
 
   if (!tasksWithDates.length) {
     return <Empty description="No hay tareas para mostrar" />
@@ -152,6 +155,12 @@ export default function GanttViewer({ projectData }) {
         className="gantt-card"
         extra={
           <Space>
+            <DatePicker
+              value={exportStartDate}
+              onChange={setExportStartDate}
+              format="DD/MM/YYYY"
+              size="small"
+            />
             <Button type="primary" icon={<ReloadOutlined />} size="small">
               Recalcular
             </Button>

@@ -27,12 +27,13 @@ function addWorkingDays(date, days) {
 /**
  * Mapea la estructura de projectData al formato requerido por exportGantt
  */
-function mapProjectDataToTasks(projectData) {
+function mapProjectDataToTasks(projectData, startDate = null) {
   if (!projectData?.estimacion?.tareas) {
     throw new Error('No hay tareas en los datos del proyecto')
   }
 
-  const projectStartDate = new Date(2026, 2, 1) // Marzo 1, 2026
+  // Usar fecha proporcionada o default (Marzo 1, 2026)
+  const projectStartDate = startDate ? new Date(startDate) : new Date(2026, 2, 1)
   let currentDate = new Date(projectStartDate)
 
   return projectData.estimacion.tareas.map((task, idx) => {
@@ -49,18 +50,21 @@ function mapProjectDataToTasks(projectData) {
       tarea: task.descripcion || task.nombre || 'Sin nombre',
       responsable: task.responsable || 'Equipo',
       inicio: taskStartDate,
+      endDate: taskEndDate,
       dias: dias,
       pct: task.progreso || task.porcentaje || 0,
       // Para subtareas
       subtareas: (task.subtareas || []).map((subtask, subIdx) => {
         const subtaskDias = subtask.dias || subtask.duracion || 0.5
         const subtaskStartDate = addWorkingDays(taskStartDate, Math.ceil(subtaskDias * subIdx))
+        const subtaskEndDate = addWorkingDays(subtaskStartDate, Math.ceil(subtaskDias))
 
         return {
           n: 0, // Las subtareas no se numeran
           tarea: subtask.descripcion || subtask.nombre || 'Sin nombre',
           responsable: subtask.responsable || 'Equipo',
           inicio: subtaskStartDate,
+          endDate: subtaskEndDate,
           dias: subtaskDias,
           pct: subtask.progreso || subtask.porcentaje || 0
         }
@@ -78,14 +82,14 @@ export default async function exportGanttHandler(req, res) {
   }
 
   try {
-    const { projectData } = req.body
+    const { projectData, startDate } = req.body
 
     if (!projectData) {
       return res.status(400).json({ error: 'projectData es requerido' })
     }
 
-    // Mapear datos
-    const tasks = mapProjectDataToTasks(projectData)
+    // Mapear datos con fecha de comienzo opcional
+    const tasks = mapProjectDataToTasks(projectData, startDate)
 
     // Crear carpeta de output si no existe
     const outputDir = path.join(__dirname, '..', 'output')
