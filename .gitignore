@@ -28,3 +28,17 @@ build/
 *.log
 npm-debug.log*
 yarn-debug.log*
+dev-server.log
+server.log
+
+# Temporary test files
+test_*.js
+test_*.jsx
+test_*.csv
+verify_*.js
+preview-*.js
+screenshot.js
+test-results/
+
+# Output files
+output/
