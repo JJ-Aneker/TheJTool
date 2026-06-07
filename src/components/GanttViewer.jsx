@@ -243,14 +243,20 @@ export default function GanttViewer({ projectData }) {
                 <div className="gantt-col-timeline">
                   {allDates.map((date, dateIdx) => {
                     const isInRange = date >= task.startDate && date < task.endDate
-                    const daysFromStart = countWorkingDays(task.startDate, date)
-                    const totalDays = Math.ceil(task.dias)
-                    const completedDays = Math.ceil((totalDays * (task.progress || 0)) / 100)
-                    const isCompleted = isInRange && daysFromStart < completedDays
+
+                    let barClass = ''
+                    if (isInRange) {
+                      const pct = task.progress || 0
+                      if (pct <= 0) barClass = 'progress-0'
+                      else if (pct <= 25) barClass = 'progress-25'
+                      else if (pct <= 50) barClass = 'progress-50'
+                      else if (pct <= 75) barClass = 'progress-75'
+                      else barClass = 'progress-100'
+                    }
 
                     return (
                       <Tooltip key={dateIdx} title={date.toLocaleDateString('es-ES')}>
-                        <div className={`gantt-bar ${isInRange ? (isCompleted ? 'completed' : 'pending') : ''}`} />
+                        <div className={`gantt-bar ${barClass}`} />
                       </Tooltip>
                     )
                   })}

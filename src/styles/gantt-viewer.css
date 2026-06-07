@@ -162,23 +162,52 @@
   opacity: 0.9;
 }
 
-.gantt-bar.completed {
-  background: #7C3AED;
+/* Colores de progreso según Excel */
+.gantt-bar {
+  transition: all 0.2s ease;
 }
 
-.gantt-bar.completed:hover {
-  background: #6d28d9;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+.gantt-bar.progress-0 {
+  background: #CEEAF9;
 }
 
-.gantt-bar.pending {
-  background: #E9D5FF;
+.gantt-bar.progress-0:hover {
+  background: #b3ddf5;
 }
 
-.gantt-bar.pending:hover {
-  background: #ddd6fe;
+.gantt-bar.progress-25 {
+  background: #7BBFE8;
 }
 
+.gantt-bar.progress-25:hover {
+  background: #5aabdb;
+}
+
+.gantt-bar.progress-50 {
+  background: #2E8DD4;
+}
+
+.gantt-bar.progress-50:hover {
+  background: #1f7bc4;
+}
+
+.gantt-bar.progress-75 {
+  background: #1A5E9A;
+}
+
+.gantt-bar.progress-75:hover {
+  background: #0d4878;
+}
+
+.gantt-bar.progress-100 {
+  background: #0C3D6B;
+}
+
+.gantt-bar.progress-100:hover {
+  background: #072850;
+}
+
+/* Subtareas - color verde */
 .gantt-bar.subtask {
   background: #10b981;
 }

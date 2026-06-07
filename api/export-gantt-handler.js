@@ -53,6 +53,7 @@ function mapProjectDataToTasks(projectData, startDate = null) {
       endDate: taskEndDate,
       dias: dias,
       pct: task.progreso || task.porcentaje || 0,
+      isSubtask: false,
       // Para subtareas
       subtareas: (task.subtareas || []).map((subtask, subIdx) => {
         const subtaskDias = subtask.dias || subtask.duracion || 0.5
@@ -66,7 +67,8 @@ function mapProjectDataToTasks(projectData, startDate = null) {
           inicio: subtaskStartDate,
           endDate: subtaskEndDate,
           dias: subtaskDias,
-          pct: subtask.progreso || subtask.porcentaje || 0
+          pct: subtask.progreso || subtask.porcentaje || 0,
+          isSubtask: true
         }
       })
     }
