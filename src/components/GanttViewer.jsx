@@ -2,22 +2,26 @@ import React, { useState, useMemo, useCallback } from 'react'
 import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, message, DatePicker } from 'antd'
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
+import ExcelJS from 'exceljs'
 import { ganttService } from '../services/ganttService'
 import '../styles/gantt-viewer.css'
 
 /**
- * Calcula solo días laborables (lunes a viernes)
+ * Calcula solo días laborables (lunes-viernes)
+ * Ignora sábados y domingos completamente
+ * Si días=5, cuenta 5 días laborables desde la fecha de inicio
  */
 function addWorkingDays(date, days) {
   let current = new Date(date)
   let daysAdded = 0
 
   while (daysAdded < days) {
-    current.setDate(current.getDate() + 1)
     const dayOfWeek = current.getDay()
     if (dayOfWeek >= 1 && dayOfWeek <= 5) {
       daysAdded++
+      if (daysAdded >= days) break
     }
+    current.setDate(current.getDate() + 1)
   }
 
   return current
@@ -127,22 +131,160 @@ export default function GanttViewer({ projectData }) {
     )
   }, [])
 
-  // Descargar Excel
+  /**
+   * Convierte fecha a número serial de Excel sin hora
+   */
+  const dateToExcelSerial = (date) => {
+    const d = new Date(date)
+    d.setHours(0, 0, 0, 0)
+    const excelEpoch = new Date(1899, 11, 30)
+    return Math.floor((d - excelEpoch) / (1000 * 60 * 60 * 24))
+  }
+
+  /**
+   * Aplana tareas y subtareas para exportación
+   */
+  const flattenTasksForExport = useCallback(() => {
+    const flat = []
+    let taskNumber = 1
+
+    tasksWithDates.forEach(task => {
+      // Tarea principal
+      flat.push({
+        numero: taskNumber,
+        nombre: task.descripcion || task.nombre || 'Tarea',
+        responsable: task.responsable || 'Equipo',
+        fechaInicio: task.startDate,
+        dias: Math.ceil(task.dias || 1),
+        progreso: (task.progress || task.progreso || 0) / 100 // Convertir a decimal 0-1
+      })
+      taskNumber++
+
+      // Subtareas
+      if (task.subtareas && Array.isArray(task.subtareas)) {
+        task.subtareas.forEach(subtask => {
+          flat.push({
+            numero: null, // Las subtareas no tienen número
+            nombre: `  ├─ ${subtask.descripcion || subtask.nombre || 'Subtarea'}`,
+            responsable: subtask.responsable || 'Equipo',
+            fechaInicio: subtask.startDate,
+            dias: Math.ceil(subtask.dias || 1),
+            progreso: (subtask.progress || subtask.progreso || 0) / 100 // Convertir a decimal 0-1
+          })
+          taskNumber++
+        })
+      }
+    })
+
+    return flat
+  }, [tasksWithDates])
+
+  /**
+   * Exporta Gantt desde plantilla .xlsm
+   */
   const handleDownloadExcel = useCallback(async () => {
-    if (!projectData) return
+    if (!projectData || tasksWithDates.length === 0) {
+      message.error('No hay tareas para exportar')
+      return
+    }
 
     setIsDownloading(true)
     try {
-      const startDateStr = exportStartDate.format('YYYY-MM-DD')
-      await ganttService.generateGantt(projectData, startDateStr)
-      message.success('Gantt descargado correctamente')
+      // Cargar plantilla
+      const response = await fetch('/templates/gantt-template.xlsm')
+      if (!response.ok) {
+        throw new Error('No se pudo cargar la plantilla Gantt')
+      }
+
+      const arrayBuffer = await response.arrayBuffer()
+      const workbook = new ExcelJS.Workbook()
+      await workbook.xlsx.load(arrayBuffer)
+      const ws = workbook.getWorksheet('Gantt')
+
+      if (!ws) {
+        throw new Error('Hoja "Gantt" no encontrada en la plantilla')
+      }
+
+      // Obtener tareas aplanadas
+      const tareas = flattenTasksForExport()
+
+      // Escribir datos desde fila 5
+      tareas.forEach((tarea, index) => {
+        const rowIndex = 5 + index
+        const row = ws.getRow(rowIndex)
+        row.height = 16
+
+        // Columna A: Número (vacío si es subtarea)
+        row.getCell(1).value = tarea.numero ?? null
+        row.getCell(1).alignment = { horizontal: 'center', vertical: 'center' }
+
+        // Columna B: Nombre de tarea/subtarea
+        row.getCell(2).value = tarea.nombre
+        row.getCell(2).alignment = { horizontal: 'left', vertical: 'center' }
+        if (tarea.nombre.includes('├─')) {
+          row.getCell(2).font = { size: 9, italic: true, color: { argb: 'FF666666' } }
+        }
+
+        // Columna C: Responsable
+        row.getCell(3).value = tarea.responsable
+        row.getCell(3).alignment = { horizontal: 'left', vertical: 'center' }
+        row.getCell(3).font = { size: 9 }
+
+        // Columna D: F. Inicio (número serial Excel)
+        if (tarea.fechaInicio) {
+          row.getCell(4).value = dateToExcelSerial(tarea.fechaInicio)
+          row.getCell(4).numFmt = 'dd/mm/yyyy'
+        }
+        row.getCell(4).alignment = { horizontal: 'center', vertical: 'center' }
+        row.getCell(4).font = { size: 9 }
+
+        // Columna E: Vacía (VBA calcula F.Fin con WORKDAY)
+        row.getCell(5).alignment = { horizontal: 'center', vertical: 'center' }
+        row.getCell(5).numFmt = 'dd/mm/yyyy'
+        row.getCell(5).font = { size: 9 }
+
+        // Columna F: Días
+        row.getCell(6).value = tarea.dias
+        row.getCell(6).numFmt = '0'
+        row.getCell(6).alignment = { horizontal: 'center', vertical: 'center' }
+        row.getCell(6).font = { size: 9 }
+
+        // Columna G: % (como decimal)
+        row.getCell(7).value = tarea.progreso
+        row.getCell(7).numFmt = '0%'
+        row.getCell(7).alignment = { horizontal: 'center', vertical: 'center' }
+        row.getCell(7).font = { size: 9 }
+
+        row.commit()
+      })
+
+      // Descargar como .xlsm
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.ms-excel.sheet.macroEnabled.12'
+      })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      const projectName = projectData.proyecto?.nombre || 'Gantt'
+      const safeName = projectName
+        .replace(/[^a-zA-Z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
+        .substring(0, 30)
+      link.download = `Gantt_${safeName}.xlsm`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      message.success('Gantt exportado. Abre el archivo y pulsa "Actualizar" para ejecutar la macro')
     } catch (error) {
-      message.error(error.message || 'Error al descargar Gantt')
-      console.error('Download error:', error)
+      message.error(error.message || 'Error al exportar Gantt')
+      console.error('Export error:', error)
     } finally {
       setIsDownloading(false)
     }
-  }, [projectData, exportStartDate])
+  }, [projectData, tasksWithDates, flattenTasksForExport])
 
   if (!tasksWithDates.length) {
     return <Empty description="No hay tareas para mostrar" />
@@ -165,12 +307,13 @@ export default function GanttViewer({ projectData }) {
               Recalcular
             </Button>
             <Button
+              type="primary"
               icon={<DownloadOutlined />}
               size="small"
               loading={isDownloading}
               onClick={handleDownloadExcel}
             >
-              Exportar Excel
+              Descargar Gantt .xlsm
             </Button>
           </Space>
         }
@@ -242,7 +385,7 @@ export default function GanttViewer({ projectData }) {
                 </div>
                 <div className="gantt-col-timeline">
                   {allDates.map((date, dateIdx) => {
-                    const isInRange = date >= task.startDate && date < task.endDate
+                    const isInRange = date >= task.startDate && date <= task.endDate
 
                     let barClass = ''
                     if (isInRange) {
@@ -284,7 +427,7 @@ export default function GanttViewer({ projectData }) {
                         subtask.startDate &&
                         subtask.endDate &&
                         date >= subtask.startDate &&
-                        date < subtask.endDate
+                        date <= subtask.endDate
 
                       return (
                         <Tooltip key={dateIdx} title={date.toLocaleDateString('es-ES')}>
