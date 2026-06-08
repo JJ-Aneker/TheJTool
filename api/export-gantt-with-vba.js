@@ -119,8 +119,9 @@ export default async function exportGanttWithVBAHandler(req, res) {
     const filename = `Gantt_${safeName}_${timestamp}.xlsm`
     tempExcelPath = path.join(outputDir, filename)
 
-    // Preparar datos JSON para PowerShell
-    const jsonData = JSON.stringify({ tareas })
+    // Escribir JSON a archivo temporal
+    const tempJsonPath = path.join(outputDir, `.temp-${Date.now()}.json`)
+    fs.writeFileSync(tempJsonPath, JSON.stringify({ tareas }))
 
     // Ejecutar PowerShell para escribir en Excel
     const psScript = path.join(__dirname, '../docs/write-gantt-excel.ps1')
@@ -132,12 +133,21 @@ export default async function exportGanttWithVBAHandler(req, res) {
         `powershell -ExecutionPolicy Bypass -File "${psScript}" ` +
         `-TemplatePath "${templatePath}" ` +
         `-OutputPath "${tempExcelPath}" ` +
-        `-JsonData '${jsonData.replace(/'/g, "''")}'`,
+        `-JsonDataPath "${tempJsonPath}"`,
         { stdio: 'inherit' }
       )
     } catch (error) {
       console.error('PowerShell error:', error.message)
       throw new Error('Error al generar Gantt con macros: ' + error.message)
+    } finally {
+      // Limpiar JSON temporal
+      if (fs.existsSync(tempJsonPath)) {
+        try {
+          fs.unlinkSync(tempJsonPath)
+        } catch (err) {
+          console.warn('No se pudo limpiar JSON temp:', err.message)
+        }
+      }
     }
 
     // Verificar que el archivo se creó
