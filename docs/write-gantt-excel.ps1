@@ -7,11 +7,9 @@ param(
 try {
     Write-Host "1. Leyendo JSON..."
     $json = Get-Content -Path $JsonDataPath -Raw
-    Write-Host "JSON size: $($json.Length) bytes"
     
     Write-Host "2. Parseando JSON..."
     $data = $json | ConvertFrom-Json
-    Write-Host "Tareas: $($data.tareas.Count)"
     
     Write-Host "3. Abriendo Excel..."
     $excel = New-Object -ComObject Excel.Application
@@ -69,7 +67,14 @@ try {
         $rowIndex++
     }
     
-    Write-Host "8. Guardando..."
+    Write-Host "8. Ejecutando macro ActualizarGantt..."
+    try {
+        $excel.Run("ActualizarGantt")
+    } catch {
+        Write-Host "Nota: Macro no se ejecuto directamente"
+    }
+    
+    Write-Host "9. Guardando..."
     $workbook.Save()
     $workbook.Close($false)
     $excel.Quit()
