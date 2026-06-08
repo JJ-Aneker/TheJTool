@@ -1,4 +1,4 @@
-import { exportGantt } from './exportGantt.js'
+import { exportGanttFromTemplate } from './exportGanttTemplate.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
@@ -106,8 +106,8 @@ export default async function exportGanttHandler(req, res) {
     const filename = `Gantt_${safeName}_${timestamp}.xlsx`
     const outputPath = path.join(outputDir, filename)
 
-    // Exportar Gantt
-    await exportGantt(tasks, outputPath)
+    // Exportar Gantt desde plantilla con VBA
+    await exportGanttFromTemplate(tasks, outputPath)
 
     // Crear archivo README con instrucciones sobre VBA
     const vbaInstructionsPath = path.join(outputDir, `${filename.replace('.xlsx', '')}_INSTRUCCIONES_VBA.txt`)
