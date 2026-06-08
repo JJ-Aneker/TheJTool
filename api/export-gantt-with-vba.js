@@ -119,9 +119,10 @@ export default async function exportGanttWithVBAHandler(req, res) {
     const filename = `Gantt_${safeName}_${timestamp}.xlsm`
     tempExcelPath = path.join(outputDir, filename)
 
-    // Escribir JSON a archivo temporal
+    // Escribir JSON a archivo temporal (UTF-8 sin BOM)
     const tempJsonPath = path.join(outputDir, `.temp-${Date.now()}.json`)
-    fs.writeFileSync(tempJsonPath, JSON.stringify({ tareas }))
+    const jsonContent = JSON.stringify({ tareas }, null, 2)
+    fs.writeFileSync(tempJsonPath, jsonContent, { encoding: 'utf8' })
 
     // Ejecutar PowerShell para escribir en Excel
     const psScript = path.join(__dirname, '../docs/write-gantt-excel.ps1')
