@@ -2,8 +2,6 @@ import React, { useState, useMemo, useCallback } from 'react'
 import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, message, DatePicker } from 'antd'
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
-import ExcelJS from 'exceljs'
-import { ganttService } from '../services/ganttService'
 import '../styles/gantt-viewer.css'
 
 /**
@@ -131,53 +129,7 @@ export default function GanttViewer({ projectData }) {
     )
   }, [])
 
-  /**
-   * Convierte fecha a número serial de Excel sin hora
-   */
-  const dateToExcelSerial = (date) => {
-    const d = new Date(date)
-    d.setHours(0, 0, 0, 0)
-    const excelEpoch = new Date(1899, 11, 30)
-    return Math.floor((d - excelEpoch) / (1000 * 60 * 60 * 24))
-  }
-
-  const flattenTasksForExport = useCallback(() => {
-    const flat = []
-    let taskNumber = 1
-
-    tasksWithDates.forEach(task => {
-      const fechaInicioPadre = task.startDate
-
-      flat.push({
-        numero: taskNumber,
-        nombre: task.descripcion || task.nombre || 'Tarea',
-        responsable: task.responsable || 'Equipo',
-        fechaInicio: fechaInicioPadre,
-        dias: Math.ceil(task.dias || 1),
-        progreso: (task.progress || task.progreso || 0) / 100
-      })
-      taskNumber++
-
-      if (task.subtareas && Array.isArray(task.subtareas)) {
-        task.subtareas.forEach(subtask => {
-          flat.push({
-            numero: null,
-            nombre: `├─ ${subtask.descripcion || subtask.nombre || 'Subtarea'}`,
-            responsable: subtask.responsable || task.responsable || 'Equipo',
-            fechaInicio: fechaInicioPadre,
-            dias: Math.ceil(subtask.dias || 1),
-            progreso: (subtask.progress || subtask.progreso || 0) / 100
-          })
-        })
-      }
-    })
-
-    return flat
-  }, [tasksWithDates])
-
-  /**
-   * Exporta Gantt desde plantilla .xlsm
-   */
+  // Descargar Gantt desde backend
   const handleDownloadExcel = useCallback(async () => {
     if (!projectData || tasksWithDates.length === 0) {
       message.error('No hay tareas para exportar')
@@ -186,101 +138,56 @@ export default function GanttViewer({ projectData }) {
 
     setIsDownloading(true)
     try {
-      // Cargar plantilla
-      const response = await fetch('/templates/gantt-template.xlsm')
+      message.loading('Generando Gantt con macros...')
+
+      const response = await fetch('/api/export-gantt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectData,
+          startDate: exportStartDate.format('YYYY-MM-DD')
+        })
+      })
+
       if (!response.ok) {
-        throw new Error('No se pudo cargar la plantilla Gantt')
+        try {
+          const error = await response.json()
+          throw new Error(error.error || `HTTP ${response.status}`)
+        } catch (e) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
       }
 
-      const arrayBuffer = await response.arrayBuffer()
-      const workbook = new ExcelJS.Workbook()
-      await workbook.xlsx.load(arrayBuffer)
-      const ws = workbook.getWorksheet('Gantt')
+      const blob = await response.blob()
 
-      if (!ws) {
-        throw new Error('Hoja "Gantt" no encontrada en la plantilla')
+      if (blob.size === 0) {
+        throw new Error('El servidor devolvió un archivo vacío')
       }
 
-      // Obtener tareas aplanadas
-      const tareas = flattenTasksForExport()
+      const contentDisposition = response.headers.get('content-disposition')
+      let filename = `Gantt_${new Date().getTime()}.xlsm`
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/)
+        if (match) filename = match[1]
+      }
 
-      // Escribir datos desde fila 5
-      tareas.forEach((tarea, index) => {
-        const rowIndex = 5 + index
-        const row = ws.getRow(rowIndex)
-        row.height = 16
-
-        // Columna A: Número (vacío si es subtarea)
-        row.getCell(1).value = tarea.numero ?? null
-        row.getCell(1).alignment = { horizontal: 'center', vertical: 'center' }
-
-        // Columna B: Nombre de tarea/subtarea
-        row.getCell(2).value = tarea.nombre
-        row.getCell(2).alignment = { horizontal: 'left', vertical: 'center' }
-        if (tarea.nombre.includes('├─')) {
-          row.getCell(2).font = { size: 9, italic: true, color: { argb: 'FF666666' } }
-        }
-
-        // Columna C: Responsable
-        row.getCell(3).value = tarea.responsable
-        row.getCell(3).alignment = { horizontal: 'left', vertical: 'center' }
-        row.getCell(3).font = { size: 9 }
-
-        // Columna D: F. Inicio (número serial Excel)
-        if (tarea.fechaInicio) {
-          row.getCell(4).value = dateToExcelSerial(tarea.fechaInicio)
-          row.getCell(4).numFmt = 'dd/mm/yyyy'
-        }
-        row.getCell(4).alignment = { horizontal: 'center', vertical: 'center' }
-        row.getCell(4).font = { size: 9 }
-
-        // Columna E: Vacía (VBA calcula F.Fin con WORKDAY)
-        row.getCell(5).alignment = { horizontal: 'center', vertical: 'center' }
-        row.getCell(5).numFmt = 'dd/mm/yyyy'
-        row.getCell(5).font = { size: 9 }
-
-        // Columna F: Días
-        row.getCell(6).value = tarea.dias
-        row.getCell(6).numFmt = '0'
-        row.getCell(6).alignment = { horizontal: 'center', vertical: 'center' }
-        row.getCell(6).font = { size: 9 }
-
-        // Columna G: % (como decimal)
-        row.getCell(7).value = tarea.progreso
-        row.getCell(7).numFmt = '0%'
-        row.getCell(7).alignment = { horizontal: 'center', vertical: 'center' }
-        row.getCell(7).font = { size: 9 }
-
-        row.commit()
-      })
-
-      // Descargar como .xlsm
-      const buffer = await workbook.xlsx.writeBuffer()
-      const blob = new Blob([buffer], {
-        type: 'application/vnd.ms-excel.sheet.macroEnabled.12'
-      })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      const projectName = projectData.proyecto?.nombre || 'Gantt'
-      const safeName = projectName
-        .replace(/[^a-zA-Z0-9\s]/g, '')
-        .replace(/\s+/g, '_')
-        .substring(0, 30)
-      link.download = `Gantt_${safeName}.xlsm`
+      link.download = filename
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
 
-      message.success('Gantt exportado. Abre el archivo y pulsa "Actualizar" para ejecutar la macro')
+      message.success('Gantt descargado. Abre el archivo y haz clic en "Actualizar" para ejecutar la macro')
     } catch (error) {
       message.error(error.message || 'Error al exportar Gantt')
       console.error('Export error:', error)
     } finally {
       setIsDownloading(false)
     }
-  }, [projectData, tasksWithDates, flattenTasksForExport])
+  }, [projectData, tasksWithDates, exportStartDate])
 
   if (!tasksWithDates.length) {
     return <Empty description="No hay tareas para mostrar" />
