@@ -141,37 +141,33 @@ export default function GanttViewer({ projectData }) {
     return Math.floor((d - excelEpoch) / (1000 * 60 * 60 * 24))
   }
 
-  /**
-   * Aplana tareas y subtareas para exportación
-   */
   const flattenTasksForExport = useCallback(() => {
     const flat = []
     let taskNumber = 1
 
     tasksWithDates.forEach(task => {
-      // Tarea principal
+      const fechaInicioPadre = task.startDate
+
       flat.push({
         numero: taskNumber,
         nombre: task.descripcion || task.nombre || 'Tarea',
         responsable: task.responsable || 'Equipo',
-        fechaInicio: task.startDate,
+        fechaInicio: fechaInicioPadre,
         dias: Math.ceil(task.dias || 1),
-        progreso: (task.progress || task.progreso || 0) / 100 // Convertir a decimal 0-1
+        progreso: (task.progress || task.progreso || 0) / 100
       })
       taskNumber++
 
-      // Subtareas
       if (task.subtareas && Array.isArray(task.subtareas)) {
         task.subtareas.forEach(subtask => {
           flat.push({
-            numero: null, // Las subtareas no tienen número
-            nombre: `  ├─ ${subtask.descripcion || subtask.nombre || 'Subtarea'}`,
-            responsable: subtask.responsable || 'Equipo',
-            fechaInicio: subtask.startDate,
+            numero: null,
+            nombre: `├─ ${subtask.descripcion || subtask.nombre || 'Subtarea'}`,
+            responsable: subtask.responsable || task.responsable || 'Equipo',
+            fechaInicio: fechaInicioPadre,
             dias: Math.ceil(subtask.dias || 1),
-            progreso: (subtask.progress || subtask.progreso || 0) / 100 // Convertir a decimal 0-1
+            progreso: (subtask.progress || subtask.progreso || 0) / 100
           })
-          taskNumber++
         })
       }
     })
