@@ -1,104 +1,51 @@
 import ExcelJS from 'exceljs'
 import path from 'path'
-import fs from 'fs'
 import { fileURLToPath } from 'url'
+import fs from 'fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const COLORS = {
-  headerBg: '2C3E50',
-  monthHeader: '1A5E9A',
-  weekdayBg: 'D6E4F0',
-  weekendBgLight: 'E8E8E8'
-}
-
 /**
- * Obtiene el rango de fechas del proyecto
+ * Convierte una fecha JavaScript a número serial de Excel (sin hora)
  */
-function getDateRange(tasks) {
-  let minDate = null
-  let maxDate = null
-
-  tasks.forEach(task => {
-    if (task.inicio) {
-      if (!minDate || task.inicio < minDate) minDate = task.inicio
-      if (!maxDate || task.inicio > maxDate) maxDate = task.inicio
-    }
-  })
-
-  if (!minDate) minDate = new Date()
-  if (!maxDate) maxDate = new Date(minDate.getTime() + 30 * 24 * 60 * 60 * 1000)
-
-  return { minDate, maxDate }
+function dateToExcelSerial(date) {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  const excelEpoch = new Date(1899, 11, 30)
+  return Math.floor((d - excelEpoch) / (1000 * 60 * 60 * 24))
 }
 
 /**
- * Genera array de todos los días naturales en el rango
- */
-function generateDayRange(minDate, maxDate) {
-  const days = []
-  let current = new Date(minDate)
-  current.setHours(0, 0, 0, 0)
-  maxDate = new Date(maxDate)
-  maxDate.setHours(0, 0, 0, 0)
-
-  while (current <= maxDate) {
-    days.push(new Date(current))
-    current.setDate(current.getDate() + 1)
-  }
-
-  return days
-}
-
-/**
- * Agrupa días por mes
- */
-function groupDaysByMonth(days) {
-  const months = {}
-  days.forEach(day => {
-    const monthKey = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}`
-    if (!months[monthKey]) {
-      months[monthKey] = []
-    }
-    months[monthKey].push(day)
-  })
-  return months
-}
-
-/**
- * Formatea día con inicial del día de la semana
- */
-function formatDayHeader(date) {
-  const dayNames = ['D', 'L', 'M', 'X', 'J', 'V', 'S']
-  const dayNum = date.getDate()
-  const dayInitial = dayNames[date.getDay()]
-  return `${dayNum}${dayInitial}`
-}
-
-/**
- * Aplanifica tareas y subtareas
+ * Aplana tareas y subtareas para escritura en Excel
  */
 function flattenTasks(tasks) {
   const flat = []
   let taskNumber = 1
 
   tasks.forEach(task => {
+    // Tarea principal
     flat.push({
-      ...task,
-      n: taskNumber,
-      isSubtask: false,
-      level: 0
+      numero: taskNumber,
+      nombre: task.descripcion || task.tarea || task.nombre || 'Tarea',
+      responsable: task.responsable || 'Equipo',
+      fechaInicio: task.inicio,
+      dias: Math.ceil(task.dias || 1),
+      progreso: (task.progreso || 0) / 100, // Convertir a decimal 0-1
+      isSubtask: false
     })
     taskNumber++
 
+    // Subtareas
     if (task.subtareas && Array.isArray(task.subtareas)) {
       task.subtareas.forEach(subtask => {
         flat.push({
-          ...subtask,
-          n: taskNumber,
-          isSubtask: true,
-          parentName: task.tarea,
-          level: 1
+          numero: null, // Las subtareas no tienen número
+          nombre: `  ├─ ${subtask.descripcion || subtask.tarea || subtask.nombre || 'Subtarea'}`,
+          responsable: subtask.responsable || 'Equipo',
+          fechaInicio: subtask.inicio,
+          dias: Math.ceil(subtask.dias || 1),
+          progreso: (subtask.progreso || 0) / 100, // Convertir a decimal 0-1
+          isSubtask: true
         })
         taskNumber++
       })
@@ -109,197 +56,100 @@ function flattenTasks(tasks) {
 }
 
 /**
- * Exporta Gantt usando la plantilla.xlsm con VBA
+ * Exporta Gantt desde la plantilla .xlsm
+ * La plantilla debe estar en public/templates/gantt-template.xlsm
  */
-export async function exportGanttFromTemplate(tasks, outputPath) {
-  const allTasks = flattenTasks(tasks)
+export async function exportGanttFromTemplate(tasks) {
+  try {
+    const templatePath = path.join(__dirname, '../public/templates/gantt-template.xlsm')
 
-  if (allTasks.length === 0) {
-    throw new Error('No hay tareas para exportar')
-  }
-
-  const { minDate, maxDate } = getDateRange(allTasks)
-  const days = generateDayRange(minDate, maxDate)
-  const daysByMonth = groupDaysByMonth(days)
-  const months = Object.keys(daysByMonth).sort()
-
-  const fixedCols = 7
-  const colStartDays = fixedCols + 1
-
-  // Cargar plantilla
-  const templatePath = path.join(__dirname, '..', 'docs', 'Gantt_Plantilla.xlsm')
-
-  if (!fs.existsSync(templatePath)) {
-    throw new Error(`Plantilla no encontrada: ${templatePath}. Ejecuta: PowerShell.exe -ExecutionPolicy Bypass -File docs/crear-plantilla-gantt.ps1`)
-  }
-
-  const workbook = new ExcelJS.Workbook()
-  await workbook.xlsx.readFile(templatePath)
-  const worksheet = workbook.getWorksheet('Gantt')
-
-  if (!worksheet) {
-    throw new Error('La plantilla no tiene una hoja llamada "Gantt"')
-  }
-
-  // ═══ LIMPIAR HOJAS ADICIONALES ═══
-  while (workbook.worksheets.length > 1) {
-    workbook.removeWorksheet(workbook.worksheets[1].id)
-  }
-
-  // ═══ FILA 1: CABECERA DE MESES ═══
-  // Limpiar filas anteriores si existen
-  for (let i = worksheet.rowCount; i >= 1; i--) {
-    worksheet.getRow(i).values = []
-  }
-
-  const headerMonthRow = worksheet.addRow([])
-  headerMonthRow.height = 20
-
-  worksheet.mergeCells(1, 1, 1, fixedCols)
-  const cellA1 = worksheet.getCell(1, 1)
-  cellA1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.headerBg } }
-  cellA1.alignment = { horizontal: 'center', vertical: 'center' }
-
-  let currentCol = colStartDays
-  months.forEach(monthKey => {
-    const monthDays = daysByMonth[monthKey]
-    const [year, month] = monthKey.split('-')
-    const monthName = new Date(year, parseInt(month) - 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
-
-    const startCol = currentCol
-    const endCol = currentCol + monthDays.length - 1
-
-    worksheet.mergeCells(1, startCol, 1, endCol)
-    const monthCell = worksheet.getCell(1, startCol)
-    monthCell.value = monthName.charAt(0).toUpperCase() + monthName.slice(1)
-    monthCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.monthHeader } }
-    monthCell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 }
-    monthCell.alignment = { horizontal: 'center', vertical: 'center' }
-
-    currentCol = endCol + 1
-  })
-
-  // ═══ FILA 2: CABECERA DE COLUMNAS ═══
-  const headerRow = worksheet.addRow(['Nº', 'Tarea', 'Responsable', 'F. Inicio', 'F. Fin', 'Días', '%'])
-  headerRow.height = 18
-
-  for (let col = 1; col <= fixedCols; col++) {
-    const cell = headerRow.getCell(col)
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.headerBg } }
-    cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 }
-    cell.alignment = { horizontal: 'center', vertical: 'center' }
-    cell.border = { bottom: { style: 'thin', color: { argb: 'FF000000' } } }
-  }
-
-  days.forEach((day) => {
-    const col = colStartDays + days.indexOf(day)
-    const cell = headerRow.getCell(col)
-    cell.value = formatDayHeader(day)
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.headerBg } }
-    cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 9 }
-    cell.alignment = { horizontal: 'center', vertical: 'center' }
-    cell.border = { bottom: { style: 'thin', color: { argb: 'FF000000' } } }
-  })
-
-  // ═══ FILAS DE DATOS ═══
-  const dataStartRow = 3
-  allTasks.forEach((task, idx) => {
-    const rowNum = dataStartRow + idx
-    const row = worksheet.getRow(rowNum)
-    row.height = 16
-
-    const cellN = row.getCell(1)
-    cellN.value = task.isSubtask ? '' : task.n
-    cellN.alignment = { horizontal: 'center', vertical: 'center' }
-
-    const cellTask = row.getCell(2)
-    cellTask.value = task.isSubtask ? `  ├─ ${task.tarea}` : task.tarea
-    cellTask.alignment = { horizontal: 'left', vertical: 'center' }
-    if (task.isSubtask) {
-      cellTask.font = { size: 9, italic: true, color: { argb: 'FF666666' } }
-    } else {
-      cellTask.font = { bold: true }
+    // Verificar que la plantilla existe
+    if (!fs.existsSync(templatePath)) {
+      throw new Error(
+        `Plantilla Gantt no encontrada en ${templatePath}. ` +
+        'Ejecuta: node create-gantt-template.mjs'
+      )
     }
 
-    const cellResp = row.getCell(3)
-    cellResp.value = task.responsable || ''
-    cellResp.alignment = { horizontal: 'left', vertical: 'center' }
-    cellResp.font = { size: 9 }
+    // Cargar plantilla
+    const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.readFile(templatePath)
+    const ws = workbook.getWorksheet('Gantt')
 
-    const cellInicio = row.getCell(4)
-    cellInicio.value = task.inicio || ''
-    cellInicio.numFmt = 'DD/MM/YYYY'
-    cellInicio.alignment = { horizontal: 'center', vertical: 'center' }
-    cellInicio.font = { size: 9 }
-
-    const cellFin = row.getCell(5)
-    cellFin.value = {
-      formula: `=IFERROR(WORKDAY(D${rowNum},ROUNDUP(F${rowNum},0)-1),D${rowNum})`,
-      result: task.endDate || new Date()
+    if (!ws) {
+      throw new Error('Hoja "Gantt" no encontrada en la plantilla')
     }
-    cellFin.numFmt = 'DD/MM/YYYY'
-    cellFin.alignment = { horizontal: 'center', vertical: 'center' }
-    cellFin.font = { size: 9 }
 
-    const cellDias = row.getCell(6)
-    cellDias.value = task.dias || 0
-    cellDias.numFmt = '0.0'
-    cellDias.alignment = { horizontal: 'center', vertical: 'center' }
-    cellDias.font = { size: 9 }
+    // Aplanar tareas
+    const flatTasks = flattenTasks(tasks)
 
-    const cellPct = row.getCell(7)
-    cellPct.value = (task.pct || 0) / 100
-    cellPct.numFmt = '0%'
-    cellPct.alignment = { horizontal: 'center', vertical: 'center' }
-    cellPct.font = { size: 9 }
+    // Escribir datos a partir de fila 5
+    flatTasks.forEach((task, idx) => {
+      const rowNum = 5 + idx
+      const row = ws.getRow(rowNum)
+      row.height = 16
 
-    // Celdas de barras vacías (VBA las coloreará)
-    days.forEach((day, dayIdx) => {
-      const col = colStartDays + dayIdx
-      const cell = row.getCell(col)
-      cell.value = ''
-      cell.alignment = { horizontal: 'center', vertical: 'center' }
-      cell.border = { top: { style: 'hair', color: { argb: 'FFBBBBBB' } },
-                      bottom: { style: 'hair', color: { argb: 'FFBBBBBB' } },
-                      left: { style: 'hair', color: { argb: 'FFBBBBBB' } },
-                      right: { style: 'hair', color: { argb: 'FFBBBBBB' } } }
+      // Columna A: Número de tarea (vacío si es subtarea)
+      const cellA = row.getCell(1)
+      cellA.value = task.numero ?? null
+      cellA.alignment = { horizontal: 'center', vertical: 'center' }
+
+      // Columna B: Nombre de tarea/subtarea
+      const cellB = row.getCell(2)
+      cellB.value = task.nombre
+      cellB.alignment = { horizontal: 'left', vertical: 'center' }
+      if (task.isSubtask) {
+        cellB.font = { size: 9, italic: true, color: { argb: 'FF666666' } }
+      } else {
+        cellB.font = { bold: true, size: 10 }
+      }
+
+      // Columna C: Responsable
+      const cellC = row.getCell(3)
+      cellC.value = task.responsable
+      cellC.alignment = { horizontal: 'left', vertical: 'center' }
+      cellC.font = { size: 9 }
+
+      // Columna D: F. Inicio (como número serial de Excel)
+      const cellD = row.getCell(4)
+      if (task.fechaInicio) {
+        cellD.value = dateToExcelSerial(task.fechaInicio)
+        cellD.numFmt = 'dd/mm/yyyy'
+      }
+      cellD.alignment = { horizontal: 'center', vertical: 'center' }
+      cellD.font = { size: 9 }
+
+      // Columna E: F. Fin (VACÍO — VBA lo calcula)
+      // NO escribir nada aquí
+      const cellE = row.getCell(5)
+      cellE.alignment = { horizontal: 'center', vertical: 'center' }
+      cellE.font = { size: 9 }
+      cellE.numFmt = 'dd/mm/yyyy'
+
+      // Columna F: Días
+      const cellF = row.getCell(6)
+      cellF.value = task.dias
+      cellF.numFmt = '0'
+      cellF.alignment = { horizontal: 'center', vertical: 'center' }
+      cellF.font = { size: 9 }
+
+      // Columna G: % (como porcentaje decimal)
+      const cellG = row.getCell(7)
+      cellG.value = task.progreso
+      cellG.numFmt = '0%'
+      cellG.alignment = { horizontal: 'center', vertical: 'center' }
+      cellG.font = { size: 9 }
+
+      // Commit para aplicar cambios
+      row.commit()
     })
-  })
 
-  // ═══ LEYENDA ═══
-  const legendStartRow = dataStartRow + allTasks.length + 2
-  const legendItems = [
-    { text: 'Leyenda', bg: COLORS.headerBg, fg: 'FFFFFF', bold: true },
-    { text: '0%', bg: '206234249', fg: '333333' },
-    { text: '1 – 25%', bg: '123191232', fg: 'FFFFFF' },
-    { text: '26 – 50%', bg: '46141212', fg: 'FFFFFF' },
-    { text: '51 – 75%', bg: '26941154', fg: 'FFFFFF' },
-    { text: '76 – 100%', bg: '1261107', fg: 'FFFFFF' },
-    { text: 'Fin de semana', bg: COLORS.weekendBgLight, fg: '333333' }
-  ]
+    // Generar buffer para descargar
+    const buffer = await workbook.xlsx.writeBuffer()
 
-  legendItems.forEach((item, idx) => {
-    const row = worksheet.getRow(legendStartRow + idx)
-    row.height = 16
-    const cell = row.getCell(1)
-    cell.value = item.text
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + item.bg } }
-    cell.font = { color: { argb: 'FF' + item.fg }, bold: item.bold, size: 10 }
-    cell.alignment = { horizontal: 'center', vertical: 'center' }
-    cell.border = { top: { style: 'thin', color: { argb: 'FF999999' } },
-                    bottom: { style: 'thin', color: { argb: 'FF999999' } },
-                    left: { style: 'thin', color: { argb: 'FF999999' } },
-                    right: { style: 'thin', color: { argb: 'FF999999' } } }
-  })
-
-  // Freeze panes
-  worksheet.views = [{ state: 'frozen', xSplit: fixedCols, ySplit: 2 }]
-
-  // Guardar como .xlsm
-  await workbook.xlsx.writeFile(outputPath)
-
-  console.log(`✓ Gantt exportado desde plantilla: ${outputPath}`)
-  console.log(`✨ VBA integrado - ejecutar macro: Alt+F8 → ColorearBarrasGantt`)
-
-  return outputPath
+    return buffer
+  } catch (error) {
+    console.error('Error exportando Gantt desde plantilla:', error)
+    throw error
+  }
 }
