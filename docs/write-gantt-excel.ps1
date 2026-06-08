@@ -1,95 +1,87 @@
-# Script para escribir datos en plantilla Gantt y preservar VBA
-# Uso: powershell -ExecutionPolicy Bypass -File write-gantt-excel.ps1 -TemplatePath "..." -OutputPath "..." -JsonDataPath "..."
-
 param(
     [Parameter(Mandatory=$true)][string]$TemplatePath,
     [Parameter(Mandatory=$true)][string]$OutputPath,
     [Parameter(Mandatory=$true)][string]$JsonDataPath
 )
 
-Write-Host "📊 Escribiendo datos en Excel..." -ForegroundColor Cyan
-
 try {
-    # Leer JSON desde archivo
-    Write-Host "  Leyendo datos..."
-    $jsonContent = Get-Content -Path $JsonDataPath -Raw
-    $data = $jsonContent | ConvertFrom-Json
+    Write-Host "1. Leyendo JSON..."
+    $json = Get-Content -Path $JsonDataPath -Raw
+    Write-Host "JSON size: $($json.Length) bytes"
     
-    # Abrir Excel
-    Write-Host "  Abriendo Excel..."
+    Write-Host "2. Parseando JSON..."
+    $data = $json | ConvertFrom-Json
+    Write-Host "Tareas: $($data.tareas.Count)"
+    
+    Write-Host "3. Abriendo Excel..."
     $excel = New-Object -ComObject Excel.Application
     $excel.Visible = $false
     $excel.DisplayAlerts = $false
     
-    # Copiar plantilla
-    Write-Host "  Copiando plantilla..."
+    Write-Host "4. Copiando plantilla..."
     Copy-Item $TemplatePath $OutputPath -Force
     
-    # Abrir copia
-    Write-Host "  Abriendo archivo..."
+    Write-Host "5. Abriendo workbook..."
     $workbook = $excel.Workbooks.Open($OutputPath)
+    
+    Write-Host "6. Obteniendo hoja..."
     $ws = $workbook.Sheets("Gantt")
     
-    # Escribir datos fila por fila
-    Write-Host "  Escribiendo $($data.tareas.Count) filas..."
+    Write-Host "7. Escribiendo datos..."
     $rowIndex = 5
     foreach ($tarea in $data.tareas) {
-        # Col A: Número
-        if ($null -ne $tarea.numero) {
-            $ws.Cells($rowIndex, 1).Value = $tarea.numero
-        }
-        $ws.Cells($rowIndex, 1).HorizontalAlignment = -4108  # xlCenter
+        Write-Host "   Fila $rowIndex : $($tarea.nombre)"
         
-        # Col B: Nombre
-        $ws.Cells($rowIndex, 2).Value = $tarea.nombre
-        $ws.Cells($rowIndex, 2).HorizontalAlignment = -4131  # xlLeft
+        try {
+            if ($null -ne $tarea.numero -and $tarea.numero -gt 0) {
+                $ws.Cells($rowIndex, 1).Value = [int]$tarea.numero
+            }
+        } catch { Write-Host "Error en col 1: $_" }
         
-        # Col C: Responsable
-        $ws.Cells($rowIndex, 3).Value = $tarea.responsable
-        $ws.Cells($rowIndex, 3).HorizontalAlignment = -4131  # xlLeft
+        try {
+            $ws.Cells($rowIndex, 2).Value = [string]$tarea.nombre
+        } catch { Write-Host "Error en col 2: $_" }
         
-        # Col D: F.Inicio (fecha como fecha, no número)
-        $fecha = [datetime]::ParseExact($tarea.fechaInicio, "yyyy-MM-dd", $null)
-        $ws.Cells($rowIndex, 4).Value = $fecha
-        $ws.Cells($rowIndex, 4).NumberFormat = "dd/mm/yyyy"
-        $ws.Cells($rowIndex, 4).HorizontalAlignment = -4108  # xlCenter
+        try {
+            $ws.Cells($rowIndex, 3).Value = [string]$tarea.responsable
+        } catch { Write-Host "Error en col 3: $_" }
         
-        # Col E: Vacío (VBA lo calcula)
-        $ws.Cells($rowIndex, 5).NumberFormat = "dd/mm/yyyy"
-        $ws.Cells($rowIndex, 5).HorizontalAlignment = -4108  # xlCenter
+        try {
+            $fechaStr = [string]$tarea.fechaInicio
+            $fecha = [DateTime]::ParseExact($fechaStr, "yyyy-MM-dd", [System.Globalization.CultureInfo]::InvariantCulture)
+            $ws.Cells($rowIndex, 4).Value = $fecha
+            $ws.Cells($rowIndex, 4).NumberFormat = "dd/mm/yyyy"
+        } catch { Write-Host "Error en col 4 fecha ($($tarea.fechaInicio)): $_" }
         
-        # Col F: Días
-        $ws.Cells($rowIndex, 6).Value = $tarea.dias
-        $ws.Cells($rowIndex, 6).NumberFormat = "0"
-        $ws.Cells($rowIndex, 6).HorizontalAlignment = -4108  # xlCenter
+        try {
+            $ws.Cells($rowIndex, 5).NumberFormat = "dd/mm/yyyy"
+        } catch { Write-Host "Error en col 5: $_" }
         
-        # Col G: %
-        $ws.Cells($rowIndex, 7).Value = $tarea.progreso
-        $ws.Cells($rowIndex, 7).NumberFormat = "0%"
-        $ws.Cells($rowIndex, 7).HorizontalAlignment = -4108  # xlCenter
+        try {
+            $ws.Cells($rowIndex, 6).Value = [int]$tarea.dias
+        } catch { Write-Host "Error en col 6: $_" }
+        
+        try {
+            $ws.Cells($rowIndex, 7).Value = [double]$tarea.progreso
+            $ws.Cells($rowIndex, 7).NumberFormat = "0%"
+        } catch { Write-Host "Error en col 7: $_" }
         
         $rowIndex++
     }
     
-    # Guardar
-    Write-Host "  Guardando..."
+    Write-Host "8. Guardando..."
     $workbook.Save()
     $workbook.Close($false)
     $excel.Quit()
     
-    Write-Host "✅ Archivo creado" -ForegroundColor Green
+    Write-Host "OK"
     
 } catch {
-    Write-Host "❌ Error: $_" -ForegroundColor Red
-    if ($excel) { 
-        try { $excel.Quit() } catch {}
-    }
+    Write-Host "EXCEPTION: $_"
+    if ($excel) { try { $excel.Quit() } catch {} }
     exit 1
 } finally {
-    # Limpiar archivo temporal JSON
     if (Test-Path $JsonDataPath) {
-        try {
-            Remove-Item -Path $JsonDataPath -Force
-        } catch {}
+        try { Remove-Item -Path $JsonDataPath -Force } catch {}
     }
 }
