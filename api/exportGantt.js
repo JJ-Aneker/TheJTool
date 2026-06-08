@@ -163,7 +163,7 @@ export async function exportGantt(tasks, outputPath) {
 
   // Configurar ancho de columnas
   worksheet.getColumn(1).width = 4
-  worksheet.getColumn(2).width = 25
+  worksheet.getColumn(2).width = 40
   worksheet.getColumn(3).width = 15
   worksheet.getColumn(4).width = 12
   worksheet.getColumn(5).width = 12
@@ -316,13 +316,16 @@ export async function exportGantt(tasks, outputPath) {
         const dayColLetter = String.fromCharCode(64 + dayCol)
         const cellRef = `${dayColLetter}${rowNum}`
 
+        // Fórmula: compara la fecha calculada (D + dayIdx) con el rango [D, E)
+        const dateFormula = `$D$${rowNum}+(COLUMN()-${colStartDays + 1})`
+
         worksheet.addConditionalFormatting({
           ref: cellRef,
           rules: [
             // 76-100%
             {
               type: 'expression',
-              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0.75)`],
+              formulae: [`AND(${dateFormula}<$E$${rowNum},${dateFormula}>=$D$${rowNum},$G$${rowNum}>0.75)`],
               fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[5] } },
               font: { color: { argb: 'FF' + COLORS.progressText[5] } },
               stopIfTrue: true
@@ -330,7 +333,7 @@ export async function exportGantt(tasks, outputPath) {
             // 51-75%
             {
               type: 'expression',
-              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0.5,$G$${rowNum}<=0.75)`],
+              formulae: [`AND(${dateFormula}<$E$${rowNum},${dateFormula}>=$D$${rowNum},$G$${rowNum}>0.5,$G$${rowNum}<=0.75)`],
               fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[4] } },
               font: { color: { argb: 'FF' + COLORS.progressText[4] } },
               stopIfTrue: true
@@ -338,7 +341,7 @@ export async function exportGantt(tasks, outputPath) {
             // 26-50%
             {
               type: 'expression',
-              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0.25,$G$${rowNum}<=0.5)`],
+              formulae: [`AND(${dateFormula}<$E$${rowNum},${dateFormula}>=$D$${rowNum},$G$${rowNum}>0.25,$G$${rowNum}<=0.5)`],
               fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[3] } },
               font: { color: { argb: 'FF' + COLORS.progressText[3] } },
               stopIfTrue: true
@@ -346,7 +349,7 @@ export async function exportGantt(tasks, outputPath) {
             // 1-25%
             {
               type: 'expression',
-              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0,$G$${rowNum}<=0.25)`],
+              formulae: [`AND(${dateFormula}<$E$${rowNum},${dateFormula}>=$D$${rowNum},$G$${rowNum}>0,$G$${rowNum}<=0.25)`],
               fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[2] } },
               font: { color: { argb: 'FF' + COLORS.progressText[2] } },
               stopIfTrue: true
@@ -354,7 +357,7 @@ export async function exportGantt(tasks, outputPath) {
             // 0%
             {
               type: 'expression',
-              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}<=0)`],
+              formulae: [`AND(${dateFormula}<$E$${rowNum},${dateFormula}>=$D$${rowNum},$G$${rowNum}<=0)`],
               fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[1] } },
               font: { color: { argb: 'FF' + COLORS.progressText[1] } },
               stopIfTrue: true
