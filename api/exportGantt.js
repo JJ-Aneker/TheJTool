@@ -31,7 +31,6 @@ const COLORS = {
 
 /**
  * Convierte una fecha JS a número serial Excel
- * Excel cuenta días desde 30/12/1899
  */
 function dateToExcelSerial(date) {
   const baseDate = new Date(1899, 11, 30)
@@ -269,7 +268,7 @@ export async function exportGantt(tasks, outputPath) {
     const cellFin = row.getCell(5)
     cellFin.value = {
       formula: `=IFERROR(WORKDAY(D${rowNum},ROUNDUP(F${rowNum},0)-1),D${rowNum})`,
-      result: task.inicio || new Date()
+      result: task.endDate || new Date()
     }
     cellFin.numFmt = 'DD/MM/YYYY'
     cellFin.alignment = { horizontal: 'center', vertical: 'center' }
@@ -303,44 +302,67 @@ export async function exportGantt(tasks, outputPath) {
       const isWeekend = day.getDay() === 0 || day.getDay() === 6
 
       if (isWeekend) {
-        // Fines de semana siempre gris
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.weekendBgLight } }
-      } else if (!task.isSubtask && task.inicio) {
-        // Para tareas (no subtareas), colorear según progreso
-        const isInRange = day >= task.inicio && day < task.endDate
-        if (isInRange) {
-          const daysFromStart = Math.floor((day - task.inicio) / (24 * 60 * 60 * 1000))
-          const totalDaysTask = Math.ceil(task.dias)
-          const completedDays = Math.ceil((totalDaysTask * task.pct) / 100)
-
-          // Seleccionar color según progreso
-          let bgColor = COLORS.progressBg[1] // 0%
-          let fgColor = COLORS.progressText[1]
-
-          if (task.pct > 75) {
-            bgColor = COLORS.progressBg[5]
-            fgColor = COLORS.progressText[5]
-          } else if (task.pct > 50) {
-            bgColor = COLORS.progressBg[4]
-            fgColor = COLORS.progressText[4]
-          } else if (task.pct > 25) {
-            bgColor = COLORS.progressBg[3]
-            fgColor = COLORS.progressText[3]
-          } else if (task.pct > 0) {
-            bgColor = COLORS.progressBg[2]
-            fgColor = COLORS.progressText[2]
-          }
-
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + bgColor } }
-          cell.font = { color: { argb: 'FF' + fgColor } }
-        } else {
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.weekdayBg } }
-        }
       } else {
-        // Subtareas y días sin tarea
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.weekdayBg } }
       }
     })
+
+    // ═══ FORMATO CONDICIONAL PARA TAREAS PRINCIPALES ═══
+    if (!task.isSubtask) {
+      // Aplicar formato condicional a cada celda de la barra
+      for (let dayIdx = 0; dayIdx < days.length; dayIdx++) {
+        const dayCol = colStartDays + dayIdx
+        const dayColLetter = String.fromCharCode(64 + dayCol)
+        const cellRef = `${dayColLetter}${rowNum}`
+
+        worksheet.addConditionalFormatting({
+          ref: cellRef,
+          rules: [
+            // 76-100%
+            {
+              type: 'expression',
+              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0.75)`],
+              fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[5] } },
+              font: { color: { argb: 'FF' + COLORS.progressText[5] } },
+              stopIfTrue: true
+            },
+            // 51-75%
+            {
+              type: 'expression',
+              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0.5,$G$${rowNum}<=0.75)`],
+              fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[4] } },
+              font: { color: { argb: 'FF' + COLORS.progressText[4] } },
+              stopIfTrue: true
+            },
+            // 26-50%
+            {
+              type: 'expression',
+              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0.25,$G$${rowNum}<=0.5)`],
+              fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[3] } },
+              font: { color: { argb: 'FF' + COLORS.progressText[3] } },
+              stopIfTrue: true
+            },
+            // 1-25%
+            {
+              type: 'expression',
+              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}>0,$G$${rowNum}<=0.25)`],
+              fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[2] } },
+              font: { color: { argb: 'FF' + COLORS.progressText[2] } },
+              stopIfTrue: true
+            },
+            // 0%
+            {
+              type: 'expression',
+              formulae: [`AND($D$${rowNum}<=(TODAY()+${dayIdx}),TODAY()+${dayIdx}<$E$${rowNum},$G$${rowNum}<=0)`],
+              fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + COLORS.progressBg[1] } },
+              font: { color: { argb: 'FF' + COLORS.progressText[1] } },
+              stopIfTrue: true
+            }
+          ]
+        })
+      }
+    }
   })
 
   // ═══ LEYENDA VERTICAL ═══
