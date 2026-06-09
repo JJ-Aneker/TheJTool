@@ -1,4 +1,4 @@
-import ExcelJS from 'exceljs'
+import AdmZip from 'adm-zip'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
@@ -87,7 +87,6 @@ function getTemplatePath() {
   const possiblePaths = [
     path.join(__dirname, '../public/templates/gantt-template.xlsm'),
     path.join(process.cwd(), 'public/templates/gantt-template.xlsm'),
-    path.resolve('public/templates/gantt-template.xlsm'),
     '/var/task/public/templates/gantt-template.xlsm'
   ]
 
@@ -98,21 +97,49 @@ function getTemplatePath() {
     }
   }
 
-  throw new Error(
-    `PLANTILLA XLSM NO ENCONTRADA. Vercel debe incluir public/templates/gantt-template.xlsm`
-  )
+  throw new Error('PLANTILLA XLSM NO ENCONTRADA')
 }
 
 /**
- * Exporta Gantt con plantilla XLSM + VBA
- * Escribe a archivo temporal para preservar VBA correctamente
+ * Genera XML para fila de Excel
+ */
+function generateRowXML(rowNum, tarea) {
+  const bold = tarea.numero ? ' b="1"' : ''
+  const boldFont = tarea.numero ? '<font b="1"/>' : '<font/>'
+  const isSubtarea = tarea.esSubtarea
+
+  return `<row r="${rowNum}">
+    <c r="A${rowNum}" s="1"${bold}><v>${tarea.numero ?? ''}</v></c>
+    <c r="B${rowNum}" s="2"${isSubtarea ? '' : bold}><v>${escapeXml(tarea.nombre)}</v></c>
+    <c r="C${rowNum}" s="2"><v>${escapeXml(tarea.responsable)}</v></c>
+    <c r="D${rowNum}" s="3"><v>${Math.floor((tarea.fechaInicio - new Date(1899, 11, 30)) / 86400000)}</v></c>
+    <c r="E${rowNum}" s="3"><f>=WORKDAY(D${rowNum},F${rowNum})</f></c>
+    <c r="F${rowNum}" s="4"><v>${tarea.dias}</v></c>
+    <c r="G${rowNum}" s="5"><v>${tarea.progreso}</v></c>
+  </row>`
+}
+
+function escapeXml(str) {
+  if (!str) return ''
+  return str.replace(/[<>&'"]/g, c => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    "'": '&apos;',
+    '"': '&quot;'
+  }[c]))
+}
+
+/**
+ * Exporta Gantt manipulando XLSM como ZIP
+ * Preserva VBA intacto
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' })
   }
 
-  let tempFile = null
+  let tempZip = null
 
   try {
     const { projectData, startDate } = req.body
@@ -122,60 +149,46 @@ export default async function handler(req, res) {
     }
 
     const tareas = mapTasksToExcel(projectData, startDate)
+    console.log(`Procesando ${tareas.length} tareas`)
 
-    // Cargar plantilla XLSM
+    // Cargar plantilla XLSM como ZIP
     const templatePath = getTemplatePath()
-    console.log(`Cargando plantilla XLSM desde: ${templatePath}`)
+    console.log(`Abriendo XLSM como ZIP: ${templatePath}`)
 
-    const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.readFile(templatePath)
+    const zip = new AdmZip(templatePath)
 
-    const ws = workbook.getWorksheet('Gantt')
-    if (!ws) {
-      throw new Error('Hoja "Gantt" no encontrada en plantilla')
+    // Extraer sheet1.xml
+    const sheet1Entry = zip.getEntry('xl/worksheets/sheet1.xml')
+    if (!sheet1Entry) {
+      throw new Error('No se encontró xl/worksheets/sheet1.xml')
     }
 
-    console.log(`✓ Plantilla cargada`)
+    let sheet1Xml = sheet1Entry.getData().toString('utf-8')
 
-    // Escribir datos
-    tareas.forEach((tarea, index) => {
-      const rowNum = 5 + index
-      const row = ws.getRow(rowNum)
+    // Generar filas
+    const rowsXml = tareas
+      .map((tarea, idx) => generateRowXML(5 + idx, tarea))
+      .join('\n')
 
-      row.getCell(1).value = tarea.numero ?? null
-      row.getCell(1).alignment = { horizontal: 'center', vertical: 'center' }
-      if (tarea.numero) row.getCell(1).font = { bold: true }
+    console.log(`Inyectando ${tareas.length} filas en XML`)
 
-      row.getCell(2).value = tarea.nombre
-      row.getCell(2).alignment = { horizontal: 'left', vertical: 'center' }
-      if (tarea.esSubtarea) {
-        row.getCell(2).font = { italic: true, color: { argb: 'FF666666' } }
-      } else {
-        row.getCell(2).font = { bold: true }
-      }
+    // Reemplazar las filas (entre </sheetData> y </worksheet>)
+    sheet1Xml = sheet1Xml.replace(
+      /<sheetData>[\s\S]*?<\/sheetData>/,
+      `<sheetData>\n${rowsXml}\n</sheetData>`
+    )
 
-      row.getCell(3).value = tarea.responsable
-      row.getCell(3).alignment = { horizontal: 'left', vertical: 'center' }
+    // Actualizar en ZIP
+    zip.updateFile(sheet1Entry, Buffer.from(sheet1Xml, 'utf-8'))
 
-      row.getCell(4).value = tarea.fechaInicio
-      row.getCell(4).numFmt = 'dd/mm/yyyy'
-      row.getCell(4).alignment = { horizontal: 'center', vertical: 'center' }
+    // Escribir a temporal
+    tempZip = path.join(os.tmpdir(), `gantt-${Date.now()}.xlsm`)
+    zip.writeZip(tempZip)
+    console.log(`ZIP escrito: ${tempZip}`)
 
-      row.getCell(5).value = { formula: `=WORKDAY(D${rowNum},F${rowNum})` }
-      row.getCell(5).numFmt = 'dd/mm/yyyy'
-      row.getCell(5).alignment = { horizontal: 'center', vertical: 'center' }
-
-      row.getCell(6).value = tarea.dias
-      row.getCell(6).numFmt = '0'
-      row.getCell(6).alignment = { horizontal: 'center', vertical: 'center' }
-
-      row.getCell(7).value = tarea.progreso
-      row.getCell(7).numFmt = '0%'
-      row.getCell(7).alignment = { horizontal: 'center', vertical: 'center' }
-
-      row.height = 16
-      row.commit()
-    })
+    // Leer buffer
+    const fileBuffer = fs.readFileSync(tempZip)
+    console.log(`Buffer: ${fileBuffer.length} bytes`)
 
     // Generar nombre
     const projectName = projectData.proyecto?.nombre || 'gantt'
@@ -186,34 +199,21 @@ export default async function handler(req, res) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
     const filename = `Gantt_${safeName}_${timestamp}.xlsm`
 
-    // CLAVE: Escribir a archivo temporal primero (preserva VBA mejor)
-    tempFile = path.join(os.tmpdir(), `temp-${Date.now()}.xlsm`)
-    console.log(`Escribiendo a temporal: ${tempFile}`)
-    await workbook.xlsx.writeFile(tempFile)
-
-    // Leer desde archivo temporal
-    console.log(`Leyendo desde temporal...`)
-    const fileBuffer = fs.readFileSync(tempFile)
-    console.log(`Buffer size: ${fileBuffer.length} bytes`)
-
-    // Responder
     res.setHeader('Content-Type', 'application/vnd.ms-excel.sheet.macroEnabled.12')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', fileBuffer.length)
 
-    console.log(`✓ Gantt enviado: ${filename} (${tareas.length} filas, ${fileBuffer.length} bytes)`)
+    console.log(`✓ Gantt: ${filename} (${tareas.length} filas con VBA preservado)`)
     res.send(fileBuffer)
   } catch (error) {
     console.error('❌ ERROR:', error.message)
     res.status(500).json({ error: error.message })
   } finally {
-    // Limpiar archivo temporal
-    if (tempFile && fs.existsSync(tempFile)) {
+    if (tempZip && fs.existsSync(tempZip)) {
       try {
-        fs.unlinkSync(tempFile)
-        console.log(`Limpiado: ${tempFile}`)
+        fs.unlinkSync(tempZip)
       } catch (err) {
-        console.warn(`No se pudo limpiar ${tempFile}: ${err.message}`)
+        console.warn(`No se pudo limpiar ${tempZip}`)
       }
     }
   }
