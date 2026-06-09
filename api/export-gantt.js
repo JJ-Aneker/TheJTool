@@ -157,6 +157,19 @@ export default async function handler(req, res) {
 
     const zip = new AdmZip(templatePath)
 
+    // VERIFICAR que tiene VBA
+    const vbaProject = zip.getEntry('xl/vbaProject.bin')
+    if (!vbaProject) {
+      throw new Error('PLANTILLA NO TIENE VBA - vbaProject.bin no encontrado')
+    }
+    console.log(`✓ vbaProject.bin encontrado (${vbaProject.header.size} bytes)`)
+
+    // Listar todos los archivos en el ZIP
+    console.log(`Archivos en ZIP:`)
+    zip.getEntries().forEach(e => {
+      console.log(`  - ${e.entryName} (${e.header.size} bytes)`)
+    })
+
     // Extraer sheet1.xml
     const sheet1Entry = zip.getEntry('xl/worksheets/sheet1.xml')
     if (!sheet1Entry) {
