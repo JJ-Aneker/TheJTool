@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs'
 import fs from 'fs'
 import path from 'path'
+import os from 'os'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 
@@ -80,14 +81,9 @@ function mapTasksToExcel(projectData, startDate) {
 }
 
 /**
- * Obtiene path de la plantilla - FALLA si no la encuentra
+ * Obtiene path de la plantilla
  */
 function getTemplatePath() {
-  console.log(`\n=== DEBUG TEMPLATE LOCATION ===`)
-  console.log(`cwd(): ${process.cwd()}`)
-  console.log(`__dirname: ${__dirname}`)
-  console.log(`__filename: ${fileURLToPath(import.meta.url)}`)
-
   const possiblePaths = [
     path.join(__dirname, '../public/templates/gantt-template.xlsm'),
     path.join(process.cwd(), 'public/templates/gantt-template.xlsm'),
@@ -95,39 +91,28 @@ function getTemplatePath() {
     '/var/task/public/templates/gantt-template.xlsm'
   ]
 
-  console.log(`\nIntentando encontrar plantilla en:`)
   for (const templatePath of possiblePaths) {
-    const exists = fs.existsSync(templatePath)
-    console.log(`  ${exists ? '✓' : '✗'} ${templatePath}`)
-    if (exists) {
-      console.log(`✓✓✓ PLANTILLA ENCONTRADA ✓✓✓\n`)
+    if (fs.existsSync(templatePath)) {
+      console.log(`✓ Plantilla encontrada: ${templatePath}`)
       return templatePath
     }
   }
 
-  console.log(`\n✗✗✗ PLANTILLA NO ENCONTRADA EN NINGUNA RUTA ✗✗✗`)
-  console.log(`\nArchivos en directorio actual:`)
-  try {
-    const files = fs.readdirSync(process.cwd())
-    console.log(files.slice(0, 20).join(', '))
-  } catch (e) {
-    console.log(`Error listando directorio: ${e.message}`)
-  }
-
   throw new Error(
-    `PLANTILLA XLSM NO ENCONTRADA. ` +
-    `Vercel debe incluir public/templates/gantt-template.xlsm. ` +
-    `Verificar: 1) archivo está en git, 2) deployment completó, 3) logs de Vercel`
+    `PLANTILLA XLSM NO ENCONTRADA. Vercel debe incluir public/templates/gantt-template.xlsm`
   )
 }
 
 /**
  * Exporta Gantt con plantilla XLSM + VBA
+ * Escribe a archivo temporal para preservar VBA correctamente
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' })
   }
+
+  let tempFile = null
 
   try {
     const { projectData, startDate } = req.body
@@ -138,7 +123,7 @@ export default async function handler(req, res) {
 
     const tareas = mapTasksToExcel(projectData, startDate)
 
-    // SIEMPRE cargar plantilla XLSM (FALLA si no existe)
+    // Cargar plantilla XLSM
     const templatePath = getTemplatePath()
     console.log(`Cargando plantilla XLSM desde: ${templatePath}`)
 
@@ -150,7 +135,7 @@ export default async function handler(req, res) {
       throw new Error('Hoja "Gantt" no encontrada en plantilla')
     }
 
-    console.log(`✓ Plantilla cargada exitosamente`)
+    console.log(`✓ Plantilla cargada`)
 
     // Escribir datos
     tareas.forEach((tarea, index) => {
@@ -192,6 +177,7 @@ export default async function handler(req, res) {
       row.commit()
     })
 
+    // Generar nombre
     const projectName = projectData.proyecto?.nombre || 'gantt'
     const safeName = projectName
       .replace(/[^a-zA-Z0-9\s]/g, '')
@@ -200,19 +186,35 @@ export default async function handler(req, res) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
     const filename = `Gantt_${safeName}_${timestamp}.xlsm`
 
-    const buffer = await workbook.xlsx.writeBuffer()
+    // CLAVE: Escribir a archivo temporal primero (preserva VBA mejor)
+    tempFile = path.join(os.tmpdir(), `temp-${Date.now()}.xlsm`)
+    console.log(`Escribiendo a temporal: ${tempFile}`)
+    await workbook.xlsx.writeFile(tempFile)
 
+    // Leer desde archivo temporal
+    console.log(`Leyendo desde temporal...`)
+    const fileBuffer = fs.readFileSync(tempFile)
+    console.log(`Buffer size: ${fileBuffer.length} bytes`)
+
+    // Responder
     res.setHeader('Content-Type', 'application/vnd.ms-excel.sheet.macroEnabled.12')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
-    res.setHeader('Content-Length', buffer.length)
+    res.setHeader('Content-Length', fileBuffer.length)
 
-    console.log(`✓ Gantt generado: ${filename} (${tareas.length} filas con VBA)`)
-    res.send(buffer)
+    console.log(`✓ Gantt enviado: ${filename} (${tareas.length} filas, ${fileBuffer.length} bytes)`)
+    res.send(fileBuffer)
   } catch (error) {
     console.error('❌ ERROR:', error.message)
-    res.status(500).json({
-      error: error.message,
-      debug: `Revisa los logs de Vercel para más detalles`
-    })
+    res.status(500).json({ error: error.message })
+  } finally {
+    // Limpiar archivo temporal
+    if (tempFile && fs.existsSync(tempFile)) {
+      try {
+        fs.unlinkSync(tempFile)
+        console.log(`Limpiado: ${tempFile}`)
+      } catch (err) {
+        console.warn(`No se pudo limpiar ${tempFile}: ${err.message}`)
+      }
+    }
   }
 }
