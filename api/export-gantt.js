@@ -80,6 +80,29 @@ function mapTasksToExcel(projectData, startDate) {
 }
 
 /**
+ * Obtiene path de la plantilla (funciona en Local y Vercel)
+ */
+function getTemplatePath() {
+  const possiblePaths = [
+    // Local: api/export-gantt.js -> ../public/templates/gantt-template.xlsm
+    path.join(__dirname, '../public/templates/gantt-template.xlsm'),
+    // Vercel: /var/task/api/export-gantt.js -> /var/task/public/templates/gantt-template.xlsm
+    path.join(process.cwd(), 'public/templates/gantt-template.xlsm'),
+    // Fallback
+    path.resolve('public/templates/gantt-template.xlsm')
+  ]
+
+  for (const templatePath of possiblePaths) {
+    if (fs.existsSync(templatePath)) {
+      console.log(`Plantilla encontrada: ${templatePath}`)
+      return templatePath
+    }
+  }
+
+  return null
+}
+
+/**
  * Exporta Gantt con plantilla XLSM + VBA (funciona en Vercel + Local)
  */
 export default async function handler(req, res) {
@@ -96,19 +119,20 @@ export default async function handler(req, res) {
 
     const tareas = mapTasksToExcel(projectData, startDate)
 
-    // Intentar cargar plantilla XLSM
-    const templatePath = path.join(__dirname, '../public/templates/gantt-template.xlsm')
+    // Cargar plantilla XLSM
     let workbook = new ExcelJS.Workbook()
+    const templatePath = getTemplatePath()
 
-    try {
-      if (fs.existsSync(templatePath)) {
+    if (templatePath) {
+      try {
         console.log('Cargando plantilla XLSM con VBA...')
         await workbook.xlsx.readFile(templatePath)
-      } else {
-        throw new Error('Template no encontrada')
+      } catch (readErr) {
+        console.warn('Error al cargar plantilla:', readErr.message)
+        workbook.addWorksheet('Gantt')
       }
-    } catch (templateErr) {
-      console.warn('No se pudo cargar plantilla, creando desde cero:', templateErr.message)
+    } else {
+      console.log('Plantilla no encontrada, creando desde cero')
       workbook.addWorksheet('Gantt')
     }
 
