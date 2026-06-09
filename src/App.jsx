@@ -274,8 +274,8 @@ function AppContent() {
               src="/assets/images/logo.png"
               alt="TheJ - ToolBox"
               style={{
-                width: '28px',
-                height: '28px',
+                width: '34px',
+                height: '40px',
                 borderRadius: 'var(--radius-md)',
                 objectFit: 'cover',
                 flexShrink: 0
@@ -285,15 +285,15 @@ function AppContent() {
           {!collapsed && (
             <>
               <div style={{
-                fontSize: '13px',
-                fontWeight: '500',
-                color: 'white',
-                whiteSpace: 'nowrap',
                 flex: 1,
                 marginLeft: '12px',
-                transition: 'color 200ms ease'
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: '2px'
               }}>
-                TheJ - ToolBox
+                <span style={{ color: 'white', fontSize: '30px', fontWeight: '600', lineHeight: '1' }}>theJay</span>
+                <span style={{ color: '#1890ff', fontSize: '11px', letterSpacing: '6.5px', lineHeight: '1' }}>TOOLBOX</span>
               </div>
               <button
                 onClick={() => handleSidebarToggle(true)}
