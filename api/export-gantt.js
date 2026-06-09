@@ -84,26 +84,28 @@ function mapTasksToExcel(projectData, startDate) {
  */
 function getTemplatePath() {
   const possiblePaths = [
-    // Local: api/export-gantt.js -> ../public/templates/gantt-template.xlsm
     path.join(__dirname, '../public/templates/gantt-template.xlsm'),
-    // Vercel: /var/task/api/export-gantt.js -> /var/task/public/templates/gantt-template.xlsm
     path.join(process.cwd(), 'public/templates/gantt-template.xlsm'),
-    // Fallback
     path.resolve('public/templates/gantt-template.xlsm')
   ]
 
+  console.log(`cwd: ${process.cwd()}`)
+  console.log(`__dirname: ${__dirname}`)
+
   for (const templatePath of possiblePaths) {
+    console.log(`Intentando: ${templatePath}`)
     if (fs.existsSync(templatePath)) {
-      console.log(`Plantilla encontrada: ${templatePath}`)
+      console.log(`✓ Plantilla encontrada: ${templatePath}`)
       return templatePath
     }
   }
 
+  console.log(`✗ Plantilla NO encontrada en ninguna ruta`)
   return null
 }
 
 /**
- * Exporta Gantt con plantilla XLSM + VBA (funciona en Vercel + Local)
+ * Exporta Gantt con plantilla XLSM + VBA (Local) o XLSX (Vercel sin plantilla)
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -122,17 +124,21 @@ export default async function handler(req, res) {
     // Cargar plantilla XLSM
     let workbook = new ExcelJS.Workbook()
     const templatePath = getTemplatePath()
+    let usandoPlantilla = false
 
     if (templatePath) {
       try {
         console.log('Cargando plantilla XLSM con VBA...')
         await workbook.xlsx.readFile(templatePath)
+        usandoPlantilla = true
+        console.log('✓ Plantilla cargada correctamente')
       } catch (readErr) {
         console.warn('Error al cargar plantilla:', readErr.message)
+        workbook = new ExcelJS.Workbook()
         workbook.addWorksheet('Gantt')
       }
     } else {
-      console.log('Plantilla no encontrada, creando desde cero')
+      console.log('Creando Excel desde cero (sin plantilla)')
       workbook.addWorksheet('Gantt')
     }
 
@@ -198,15 +204,24 @@ export default async function handler(req, res) {
       .replace(/\s+/g, '_')
       .substring(0, 30)
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-    const filename = `Gantt_${safeName}_${timestamp}.xlsm`
+
+    // Extensión depende de si cargó plantilla o no
+    const ext = usandoPlantilla ? 'xlsm' : 'xlsx'
+    const filename = `Gantt_${safeName}_${timestamp}.${ext}`
 
     const buffer = await workbook.xlsx.writeBuffer()
 
-    res.setHeader('Content-Type', 'application/vnd.ms-excel.sheet.macroEnabled.12')
+    // MIME type correcto
+    const mimeType = usandoPlantilla
+      ? 'application/vnd.ms-excel.sheet.macroEnabled.12'
+      : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+    res.setHeader('Content-Type', mimeType)
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', buffer.length)
 
-    console.log(`✓ Gantt: ${filename} (${tareas.length} filas)`)
+    const estado = usandoPlantilla ? 'XLSM con VBA' : 'XLSX'
+    console.log(`✓ Gantt: ${filename} (${tareas.length} filas, ${estado})`)
     res.send(buffer)
   } catch (error) {
     console.error('Error:', error.message)
