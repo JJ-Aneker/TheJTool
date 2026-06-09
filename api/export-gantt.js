@@ -1,10 +1,4 @@
-import path from 'path'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-import fs from 'fs'
-import { execSync } from 'child_process'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+import ExcelJS from 'exceljs'
 
 /**
  * Calcula solo días laborables (lunes-viernes)
@@ -52,7 +46,7 @@ function mapTasksToExcel(projectData, startDate) {
       numero: idx + 1,
       nombre: task.descripcion || task.nombre || 'Sin nombre',
       responsable: task.responsable || 'Equipo',
-      fechaInicio: taskStartDate.toISOString().split('T')[0],
+      fechaInicio: taskStartDate,
       dias: Math.ceil(dias),
       progreso: (task.progreso || task.porcentaje || 0) / 100
     })
@@ -66,7 +60,7 @@ function mapTasksToExcel(projectData, startDate) {
           numero: null,
           nombre: `├─ ${subtask.descripcion || subtask.nombre || 'Subtarea'}`,
           responsable: subtask.responsable || task.responsable || 'Equipo',
-          fechaInicio: taskStartDate.toISOString().split('T')[0],
+          fechaInicio: taskStartDate,
           dias: Math.ceil(subtaskDias),
           progreso: (subtask.progreso || subtask.porcentaje || 0) / 100
         })
@@ -81,15 +75,12 @@ function mapTasksToExcel(projectData, startDate) {
 }
 
 /**
- * Exporta Gantt usando PowerShell COM
- * Preserva el VBA automáticamente
+ * Exporta Gantt usando ExcelJS (funciona en Vercel + Local)
  */
-export default async function exportGanttWithVBAHandler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' })
   }
-
-  let tempExcelPath = null
 
   try {
     const { projectData, startDate } = req.body
@@ -101,15 +92,78 @@ export default async function exportGanttWithVBAHandler(req, res) {
     // Mapear tareas
     const tareas = mapTasksToExcel(projectData, startDate)
 
-    // Paths
-    const templatePath = path.join(__dirname, '../public/templates/gantt-template.xlsm')
-    const outputDir = path.join(__dirname, '../output')
+    // Crear workbook desde cero con ExcelJS
+    const workbook = new ExcelJS.Workbook()
+    const ws = workbook.addWorksheet('Gantt')
 
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true })
-    }
+    // Configurar columnas
+    ws.columns = [
+      { header: 'N°', key: 'numero', width: 5 },
+      { header: 'Tarea', key: 'nombre', width: 25 },
+      { header: 'Responsable', key: 'responsable', width: 15 },
+      { header: 'F.Inicio', key: 'fechaInicio', width: 12 },
+      { header: 'F.Fin', key: 'fechaFin', width: 12 },
+      { header: 'Días', key: 'dias', width: 7 },
+      { header: '%', key: 'progreso', width: 7 }
+    ]
 
-    // Nombre de archivo
+    // Filas 1-4: Reservadas para headers/controles (Excel lo rellena con VBA)
+    // Datos comienzan en fila 5
+    tareas.forEach((tarea, index) => {
+      const rowNum = 5 + index
+      const row = ws.getRow(rowNum)
+
+      // Col A: Número
+      row.getCell(1).value = tarea.numero ?? null
+      row.getCell(1).alignment = { horizontal: 'center', vertical: 'center' }
+      if (tarea.numero) {
+        row.getCell(1).font = { bold: true }
+      }
+
+      // Col B: Nombre
+      row.getCell(2).value = tarea.nombre
+      row.getCell(2).alignment = { horizontal: 'left', vertical: 'center' }
+      if (tarea.nombre.includes('├─')) {
+        row.getCell(2).font = { italic: true, color: { argb: 'FF666666' } }
+      } else {
+        row.getCell(2).font = { bold: true }
+      }
+
+      // Col C: Responsable
+      row.getCell(3).value = tarea.responsable
+      row.getCell(3).alignment = { horizontal: 'left', vertical: 'center' }
+      row.getCell(3).font = { size: 9 }
+
+      // Col D: F.Inicio (fecha objeto)
+      row.getCell(4).value = tarea.fechaInicio
+      row.getCell(4).numFmt = 'dd/mm/yyyy'
+      row.getCell(4).alignment = { horizontal: 'center', vertical: 'center' }
+      row.getCell(4).font = { size: 9 }
+
+      // Col E: F.Fin (fórmula WORKDAY)
+      const rowNum_str = rowNum
+      row.getCell(5).value = { formula: `=WORKDAY(D${rowNum_str},F${rowNum_str})` }
+      row.getCell(5).numFmt = 'dd/mm/yyyy'
+      row.getCell(5).alignment = { horizontal: 'center', vertical: 'center' }
+      row.getCell(5).font = { size: 9 }
+
+      // Col F: Días
+      row.getCell(6).value = tarea.dias
+      row.getCell(6).numFmt = '0'
+      row.getCell(6).alignment = { horizontal: 'center', vertical: 'center' }
+      row.getCell(6).font = { size: 9 }
+
+      // Col G: Progreso (%)
+      row.getCell(7).value = tarea.progreso
+      row.getCell(7).numFmt = '0%'
+      row.getCell(7).alignment = { horizontal: 'center', vertical: 'center' }
+      row.getCell(7).font = { size: 9 }
+
+      row.height = 16
+      row.commit()
+    })
+
+    // Generar nombre de archivo
     const projectName = projectData.proyecto?.nombre || 'gantt'
     const safeName = projectName
       .replace(/[^a-zA-Z0-9\s]/g, '')
@@ -117,71 +171,19 @@ export default async function exportGanttWithVBAHandler(req, res) {
       .substring(0, 30)
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
     const filename = `Gantt_${safeName}_${timestamp}.xlsm`
-    tempExcelPath = path.join(outputDir, filename)
 
-    // Escribir JSON a archivo temporal (UTF-8 sin BOM)
-    const tempJsonPath = path.join(outputDir, `.temp-${Date.now()}.json`)
-    const jsonContent = JSON.stringify({ tareas }, null, 2)
-    fs.writeFileSync(tempJsonPath, jsonContent, { encoding: 'utf8' })
+    // Generar buffer Excel
+    const buffer = await workbook.xlsx.writeBuffer()
 
-    // Ejecutar PowerShell para escribir en Excel
-    const psScript = path.join(__dirname, '../docs/write-gantt-excel.ps1')
-
-    console.log(`📊 Generando Gantt con ${tareas.length} filas...`)
-
-    try {
-      execSync(
-        `powershell -ExecutionPolicy Bypass -File "${psScript}" ` +
-        `-TemplatePath "${templatePath}" ` +
-        `-OutputPath "${tempExcelPath}" ` +
-        `-JsonDataPath "${tempJsonPath}"`,
-        { stdio: 'inherit' }
-      )
-    } catch (error) {
-      console.error('PowerShell error:', error.message)
-      throw new Error('Error al generar Gantt con macros: ' + error.message)
-    } finally {
-      // Limpiar JSON temporal
-      if (fs.existsSync(tempJsonPath)) {
-        try {
-          fs.unlinkSync(tempJsonPath)
-        } catch (err) {
-          console.warn('No se pudo limpiar JSON temp:', err.message)
-        }
-      }
-    }
-
-    // Verificar que el archivo se creó
-    if (!fs.existsSync(tempExcelPath)) {
-      throw new Error('El archivo no se creó correctamente')
-    }
-
-    // Leer y enviar archivo
-    const fileBuffer = fs.readFileSync(tempExcelPath)
-
+    // Headers de respuesta
     res.setHeader('Content-Type', 'application/vnd.ms-excel.sheet.macroEnabled.12')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
-    res.setHeader('Content-Length', fileBuffer.length)
+    res.setHeader('Content-Length', buffer.length)
 
-    console.log(`✓ Descargando: ${filename}`)
-    res.send(fileBuffer)
+    console.log(`✓ Gantt generado: ${filename} (${tareas.length} filas)`)
+    res.send(buffer)
   } catch (error) {
     console.error('❌ Error exportando Gantt:', error.message)
     res.status(500).json({ error: error.message })
-  } finally {
-    // Limpiar archivo temporal después de enviar
-    if (tempExcelPath && fs.existsSync(tempExcelPath)) {
-      try {
-        // Esperar un poco para asegurar que se descargó
-        setTimeout(() => {
-          if (fs.existsSync(tempExcelPath)) {
-            fs.unlinkSync(tempExcelPath)
-            console.log(`Limpiado: ${tempExcelPath}`)
-          }
-        }, 1000)
-      } catch (err) {
-        console.warn('No se pudo limpiar temp:', err.message)
-      }
-    }
   }
 }
