@@ -80,32 +80,49 @@ function mapTasksToExcel(projectData, startDate) {
 }
 
 /**
- * Obtiene path de la plantilla (funciona en Local y Vercel)
+ * Obtiene path de la plantilla - FALLA si no la encuentra
  */
 function getTemplatePath() {
+  console.log(`\n=== DEBUG TEMPLATE LOCATION ===`)
+  console.log(`cwd(): ${process.cwd()}`)
+  console.log(`__dirname: ${__dirname}`)
+  console.log(`__filename: ${fileURLToPath(import.meta.url)}`)
+
   const possiblePaths = [
     path.join(__dirname, '../public/templates/gantt-template.xlsm'),
     path.join(process.cwd(), 'public/templates/gantt-template.xlsm'),
-    path.resolve('public/templates/gantt-template.xlsm')
+    path.resolve('public/templates/gantt-template.xlsm'),
+    '/var/task/public/templates/gantt-template.xlsm'
   ]
 
-  console.log(`cwd: ${process.cwd()}`)
-  console.log(`__dirname: ${__dirname}`)
-
+  console.log(`\nIntentando encontrar plantilla en:`)
   for (const templatePath of possiblePaths) {
-    console.log(`Intentando: ${templatePath}`)
-    if (fs.existsSync(templatePath)) {
-      console.log(`✓ Plantilla encontrada: ${templatePath}`)
+    const exists = fs.existsSync(templatePath)
+    console.log(`  ${exists ? '✓' : '✗'} ${templatePath}`)
+    if (exists) {
+      console.log(`✓✓✓ PLANTILLA ENCONTRADA ✓✓✓\n`)
       return templatePath
     }
   }
 
-  console.log(`✗ Plantilla NO encontrada en ninguna ruta`)
-  return null
+  console.log(`\n✗✗✗ PLANTILLA NO ENCONTRADA EN NINGUNA RUTA ✗✗✗`)
+  console.log(`\nArchivos en directorio actual:`)
+  try {
+    const files = fs.readdirSync(process.cwd())
+    console.log(files.slice(0, 20).join(', '))
+  } catch (e) {
+    console.log(`Error listando directorio: ${e.message}`)
+  }
+
+  throw new Error(
+    `PLANTILLA XLSM NO ENCONTRADA. ` +
+    `Vercel debe incluir public/templates/gantt-template.xlsm. ` +
+    `Verificar: 1) archivo está en git, 2) deployment completó, 3) logs de Vercel`
+  )
 }
 
 /**
- * Exporta Gantt con plantilla XLSM + VBA (Local) o XLSX (Vercel sin plantilla)
+ * Exporta Gantt con plantilla XLSM + VBA
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -121,44 +138,21 @@ export default async function handler(req, res) {
 
     const tareas = mapTasksToExcel(projectData, startDate)
 
-    // Cargar plantilla XLSM
-    let workbook = new ExcelJS.Workbook()
+    // SIEMPRE cargar plantilla XLSM (FALLA si no existe)
     const templatePath = getTemplatePath()
-    let usandoPlantilla = false
+    console.log(`Cargando plantilla XLSM desde: ${templatePath}`)
 
-    if (templatePath) {
-      try {
-        console.log('Cargando plantilla XLSM con VBA...')
-        await workbook.xlsx.readFile(templatePath)
-        usandoPlantilla = true
-        console.log('✓ Plantilla cargada correctamente')
-      } catch (readErr) {
-        console.warn('Error al cargar plantilla:', readErr.message)
-        workbook = new ExcelJS.Workbook()
-        workbook.addWorksheet('Gantt')
-      }
-    } else {
-      console.log('Creando Excel desde cero (sin plantilla)')
-      workbook.addWorksheet('Gantt')
-    }
+    const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.readFile(templatePath)
 
     const ws = workbook.getWorksheet('Gantt')
     if (!ws) {
-      throw new Error('No hay hoja "Gantt"')
+      throw new Error('Hoja "Gantt" no encontrada en plantilla')
     }
 
-    // Headers
-    ws.columns = [
-      { header: 'N°', key: 'numero', width: 5 },
-      { header: 'Tarea', key: 'nombre', width: 25 },
-      { header: 'Responsable', key: 'responsable', width: 15 },
-      { header: 'F.Inicio', key: 'fechaInicio', width: 12 },
-      { header: 'F.Fin', key: 'fechaFin', width: 12 },
-      { header: 'Días', key: 'dias', width: 7 },
-      { header: '%', key: 'progreso', width: 7 }
-    ]
+    console.log(`✓ Plantilla cargada exitosamente`)
 
-    // Datos
+    // Escribir datos
     tareas.forEach((tarea, index) => {
       const rowNum = 5 + index
       const row = ws.getRow(rowNum)
@@ -204,27 +198,21 @@ export default async function handler(req, res) {
       .replace(/\s+/g, '_')
       .substring(0, 30)
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-
-    // Extensión depende de si cargó plantilla o no
-    const ext = usandoPlantilla ? 'xlsm' : 'xlsx'
-    const filename = `Gantt_${safeName}_${timestamp}.${ext}`
+    const filename = `Gantt_${safeName}_${timestamp}.xlsm`
 
     const buffer = await workbook.xlsx.writeBuffer()
 
-    // MIME type correcto
-    const mimeType = usandoPlantilla
-      ? 'application/vnd.ms-excel.sheet.macroEnabled.12'
-      : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-
-    res.setHeader('Content-Type', mimeType)
+    res.setHeader('Content-Type', 'application/vnd.ms-excel.sheet.macroEnabled.12')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', buffer.length)
 
-    const estado = usandoPlantilla ? 'XLSM con VBA' : 'XLSX'
-    console.log(`✓ Gantt: ${filename} (${tareas.length} filas, ${estado})`)
+    console.log(`✓ Gantt generado: ${filename} (${tareas.length} filas con VBA)`)
     res.send(buffer)
   } catch (error) {
-    console.error('Error:', error.message)
-    res.status(500).json({ error: error.message })
+    console.error('❌ ERROR:', error.message)
+    res.status(500).json({
+      error: error.message,
+      debug: `Revisa los logs de Vercel para más detalles`
+    })
   }
 }
