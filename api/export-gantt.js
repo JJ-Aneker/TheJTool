@@ -1,4 +1,9 @@
 import ExcelJS from 'exceljs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 /**
  * Calcula solo días laborables (lunes-viernes)
@@ -75,7 +80,8 @@ function mapTasksToExcel(projectData, startDate) {
 }
 
 /**
- * Exporta Gantt usando ExcelJS (funciona en Vercel + Local)
+ * Exporta Gantt usando plantilla XLSM + ExcelJS
+ * Funciona en Vercel + Local
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -92,23 +98,17 @@ export default async function handler(req, res) {
     // Mapear tareas
     const tareas = mapTasksToExcel(projectData, startDate)
 
-    // Crear workbook desde cero con ExcelJS
+    // Cargar plantilla XLSM existente
+    const templatePath = path.join(__dirname, '../public/templates/gantt-template.xlsm')
     const workbook = new ExcelJS.Workbook()
-    const ws = workbook.addWorksheet('Gantt')
+    await workbook.xlsx.readFile(templatePath)
+    const ws = workbook.getWorksheet('Gantt')
 
-    // Configurar columnas
-    ws.columns = [
-      { header: 'N°', key: 'numero', width: 5 },
-      { header: 'Tarea', key: 'nombre', width: 25 },
-      { header: 'Responsable', key: 'responsable', width: 15 },
-      { header: 'F.Inicio', key: 'fechaInicio', width: 12 },
-      { header: 'F.Fin', key: 'fechaFin', width: 12 },
-      { header: 'Días', key: 'dias', width: 7 },
-      { header: '%', key: 'progreso', width: 7 }
-    ]
+    if (!ws) {
+      throw new Error('Hoja "Gantt" no encontrada en plantilla')
+    }
 
-    // Filas 1-4: Reservadas para headers/controles (Excel lo rellena con VBA)
-    // Datos comienzan en fila 5
+    // Escribir datos en filas 5+
     tareas.forEach((tarea, index) => {
       const rowNum = 5 + index
       const row = ws.getRow(rowNum)
@@ -141,8 +141,7 @@ export default async function handler(req, res) {
       row.getCell(4).font = { size: 9 }
 
       // Col E: F.Fin (fórmula WORKDAY)
-      const rowNum_str = rowNum
-      row.getCell(5).value = { formula: `=WORKDAY(D${rowNum_str},F${rowNum_str})` }
+      row.getCell(5).value = { formula: `=WORKDAY(D${rowNum},F${rowNum})` }
       row.getCell(5).numFmt = 'dd/mm/yyyy'
       row.getCell(5).alignment = { horizontal: 'center', vertical: 'center' }
       row.getCell(5).font = { size: 9 }
@@ -172,7 +171,7 @@ export default async function handler(req, res) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
     const filename = `Gantt_${safeName}_${timestamp}.xlsm`
 
-    // Generar buffer Excel
+    // Generar buffer Excel (preserva VBA automáticamente)
     const buffer = await workbook.xlsx.writeBuffer()
 
     // Headers de respuesta
