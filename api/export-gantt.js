@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs'
+import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
@@ -53,7 +54,8 @@ function mapTasksToExcel(projectData, startDate) {
       responsable: task.responsable || 'Equipo',
       fechaInicio: taskStartDate,
       dias: Math.ceil(dias),
-      progreso: (task.progreso || task.porcentaje || 0) / 100
+      progreso: (task.progreso || task.porcentaje || 0) / 100,
+      esSubtarea: false
     })
 
     // Subtareas (heredan fecha de inicio de tarea principal)
@@ -67,7 +69,8 @@ function mapTasksToExcel(projectData, startDate) {
           responsable: subtask.responsable || task.responsable || 'Equipo',
           fechaInicio: taskStartDate,
           dias: Math.ceil(subtaskDias),
-          progreso: (subtask.progreso || subtask.porcentaje || 0) / 100
+          progreso: (subtask.progreso || subtask.porcentaje || 0) / 100,
+          esSubtarea: true
         })
       })
     }
@@ -80,8 +83,7 @@ function mapTasksToExcel(projectData, startDate) {
 }
 
 /**
- * Exporta Gantt usando plantilla XLSM + ExcelJS
- * Funciona en Vercel + Local
+ * Exporta Gantt usando ExcelJS (funciona en Vercel + Local)
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -98,15 +100,33 @@ export default async function handler(req, res) {
     // Mapear tareas
     const tareas = mapTasksToExcel(projectData, startDate)
 
-    // Cargar plantilla XLSM existente
+    // Intentar cargar plantilla si existe (local)
+    let workbook = new ExcelJS.Workbook()
     const templatePath = path.join(__dirname, '../public/templates/gantt-template.xlsm')
-    const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.readFile(templatePath)
-    const ws = workbook.getWorksheet('Gantt')
 
-    if (!ws) {
-      throw new Error('Hoja "Gantt" no encontrada en plantilla')
+    if (fs.existsSync(templatePath)) {
+      console.log('Cargando plantilla XLSM...')
+      await workbook.xlsx.readFile(templatePath)
+    } else {
+      console.log('Plantilla no encontrada, creando desde cero (Vercel)')
+      workbook.addWorksheet('Gantt')
     }
+
+    const ws = workbook.getWorksheet('Gantt')
+    if (!ws) {
+      throw new Error('No hay hoja "Gantt"')
+    }
+
+    // Configurar columnas
+    ws.columns = [
+      { header: 'N°', key: 'numero', width: 5 },
+      { header: 'Tarea', key: 'nombre', width: 25 },
+      { header: 'Responsable', key: 'responsable', width: 15 },
+      { header: 'F.Inicio', key: 'fechaInicio', width: 12 },
+      { header: 'F.Fin', key: 'fechaFin', width: 12 },
+      { header: 'Días', key: 'dias', width: 7 },
+      { header: '%', key: 'progreso', width: 7 }
+    ]
 
     // Escribir datos en filas 5+
     tareas.forEach((tarea, index) => {
@@ -123,7 +143,7 @@ export default async function handler(req, res) {
       // Col B: Nombre
       row.getCell(2).value = tarea.nombre
       row.getCell(2).alignment = { horizontal: 'left', vertical: 'center' }
-      if (tarea.nombre.includes('├─')) {
+      if (tarea.esSubtarea) {
         row.getCell(2).font = { italic: true, color: { argb: 'FF666666' } }
       } else {
         row.getCell(2).font = { bold: true }
@@ -134,7 +154,7 @@ export default async function handler(req, res) {
       row.getCell(3).alignment = { horizontal: 'left', vertical: 'center' }
       row.getCell(3).font = { size: 9 }
 
-      // Col D: F.Inicio (fecha objeto)
+      // Col D: F.Inicio
       row.getCell(4).value = tarea.fechaInicio
       row.getCell(4).numFmt = 'dd/mm/yyyy'
       row.getCell(4).alignment = { horizontal: 'center', vertical: 'center' }
@@ -158,6 +178,27 @@ export default async function handler(req, res) {
       row.getCell(7).alignment = { horizontal: 'center', vertical: 'center' }
       row.getCell(7).font = { size: 9 }
 
+      // Color de progreso (sin caracteres, solo color de fondo)
+      const colors = {
+        0: 'FFBDDDF2',    // 0-25%: Azul claro
+        25: 'FF7BBFE8',   // 26-50%: Azul medio
+        50: 'FF2E8DD4',   // 51-75%: Azul oscuro
+        75: 'FF1A5E9A'    // 76-100%: Azul muy oscuro
+      }
+
+      let colorKey = 0
+      if (tarea.progreso > 0.75) colorKey = 75
+      else if (tarea.progreso > 0.5) colorKey = 50
+      else if (tarea.progreso > 0.25) colorKey = 25
+
+      for (let col = 1; col <= 7; col++) {
+        row.getCell(col).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colors[colorKey] }
+        }
+      }
+
       row.height = 16
       row.commit()
     })
@@ -169,13 +210,13 @@ export default async function handler(req, res) {
       .replace(/\s+/g, '_')
       .substring(0, 30)
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-    const filename = `Gantt_${safeName}_${timestamp}.xlsm`
+    const filename = `Gantt_${safeName}_${timestamp}.xlsx`
 
-    // Generar buffer Excel (preserva VBA automáticamente)
+    // Generar buffer Excel
     const buffer = await workbook.xlsx.writeBuffer()
 
-    // Headers de respuesta
-    res.setHeader('Content-Type', 'application/vnd.ms-excel.sheet.macroEnabled.12')
+    // Headers de respuesta (XLSX, no XLSM)
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', buffer.length)
 
