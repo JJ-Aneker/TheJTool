@@ -215,6 +215,9 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/vnd.ms-excel.sheet.macroEnabled.12')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', fileBuffer.length)
+    // Intentar evitar "Mark of the Web" (puede no funcionar en todos los navegadores)
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader('Content-Security-Policy', "default-src 'self'")
 
     console.log(`✓ Gantt: ${filename} (${tareas.length} filas con VBA preservado)`)
     res.send(fileBuffer)
