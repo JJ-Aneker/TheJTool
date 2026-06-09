@@ -15,7 +15,7 @@ import { Router } from 'express';
 import analyzeHandler from './api/analyze.js';
 import buildDocxHandler from './api/build-docx.js';
 import ganttHandler from './api/generate-gantt.js';
-import exportGanttWithVBAHandler from './api/export-gantt-with-vba.js';
+import exportGanttHandler from './api/export-gantt.js';
 import convertGanttScriptHandler from './api/convert-gantt-script.js';
 import executeSqlHandler from './api/execute-sql.js';
 import updateUserRoleHandler from './api/update-user-role.js';
@@ -79,7 +79,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/analyze', analyzeHandler);
 app.post('/api/build-docx', buildDocxHandler);
 app.post('/api/generate-gantt', ganttHandler);
-app.post('/api/export-gantt', exportGanttWithVBAHandler);
+app.post('/api/export-gantt', exportGanttHandler);
 app.get('/api/gantt-converter-script', convertGanttScriptHandler);
 
 // Admin routes
