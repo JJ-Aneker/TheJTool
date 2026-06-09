@@ -1,10 +1,4 @@
 import ExcelJS from 'exceljs'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 /**
  * Calcula solo días laborables (lunes-viernes)
@@ -38,7 +32,6 @@ function mapTasksToExcel(projectData, startDate) {
   const tareas = []
 
   projectData.estimacion.tareas.forEach((task, idx) => {
-    // Ajustar fecha de inicio al lunes si es fin de semana
     let taskStartDate = new Date(currentDate)
     while (taskStartDate.getDay() === 0 || taskStartDate.getDay() === 6) {
       taskStartDate.setDate(taskStartDate.getDate() + 1)
@@ -47,7 +40,6 @@ function mapTasksToExcel(projectData, startDate) {
     const dias = task.dias || task.duracion || 1
     const taskEndDate = addWorkingDays(taskStartDate, Math.ceil(dias))
 
-    // Tarea principal
     tareas.push({
       numero: idx + 1,
       nombre: task.descripcion || task.nombre || 'Sin nombre',
@@ -58,7 +50,6 @@ function mapTasksToExcel(projectData, startDate) {
       esSubtarea: false
     })
 
-    // Subtareas (heredan fecha de inicio de tarea principal)
     if (task.subtareas && Array.isArray(task.subtareas)) {
       task.subtareas.forEach(subtask => {
         const subtaskDias = subtask.dias || subtask.duracion || 0.5
@@ -83,7 +74,7 @@ function mapTasksToExcel(projectData, startDate) {
 }
 
 /**
- * Exporta Gantt usando ExcelJS (funciona en Vercel + Local)
+ * Exporta Gantt con ExcelJS (funciona en Vercel + Local)
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -97,27 +88,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'projectData es requerido' })
     }
 
-    // Mapear tareas
     const tareas = mapTasksToExcel(projectData, startDate)
 
-    // Intentar cargar plantilla si existe (local)
-    let workbook = new ExcelJS.Workbook()
-    const templatePath = path.join(__dirname, '../public/templates/gantt-template.xlsm')
+    const workbook = new ExcelJS.Workbook()
+    const ws = workbook.addWorksheet('Gantt')
 
-    if (fs.existsSync(templatePath)) {
-      console.log('Cargando plantilla XLSM...')
-      await workbook.xlsx.readFile(templatePath)
-    } else {
-      console.log('Plantilla no encontrada, creando desde cero (Vercel)')
-      workbook.addWorksheet('Gantt')
-    }
-
-    const ws = workbook.getWorksheet('Gantt')
-    if (!ws) {
-      throw new Error('No hay hoja "Gantt"')
-    }
-
-    // Configurar columnas
+    // Headers
     ws.columns = [
       { header: 'N°', key: 'numero', width: 5 },
       { header: 'Tarea', key: 'nombre', width: 25 },
@@ -128,19 +104,22 @@ export default async function handler(req, res) {
       { header: '%', key: 'progreso', width: 7 }
     ]
 
-    // Escribir datos en filas 5+
+    const colors = {
+      0: 'FFBDDDF2',
+      25: 'FF7BBFE8',
+      50: 'FF2E8DD4',
+      75: 'FF1A5E9A'
+    }
+
+    // Datos
     tareas.forEach((tarea, index) => {
-      const rowNum = 5 + index
+      const rowNum = 2 + index
       const row = ws.getRow(rowNum)
 
-      // Col A: Número
       row.getCell(1).value = tarea.numero ?? null
       row.getCell(1).alignment = { horizontal: 'center', vertical: 'center' }
-      if (tarea.numero) {
-        row.getCell(1).font = { bold: true }
-      }
+      if (tarea.numero) row.getCell(1).font = { bold: true }
 
-      // Col B: Nombre
       row.getCell(2).value = tarea.nombre
       row.getCell(2).alignment = { horizontal: 'left', vertical: 'center' }
       if (tarea.esSubtarea) {
@@ -149,42 +128,24 @@ export default async function handler(req, res) {
         row.getCell(2).font = { bold: true }
       }
 
-      // Col C: Responsable
       row.getCell(3).value = tarea.responsable
       row.getCell(3).alignment = { horizontal: 'left', vertical: 'center' }
-      row.getCell(3).font = { size: 9 }
 
-      // Col D: F.Inicio
       row.getCell(4).value = tarea.fechaInicio
       row.getCell(4).numFmt = 'dd/mm/yyyy'
       row.getCell(4).alignment = { horizontal: 'center', vertical: 'center' }
-      row.getCell(4).font = { size: 9 }
 
-      // Col E: F.Fin (fórmula WORKDAY)
       row.getCell(5).value = { formula: `=WORKDAY(D${rowNum},F${rowNum})` }
       row.getCell(5).numFmt = 'dd/mm/yyyy'
       row.getCell(5).alignment = { horizontal: 'center', vertical: 'center' }
-      row.getCell(5).font = { size: 9 }
 
-      // Col F: Días
       row.getCell(6).value = tarea.dias
       row.getCell(6).numFmt = '0'
       row.getCell(6).alignment = { horizontal: 'center', vertical: 'center' }
-      row.getCell(6).font = { size: 9 }
 
-      // Col G: Progreso (%)
       row.getCell(7).value = tarea.progreso
       row.getCell(7).numFmt = '0%'
       row.getCell(7).alignment = { horizontal: 'center', vertical: 'center' }
-      row.getCell(7).font = { size: 9 }
-
-      // Color de progreso (sin caracteres, solo color de fondo)
-      const colors = {
-        0: 'FFBDDDF2',    // 0-25%: Azul claro
-        25: 'FF7BBFE8',   // 26-50%: Azul medio
-        50: 'FF2E8DD4',   // 51-75%: Azul oscuro
-        75: 'FF1A5E9A'    // 76-100%: Azul muy oscuro
-      }
 
       let colorKey = 0
       if (tarea.progreso > 0.75) colorKey = 75
@@ -203,7 +164,6 @@ export default async function handler(req, res) {
       row.commit()
     })
 
-    // Generar nombre de archivo
     const projectName = projectData.proyecto?.nombre || 'gantt'
     const safeName = projectName
       .replace(/[^a-zA-Z0-9\s]/g, '')
@@ -212,18 +172,16 @@ export default async function handler(req, res) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
     const filename = `Gantt_${safeName}_${timestamp}.xlsx`
 
-    // Generar buffer Excel
     const buffer = await workbook.xlsx.writeBuffer()
 
-    // Headers de respuesta (XLSX, no XLSM)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', buffer.length)
 
-    console.log(`✓ Gantt generado: ${filename} (${tareas.length} filas)`)
+    console.log(`✓ Gantt: ${filename}`)
     res.send(buffer)
   } catch (error) {
-    console.error('❌ Error exportando Gantt:', error.message)
+    console.error('Error:', error.message)
     res.status(500).json({ error: error.message })
   }
 }
