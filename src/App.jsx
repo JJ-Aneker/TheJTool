@@ -274,8 +274,8 @@ function AppContent() {
               src="/assets/images/logo.png"
               alt="TheJ - ToolBox"
               style={{
-                width: '34px',
-                height: '40px',
+                width: '37px',
+                height: '50px',
                 borderRadius: 'var(--radius-md)',
                 objectFit: 'cover',
                 flexShrink: 0
@@ -293,7 +293,7 @@ function AppContent() {
                 gap: '2px'
               }}>
                 <span style={{ color: 'white', fontSize: '30px', fontWeight: '600', lineHeight: '1' }}>theJay</span>
-                <span style={{ color: '#1890ff', fontSize: '11px', letterSpacing: '6.5px', lineHeight: '1' }}>TOOLBOX</span>
+                <span style={{ color: '#1890ff', fontSize: '11px', letterSpacing: '6.5px', lineHeight: '1' }}>······</span>
               </div>
               <button
                 onClick={() => handleSidebarToggle(true)}

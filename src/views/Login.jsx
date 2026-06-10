@@ -342,8 +342,8 @@ export default function Login() {
               src="/assets/images/logo.png"
               alt="Logo"
               style={{
-                width: '70px',
-                height: '80px'
+                width: '75px',
+                height: '100px'
               }}
             />
           </div>
