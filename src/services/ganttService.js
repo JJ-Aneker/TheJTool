@@ -49,7 +49,7 @@ export const ganttService = {
 
       return { success: true };
     } catch (err) {
-      console.error('Gantt generation error:', err);
+      logger.error('Gantt generation error:', err);
       throw new Error(`Error generando Gantt: ${err.message}`);
     }
   }

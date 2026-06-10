@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabaseClient'
+import { logger } from '../utils/logger'
 
 export const storageService = {
   async uploadAvatar(file, userId) {
@@ -22,7 +23,7 @@ export const storageService = {
 
       return { success: true, url: data.publicUrl }
     } catch (error) {
-      console.error('Error uploading avatar:', error)
+      logger.error('Error uploading avatar:', error)
       return { success: false, error: error.message }
     }
   },
@@ -42,7 +43,7 @@ export const storageService = {
       if (error) throw error
       return { success: true }
     } catch (error) {
-      console.error('Error deleting avatar:', error)
+      logger.error('Error deleting avatar:', error)
       return { success: false, error: error.message }
     }
   }

@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabaseClient'
+import { logger } from '../utils/logger'
 
 export const userService = {
   // Get user by ID

@@ -4,6 +4,8 @@ import { UserOutlined, CameraOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'
+import { MESSAGES } from '../constants/messages'
+import { handleError, logError } from '../utils/errorHandler'
 
 export default function UserProfile() {
   const [form] = Form.useForm()
@@ -45,7 +47,7 @@ export default function UserProfile() {
         role: data.role || ''
       })
     } catch (err) {
-      console.error('Error loading profile:', err)
+      logError('Error loading profile:', err)
       try {
         const newProfile = {
           user_id: user.id,
@@ -81,8 +83,9 @@ export default function UserProfile() {
           role: createdProfile.role
         })
       } catch (createErr) {
-        console.error('Error creating profile:', createErr)
-        message.error('No se pudo cargar el perfil')
+        logError('Error creating profile:', createErr)
+        handleError(createErr, 'cargar el perfil', false)
+        message.error(MESSAGES.ERROR.LOAD('perfil'))
       }
     } finally {
       setLoading(false)
@@ -109,9 +112,9 @@ export default function UserProfile() {
       if (error) throw error
 
       setProfile({ ...profile, ...values })
-      message.success('Perfil actualizado exitosamente')
-    } catch (err) {
-      message.error('Error al actualizar perfil: ' + err.message)
+      message.success(MESSAGES.SUCCESS.UPDATE('Perfil'))
+    } catch (error) {
+      handleError(error, 'actualizar perfil')
     } finally {
       setLoading(false)
     }
@@ -119,7 +122,7 @@ export default function UserProfile() {
 
   const handleChangePassword = async (values) => {
     if (values.newPassword !== values.confirmPassword) {
-      message.error('Las contraseñas no coinciden')
+      message.error(MESSAGES.AUTH.PASSWORD_MISMATCH)
       return
     }
 
@@ -127,12 +130,11 @@ export default function UserProfile() {
     try {
       const result = await updatePassword(values.newPassword)
       if (result.success) {
-        message.success('Contraseña actualizada exitosamente')
+        message.success(MESSAGES.AUTH.PASSWORD_UPDATED)
         passwordForm.resetFields()
         setShowPasswordModal(false)
       } else {
-        message.error(result.error || 'Error al cambiar contraseña')
-      }
+        message.error(result.error || MESSAGES.ERROR.UPDATE('contraseña'))
     } finally {
       setLoading(false)
     }
@@ -151,12 +153,12 @@ export default function UserProfile() {
         if (error) throw error
 
         setProfile({ ...profile, avatar_url: result.url })
-        message.success('Avatar actualizado exitosamente')
+        message.success(MESSAGES.SUCCESS.UPLOAD('Avatar'))
       } else {
-        message.error('Error al cargar avatar: ' + result.error)
+        message.error(MESSAGES.ERROR.UPLOAD('avatar') + ': ' + result.error)
       }
-    } catch (err) {
-      message.error('Error al actualizar avatar: ' + err.message)
+    } catch (error) {
+      handleError(error, 'actualizar avatar')
     } finally {
       setAvatarLoading(false)
     }

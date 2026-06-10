@@ -2,6 +2,7 @@
 // Handles authentication and queries to Therefore servers
 
 import axios from 'axios'
+import { logger } from '../utils/logger'
 
 class ThereforeService {
   constructor() {
@@ -73,7 +74,7 @@ class ThereforeService {
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
-      console.error('Error counting documents:', err.message)
+      logger.error('Error counting documents:', err.message)
       if (err.message?.includes('403') || err.message?.includes('permission')) {
         throw new Error('Permiso denegado: El usuario no tiene permisos para consultar documentos')
       }
@@ -107,7 +108,7 @@ class ThereforeService {
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
-      console.error('Error counting cases:', err.message)
+      logger.error('Error counting cases:', err.message)
       if (err.message?.includes('403') || err.message?.includes('permission')) {
         throw new Error('Permiso denegado: El usuario no tiene permisos para consultar casos')
       }
@@ -139,7 +140,7 @@ class ThereforeService {
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
-      console.error('Error counting users:', err.message)
+      logger.error('Error counting users:', err.message)
       if (err.message?.includes('403') || err.message?.includes('permission')) {
         throw new Error('Permiso denegado: El usuario no tiene permisos para consultar usuarios')
       }
@@ -169,7 +170,7 @@ class ThereforeService {
 
       return response.data?.ResultRows?.length || 0
     } catch (err) {
-      console.error('Error counting workflows:', err.message)
+      logger.error('Error counting workflows:', err.message)
       if (err.message?.includes('403') || err.message?.includes('permission')) {
         throw new Error('Permiso denegado: El usuario no tiene permisos para consultar workflows')
       }
@@ -444,7 +445,7 @@ class ThereforeService {
 
       return { rows, canonicalFields, error: null }
     } catch (err) {
-      console.error('executeMultiQuery error:', err)
+      logger.error('executeMultiQuery error:', err)
       return { rows: [], canonicalFields: [], error: err.message }
     }
   }

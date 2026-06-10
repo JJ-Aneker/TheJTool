@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabaseClient'
+import { logger } from '../utils/logger'
 
 export const authService = {
   // Sign up new user
@@ -34,14 +35,14 @@ export const authService = {
           })
 
         if (upsertError) {
-          console.error('Error creating profile:', upsertError)
+          logger.error('Error creating profile:', upsertError)
           throw new Error(`Error al crear perfil: ${upsertError.message}`)
         }
       }
 
       return { success: true, user: data.user }
     } catch (error) {
-      console.error('SignUp error:', error)
+      logger.error('SignUp error:', error)
       return { success: false, error: error.message }
     }
   },
@@ -62,7 +63,7 @@ export const authService = {
           .rpc('is_user_approved', { user_id: data.user.id })
 
         if (rpcError) {
-          console.error('Error checking user approval:', rpcError)
+          logger.error('Error checking user approval:', rpcError)
           throw new Error('Error al verificar estado de usuario')
         }
 
