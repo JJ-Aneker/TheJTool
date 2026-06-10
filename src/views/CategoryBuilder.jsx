@@ -3,6 +3,9 @@ import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin, Tabs } f
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import '../styles/category-builder.css'
+import { MESSAGES } from '../constants/messages'
+import { handleError, logError } from '../utils/errorHandler'
+import { logger } from '../utils/logger'
 
 function newGuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -39,7 +42,7 @@ const bgr = (r, g, b) => b * 65536 + g * 256 + r
 const bgrToHex = (val) => {
   // Handle invalid input gracefully
   if (typeof val !== 'number' || val < 0 || val > 16777215) {
-    console.warn('Invalid BGR value:', val, '- using fallback #F0F0F0')
+    logger.warn('Invalid BGR value', { val, fallback: '#F0F0F0' })
     return '#F0F0F0'
   }
   const b = (val >> 16) & 0xff
@@ -2051,14 +2054,14 @@ export default function CategoryBuilder() {
 
   const saveTemplate = async () => {
     if (!currentCategory.name.trim()) {
-      message.error('El nombre de la categoría es obligatorio')
-    return
+      message.error(MESSAGES.CATEGORY.NAME_REQUIRED)
+      return
     }
 
     try {
-    const categoryJson = JSON.stringify(currentCategory)
-    if (selectedTemplate?.id) {
-        const { error: err } = await supabase
+      const categoryJson = JSON.stringify(currentCategory)
+      if (selectedTemplate?.id) {
+        const { error } = await supabase
           .from('category_templates')
           .update({
             name: currentCategory.name,
@@ -2068,10 +2071,10 @@ export default function CategoryBuilder() {
           })
           .eq('id', selectedTemplate.id)
 
-        if (err) throw err
-        message.success('Actualizada')
+        if (error) throw error
+        message.success(MESSAGES.SUCCESS.UPDATE('Categoría'))
       } else {
-        const { error: err } = await supabase
+        const { error } = await supabase
           .from('category_templates')
           .insert({
             template_id: `cat_${Date.now()}`,
@@ -2082,15 +2085,15 @@ export default function CategoryBuilder() {
             compartido: false
           })
 
-        if (err) throw err
-        message.success('Guardada')
+        if (error) throw error
+        message.success(MESSAGES.SUCCESS.SAVE('Categoría'))
       }
 
       setSelectedTemplate(null)
       setXml('')
       await loadTemplates()
-    } catch (err) {
-      message.error(`Error: ${err.message}`)
+    } catch (error) {
+      handleError(error, 'guardar la categoría')
     }
   }
 

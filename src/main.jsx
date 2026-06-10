@@ -5,6 +5,7 @@ import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider, ThemeContext } from './context/ThemeContext'
 import './App.css'
+import './styles/common.css'
 
 // Debug tools (only in development)
 if (import.meta.env.DEV) {

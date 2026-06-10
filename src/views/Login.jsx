@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Form, Input, Button, message, Spin } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
+import { MESSAGES } from '../constants/messages'
+import { handleError } from '../utils/errorHandler'
 
 export default function Login() {
   const [form] = Form.useForm()
@@ -21,9 +23,9 @@ export default function Login() {
     try {
       const result = await login(values.email, values.password)
       if (result.success) {
-        message.success('Login exitoso')
+        message.success(MESSAGES.AUTH.LOGIN_SUCCESS)
       } else {
-        message.error(result.error || 'Error en el login. Verifica email y contraseña.')
+        message.error(result.error || MESSAGES.AUTH.LOGIN_ERROR)
       }
     } finally {
       setLoading(false)
@@ -32,7 +34,7 @@ export default function Login() {
 
   const handleSignup = async (values) => {
     if (values.password !== values.confirmPassword) {
-      message.error('Las contraseñas no coinciden')
+      message.error(MESSAGES.AUTH.PASSWORD_MISMATCH)
       return
     }
 
@@ -44,11 +46,11 @@ export default function Login() {
         department: values.department
       })
       if (result.success) {
-        message.success('Usuario creado exitosamente. Por favor inicia sesión.')
+        message.success(MESSAGES.AUTH.REGISTER_SUCCESS)
         setActiveView('login')
         form.resetFields()
       } else {
-        message.error(result.error || 'Error al crear usuario')
+        message.error(result.error || MESSAGES.AUTH.REGISTER_ERROR)
       }
     } finally {
       setLoading(false)
@@ -58,9 +60,9 @@ export default function Login() {
   const handleRecoverPassword = async (values) => {
     setLoading(true)
     try {
-      message.loading('Enviando enlace de recuperación...')
+      message.loading(MESSAGES.INFO.PROCESSING)
       await new Promise(resolve => setTimeout(resolve, 1500))
-      message.success('Enlace enviado a tu correo electrónico')
+      message.success(MESSAGES.AUTH.RESET_LINK_SENT)
       form.resetFields()
       setActiveView('login')
     } finally {
