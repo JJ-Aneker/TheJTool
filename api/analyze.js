@@ -3,7 +3,7 @@
 // y extrae datos estructurados del proyecto via Claude API
 
 import { createClient } from '@supabase/supabase-js'
-import { callBedrock } from './bedrockClient.js'
+import { callBedrock } from './_lib/bedrockClient.js'
 import { RATIOS } from './_lib/knowledge/ratios.js'
 import { TEXTOS } from './_lib/knowledge/textos_estandar.js'
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js'
