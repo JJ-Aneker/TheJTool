@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { Layout, Menu, Spin, Dropdown } from 'antd'
 import {
@@ -28,20 +28,22 @@ import './styles/design-tokens.css'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 
-// Vistas
+// Vistas - Carga inmediata (pequeñas, usadas frecuentemente)
 import Home from './views/Home'
 import Login from './views/Login'
-import UserProfile from './views/UserProfile'
-import UserManager from './views/UserManager'
-import VerticalesManager from './views/VerticalesManager'
-import TenantManager from './views/TenantManager'
-import WebServicesManager from './views/WebServicesManager'
-import EFormBuilder from './views/EFormBuilder'
-import CategoryBuilder from './views/CategoryBuilder'
-import DocumentGenerator from './views/DocumentGenerator'
-import ThereforeReporter from './views/ThereforeReporter'
-import BedrrockPanel from './views/BedrrockPanel'
 import Placeholder from './views/Placeholder'
+
+// Vistas - Lazy Loading (grandes, usadas bajo demanda)
+const UserProfile = lazy(() => import('./views/UserProfile'))
+const UserManager = lazy(() => import('./views/UserManager'))
+const VerticalesManager = lazy(() => import('./views/VerticalesManager'))
+const TenantManager = lazy(() => import('./views/TenantManager'))
+const WebServicesManager = lazy(() => import('./views/WebServicesManager'))
+const EFormBuilder = lazy(() => import('./views/EFormBuilder'))
+const CategoryBuilder = lazy(() => import('./views/CategoryBuilder'))
+const DocumentGenerator = lazy(() => import('./views/DocumentGenerator'))
+const ThereforeReporter = lazy(() => import('./views/ThereforeReporter'))
+const BedrrockPanel = lazy(() => import('./views/BedrrockPanel'))
 
 const { Sider, Content } = Layout
 
@@ -408,22 +410,33 @@ function AppContent() {
           minHeight: 0,
           overflow: 'hidden'
         }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/profile" element={<UserProfile />} />
-            <Route path="/users" element={<AdminRoute><UserManager /></AdminRoute>} />
-            <Route path="/verticales" element={<AdminRoute><VerticalesManager /></AdminRoute>} />
-            <Route path="/bedrock" element={<AdminRoute><BedrrockPanel /></AdminRoute>} />
-            <Route path="/eforms" element={<EFormBuilder />} />
-            <Route path="/category-builder" element={<CategoryBuilder />} />
-            <Route path="/tenants" element={<TenantManager />} />
-            <Route path="/document-generator" element={<DocumentGenerator />} />
-            <Route path="/reporter" element={<ThereforeReporter />} />
-            <Route path="/web-services" element={<WebServicesManager />} />
-            <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" status="construction" />} />
-            <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" status="construction" />} />
-            <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" status="construction" />} />
-          </Routes>
+          <Suspense fallback={
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '400px'
+            }}>
+              <Spin size="large" tip="Cargando..." />
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/users" element={<AdminRoute><UserManager /></AdminRoute>} />
+              <Route path="/verticales" element={<AdminRoute><VerticalesManager /></AdminRoute>} />
+              <Route path="/bedrock" element={<AdminRoute><BedrrockPanel /></AdminRoute>} />
+              <Route path="/eforms" element={<EFormBuilder />} />
+              <Route path="/category-builder" element={<CategoryBuilder />} />
+              <Route path="/tenants" element={<TenantManager />} />
+              <Route path="/document-generator" element={<DocumentGenerator />} />
+              <Route path="/reporter" element={<ThereforeReporter />} />
+              <Route path="/web-services" element={<WebServicesManager />} />
+              <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" status="construction" />} />
+              <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" status="construction" />} />
+              <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" status="construction" />} />
+            </Routes>
+          </Suspense>
         </Content>
       </div>
     </div>
