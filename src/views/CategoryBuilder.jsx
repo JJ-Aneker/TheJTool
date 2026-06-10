@@ -1336,7 +1336,7 @@ function parseXmlCategories(xmlString, sourceCategories = []) {
 
     const parseErr = xmlDoc.querySelector('parsererror')
     if (parseErr) {
-      console.error('XML Parse Error:', parseErr.textContent.slice(0, 120))
+      logger.error('XML Parse Error:', parseErr.textContent.slice(0, 120))
       return []
     }
 
@@ -1432,7 +1432,7 @@ function parseXmlCategories(xmlString, sourceCategories = []) {
 
     return parsedCategories
   } catch (err) {
-    console.error('Error parsing XML:', err)
+    logger.error('Error parsing XML:', err)
     return []
   }
 }
@@ -2044,7 +2044,7 @@ export default function CategoryBuilder() {
     if (err) throw err
       setTemplates(data || [])
     } catch (err) {
-      console.error('Error:', err.message)
+      logger.error('Error:', err.message)
     } finally {
       setLoading(false)
     }
@@ -2757,7 +2757,7 @@ export default function CategoryBuilder() {
       return
     } catch (err) {
       setError(`Error: ${err.message}`)
-      console.error('Error generando XML:', err)
+      logger.error('Error generando XML:', err)
       return
     }
   }

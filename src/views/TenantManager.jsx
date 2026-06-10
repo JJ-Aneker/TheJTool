@@ -3,6 +3,8 @@ import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfir
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LinkOutlined, GlobalOutlined, LockOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import { MESSAGES } from '../constants/messages'
+import { handleError } from '../utils/errorHandler'
 import { useRole } from '../hooks/useRole'
 import '../styles/tenant-manager.css'
 
@@ -52,7 +54,7 @@ export default function TenantManager() {
       if (error) throw error
       setTenants(data || [])
     } catch (err) {
-      message.error('Error al cargar tenants: ' + err.message)
+      handleError(err, 'cargar tenants', false); message.error(MESSAGES.ERROR.LOAD('tenants') + ': ' + err.message)
     } finally {
       setLoading(false)
     }
@@ -246,7 +248,7 @@ export default function TenantManager() {
           t.id === selectedTenant.id ? updatedTenant : t
         ))
         setSelectedTenant(updatedTenant)
-        message.success('Tenant actualizado correctamente')
+        message.success(MESSAGES.SUCCESS.UPDATE('Tenant'))
       } else {
         // Crear
         const insertData = {
@@ -273,7 +275,7 @@ export default function TenantManager() {
         if (error) throw error
 
         setTenants([data[0], ...tenants])
-        message.success('Tenant creado correctamente')
+        message.success(MESSAGES.SUCCESS.CREATE('Tenant'))
       }
 
       setIsModalVisible(false)

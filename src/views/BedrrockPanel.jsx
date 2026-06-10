@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { Card, Button, Space, Modal, Form, Input, Select, message, Spin, Tag, Tooltip, InputNumber, Tabs } from 'antd'
 import { CloudOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
+import { MESSAGES } from '../constants/messages'
+import { handleError, logError } from '../utils/errorHandler'
+import { logger } from '../utils/logger'
 import '../styles/anthropic-panel.css'
 
 export default function BedrrockPanel() {
@@ -41,7 +44,7 @@ export default function BedrrockPanel() {
       const data = await resp.json()
       setBedrockStatus(data)
     } catch (err) {
-      console.error('Error loading Bedrock status:', err)
+      handleError(err, 'Error loading Bedrock status')
       setBedrockStatus({ hasCredentials: false, error: err.message })
     }
   }
@@ -68,7 +71,7 @@ export default function BedrrockPanel() {
       setUsage(usageData)
       setHistory(historyData)
     } catch (err) {
-      console.error('Error loading Bedrock usage:', err)
+      handleError(err, 'Error loading Bedrock usage')
       setUsage(null)
       setHistory(null)
     } finally {

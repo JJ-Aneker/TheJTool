@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Table, Button, Modal, message, Spin, Space, Tag, Input, Empty } from 'antd'
 import { DeleteOutlined, EditOutlined, CopyOutlined, DownloadOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
+import { MESSAGES } from '../constants/messages'
+import { handleError } from '../utils/errorHandler'
 import { supabase } from '../config/supabaseClient'
 
 export default function EFormManager() {
@@ -46,7 +48,7 @@ export default function EFormManager() {
         .eq('id', selectedForm.id)
 
       if (error) throw error
-      message.success('Formulario eliminado')
+      message.success(MESSAGES.SUCCESS.DELETE('Formulario'))
       setDeleteModalOpen(false)
       setSelectedForm(null)
       loadForms()

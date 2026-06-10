@@ -66,7 +66,7 @@ export default function VerticalesManager() {
       const data = await verticalesService.getAllVerticals();
       setVerticales(data);
     } catch (err) {
-      message.error('Error al cargar verticales: ' + err.message);
+      handleError(err, 'cargar verticales', false); message.error(MESSAGES.ERROR.LOAD('verticales') + ': ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -158,7 +158,7 @@ export default function VerticalesManager() {
     try {
       await verticalesService.deleteVertical(vertical.id);
       setVerticales(verticales.filter(v => v.id !== vertical.id));
-      message.success('Vertical eliminado');
+      message.success(MESSAGES.SUCCESS.DELETE('Vertical'));
     } catch (err) {
       message.error('Error al eliminar: ' + err.message);
     } finally {
@@ -191,11 +191,11 @@ export default function VerticalesManager() {
             ? { ...v, ...data, updated_at: new Date().toISOString() }
             : v
         ));
-        message.success('Vertical actualizado');
+        message.success(MESSAGES.SUCCESS.UPDATE('Vertical'));
       } else {
         const newVertical = await verticalesService.createVertical(data);
         setVerticales([newVertical, ...verticales]);
-        message.success('Vertical creado');
+        message.success(MESSAGES.SUCCESS.CREATE('Vertical'));
       }
 
       setIsModalVisible(false);

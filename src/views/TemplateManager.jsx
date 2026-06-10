@@ -25,7 +25,7 @@ export default function TemplateManager() {
       if (error) throw error
       setTemplates(data || [])
     } catch (err) {
-      message.error('Error al cargar templates: ' + err.message)
+      handleError(err, 'cargar templates', false); message.error(MESSAGES.ERROR.LOAD('templates') + ': ' + err.message)
     } finally {
       setLoading(false)
     }
@@ -119,7 +119,7 @@ export default function TemplateManager() {
 
       if (error) throw error
       setTemplates(templates.filter(t => t.id !== template.id))
-      message.success('Template eliminado')
+      message.success(MESSAGES.SUCCESS.DELETE('Template'))
     } catch (err) {
       message.error('Error al eliminar: ' + err.message)
     } finally {
@@ -157,7 +157,7 @@ export default function TemplateManager() {
             ? { ...t, ...values }
             : t
         ))
-        message.success('Template actualizado')
+        message.success(MESSAGES.SUCCESS.UPDATE('Template'))
       } else {
         const { data, error } = await supabase
           .from('therefore_templates')
@@ -171,7 +171,7 @@ export default function TemplateManager() {
 
         if (error) throw error
         setTemplates([...templates, ...data])
-        message.success('Template creado')
+        message.success(MESSAGES.SUCCESS.CREATE('Template'))
       }
 
       setIsModalVisible(false)

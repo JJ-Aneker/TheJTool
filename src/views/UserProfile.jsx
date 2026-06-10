@@ -135,6 +135,7 @@ export default function UserProfile() {
         setShowPasswordModal(false)
       } else {
         message.error(result.error || MESSAGES.ERROR.UPDATE('contraseña'))
+      }
     } finally {
       setLoading(false)
     }

@@ -26,7 +26,7 @@ export default function WebServicesManager() {
       if (error) throw error
       setServices(data || [])
     } catch (err) {
-      message.error('Error al cargar servicios: ' + err.message)
+      handleError(err, 'cargar servicios', false); message.error(MESSAGES.ERROR.LOAD('servicios') + ': ' + err.message)
     } finally {
       setLoading(false)
     }
@@ -153,7 +153,7 @@ export default function WebServicesManager() {
 
       if (error) throw error
       setServices(services.filter(s => s.id !== service.id))
-      message.success('Servicio eliminado')
+      message.success(MESSAGES.SUCCESS.DELETE('Servicio'))
     } catch (err) {
       message.error('Error al eliminar: ' + err.message)
     } finally {
@@ -203,7 +203,7 @@ export default function WebServicesManager() {
             ? { ...s, ...values }
             : s
         ))
-        message.success('Servicio actualizado')
+        message.success(MESSAGES.SUCCESS.UPDATE('Servicio'))
       } else {
         const { data, error } = await supabase
           .from('web_services')
@@ -220,7 +220,7 @@ export default function WebServicesManager() {
 
         if (error) throw error
         setServices([...services, ...data])
-        message.success('Servicio creado')
+        message.success(MESSAGES.SUCCESS.CREATE('Servicio'))
       }
 
       setIsModalVisible(false)

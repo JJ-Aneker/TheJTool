@@ -46,7 +46,7 @@ export default function UserManager() {
       if (error) throw error
       setUsers(data || [])
     } catch (err) {
-      message.error('Error al cargar usuarios: ' + err.message)
+      handleError(err, 'cargar usuarios', false); message.error(MESSAGES.ERROR.LOAD('usuarios') + ': ' + err.message)
     } finally {
       setLoading(false)
     }
@@ -180,7 +180,7 @@ export default function UserManager() {
         ))
         message.success('Avatar actualizado exitosamente')
       } else {
-        message.error('Error al cargar avatar: ' + result.error)
+        handleError(err, 'cargar avatar', false); message.error(MESSAGES.ERROR.LOAD('avatar') + ': ' + result.error)
       }
     } catch (err) {
       message.error('Error al actualizar avatar: ' + err.message)
@@ -200,7 +200,7 @@ export default function UserManager() {
 
       if (error) throw error
       setUsers(users.filter(u => u.id !== user.id))
-      message.success('Usuario eliminado')
+      message.success(MESSAGES.SUCCESS.DELETE('Usuario'))
     } catch (err) {
       message.error('Error al eliminar: ' + err.message)
     } finally {

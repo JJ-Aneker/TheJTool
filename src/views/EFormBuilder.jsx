@@ -610,7 +610,7 @@ export default function EFormBuilder() {
       message.success(isNew ? 'âœ“ Formulario guardado' : 'âœ“ Formulario actualizado')
       setXmlModalOpen(false)
     } catch (err) {
-      message.error('Error: ' + err.message)
+      handleError(err, 'realizar la operación')
     } finally {
       setSaving(false)
     }
@@ -965,7 +965,7 @@ export default function EFormBuilder() {
                             message.success(form.compartido ? 'No compartido' : 'Compartido')
                             loadSavedForms()
                           } catch (err) {
-                            message.error('Error: ' + err.message)
+                            handleError(err, 'realizar la operación')
                           }
                         }}
                       >
@@ -982,7 +982,7 @@ export default function EFormBuilder() {
                               message.success('Eliminado')
                               loadSavedForms()
                             } catch (err) {
-                              message.error('Error: ' + err.message)
+                              handleError(err, 'realizar la operación')
                             }
                           }
                         }}

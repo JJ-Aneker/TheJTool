@@ -3,6 +3,9 @@ import { Table, Button, Space, Modal, Form, Input, Select, message, Spin, Popcon
 import { ThunderboltOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ReloadOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import { MESSAGES } from '../constants/messages'
+import { handleError, logError } from '../utils/errorHandler'
+import { logger } from '../utils/logger'
 import { thereforeService } from '../services/thereforeService'
 import '../styles/therefore-reporter.css'
 import '../styles/therefore-reporter-panels.css'
@@ -77,7 +80,7 @@ export default function ThereforeReporter() {
       if (error) throw error
       setTenants(data || [])
     } catch (err) {
-      console.error('Error loading tenants:', err)
+      handleError(err, 'Error loading tenants')
       message.error('Error al cargar tenants: ' + err.message)
     }
   }
@@ -95,7 +98,7 @@ export default function ThereforeReporter() {
       if (error) throw error
       setProfiles(data || [])
     } catch (err) {
-      console.error('Error loading profiles:', err)
+      handleError(err, 'Error loading profiles')
       message.error('Error al cargar perfiles: ' + err.message)
     } finally {
       setLoading(false)
@@ -149,7 +152,7 @@ export default function ThereforeReporter() {
 
   const connectToTenant = async () => {
     if (!editorState.nombre || !editorState.tenantId) {
-      message.error('Completa nombre y servidor')
+      message.error(MESSAGES.ERROR.REQUIRED_FIELDS); // 'Completa nombre y servidor')
       return
     }
 
@@ -279,7 +282,7 @@ export default function ThereforeReporter() {
         allCommonFields: commonFields
       }))
     } catch (err) {
-      console.error('Error loading fields:', err)
+      handleError(err, 'Error loading fields')
       message.error('Error: ' + err.message)
     }
   }
@@ -300,7 +303,7 @@ export default function ThereforeReporter() {
     const tenantId = editorState.tenantId
 
     if (!nombre || !tenantId || editorState.selectedCatNos.size === 0) {
-      message.error('Completa todos los campos')
+      message.error(MESSAGES.ERROR.REQUIRED_FIELDS); // 'Completa todos los campos')
       return
     }
 
@@ -405,7 +408,7 @@ export default function ThereforeReporter() {
     const dateTo = resultsState.dateTo
 
     if (!dateField || !dateFrom || !dateTo) {
-      message.error('Completa rango de fechas')
+      message.error(MESSAGES.ERROR.REQUIRED_FIELDS); // 'Completa rango de fechas')
       return
     }
 
@@ -464,7 +467,7 @@ export default function ThereforeReporter() {
 
       renderDashboard()
     } catch (err) {
-      console.error('Query error:', err)
+      handleError(err, 'Query error')
       message.error('Error: ' + err.message)
       setResultsState(s => ({ ...s, loading: false }))
     }
