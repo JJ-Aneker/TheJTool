@@ -336,7 +336,20 @@
     "serverUrlRequired": "URL del servidor requerida",
     "usernameRequired": "Usuario requerido",
     "passwordRequired": "Contraseña requerida",
-    "searchTenant": "Buscar tenant..."
+    "searchTenant": "Buscar tenant...",
+    "namePlaceholder": "ej: BuildingCenter Producción",
+    "serverPlaceholder": "https://buildingcenter.thereforeonline.com",
+    "tenantNamePlaceholder": "buildingcenter (opcional para on-premise)",
+    "emailPlaceholder": "admin@empresa.com",
+    "passwordPlaceholder2": "Contraseña",
+    "columnName": "Nombre",
+    "columnServer": "Servidor",
+    "columnStatus": "Estado",
+    "columnActions": "Acciones",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "deleteTenant": "¿Eliminar tenant?",
+    "name": "Nombre"
   },
 
   "verticalesManager": {

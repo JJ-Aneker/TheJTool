@@ -340,7 +340,7 @@ export default function TenantManager() {
             name="nombre"
             rules={[{ required: true, message: 'Nombre requerido' }]}
           >
-            <Input placeholder="ej: BuildingCenter Producción" />
+            <Input placeholder={t('tenantManager.namePlaceholder')} />
           </Form.Item>
 
           <Form.Item
@@ -351,7 +351,7 @@ export default function TenantManager() {
               { type: 'url', message: 'Debe ser una URL válida' }
             ]}
           >
-            <Input placeholder="https://buildingcenter.thereforeonline.com" />
+            <Input placeholder={t('tenantManager.serverPlaceholder')} />
           </Form.Item>
 
           <Form.Item
@@ -360,7 +360,7 @@ export default function TenantManager() {
             rules={[]}
             tooltip="Requerido solo para instancias cloud; dejar vacío para on-premise"
           >
-            <Input placeholder="buildingcenter (opcional para on-premise)" />
+            <Input placeholder={t('tenantManager.tenantNamePlaceholder')} />
           </Form.Item>
 
           <Form.Item
@@ -368,7 +368,7 @@ export default function TenantManager() {
             name="usuario"
             rules={[{ required: true, message: 'Usuario requerido' }]}
           >
-            <Input placeholder="admin@empresa.com" />
+            <Input placeholder={t('tenantManager.emailPlaceholder')} />
           </Form.Item>
 
           <Form.Item
