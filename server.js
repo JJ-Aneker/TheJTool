@@ -14,11 +14,11 @@ import { createClient } from '@supabase/supabase-js';
 import { Router } from 'express';
 import analyzeHandler from './api/analyze.js';
 import buildDocxHandler from './api/build-docx.js';
-import ganttHandler from './api/generate-gantt.js';
+// import ganttHandler from './api/generate-gantt.js'; // DISABLED: file not found
 import exportGanttHandler from './api/export-gantt.js';
-import convertGanttScriptHandler from './api/convert-gantt-script.js';
-import executeSqlHandler from './api/execute-sql.js';
-import updateUserRoleHandler from './api/update-user-role.js';
+// import convertGanttScriptHandler from './api/convert-gantt-script.js'; // DISABLED: file not found
+// import executeSqlHandler from './api/execute-sql.js'; // DISABLED: file not found
+// import updateUserRoleHandler from './api/update-user-role.js'; // DISABLED: file not found
 import bedrockHandler from './api/bedrock.js';
 import verticalesHandlers from './api/verticales.js';
 
@@ -78,13 +78,13 @@ app.get('/api/health', (req, res) => {
 // EFDT API routes
 app.post('/api/analyze', analyzeHandler);
 app.post('/api/build-docx', buildDocxHandler);
-app.post('/api/generate-gantt', ganttHandler);
+// app.post('/api/generate-gantt', ganttHandler); // DISABLED: handler not found
 app.post('/api/export-gantt', exportGanttHandler);
-app.get('/api/gantt-converter-script', convertGanttScriptHandler);
+// app.get('/api/gantt-converter-script', convertGanttScriptHandler); // DISABLED: handler not found
 
-// Admin routes
-app.post('/api/admin/execute-sql', executeSqlHandler);
-app.post('/api/admin/update-user-role', updateUserRoleHandler);
+// Admin routes (DISABLED: handlers not found)
+// app.post('/api/admin/execute-sql', executeSqlHandler);
+// app.post('/api/admin/update-user-role', updateUserRoleHandler);
 
 // AWS Bedrock API management routes (admin only)
 // Unified endpoint: /api/bedrock?action=status|test|credentials|usage
