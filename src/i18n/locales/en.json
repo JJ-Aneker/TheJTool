@@ -304,7 +304,21 @@
     "approveUser": "Approve User",
     "changeRole": "Change Role",
     "searchUser": "Search user...",
-    "noUsers": "No registered users"
+    "noUsers": "No registered users",
+    "columnUser": "User",
+    "columnEmail": "Email",
+    "columnRole": "Role",
+    "columnApproved": "Approved",
+    "columnCreated": "Created",
+    "columnActions": "Actions",
+    "columnPermissions": "Permissions",
+    "columnTimestamp": "Timestamp",
+    "columnAction": "Action",
+    "columnDescription": "Description",
+    "columnStatus": "Status",
+    "resetPassword": "Reset password",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User"
   },
 
   "tenantManager": {

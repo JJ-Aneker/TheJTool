@@ -66,7 +66,7 @@ export default function UserManager() {
 
   const columns = [
     {
-      title: 'Usuario',
+      title: t('userManager.columnUser'),
       key: 'user',
       render: (_, record) => (
         <div style={{ fontWeight: '600', fontSize: '14px' }}>
@@ -75,13 +75,13 @@ export default function UserManager() {
       )
     },
     {
-      title: 'Email',
+      title: t('userManager.columnEmail'),
       dataIndex: 'email',
       key: 'email',
       render: (text) => <span style={{ color: 'var(--accent-primary)' }}>{text || '-'}</span>
     },
     {
-      title: 'Rol',
+      title: t('userManager.columnRole'),
       dataIndex: 'role',
       key: 'role',
       render: (role) => {
@@ -101,7 +101,7 @@ export default function UserManager() {
       }
     },
     {
-      title: 'Aprobado',
+      title: t('userManager.columnApproved'),
       dataIndex: 'approved',
       key: 'approved',
       render: (approved) => (
@@ -111,13 +111,13 @@ export default function UserManager() {
       )
     },
     {
-      title: 'Creado',
+      title: t('userManager.columnCreated'),
       dataIndex: 'created_at',
       key: 'created_at',
       render: (text) => text ? new Date(text).toLocaleString('es-ES') : '-'
     },
     {
-      title: 'Acciones',
+      title: t('userManager.columnActions'),
       key: 'actions',
       fixed: 'right',
       width: 100,
@@ -384,7 +384,7 @@ export default function UserManager() {
                     ]}
                     columns={[
                       {
-                        title: 'Rol',
+                        title: t('userManager.columnRole'),
                         dataIndex: 'label',
                         key: 'label',
                         render: (text, record) => {
@@ -462,7 +462,7 @@ export default function UserManager() {
                         width: 150
                       },
                       {
-                        title: 'Usuario',
+                        title: t('userManager.columnUser'),
                         dataIndex: 'user',
                         key: 'user',
                         width: 150
