@@ -3,12 +3,15 @@ import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfir
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LinkOutlined, GlobalOutlined, LockOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
-import { MESSAGES } from '../constants/messages'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import { handleError } from '../utils/errorHandler'
 import { useRole } from '../hooks/useRole'
 import '../styles/tenant-manager.css'
 
 export default function TenantManager() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const [form] = Form.useForm()
   const { user } = useAuth()
   const { isAdmin } = useRole()

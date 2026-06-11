@@ -3,8 +3,13 @@ import { Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, B
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, CheckCircleOutlined, CloseCircleOutlined, MailOutlined, PhoneOutlined, CameraOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
+import { handleError } from '../utils/errorHandler'
 
 export default function UserManager() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [avatarLoading, setAvatarLoading] = useState(false)

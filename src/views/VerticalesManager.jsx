@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import { Table, Modal, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Collapse, InputNumber, Checkbox } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
+import { useTranslation } from 'react-i18next';
+import { useMessages } from '../utils/i18nMessages';
 
 export default function VerticalesManager() {
+  const { t } = useTranslation();
+  const MESSAGES = useMessages();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [verticales, setVerticales] = useState([]);

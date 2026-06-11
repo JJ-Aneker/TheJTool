@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { Card, Button, Space, Modal, Form, Input, Select, message, Spin, Tag, Tooltip, InputNumber, Tabs } from 'antd'
 import { CloudOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
-import { MESSAGES } from '../constants/messages'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import { handleError, logError } from '../utils/errorHandler'
 import { logger } from '../utils/logger'
 import '../styles/anthropic-panel.css'
 
 export default function BedrrockPanel() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const { session } = useAuth()
   const [activeTab, setActiveTab] = useState('status')
   const [loading, setLoading] = useState(false)

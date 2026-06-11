@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react'
 import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm, Tooltip } from 'antd'
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, LinkOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 
 export default function WebServicesManager() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [services, setServices] = useState([])
