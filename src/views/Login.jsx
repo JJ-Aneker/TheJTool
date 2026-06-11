@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 import { Form, Input, Button, message, Spin } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
-import { MESSAGES } from '../constants/messages'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import { handleError } from '../utils/errorHandler'
 
 export default function Login() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [activeView, setActiveView] = useState('login')
@@ -82,12 +85,12 @@ export default function Login() {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: 'Email requerido' },
-            { type: 'email', message: 'Email inválido' }
+            { required: true, message: t('auth.emailRequired') },
+            { type: 'email', message: t('auth.emailInvalid') }
           ]}
         >
           <Input
-            placeholder="Correo electrónico"
+            placeholder={t('auth.emailPlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -95,11 +98,11 @@ export default function Login() {
 
         <Form.Item
           name="password"
-          rules={[{ required: true, message: 'Contraseña requerida' }]}
+          rules={[{ required: true, message: t('auth.passwordRequired') }]}
         >
           <Input
             type="password"
-            placeholder="Contraseña"
+            placeholder={t('auth.passwordPlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -112,7 +115,7 @@ export default function Login() {
             disabled={loading}
             style={{ height: '40px', fontSize: '14px', fontWeight: '600', width: '100%' }}
           >
-            {loading ? '⏳ Entrando...' : 'Entrar'}
+            {loading ? t('auth.loginButtonLoading') : t('auth.loginButton')}
           </button>
         </Form.Item>
 
@@ -124,7 +127,7 @@ export default function Login() {
             }}
             style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginRight: '8px' }}
           >
-            ¿Olvidaste tu contraseña?
+            {t('auth.forgotPassword')}
           </a>
           <span style={{ color: 'var(--text-secondary)' }}>|</span>
           <a
@@ -134,7 +137,7 @@ export default function Login() {
             }}
             style={{ color: 'var(--accent-primary)', cursor: 'pointer', marginLeft: '8px' }}
           >
-            Crear cuenta
+            {t('auth.createAccountLink')}
           </a>
         </div>
       </Form>
@@ -152,10 +155,10 @@ export default function Login() {
       >
         <Form.Item
           name="nombre"
-          rules={[{ required: true, message: 'Nombre requerido' }]}
+          rules={[{ required: true, message: t('auth.firstNameRequired') }]}
         >
           <Input
-            placeholder="Nombre"
+            placeholder={t('auth.firstNamePlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -163,10 +166,10 @@ export default function Login() {
 
         <Form.Item
           name="apellidos"
-          rules={[{ required: true, message: 'Apellidos requeridos' }]}
+          rules={[{ required: true, message: t('auth.lastNameRequired') }]}
         >
           <Input
-            placeholder="Apellidos"
+            placeholder={t('auth.lastNamePlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -174,10 +177,10 @@ export default function Login() {
 
         <Form.Item
           name="phone"
-          rules={[{ required: true, message: 'Teléfono requerido' }]}
+          rules={[{ required: true, message: t('auth.phoneRequired') }]}
         >
           <Input
-            placeholder="Teléfono"
+            placeholder={t('auth.phonePlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -186,12 +189,12 @@ export default function Login() {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: 'Email requerido' },
-            { type: 'email', message: 'Email inválido' }
+            { required: true, message: t('auth.emailRequired') },
+            { type: 'email', message: t('auth.emailInvalid') }
           ]}
         >
           <Input
-            placeholder="Correo electrónico"
+            placeholder={t('auth.emailPlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -200,13 +203,13 @@ export default function Login() {
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: 'Contraseña requerida' },
-            { min: 8, message: 'Mínimo 8 caracteres' }
+            { required: true, message: t('auth.passwordRequired') },
+            { min: 8, message: t('auth.passwordMinLength') }
           ]}
         >
           <Input
             type="password"
-            placeholder="Contraseña"
+            placeholder={t('auth.passwordPlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -214,11 +217,11 @@ export default function Login() {
 
         <Form.Item
           name="confirmPassword"
-          rules={[{ required: true, message: 'Confirma tu contraseña' }]}
+          rules={[{ required: true, message: t('auth.confirmPasswordRequired') }]}
         >
           <Input
             type="password"
-            placeholder="Confirmar contraseña"
+            placeholder={t('auth.confirmPasswordPlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -231,7 +234,7 @@ export default function Login() {
             disabled={loading}
             style={{ height: '40px', fontSize: '14px', fontWeight: '600', width: '100%' }}
           >
-            {loading ? '⏳ Creando...' : 'Crear cuenta'}
+            {loading ? t('auth.signupButtonLoading') : t('auth.signupButton')}
           </button>
         </Form.Item>
 
@@ -243,7 +246,7 @@ export default function Login() {
             }}
             style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
           >
-            ¿Ya tienes cuenta? Inicia sesión
+            {t('auth.alreadyHaveAccountLink')}
           </a>
         </div>
       </Form>
@@ -254,7 +257,7 @@ export default function Login() {
     <Spin spinning={loading}>
       <div style={{ marginTop: '24px', textAlign: 'center', marginBottom: '24px' }}>
         <p style={{ color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.5' }}>
-          Introduce tu correo y recibirás un enlace para restaurarla.
+          {t('auth.recoverPasswordInstructions')}
         </p>
       </div>
       <Form
@@ -266,12 +269,12 @@ export default function Login() {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: 'Email requerido' },
-            { type: 'email', message: 'Email inválido' }
+            { required: true, message: t('auth.emailRequired') },
+            { type: 'email', message: t('auth.emailInvalid') }
           ]}
         >
           <Input
-            placeholder="Correo electrónico"
+            placeholder={t('auth.emailPlaceholder')}
             size="large"
             style={{ height: 'var(--height-input)' }}
           />
@@ -284,7 +287,7 @@ export default function Login() {
             disabled={loading}
             style={{ height: '40px', fontSize: '14px', fontWeight: '600', width: '100%' }}
           >
-            {loading ? '⏳ Enviando...' : 'Enviar enlace'}
+            {loading ? t('auth.recoverButtonLoading') : t('auth.recoverButton')}
           </button>
         </Form.Item>
 
@@ -296,7 +299,7 @@ export default function Login() {
             }}
             style={{ color: 'var(--accent-primary)', cursor: 'pointer' }}
           >
-            ← Volver al inicio de sesión
+            {t('auth.backToLoginLink')}
           </a>
         </div>
       </Form>
