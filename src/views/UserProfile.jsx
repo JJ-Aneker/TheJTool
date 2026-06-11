@@ -4,10 +4,13 @@ import { UserOutlined, CameraOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'
-import { MESSAGES } from '../constants/messages'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import { handleError, logError } from '../utils/errorHandler'
 
 export default function UserProfile() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const [form] = Form.useForm()
   const [passwordForm] = Form.useForm()
   const [loading, setLoading] = useState(false)
@@ -177,7 +180,7 @@ export default function UserProfile() {
   return (
     <>
       <Modal
-        title="Mi Perfil"
+        title={t('userProfile.title')}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
@@ -241,24 +244,24 @@ export default function UserProfile() {
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <Form.Item
-                  label="Nombre"
+                  label={t('userProfile.name')}
                   name="name"
-                  rules={[{ required: true, message: 'Nombre requerido' }]}
+                  rules={[{ required: true, message: t('userProfile.nameRequired') }]}
                 >
-                  <Input placeholder="Tu nombre" />
+                  <Input placeholder={t('userProfile.namePlaceholder')} />
                 </Form.Item>
 
                 <Form.Item
-                  label="Apellido"
+                  label={t('userProfile.surname')}
                   name="surname"
-                  rules={[{ required: true, message: 'Apellido requerido' }]}
+                  rules={[{ required: true, message: t('userProfile.surnameRequired') }]}
                 >
-                  <Input placeholder="Tu apellido" />
+                  <Input placeholder={t('userProfile.surnamePlaceholder')} />
                 </Form.Item>
               </div>
 
               <Form.Item
-                label="Teléfono"
+                label={t('userProfile.phone')}
                 name="phone"
               >
                 <Input placeholder="+34 912 345 678" />

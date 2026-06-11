@@ -267,6 +267,83 @@
     "selectLanguage": "Seleccionar idioma"
   },
 
+  "userProfile": {
+    "title": "Mi Perfil",
+    "name": "Nombre",
+    "surname": "Apellido",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "city": "Ciudad",
+    "province": "Provincia",
+    "postal": "Código Postal",
+    "namePlaceholder": "Tu nombre",
+    "surnamePlaceholder": "Tu apellido",
+    "phonePlaceholder": "+34 912 345 678",
+    "addressPlaceholder": "Calle principal, 123",
+    "cityPlaceholder": "Madrid",
+    "provincePlaceholder": "Madrid",
+    "postalPlaceholder": "28001",
+    "nameRequired": "Nombre requerido",
+    "surnameRequired": "Apellido requerido",
+    "updatePassword": "Actualizar Contraseña",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña",
+    "confirmNewPassword": "Confirmar Nueva Contraseña",
+    "currentPasswordRequired": "Contraseña actual requerida",
+    "newPasswordRequired": "Nueva contraseña requerida",
+    "confirmPasswordRequired": "Confirma la nueva contraseña",
+    "passwordMinLength": "Mínimo 8 caracteres"
+  },
+
+  "userManager": {
+    "title": "Gestión de Usuarios",
+    "approved": "Aprobado",
+    "pending": "Pendiente",
+    "admin": "Administrador",
+    "user": "Usuario",
+    "approveUser": "Aprobar Usuario",
+    "changeRole": "Cambiar Rol",
+    "searchUser": "Buscar usuario...",
+    "noUsers": "No hay usuarios registrados"
+  },
+
+  "tenantManager": {
+    "title": "Gestión de Tenants",
+    "newTenant": "Nuevo Tenant",
+    "editTenant": "Editar Tenant",
+    "serverUrl": "URL del Servidor",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "testConnection": "Probar Conexión",
+    "saveAndTest": "Guardar y Probar",
+    "serverUrlPlaceholder": "https://servidor.thereforeonline.com",
+    "usernamePlaceholder": "usuario",
+    "passwordPlaceholder": "contraseña",
+    "serverUrlRequired": "URL del servidor requerida",
+    "usernameRequired": "Usuario requerido",
+    "passwordRequired": "Contraseña requerida",
+    "searchTenant": "Buscar tenant..."
+  },
+
+  "verticalesManager": {
+    "title": "Gestión de Verticales",
+    "newVertical": "Nueva Vertical",
+    "editVertical": "Editar Vertical",
+    "knowledgeBase": "Base de Conocimiento",
+    "namePlaceholder": "Nombre de la vertical",
+    "descriptionPlaceholder": "Descripción breve",
+    "knowledgePlaceholder": "Base de conocimiento...",
+    "nameRequired": "Nombre requerido",
+    "searchVertical": "Buscar vertical..."
+  },
+
+  "webServices": {
+    "title": "Servicios Web",
+    "testEndpoint": "Probar Endpoint",
+    "response": "Respuesta",
+    "noResponse": "Sin respuesta aún"
+  },
+
   "home": {
     "title": "TheJToolbox - Therefore™ Administration Panel",
     "description": "Panel central para administración de proyectos y configuraciones en Therefore™ DMS",

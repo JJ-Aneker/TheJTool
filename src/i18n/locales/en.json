@@ -267,6 +267,83 @@
     "selectLanguage": "Select language"
   },
 
+  "userProfile": {
+    "title": "My Profile",
+    "name": "Name",
+    "surname": "Surname",
+    "phone": "Phone",
+    "address": "Address",
+    "city": "City",
+    "province": "Province",
+    "postal": "Postal Code",
+    "namePlaceholder": "Your name",
+    "surnamePlaceholder": "Your surname",
+    "phonePlaceholder": "+34 912 345 678",
+    "addressPlaceholder": "Main Street, 123",
+    "cityPlaceholder": "Madrid",
+    "provincePlaceholder": "Madrid",
+    "postalPlaceholder": "28001",
+    "nameRequired": "Name required",
+    "surnameRequired": "Surname required",
+    "updatePassword": "Update Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "currentPasswordRequired": "Current password required",
+    "newPasswordRequired": "New password required",
+    "confirmPasswordRequired": "Confirm new password",
+    "passwordMinLength": "Minimum 8 characters"
+  },
+
+  "userManager": {
+    "title": "User Management",
+    "approved": "Approved",
+    "pending": "Pending",
+    "admin": "Administrator",
+    "user": "User",
+    "approveUser": "Approve User",
+    "changeRole": "Change Role",
+    "searchUser": "Search user...",
+    "noUsers": "No registered users"
+  },
+
+  "tenantManager": {
+    "title": "Tenant Management",
+    "newTenant": "New Tenant",
+    "editTenant": "Edit Tenant",
+    "serverUrl": "Server URL",
+    "username": "Username",
+    "password": "Password",
+    "testConnection": "Test Connection",
+    "saveAndTest": "Save and Test",
+    "serverUrlPlaceholder": "https://server.thereforeonline.com",
+    "usernamePlaceholder": "username",
+    "passwordPlaceholder": "password",
+    "serverUrlRequired": "Server URL required",
+    "usernameRequired": "Username required",
+    "passwordRequired": "Password required",
+    "searchTenant": "Search tenant..."
+  },
+
+  "verticalesManager": {
+    "title": "Vertical Management",
+    "newVertical": "New Vertical",
+    "editVertical": "Edit Vertical",
+    "knowledgeBase": "Knowledge Base",
+    "namePlaceholder": "Vertical name",
+    "descriptionPlaceholder": "Brief description",
+    "knowledgePlaceholder": "Knowledge base...",
+    "nameRequired": "Name required",
+    "searchVertical": "Search vertical..."
+  },
+
+  "webServices": {
+    "title": "Web Services",
+    "testEndpoint": "Test Endpoint",
+    "response": "Response",
+    "noResponse": "No response yet"
+  },
+
   "home": {
     "title": "TheJToolbox - Therefore™ Administration Panel",
     "description": "Central panel for project management and configurations in Therefore™ DMS",
