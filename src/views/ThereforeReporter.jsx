@@ -3,7 +3,8 @@ import { Table, Button, Space, Modal, Form, Input, Select, message, Spin, Popcon
 import { ThunderboltOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ReloadOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
-import { MESSAGES } from '../constants/messages'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import { handleError, logError } from '../utils/errorHandler'
 import { logger } from '../utils/logger'
 import { thereforeService } from '../services/thereforeService'
@@ -11,6 +12,8 @@ import '../styles/therefore-reporter.css'
 import '../styles/therefore-reporter-panels.css'
 
 export default function ThereforeReporter() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const { user } = useAuth()
   const [view, setView] = useState('home') // home, editor, results
   const [loading, setLoading] = useState(false)

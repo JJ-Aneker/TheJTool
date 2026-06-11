@@ -3,6 +3,8 @@ import React from 'react'
 import { Modal, Button, message, Spin } from 'antd'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import '../styles/eform-builder.css'
 
 function newGuid() {
@@ -519,6 +521,8 @@ function FormPreview({ formName, description, submitLabel, sections, colsPerRow 
 }
 
 export default function EFormBuilder() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const { user } = useAuth()
   const [formName, setFormName] = useState('')
   const [description, setDescription] = useState('')
@@ -610,7 +614,7 @@ export default function EFormBuilder() {
       message.success(isNew ? 'âœ“ Formulario guardado' : 'âœ“ Formulario actualizado')
       setXmlModalOpen(false)
     } catch (err) {
-      handleError(err, 'realizar la operación')
+      handleError(err, 'realizar la operaciï¿½n')
     } finally {
       setSaving(false)
     }
@@ -965,7 +969,7 @@ export default function EFormBuilder() {
                             message.success(form.compartido ? 'No compartido' : 'Compartido')
                             loadSavedForms()
                           } catch (err) {
-                            handleError(err, 'realizar la operación')
+                            handleError(err, 'realizar la operaciï¿½n')
                           }
                         }}
                       >
@@ -982,7 +986,7 @@ export default function EFormBuilder() {
                               message.success('Eliminado')
                               loadSavedForms()
                             } catch (err) {
-                              handleError(err, 'realizar la operación')
+                              handleError(err, 'realizar la operaciï¿½n')
                             }
                           }
                         }}

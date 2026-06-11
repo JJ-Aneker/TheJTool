@@ -3,7 +3,8 @@ import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin, Tabs } f
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import '../styles/category-builder.css'
-import { MESSAGES } from '../constants/messages'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import { handleError, logError } from '../utils/errorHandler'
 import { logger } from '../utils/logger'
 
@@ -2004,6 +2005,8 @@ function FieldTableComponent({ fields, expandedRows, setExpandedRows, updateFiel
 }
 
 export default function CategoryBuilder() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const { user } = useAuth()
   const [categories, setCategories] = useState([
     {

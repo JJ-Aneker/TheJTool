@@ -16,6 +16,8 @@ import {
 import { DOCUMENT_TYPES, getDocumentTypeOptions } from '../constants/documentTypes.js'
 import { ganttService } from '../services/ganttService.js'
 import GanttViewer from '../components/GanttViewer.jsx'
+import { useTranslation } from 'react-i18next'
+import { useMessages } from '../utils/i18nMessages'
 import '../styles/document-generator.css'
 
 const { Title, Text, Paragraph } = Typography
@@ -46,6 +48,8 @@ const getFileIcon = (type) => {
 
 // ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 export default function DocumentGenerator() {
+  const { t } = useTranslation()
+  const MESSAGES = useMessages()
   const [currentStep, setCurrentStep]           = useState(0)
   const [files, setFiles]                       = useState([])
   const [vertical, setVertical]                 = useState(null)
