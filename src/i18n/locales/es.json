@@ -265,5 +265,40 @@
     "spanish": "Español",
     "english": "English",
     "selectLanguage": "Seleccionar idioma"
+  },
+
+  "home": {
+    "title": "TheJToolbox - Therefore™ Administration Panel",
+    "description": "Panel central para administración de proyectos y configuraciones en Therefore™ DMS",
+    "activeInstances": "Instancias Activas",
+    "categories": "Categorías",
+    "forms": "Formularios",
+    "workflows": "Workflows",
+    "availableTools": "Herramientas Disponibles",
+    "recentActivity": "Últimas Actividades",
+    "tools": {
+      "eformBuilder": {
+        "title": "Generador de eForms",
+        "description": "Crea y gestiona formularios electrónicos"
+      },
+      "categoryCloner": {
+        "title": "Clonador de Categorías",
+        "description": "Replica estructuras de categorías existentes"
+      },
+      "tenantManager": {
+        "title": "Gestión de Tenants",
+        "description": "Administra instancias de Therefore"
+      },
+      "apiExplorer": {
+        "title": "Explorador API REST",
+        "description": "Explora y prueba endpoints de la API"
+      }
+    },
+    "activities": {
+      "categoriesSync": "Sincronización de categorías completada",
+      "eformImported": "Nuevo formulario eForms importado",
+      "workflowsUpdated": "Configuración de workflows actualizada",
+      "backupGenerated": "Backup de instancias generado"
+    }
   }
 }

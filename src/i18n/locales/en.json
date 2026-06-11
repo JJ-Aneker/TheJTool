@@ -265,5 +265,40 @@
     "spanish": "Español",
     "english": "English",
     "selectLanguage": "Select language"
+  },
+
+  "home": {
+    "title": "TheJToolbox - Therefore™ Administration Panel",
+    "description": "Central panel for project management and configurations in Therefore™ DMS",
+    "activeInstances": "Active Instances",
+    "categories": "Categories",
+    "forms": "Forms",
+    "workflows": "Workflows",
+    "availableTools": "Available Tools",
+    "recentActivity": "Recent Activity",
+    "tools": {
+      "eformBuilder": {
+        "title": "eForm Builder",
+        "description": "Create and manage electronic forms"
+      },
+      "categoryCloner": {
+        "title": "Category Cloner",
+        "description": "Replicate existing category structures"
+      },
+      "tenantManager": {
+        "title": "Tenant Management",
+        "description": "Manage Therefore instances"
+      },
+      "apiExplorer": {
+        "title": "REST API Explorer",
+        "description": "Explore and test API endpoints"
+      }
+    },
+    "activities": {
+      "categoriesSync": "Category synchronization completed",
+      "eformImported": "New eForm imported",
+      "workflowsUpdated": "Workflow configuration updated",
+      "backupGenerated": "Instance backup generated"
+    }
   }
 }

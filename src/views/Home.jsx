@@ -9,31 +9,34 @@ import {
   SettingOutlined,
   HomeOutlined
 } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 
 export default function Home() {
+  const { t } = useTranslation()
+
   const tools = [
     {
       icon: <FormOutlined style={{ fontSize: '32px', color: 'var(--kpi-blue)' }} />,
-      title: 'Generador de eForms',
-      description: 'Crea y gestiona formularios electrónicos',
+      title: t('home.tools.eformBuilder.title'),
+      description: t('home.tools.eformBuilder.description'),
       path: '/eforms'
     },
     {
       icon: <CopyOutlined style={{ fontSize: '32px', color: 'var(--kpi-green)' }} />,
-      title: 'Clonador de Categorías',
-      description: 'Replica estructuras de categorías existentes',
+      title: t('home.tools.categoryCloner.title'),
+      description: t('home.tools.categoryCloner.description'),
       path: '/category-cloner'
     },
     {
       icon: <CloudOutlined style={{ fontSize: '32px', color: 'var(--kpi-amber)' }} />,
-      title: 'Gestión de Tenants',
-      description: 'Administra instancias de Therefore',
+      title: t('home.tools.tenantManager.title'),
+      description: t('home.tools.tenantManager.description'),
       path: '/tenants'
     },
     {
       icon: <ApiOutlined style={{ fontSize: '32px', color: 'var(--kpi-pink)' }} />,
-      title: 'Explorador API REST',
-      description: 'Explora y prueba endpoints de la API',
+      title: t('home.tools.apiExplorer.title'),
+      description: t('home.tools.apiExplorer.description'),
       path: '/api-explorer'
     }
   ]
@@ -41,8 +44,8 @@ export default function Home() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
       <Alert
-        message="TheJToolbox - Therefore™ Administration Panel"
-        description="Panel central para administración de proyectos y configuraciones en Therefore™ DMS"
+        message={t('home.title')}
+        description={t('home.description')}
         type="info"
         showIcon
         style={{ margin: 0, borderRadius: 'var(--radius-lg)' }}
@@ -61,7 +64,7 @@ export default function Home() {
             boxShadow: 'var(--shadow-sm)',
             transition: 'all 200ms ease'
           }}>
-            <div className="kpi-label">Instancias Activas</div>
+            <div className="kpi-label">{t('home.activeInstances')}</div>
             <div className="kpi-value">2</div>
           </div>
         </Col>
@@ -76,7 +79,7 @@ export default function Home() {
             boxShadow: 'var(--shadow-sm)',
             transition: 'all 200ms ease'
           }}>
-            <div className="kpi-label">Categorías</div>
+            <div className="kpi-label">{t('home.categories')}</div>
             <div className="kpi-value">45</div>
           </div>
         </Col>
@@ -91,7 +94,7 @@ export default function Home() {
             boxShadow: 'var(--shadow-sm)',
             transition: 'all 200ms ease'
           }}>
-            <div className="kpi-label">Formularios</div>
+            <div className="kpi-label">{t('home.forms')}</div>
             <div className="kpi-value">128</div>
           </div>
         </Col>
@@ -106,7 +109,7 @@ export default function Home() {
             boxShadow: 'var(--shadow-sm)',
             transition: 'all 200ms ease'
           }}>
-            <div className="kpi-label">Workflows</div>
+            <div className="kpi-label">{t('home.workflows')}</div>
             <div className="kpi-value">67</div>
           </div>
         </Col>
@@ -114,7 +117,7 @@ export default function Home() {
 
       {/* Herramientas */}
       <div>
-        <h2 style={{ marginBottom: '16px', marginTop: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>Herramientas Disponibles</h2>
+        <h2 style={{ marginBottom: '16px', marginTop: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('home.availableTools')}</h2>
         <Row gutter={[16, 16]}>
           {tools.map((tool) => (
             <Col xs={24} sm={12} md={8} lg={6} key={tool.title}>
@@ -158,7 +161,7 @@ export default function Home() {
 
       {/* Actividades */}
       <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-        <h2 style={{ marginBottom: '16px', marginTop: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>Últimas Actividades</h2>
+        <h2 style={{ marginBottom: '16px', marginTop: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('home.recentActivity')}</h2>
         <div style={{
           background: 'var(--bg-card)',
           border: '1px solid var(--border-default)',
@@ -168,10 +171,10 @@ export default function Home() {
           transition: 'all 200ms ease'
         }}>
           <Timeline items={[
-            { children: 'Sincronización de categorías completada' },
-            { children: 'Nuevo formulario eForms importado' },
-            { children: 'Configuración de workflows actualizada' },
-            { children: 'Backup de instancias generado' }
+            { children: t('home.activities.categoriesSync') },
+            { children: t('home.activities.eformImported') },
+            { children: t('home.activities.workflowsUpdated') },
+            { children: t('home.activities.backupGenerated') }
           ]} />
         </div>
       </div>
