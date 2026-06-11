@@ -347,14 +347,14 @@ function AppContent() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: '4px',
-                    transition: 'color 200ms ease'
+                    transition: 'color 200ms ease',
+                    marginLeft: '8px'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
                   onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)'}
                 >
                   <MenuFoldOutlined size={18} />
                 </button>
-              </div>
             </>
           )}
         </div>
