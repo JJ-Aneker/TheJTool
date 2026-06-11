@@ -17,7 +17,8 @@ import {
   SunOutlined,
   MoonOutlined,
   ThunderboltOutlined,
-  KeyOutlined
+  KeyOutlined,
+  GlobalOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useRole } from './hooks/useRole'
@@ -29,7 +30,6 @@ import './i18n'
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
-import LanguageSwitcher from './components/LanguageSwitcher'
 
 // Vistas - Carga inmediata (pequeñas, usadas frecuentemente)
 import Home from './views/Home'
@@ -219,6 +219,41 @@ function AppContent() {
       type: 'divider'
     },
     {
+      key: 'language',
+      icon: <GlobalOutlined />,
+      label: t('language.selectLanguage'),
+      children: [
+        {
+          key: 'es',
+          label: (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🇪🇸</span>
+              <span>{t('language.spanish')}</span>
+              {i18n.language === 'es' && <span style={{ color: '#1677ff' }}>✓</span>}
+            </div>
+          ),
+          onClick: () => {
+            i18n.changeLanguage('es')
+            localStorage.setItem('i18nextLng', 'es')
+          }
+        },
+        {
+          key: 'en',
+          label: (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🇬🇧</span>
+              <span>{t('language.english')}</span>
+              {i18n.language === 'en' && <span style={{ color: '#1677ff' }}>✓</span>}
+            </div>
+          ),
+          onClick: () => {
+            i18n.changeLanguage('en')
+            localStorage.setItem('i18nextLng', 'en')
+          }
+        }
+      ]
+    },
+    {
       key: 'theme',
       icon: isDark ? <SunOutlined /> : <MoonOutlined />,
       label: isDark ? t('common.lightMode') : t('common.darkMode'),
@@ -301,11 +336,7 @@ function AppContent() {
                 <span style={{ color: 'white', fontSize: '30px', fontWeight: '600', lineHeight: '1' }}>theJay</span>
                 <span style={{ color: '#1890ff', fontSize: '11px', letterSpacing: '6.5px', lineHeight: '1' }}>······</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <div style={{ transform: 'scale(0.85)' }}>
-                  <LanguageSwitcher />
-                </div>
-                <button
+              <button
                   onClick={() => handleSidebarToggle(true)}
                   style={{
                     background: 'none',
