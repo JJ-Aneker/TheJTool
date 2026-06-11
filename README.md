@@ -136,9 +136,13 @@ AWS_REGION=us-east-1
 ## 🧪 Scripts Disponibles
 
 ```bash
-# Desarrollo
+# Desarrollo (Windows)
+./start-dev.ps1          # ⚡ Arranca Frontend + Backend (recomendado)
+./stop-dev.ps1           # 🛑 Detiene todos los servidores
+
+# Desarrollo (Manual)
 npm run dev              # Iniciar frontend (puerto 5173)
-node server.js           # Iniciar backend (puerto 3001)
+node server.js           # Iniciar backend (puerto 3002)
 
 # Build
 npm run build            # Build de producción
@@ -146,6 +150,24 @@ npm run preview          # Preview del build
 
 # Utilidades
 npm run lint             # Linter
+```
+
+### 🚀 Start Development (Script Automático)
+
+**Windows PowerShell:**
+```powershell
+.\start-dev.ps1
+```
+
+Este script arranca automáticamente:
+- ✅ Frontend (Vite) en http://localhost:5173
+- ✅ Backend (Express) en http://localhost:3002
+
+Ambos en ventanas separadas para ver los logs.
+
+**Para detener:**
+```powershell
+.\stop-dev.ps1
 ```
 
 ---
