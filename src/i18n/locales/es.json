@@ -1,0 +1,245 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "processing": "Procesando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "download": "Descargar",
+    "upload": "Cargar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "OK",
+    "actions": "Acciones",
+    "status": "Estado",
+    "name": "Nombre",
+    "description": "Descripción",
+    "date": "Fecha",
+    "type": "Tipo",
+    "size": "Tamaño",
+    "view": "Ver",
+    "copy": "Copiar",
+    "duplicate": "Duplicar",
+    "share": "Compartir",
+    "settings": "Configuración",
+    "lightMode": "Modo Claro",
+    "darkMode": "Modo Oscuro"
+  },
+
+  "nav": {
+    "home": "Inicio",
+    "categoryBuilder": "Category Builder",
+    "eformBuilder": "eForm Builder",
+    "documentGenerator": "Document Generator",
+    "thereforeReporter": "Therefore Reporter",
+    "ganttViewer": "Gantt Viewer",
+    "userManager": "Gestión de Usuarios",
+    "tenantManager": "Gestión de Tenants",
+    "verticalesManager": "Gestión de Verticales",
+    "webServices": "Web Services",
+    "userProfile": "Perfil de Usuario",
+    "bedrock": "AWS Bedrock",
+    "logout": "Cerrar Sesión"
+  },
+
+  "auth": {
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "email": "Email",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "rememberMe": "Recordarme",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "loginError": "Error en el inicio de sesión. Verifica email y contraseña.",
+    "logoutSuccess": "Sesión cerrada",
+    "registerSuccess": "Usuario creado exitosamente. Por favor inicia sesión.",
+    "registerError": "Error al crear usuario",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "passwordUpdated": "Contraseña actualizada exitosamente",
+    "resetLinkSent": "Enlace enviado a tu correo electrónico",
+    "unauthorized": "No tienes permisos para realizar esta acción",
+    "fullName": "Nombre completo",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "phone": "Teléfono",
+    "department": "Departamento"
+  },
+
+  "success": {
+    "load": "{{resource}} cargado correctamente",
+    "save": "{{resource}} guardado correctamente",
+    "update": "{{resource}} actualizado correctamente",
+    "delete": "{{resource}} eliminado correctamente",
+    "create": "{{resource}} creado correctamente",
+    "upload": "{{resource}} cargado exitosamente",
+    "connect": "Conexión exitosa",
+    "copy": "Copiado al portapapeles",
+    "export": "Exportado correctamente",
+    "generate": "{{item}} generado correctamente"
+  },
+
+  "error": {
+    "load": "Error al cargar {{resource}}",
+    "save": "Error al guardar {{resource}}",
+    "update": "Error al actualizar {{resource}}",
+    "delete": "Error al eliminar {{resource}}",
+    "create": "Error al crear {{resource}}",
+    "upload": "Error al cargar {{resource}}",
+    "connect": "Error de conexión",
+    "invalidData": "Datos inválidos",
+    "requiredFields": "Por favor completa todos los campos requeridos",
+    "generic": "Ha ocurrido un error"
+  },
+
+  "warning": {
+    "unsavedChanges": "Tienes cambios sin guardar",
+    "noData": "No hay datos disponibles",
+    "confirmDelete": "¿Estás seguro de eliminar {{resource}}?",
+    "confirmAction": "¿Estás seguro de realizar esta acción?"
+  },
+
+  "info": {
+    "inDevelopment": "Función en desarrollo",
+    "noResults": "No se encontraron resultados",
+    "loading": "Cargando...",
+    "processing": "Procesando..."
+  },
+
+  "validation": {
+    "required": "{{field}} es obligatorio",
+    "invalidFormat": "Formato de {{field}} inválido",
+    "minLength": "{{field}} debe tener al menos {{length}} caracteres",
+    "maxLength": "{{field}} no puede exceder {{length}} caracteres",
+    "invalidEmail": "Email inválido",
+    "invalidUrl": "URL inválida"
+  },
+
+  "category": {
+    "title": "Categorías",
+    "nameRequired": "El nombre de la categoría es obligatorio",
+    "xmlGenerated": "✅ XML generado con {{count}} categoría(s)",
+    "loaded": "Categoría cargada",
+    "fields": "Campos",
+    "tabs": "Pestañas",
+    "counters": "Contadores",
+    "templates": "Plantillas"
+  },
+
+  "eform": {
+    "title": "Formularios",
+    "saved": "Formulario guardado",
+    "updated": "Formulario actualizado",
+    "duplicated": "Formulario duplicado",
+    "loaded": "Formulario cargado",
+    "shared": "Compartido",
+    "notShared": "No compartido",
+    "newForm": "Nuevo Formulario",
+    "editForm": "Editar Formulario"
+  },
+
+  "tenant": {
+    "title": "Tenants",
+    "testSuccess": "Conexión al tenant exitosa",
+    "completeFields": "Completa nombre y servidor",
+    "notFound": "Servidor no encontrado",
+    "server": "Servidor",
+    "credentials": "Credenciales",
+    "username": "Usuario",
+    "testConnection": "Probar Conexión"
+  },
+
+  "document": {
+    "title": "Generador de Documentos",
+    "fileTypeError": "Solo se aceptan archivos {{expected}}",
+    "dimensionsWarning": "Dimensiones detectadas: {{actual}}. Recomendado: {{expected}}",
+    "noData": "No hay datos del proyecto para generar el documento",
+    "selectVertical": "Selecciona vertical",
+    "selectDocType": "Selecciona tipo de documento",
+    "uploadFiles": "Subir archivos",
+    "analyze": "Analizar",
+    "generateDocument": "Generar Documento"
+  },
+
+  "gantt": {
+    "title": "Gantt",
+    "success": "Diagrama Gantt generado y descargado exitosamente",
+    "noData": "No hay datos del proyecto para generar Gantt",
+    "export": "Exportar Gantt",
+    "phases": "Fases",
+    "tasks": "Tareas",
+    "duration": "Duración",
+    "startDate": "Fecha inicio",
+    "endDate": "Fecha fin"
+  },
+
+  "bedrock": {
+    "title": "AWS Bedrock",
+    "testSuccess": "Bedrock connection test successful!",
+    "testFailed": "Bedrock test failed",
+    "credentialsUpdated": "AWS Bedrock credentials updated successfully!",
+    "accessKey": "Access Key",
+    "secretKey": "Secret Key",
+    "region": "Región",
+    "testConnection": "Probar Conexión",
+    "status": "Estado"
+  },
+
+  "reporter": {
+    "title": "Therefore Reporter",
+    "completeFields": "Completa todos los campos",
+    "completeDateRange": "Completa rango de fechas",
+    "noDataToExport": "No hay datos para exportar",
+    "csvExported": "CSV exportado",
+    "connected": "✓ Conectado",
+    "category": "Categoría",
+    "dateRange": "Rango de fechas",
+    "from": "Desde",
+    "to": "Hasta",
+    "query": "Consulta",
+    "results": "Resultados",
+    "exportCsv": "Exportar CSV"
+  },
+
+  "user": {
+    "title": "Usuarios",
+    "profile": "Perfil",
+    "role": "Rol",
+    "email": "Email",
+    "approved": "Aprobado",
+    "pending": "Pendiente",
+    "admin": "Administrador",
+    "user": "Usuario",
+    "updateRole": "Actualizar Rol",
+    "updatePassword": "Actualizar Contraseña",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña"
+  },
+
+  "vertical": {
+    "title": "Verticales",
+    "name": "Nombre",
+    "description": "Descripción",
+    "knowledge": "Base de Conocimiento",
+    "newVertical": "Nueva Vertical",
+    "editVertical": "Editar Vertical"
+  },
+
+  "language": {
+    "spanish": "Español",
+    "english": "English",
+    "selectLanguage": "Seleccionar idioma"
+  }
+}

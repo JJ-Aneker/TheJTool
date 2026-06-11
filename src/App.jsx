@@ -22,11 +22,14 @@ import {
 import { useAuth } from './hooks/useAuth'
 import { useRole } from './hooks/useRole'
 import { useTheme } from './hooks/useTheme'
+import { useTranslation } from 'react-i18next'
 import './styles/design-tokens.css'
+import './i18n'
 
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
+import LanguageSwitcher from './components/LanguageSwitcher'
 
 // Vistas - Carga inmediata (pequeñas, usadas frecuentemente)
 import Home from './views/Home'
@@ -48,69 +51,69 @@ const BedrrockPanel = lazy(() => import('./views/BedrrockPanel'))
 const { Sider, Content } = Layout
 
 // Menu items flat structure
-const getMenuItems = (isAdmin = false) => {
+const getMenuItems = (isAdmin = false, t = (key) => key) => {
   const activeItems = [
     {
       key: 'home',
       icon: <HomeOutlined />,
-      label: 'Inicio',
+      label: t('nav.home'),
       path: '/'
     },
     {
       key: 'users',
       icon: <UserOutlined />,
-      label: 'Gestión de Usuarios',
+      label: t('nav.userManager'),
       path: '/users',
       adminOnly: true
     },
     {
       key: 'verticales',
       icon: <AppstoreOutlined />,
-      label: 'Gestión de Verticales',
+      label: t('nav.verticalesManager'),
       path: '/verticales',
       adminOnly: true
     },
     {
       key: 'bedrock',
       icon: <CloudOutlined />,
-      label: 'AWS Bedrock',
+      label: t('nav.bedrock'),
       path: '/bedrock',
       adminOnly: true
     },
     {
       key: 'eforms',
       icon: <FormOutlined />,
-      label: 'Generador de eForms',
+      label: t('nav.eformBuilder'),
       path: '/eforms'
     },
     {
       key: 'category-builder',
       icon: <AppstoreOutlined />,
-      label: 'Category Builder',
+      label: t('nav.categoryBuilder'),
       path: '/category-builder'
     },
     {
       key: 'tenants',
       icon: <CloudOutlined />,
-      label: 'Gestión de Tenants',
+      label: t('nav.tenantManager'),
       path: '/tenants'
     },
     {
       key: 'document-generator',
       icon: <ThunderboltOutlined />,
-      label: 'Generador de Documentación',
+      label: t('nav.documentGenerator'),
       path: '/document-generator'
     },
     {
       key: 'reporter',
       icon: <FileTextOutlined />,
-      label: 'Therefore Reporter',
+      label: t('nav.thereforeReporter'),
       path: '/reporter'
     },
     {
       key: 'web-services',
       icon: <CloudOutlined />,
-      label: 'Servicios Web',
+      label: t('nav.webServices'),
       path: '/web-services'
     }
   ]
@@ -149,6 +152,7 @@ const getMenuItems = (isAdmin = false) => {
 }
 
 function AppContent() {
+  const { t } = useTranslation()
   const [collapsed, setCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebar_collapsed')
     return saved ? JSON.parse(saved) : false
@@ -187,13 +191,13 @@ function AppContent() {
   }
 
   const getSelectedKey = () => {
-    const items = getMenuItems(isAdmin)
+    const items = getMenuItems(isAdmin, t)
     const item = items.find(m => m.path === location.pathname)
     return item ? [item.key] : ['home']
   }
 
   const handleMenuClick = (e) => {
-    const items = getMenuItems(isAdmin)
+    const items = getMenuItems(isAdmin, t)
     const item = items.find(m => m.key === e.key)
     if (item) {
       navigate(item.path)
@@ -208,7 +212,7 @@ function AppContent() {
     {
       key: 'profile',
       icon: <UserSwitchOutlined />,
-      label: 'Mi Perfil',
+      label: t('nav.userProfile'),
       onClick: handleProfileClick
     },
     {
@@ -217,7 +221,7 @@ function AppContent() {
     {
       key: 'theme',
       icon: isDark ? <SunOutlined /> : <MoonOutlined />,
-      label: isDark ? 'Modo Claro' : 'Modo Oscuro',
+      label: isDark ? t('common.lightMode') : t('common.darkMode'),
       onClick: toggleTheme
     },
     {
@@ -226,7 +230,7 @@ function AppContent() {
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: 'Cerrar Sesión',
+      label: t('nav.logout'),
       onClick: () => logout()
     }
   ]
@@ -297,25 +301,29 @@ function AppContent() {
                 <span style={{ color: 'white', fontSize: '30px', fontWeight: '600', lineHeight: '1' }}>theJay</span>
                 <span style={{ color: '#1890ff', fontSize: '11px', letterSpacing: '6.5px', lineHeight: '1' }}>······</span>
               </div>
-              <button
-                onClick={() => handleSidebarToggle(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'rgba(255, 255, 255, 0.45)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '4px',
-                  transition: 'color 200ms ease',
-                  marginLeft: '8px'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)'}
-              >
-                <MenuFoldOutlined size={18} />
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ transform: 'scale(0.85)' }}>
+                  <LanguageSwitcher />
+                </div>
+                <button
+                  onClick={() => handleSidebarToggle(true)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'rgba(255, 255, 255, 0.45)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px',
+                    transition: 'color 200ms ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)'}
+                >
+                  <MenuFoldOutlined size={18} />
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -331,7 +339,7 @@ function AppContent() {
             mode="inline"
             selectedKeys={getSelectedKey()}
             onClick={handleMenuClick}
-            items={getMenuItems(isAdmin)}
+            items={getMenuItems(isAdmin, t)}
             style={{
               background: 'var(--bg-sidebar)',
               borderRight: 'none',

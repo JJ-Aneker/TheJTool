@@ -1,0 +1,245 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "description": "Description",
+    "date": "Date",
+    "type": "Type",
+    "size": "Size",
+    "view": "View",
+    "copy": "Copy",
+    "duplicate": "Duplicate",
+    "share": "Share",
+    "settings": "Settings",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
+  },
+
+  "nav": {
+    "home": "Home",
+    "categoryBuilder": "Category Builder",
+    "eformBuilder": "eForm Builder",
+    "documentGenerator": "Document Generator",
+    "thereforeReporter": "Therefore Reporter",
+    "ganttViewer": "Gantt Viewer",
+    "userManager": "User Management",
+    "tenantManager": "Tenant Management",
+    "verticalesManager": "Vertical Management",
+    "webServices": "Web Services",
+    "userProfile": "User Profile",
+    "bedrock": "AWS Bedrock",
+    "logout": "Logout"
+  },
+
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot your password?",
+    "rememberMe": "Remember me",
+    "loginSuccess": "Login successful",
+    "loginError": "Login error. Check email and password.",
+    "logoutSuccess": "Session closed",
+    "registerSuccess": "User created successfully. Please login.",
+    "registerError": "Error creating user",
+    "passwordMismatch": "Passwords do not match",
+    "passwordUpdated": "Password updated successfully",
+    "resetLinkSent": "Link sent to your email",
+    "unauthorized": "You do not have permission to perform this action",
+    "fullName": "Full Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "department": "Department"
+  },
+
+  "success": {
+    "load": "{{resource}} loaded successfully",
+    "save": "{{resource}} saved successfully",
+    "update": "{{resource}} updated successfully",
+    "delete": "{{resource}} deleted successfully",
+    "create": "{{resource}} created successfully",
+    "upload": "{{resource}} uploaded successfully",
+    "connect": "Connection successful",
+    "copy": "Copied to clipboard",
+    "export": "Exported successfully",
+    "generate": "{{item}} generated successfully"
+  },
+
+  "error": {
+    "load": "Error loading {{resource}}",
+    "save": "Error saving {{resource}}",
+    "update": "Error updating {{resource}}",
+    "delete": "Error deleting {{resource}}",
+    "create": "Error creating {{resource}}",
+    "upload": "Error uploading {{resource}}",
+    "connect": "Connection error",
+    "invalidData": "Invalid data",
+    "requiredFields": "Please complete all required fields",
+    "generic": "An error has occurred"
+  },
+
+  "warning": {
+    "unsavedChanges": "You have unsaved changes",
+    "noData": "No data available",
+    "confirmDelete": "Are you sure you want to delete {{resource}}?",
+    "confirmAction": "Are you sure you want to perform this action?"
+  },
+
+  "info": {
+    "inDevelopment": "Feature in development",
+    "noResults": "No results found",
+    "loading": "Loading...",
+    "processing": "Processing..."
+  },
+
+  "validation": {
+    "required": "{{field}} is required",
+    "invalidFormat": "Invalid {{field}} format",
+    "minLength": "{{field}} must be at least {{length}} characters",
+    "maxLength": "{{field}} cannot exceed {{length}} characters",
+    "invalidEmail": "Invalid email",
+    "invalidUrl": "Invalid URL"
+  },
+
+  "category": {
+    "title": "Categories",
+    "nameRequired": "Category name is required",
+    "xmlGenerated": "✅ XML generated with {{count}} category(ies)",
+    "loaded": "Category loaded",
+    "fields": "Fields",
+    "tabs": "Tabs",
+    "counters": "Counters",
+    "templates": "Templates"
+  },
+
+  "eform": {
+    "title": "Forms",
+    "saved": "Form saved",
+    "updated": "Form updated",
+    "duplicated": "Form duplicated",
+    "loaded": "Form loaded",
+    "shared": "Shared",
+    "notShared": "Not shared",
+    "newForm": "New Form",
+    "editForm": "Edit Form"
+  },
+
+  "tenant": {
+    "title": "Tenants",
+    "testSuccess": "Tenant connection successful",
+    "completeFields": "Complete name and server",
+    "notFound": "Server not found",
+    "server": "Server",
+    "credentials": "Credentials",
+    "username": "Username",
+    "testConnection": "Test Connection"
+  },
+
+  "document": {
+    "title": "Document Generator",
+    "fileTypeError": "Only {{expected}} files are accepted",
+    "dimensionsWarning": "Dimensions detected: {{actual}}. Recommended: {{expected}}",
+    "noData": "No project data to generate document",
+    "selectVertical": "Select vertical",
+    "selectDocType": "Select document type",
+    "uploadFiles": "Upload files",
+    "analyze": "Analyze",
+    "generateDocument": "Generate Document"
+  },
+
+  "gantt": {
+    "title": "Gantt",
+    "success": "Gantt diagram generated and downloaded successfully",
+    "noData": "No project data to generate Gantt",
+    "export": "Export Gantt",
+    "phases": "Phases",
+    "tasks": "Tasks",
+    "duration": "Duration",
+    "startDate": "Start Date",
+    "endDate": "End Date"
+  },
+
+  "bedrock": {
+    "title": "AWS Bedrock",
+    "testSuccess": "Bedrock connection test successful!",
+    "testFailed": "Bedrock test failed",
+    "credentialsUpdated": "AWS Bedrock credentials updated successfully!",
+    "accessKey": "Access Key",
+    "secretKey": "Secret Key",
+    "region": "Region",
+    "testConnection": "Test Connection",
+    "status": "Status"
+  },
+
+  "reporter": {
+    "title": "Therefore Reporter",
+    "completeFields": "Complete all fields",
+    "completeDateRange": "Complete date range",
+    "noDataToExport": "No data to export",
+    "csvExported": "CSV exported",
+    "connected": "✓ Connected",
+    "category": "Category",
+    "dateRange": "Date Range",
+    "from": "From",
+    "to": "To",
+    "query": "Query",
+    "results": "Results",
+    "exportCsv": "Export CSV"
+  },
+
+  "user": {
+    "title": "Users",
+    "profile": "Profile",
+    "role": "Role",
+    "email": "Email",
+    "approved": "Approved",
+    "pending": "Pending",
+    "admin": "Administrator",
+    "user": "User",
+    "updateRole": "Update Role",
+    "updatePassword": "Update Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password"
+  },
+
+  "vertical": {
+    "title": "Verticals",
+    "name": "Name",
+    "description": "Description",
+    "knowledge": "Knowledge Base",
+    "newVertical": "New Vertical",
+    "editVertical": "Edit Vertical"
+  },
+
+  "language": {
+    "spanish": "Español",
+    "english": "English",
+    "selectLanguage": "Select language"
+  }
+}
