@@ -25,7 +25,7 @@ import { useRole } from './hooks/useRole'
 import { useTheme } from './hooks/useTheme'
 import { useTranslation } from 'react-i18next'
 import './styles/design-tokens.css'
-import './i18n'
+import i18n from './i18n'
 
 // Componentes
 import ProtectedRoute from './components/ProtectedRoute'
