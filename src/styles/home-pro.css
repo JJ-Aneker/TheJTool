@@ -237,7 +237,7 @@
 }
 
 .card-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
   display: flex;
@@ -483,8 +483,12 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .home-pro {
+    padding: 0 16px 24px 16px;
+  }
+
   .hero-content {
-    padding: 28px 24px;
+    padding: 24px 20px;
   }
 
   .hero-subtitle {
@@ -519,5 +523,9 @@
 
   .status-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-card .ant-card-body {
+    padding: 16px;
   }
 }
