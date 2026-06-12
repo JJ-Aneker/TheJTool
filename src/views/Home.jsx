@@ -213,7 +213,12 @@ export default function Home() {
             <div className="reports-list">
               {recentReports.length > 0 ? (
                 recentReports.slice(0, 4).map((report, index) => (
-                  <div key={report.id || index} className="report-item">
+                  <div
+                    key={report.id || index}
+                    className="report-item"
+                    onClick={() => navigate('/reporter')}
+                    title="Click para ir a Therefore Reporter"
+                  >
                     <div className="report-info">
                       <div className="report-name">{report.report_name || 'Sin nombre'}</div>
                       <div className="report-meta">
@@ -248,7 +253,12 @@ export default function Home() {
             <div className="documents-list">
               {recentDocs.length > 0 ? (
                 recentDocs.slice(0, 4).map((doc, index) => (
-                  <div key={doc.id || index} className="doc-item">
+                  <div
+                    key={doc.id || index}
+                    className="doc-item"
+                    onClick={() => navigate('/document-generator')}
+                    title="Click para ir a Document Generator"
+                  >
                     <div className="doc-icon">{documentTypeIcons[doc.document_type] || '📄'}</div>
                     <div className="doc-info">
                       <div className="doc-name">{doc.title}</div>
