@@ -32,7 +32,7 @@ class ThereforeService {
         this.tokens[url] = response.data.Token
         return response.data.Token
       }
-      throw new Error('No token received from server')
+      throw new Error('No se recibió token del servidor')
     } catch (err) {
       if (err.response?.status === 401) {
         throw new Error('Credenciales inválidas. Verifica usuario y contraseña del Therefore.')

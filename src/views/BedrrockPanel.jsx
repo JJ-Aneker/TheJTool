@@ -94,13 +94,13 @@ export default function BedrrockPanel() {
 
       if (data.success) {
         setTestResult({ success: true, ...data })
-        message.success('Bedrock connection test successful!')
+        message.success(MESSAGES.BEDROCK.TEST_SUCCESS)
       } else {
         setTestResult({ success: false, error: data.error })
-        message.error('Bedrock test failed: ' + data.error)
+        message.error(MESSAGES.BEDROCK.TEST_FAILED + ': ' + data.error)
       }
     } catch (err) {
-      message.error('Error testing Bedrock: ' + err.message)
+      message.error('Error al probar Bedrock: ' + err.message)
       setTestResult({ success: false, error: err.message })
     } finally {
       setTestLoading(false)
@@ -122,7 +122,7 @@ export default function BedrrockPanel() {
       const data = await resp.json()
 
       if (resp.ok) {
-        message.success('AWS Bedrock credentials updated successfully!')
+        message.success(MESSAGES.BEDROCK.CREDENTIALS_UPDATED)
         setIsModalVisible(false)
         form.resetFields()
         loadBedrockStatus()
@@ -130,24 +130,24 @@ export default function BedrrockPanel() {
         message.error('Error: ' + data.error)
       }
     } catch (err) {
-      message.error('Error updating credentials: ' + err.message)
+      message.error('Error al actualizar credenciales: ' + err.message)
     } finally {
       setLoading(false)
     }
   }
 
   const periodOptions = [
-    { label: 'Today', value: 1 },
-    { label: '7 days', value: 7 },
-    { label: '30 days', value: 30 },
-    { label: 'All time', value: 365 }
+    { label: 'Hoy', value: 1 },
+    { label: '7 días', value: 7 },
+    { label: '30 días', value: 30 },
+    { label: 'Todo', value: 365 }
   ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '20px', height: '100%', overflow: 'auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <h1 className="page-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-          <CloudOutlined /> AWS Bedrock Management
+          <CloudOutlined /> Gestión AWS Bedrock
         </h1>
         <Tag color="cyan">Converse API</Tag>
       </div>
@@ -158,17 +158,17 @@ export default function BedrrockPanel() {
         items={[
           {
             key: 'status',
-            label: 'Credentials & Status',
+            label: 'Credenciales y Estado',
             children: <StatusTab bedrockStatus={bedrockStatus} testLoading={testLoading} testResult={testResult} handleTest={handleTest} setIsModalVisible={setIsModalVisible} showKeys={showKeys} setShowKeys={setShowKeys} />
           },
           {
             key: 'usage',
-            label: 'Usage & Costs',
+            label: 'Uso y Costes',
             children: <UsageTab loading={loading} usage={usage} history={history} period={period} setPeriod={setPeriod} periodOptions={periodOptions} onRefresh={loadUsage} />
           },
           {
             key: 'inference-profiles',
-            label: 'Inference Profiles',
+            label: 'Perfiles de Inferencia',
             children: <InferenceProfilesTab bedrockStatus={bedrockStatus} />
           }
         ]}
@@ -176,7 +176,7 @@ export default function BedrrockPanel() {
 
       {/* Update Credentials Modal */}
       <Modal
-        title="Update AWS Bedrock Credentials"
+        title="Actualizar Credenciales AWS Bedrock"
         open={isModalVisible}
         onOk={() => form.submit()}
         onCancel={() => setIsModalVisible(false)}
@@ -190,14 +190,14 @@ export default function BedrrockPanel() {
           <Form.Item
             label="AWS Access Key ID"
             name="accessKeyId"
-            rules={[{ required: true, message: 'Access Key ID required' }]}
+            rules={[{ required: true, message: 'Access Key ID requerido' }]}
           >
             <Input placeholder="AKIA..." />
           </Form.Item>
           <Form.Item
             label="AWS Secret Access Key"
             name="secretAccessKey"
-            rules={[{ required: true, message: 'Secret Access Key required' }]}
+            rules={[{ required: true, message: 'Secret Access Key requerido' }]}
           >
             <Input.Password placeholder="••••••••" />
           </Form.Item>
@@ -205,7 +205,7 @@ export default function BedrrockPanel() {
             label="AWS Region"
             name="region"
             initialValue="eu-south-2"
-            rules={[{ required: true, message: 'Region required' }]}
+            rules={[{ required: true, message: 'Región requerida' }]}
           >
             <Select
               options={[
@@ -218,7 +218,7 @@ export default function BedrrockPanel() {
             />
           </Form.Item>
           <Form.Item style={{ marginBottom: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>
-            ⚠️ These credentials will be stored securely and used for Bedrock API calls.
+            ⚠️ Estas credenciales se almacenarán de forma segura y se usarán para llamadas a la API de Bedrock.
           </Form.Item>
         </Form>
       </Modal>
@@ -228,19 +228,19 @@ export default function BedrrockPanel() {
 
 function StatusTab({ bedrockStatus, testLoading, testResult, handleTest, setIsModalVisible, showKeys, setShowKeys }) {
   return (
-    <Card title="AWS Bedrock Credentials & Connection Status" className="anthropic-card">
+    <Card title="Credenciales AWS Bedrock y Estado de Conexión" className="anthropic-card">
       <Space direction="vertical" style={{ width: '100%' }} size="large">
         {/* Status Badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           {bedrockStatus?.hasCredentials ? (
-            <Tag icon={<CheckCircleOutlined />} color="success">AWS Credentials Valid</Tag>
+            <Tag icon={<CheckCircleOutlined />} color="success">Credenciales AWS Válidas</Tag>
           ) : (
             <Tag icon={<CloseCircleOutlined />} color="error">
-              {bedrockStatus?.error ? 'AWS Unavailable' : 'Credentials Not Configured'}
+              {bedrockStatus?.error ? 'AWS No Disponible' : 'Credenciales No Configuradas'}
             </Tag>
           )}
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-            Last checked: {bedrockStatus?.timestamp ? new Date(bedrockStatus.timestamp).toLocaleString() : 'Never'}
+            Última verificación: {bedrockStatus?.timestamp ? new Date(bedrockStatus.timestamp).toLocaleString() : 'Nunca'}
           </span>
           {bedrockStatus?.error && (
             <span style={{ fontSize: '11px', color: 'var(--kpi-red)' }}>
@@ -279,10 +279,10 @@ function StatusTab({ bedrockStatus, testLoading, testResult, handleTest, setIsMo
             onClick={handleTest}
             disabled={testLoading}
           >
-            {testLoading ? '⏳ Testing...' : 'Test Connection'}
+            {testLoading ? '⏳ Probando...' : 'Probar Conexión'}
           </button>
           <button className="btn-default" onClick={() => setIsModalVisible(true)}>
-            Update Credentials
+            Actualizar Credenciales
           </button>
         </div>
 
@@ -296,14 +296,14 @@ function StatusTab({ bedrockStatus, testLoading, testResult, handleTest, setIsMo
           }}>
             {testResult.success ? (
               <>
-                <div style={{ fontWeight: 500, color: 'var(--kpi-green)' }}>✓ Test Successful</div>
+                <div style={{ fontWeight: 500, color: 'var(--kpi-green)' }}>✓ Prueba Exitosa</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  Model: {testResult.model} | Input: {testResult.inputTokens} | Output: {testResult.outputTokens} | Duration: {testResult.durationMs}ms
+                  Modelo: {testResult.model} | Entrada: {testResult.inputTokens} | Salida: {testResult.outputTokens} | Duración: {testResult.durationMs}ms
                 </div>
               </>
             ) : (
               <>
-                <div style={{ fontWeight: 500, color: 'var(--kpi-red)' }}>✗ Test Failed</div>
+                <div style={{ fontWeight: 500, color: 'var(--kpi-red)' }}>✗ Prueba Fallida</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{testResult.error}</div>
               </>
             )}
@@ -321,7 +321,7 @@ function UsageTab({ loading, usage, history, period, setPeriod, periodOptions, o
         {/* Period Selector & Refresh */}
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <label style={{ fontSize: '12px', fontWeight: 500 }}>Period:</label>
+            <label style={{ fontSize: '12px', fontWeight: 500 }}>Período:</label>
             <Select
               value={period}
               onChange={setPeriod}
@@ -335,7 +335,7 @@ function UsageTab({ loading, usage, history, period, setPeriod, periodOptions, o
             disabled={loading}
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            🔄 Refresh
+            🔄 Refrescar
           </button>
         </div>
 
@@ -347,22 +347,22 @@ function UsageTab({ loading, usage, history, period, setPeriod, periodOptions, o
             gap: '16px'
           }}>
             <StatCard
-              title="Input Tokens"
+              title="Tokens Entrada"
               value={usage.summary.totalInputTokens.toLocaleString()}
               color="blue"
             />
             <StatCard
-              title="Output Tokens"
+              title="Tokens Salida"
               value={usage.summary.totalOutputTokens.toLocaleString()}
               color="green"
             />
             <StatCard
-              title="Total Cost (USD)"
+              title="Coste Total (USD)"
               value={`$${usage.summary.totalCost.toFixed(2)}`}
               color="amber"
             />
             <StatCard
-              title="Total Invocations"
+              title="Total Invocaciones"
               value={usage.summary.totalCalls.toLocaleString()}
               color="purple"
             />
@@ -370,9 +370,9 @@ function UsageTab({ loading, usage, history, period, setPeriod, periodOptions, o
           ) : (
             <Card style={{ textAlign: 'center', padding: '40px 20px' }}>
               <div style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-                <div style={{ marginBottom: '12px' }}>📊 No usage data available for the selected period</div>
+                <div style={{ marginBottom: '12px' }}>📊 No hay datos de uso disponibles para el período seleccionado</div>
                 <button className="btn-default" onClick={onRefresh} disabled={loading}>
-                  {loading ? 'Loading...' : 'Load Usage Data'}
+                  {loading ? 'Cargando...' : 'Cargar Datos de Uso'}
                 </button>
               </div>
             </Card>
@@ -383,21 +383,21 @@ function UsageTab({ loading, usage, history, period, setPeriod, periodOptions, o
           <>
             {usage.byModel?.length > 0 && (
               <div>
-                <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px', color: 'var(--text-primary)' }}>Usage by Model</h3>
+                <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px', color: 'var(--text-primary)' }}>Uso por Modelo</h3>
                 <UsageTable data={usage.byModel} isModel={true} />
               </div>
             )}
 
             {usage.byModule?.length > 0 && (
               <div>
-                <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px', color: 'var(--text-primary)' }}>Usage by Module</h3>
+                <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px', color: 'var(--text-primary)' }}>Uso por Módulo</h3>
                 <UsageTable data={usage.byModule} />
               </div>
             )}
 
             {usage.byUser?.length > 0 && (
               <div>
-                <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px' }}>Usage by User</h3>
+                <h3 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px' }}>Uso por Usuario</h3>
                 <UsageTable data={usage.byUser} isUser={true} />
               </div>
             )}
@@ -406,7 +406,7 @@ function UsageTab({ loading, usage, history, period, setPeriod, periodOptions, o
 
         {/* Daily History Chart */}
         {history?.history && (
-          <Card title="Daily Cost History">
+          <Card title="Historial de Coste Diario">
             <HistoryChart data={history.history} />
           </Card>
         )}
@@ -420,7 +420,7 @@ function InferenceProfilesTab({ bedrockStatus }) {
     return (
       <Card>
         <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-          Configure AWS credentials to see available Inference Profiles
+          Configura credenciales AWS para ver Perfiles de Inferencia disponibles
         </div>
       </Card>
     )
@@ -482,12 +482,12 @@ function UsageTable({ data, isUser = false, isModel = false }) {
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border-default)' }}>
             <th style={{ padding: '8px', textAlign: 'left', fontWeight: 600 }}>
-              {isModel ? 'Model' : isUser ? 'User' : 'Module'}
+              {isModel ? 'Modelo' : isUser ? 'Usuario' : 'Módulo'}
             </th>
-            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Calls</th>
-            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Input Tokens</th>
-            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Output Tokens</th>
-            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Cost (USD)</th>
+            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Llamadas</th>
+            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Tokens Entrada</th>
+            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Tokens Salida</th>
+            <th style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>Coste (USD)</th>
           </tr>
         </thead>
         <tbody>
@@ -512,7 +512,7 @@ function UsageTable({ data, isUser = false, isModel = false }) {
 
 function HistoryChart({ data }) {
   if (!data || data.length === 0) {
-    return <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No data</div>
+    return <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Sin datos</div>
   }
 
   const maxCost = Math.max(...data.map(d => d.cost), 1)

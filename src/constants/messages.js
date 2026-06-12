@@ -105,9 +105,9 @@ export const MESSAGES = {
   },
 
   BEDROCK: {
-    TEST_SUCCESS: 'Bedrock connection test successful!',
-    TEST_FAILED: 'Bedrock test failed',
-    CREDENTIALS_UPDATED: 'AWS Bedrock credentials updated successfully!',
+    TEST_SUCCESS: 'Prueba de conexión Bedrock exitosa',
+    TEST_FAILED: 'Prueba de Bedrock fallida',
+    CREDENTIALS_UPDATED: 'Credenciales AWS Bedrock actualizadas correctamente',
   },
 
   REPORTER: {

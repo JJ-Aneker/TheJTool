@@ -217,7 +217,7 @@ export default function Home() {
                     key={report.id || index}
                     className="report-item"
                     onClick={() => navigate('/reporter')}
-                    title="Click para ir a Therefore Reporter"
+                    title="Haz click para ir a Therefore Reporter"
                   >
                     <div className="report-info">
                       <div className="report-name">{report.report_name || 'Sin nombre'}</div>
@@ -257,7 +257,7 @@ export default function Home() {
                     key={doc.id || index}
                     className="doc-item"
                     onClick={() => navigate('/document-generator')}
-                    title="Click para ir a Document Generator"
+                    title="Haz click para ir a Document Generator"
                   >
                     <div className="doc-icon">{documentTypeIcons[doc.document_type] || '📄'}</div>
                     <div className="doc-info">
@@ -354,7 +354,7 @@ export default function Home() {
                       labelFormatter={(date) => new Date(date).toLocaleDateString('es-ES')}
                     />
                     <Legend wrapperStyle={{ fontSize: '12px' }} />
-                    <Line type="monotone" dataKey="reports" stroke="#3b82f6" name="Reports" strokeWidth={2} />
+                    <Line type="monotone" dataKey="reports" stroke="#3b82f6" name="Reportes" strokeWidth={2} />
                     <Line type="monotone" dataKey="documents" stroke="#10b981" name="Documentos" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
