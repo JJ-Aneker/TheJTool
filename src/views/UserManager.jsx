@@ -3,6 +3,7 @@ import { Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, B
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, CheckCircleOutlined, CloseCircleOutlined, MailOutlined, PhoneOutlined, CameraOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'
+import { activateUserEmail, approveUser, activateAndApproveUser } from '../services/adminService'
 import { useTranslation } from 'react-i18next'
 import { useMessages } from '../utils/i18nMessages'
 import { handleError } from '../utils/errorHandler'
@@ -43,13 +44,38 @@ export default function UserManager() {
   const loadUsers = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
+      // Get profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      setUsers(data || [])
+      if (profilesError) throw profilesError
+
+      // Get auth users to check email confirmation status
+      // We'll use the admin API endpoint to get this info
+      const usersWithStatus = await Promise.all(
+        (profiles || []).map(async (profile) => {
+          try {
+            const response = await fetch(`http://localhost:3002/api/admin/user-status/${profile.user_id}`)
+            const result = await response.json()
+
+            if (result.success) {
+              return {
+                ...profile,
+                email_confirmed: result.status.emailConfirmed,
+                email_confirmed_at: result.status.emailConfirmedAt
+              }
+            }
+          } catch (err) {
+            console.error('Error fetching user status:', err)
+          }
+          // Fallback if status fetch fails
+          return { ...profile, email_confirmed: false }
+        })
+      )
+
+      setUsers(usersWithStatus || [])
     } catch (err) {
       handleError(err, 'cargar usuarios', false); message.error(MESSAGES.ERROR.LOAD('usuarios') + ': ' + err.message)
     } finally {
@@ -79,6 +105,16 @@ export default function UserManager() {
       dataIndex: 'email',
       key: 'email',
       render: (text) => <span style={{ color: 'var(--accent-primary)' }}>{text || '-'}</span>
+    },
+    {
+      title: 'Email Estado',
+      dataIndex: 'email_confirmed',
+      key: 'email_confirmed',
+      render: (confirmed) => (
+        <Tag icon={confirmed ? <CheckCircleOutlined /> : <MailOutlined />} color={confirmed ? 'cyan' : 'orange'}>
+          {confirmed ? 'Confirmado' : 'Pendiente'}
+        </Tag>
+      )
     },
     {
       title: t('userManager.columnRole'),
@@ -115,6 +151,58 @@ export default function UserManager() {
       dataIndex: 'created_at',
       key: 'created_at',
       render: (text) => text ? new Date(text).toLocaleString('es-ES') : '-'
+    },
+    {
+      title: 'Acciones Rápidas',
+      key: 'quick_actions',
+      width: 150,
+      render: (_, record) => (
+        <Space size="small" direction="vertical" style={{ width: '100%' }}>
+          {!record.email_confirmed && !record.approved && (
+            <Tooltip title="Activar email y aprobar usuario de una vez">
+              <Button
+                size="small"
+                type="primary"
+                block
+                onClick={() => handleActivateAndApprove(record)}
+                style={{ fontSize: '11px' }}
+              >
+                ✓ Activar y Aprobar
+              </Button>
+            </Tooltip>
+          )}
+          {!record.email_confirmed && record.approved && (
+            <Tooltip title="Confirmar email manualmente">
+              <Button
+                size="small"
+                block
+                onClick={() => handleActivateEmail(record)}
+                style={{ fontSize: '11px' }}
+              >
+                ✓ Activar Email
+              </Button>
+            </Tooltip>
+          )}
+          {record.email_confirmed && !record.approved && (
+            <Tooltip title="Aprobar acceso del usuario">
+              <Button
+                size="small"
+                type="primary"
+                block
+                onClick={() => handleApproveUser(record)}
+                style={{ fontSize: '11px' }}
+              >
+                ✓ Aprobar
+              </Button>
+            </Tooltip>
+          )}
+          {record.email_confirmed && record.approved && (
+            <Tag color="success" style={{ margin: 0 }}>
+              <CheckCircleOutlined /> Activo
+            </Tag>
+          )}
+        </Space>
+      )
     },
     {
       title: t('userManager.columnActions'),
@@ -223,6 +311,57 @@ export default function UserManager() {
         message.success(`Enlace de restablecimiento enviado a ${user.email}`)
       }
     })
+  }
+
+  const handleActivateEmail = async (user) => {
+    setLoading(true)
+    try {
+      const result = await activateUserEmail(user.user_id)
+      if (result.success) {
+        message.success(`Email de ${user.email} activado exitosamente`)
+        loadUsers()
+      } else {
+        message.error('Error al activar email: ' + result.error)
+      }
+    } catch (err) {
+      message.error('Error: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleApproveUser = async (user) => {
+    setLoading(true)
+    try {
+      const result = await approveUser(user.user_id)
+      if (result.success) {
+        message.success(`Usuario ${user.name} ${user.surname} aprobado exitosamente`)
+        loadUsers()
+      } else {
+        message.error('Error al aprobar usuario: ' + result.error)
+      }
+    } catch (err) {
+      message.error('Error: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleActivateAndApprove = async (user) => {
+    setLoading(true)
+    try {
+      const result = await activateAndApproveUser(user.user_id)
+      if (result.success) {
+        message.success(`Usuario ${user.name} ${user.surname} activado y aprobado. Ya puede acceder a la aplicación.`)
+        loadUsers()
+      } else {
+        message.error('Error: ' + result.error)
+      }
+    } catch (err) {
+      message.error('Error: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const createNewUser = () => {
