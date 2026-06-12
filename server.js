@@ -22,6 +22,7 @@ import exportGanttHandler from './api/export-gantt.js';
 import bedrockHandler from './api/bedrock.js';
 import verticalesHandlers from './api/verticales.js';
 import dashboardRouter from './routes/dashboard.js';
+import adminRouter from './routes/admin.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -114,6 +115,9 @@ app.delete('/api/verticales/:id', verticalesHandlers.deleteVertical);
 
 // Dashboard routes (real data for Home view)
 app.use('/api/dashboard', dashboardRouter);
+
+// Admin routes (user management with Supabase Admin API)
+app.use('/api/admin', adminRouter);
 
 // Start server
 app.listen(PORT, () => {
