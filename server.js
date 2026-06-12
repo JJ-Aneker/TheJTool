@@ -21,6 +21,7 @@ import exportGanttHandler from './api/export-gantt.js';
 // import updateUserRoleHandler from './api/update-user-role.js'; // DISABLED: file not found
 import bedrockHandler from './api/bedrock.js';
 import verticalesHandlers from './api/verticales.js';
+import dashboardRouter from './routes/dashboard.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -110,6 +111,9 @@ app.post('/api/verticales', verticalesHandlers.createVertical);
 app.get('/api/verticales/:id', verticalesHandlers.getVerticalById);
 app.put('/api/verticales/:id', verticalesHandlers.updateVertical);
 app.delete('/api/verticales/:id', verticalesHandlers.deleteVertical);
+
+// Dashboard routes (real data for Home view)
+app.use('/api/dashboard', dashboardRouter);
 
 // Start server
 app.listen(PORT, () => {

@@ -327,8 +327,60 @@ export default function DocumentGenerator() {
       setDocxUrl(URL.createObjectURL(blob))
       setDocxFilename(data.filename)
       setCurrentStep(2)
+
+      // Log document generation
+      if (user) {
+        const documentTypeMap = {
+          'efdt': 'EFDT',
+          'requirements': 'Requirements',
+          'budget': 'Budget',
+          'commercial': 'Commercial',
+          'cr': 'CR'
+        }
+
+        const title = projectData?.titulo || data.filename || 'Documento sin título'
+        const estimatedPages = data.pages || Math.ceil(blob.size / 50000) // Rough estimate: 50KB per page
+
+        await logDocumentGeneration({
+          userId: user.id,
+          userName: user.email?.split('@')[0] || 'Usuario',
+          documentType: documentTypeMap[tipoDoc] || tipoDoc.toUpperCase(),
+          title: title,
+          pages: estimatedPages,
+          status: 'completed',
+          metadata: {
+            vertical: vertical,
+            has_cover: !!portada || useDefaultPortada,
+            file_size_bytes: blob.size
+          }
+        })
+      }
     } catch (err) {
       setBuildError(err.message)
+
+      // Log failed generation
+      if (user) {
+        const documentTypeMap = {
+          'efdt': 'EFDT',
+          'requirements': 'Requirements',
+          'budget': 'Budget',
+          'commercial': 'Commercial',
+          'cr': 'CR'
+        }
+
+        await logDocumentGeneration({
+          userId: user.id,
+          userName: user.email?.split('@')[0] || 'Usuario',
+          documentType: documentTypeMap[tipoDoc] || tipoDoc.toUpperCase(),
+          title: projectData?.titulo || 'Documento',
+          pages: 0,
+          status: 'failed',
+          metadata: {
+            error: err.message,
+            vertical: vertical
+          }
+        })
+      }
     } finally {
       setBuilding(false)
     }

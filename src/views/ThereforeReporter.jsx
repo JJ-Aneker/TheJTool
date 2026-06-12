@@ -8,6 +8,7 @@ import { useMessages } from '../utils/i18nMessages'
 import { handleError, logError } from '../utils/errorHandler'
 import { logger } from '../utils/logger'
 import { thereforeService } from '../services/thereforeService'
+import { logReportExecution } from '../services/dashboardService'
 import '../styles/therefore-reporter.css'
 import '../styles/therefore-reporter-panels.css'
 
@@ -417,6 +418,10 @@ export default function ThereforeReporter() {
 
     setResultsState(s => ({ ...s, loading: true, progress: { pct: 0, label: 'Preparando...' } }))
 
+    const startTime = Date.now()
+    let executionSuccess = false
+    let resultCount = 0
+
     try {
       const tenant = tenants.find(t => t.id === resultsState.profile.tenant_id)
       const { headers, baseUrl } = await thereforeService.connect(
@@ -460,6 +465,9 @@ export default function ThereforeReporter() {
 
       if (error) throw new Error(error)
 
+      resultCount = rows.length
+      executionSuccess = true
+
       setResultsState(s => ({
         ...s,
         rows,
@@ -468,11 +476,46 @@ export default function ThereforeReporter() {
         progress: { pct: 100, label: 'Completado' }
       }))
 
+      // Log successful execution
+      const executionTime = Date.now() - startTime
+      const categoryName = resultsState.profile.cat_names?.[resultsState.profile.saved_cat_nos[0]] || 'Multiple'
+
+      await logReportExecution({
+        userId: user.id,
+        userName: user.email?.split('@')[0] || 'Usuario',
+        tenantName: tenant.nombre,
+        reportName: resultsState.profile.nombre,
+        categoryNo: resultsState.profile.saved_cat_nos[0],
+        categoryName: categoryName,
+        condition: `${dateField}: ${dateFrom} TO ${dateTo}`,
+        resultCount: resultCount,
+        executionTimeMs: executionTime,
+        status: 'success'
+      })
+
       renderDashboard()
     } catch (err) {
       handleError(err, 'Query error')
       message.error('Error: ' + err.message)
       setResultsState(s => ({ ...s, loading: false }))
+
+      // Log failed execution
+      if (user) {
+        const tenant = tenants.find(t => t.id === resultsState.profile.tenant_id)
+        await logReportExecution({
+          userId: user.id,
+          userName: user.email?.split('@')[0] || 'Usuario',
+          tenantName: tenant?.nombre || 'Unknown',
+          reportName: resultsState.profile.nombre,
+          categoryNo: resultsState.profile.saved_cat_nos[0] || 0,
+          categoryName: 'Unknown',
+          condition: `${dateField}: ${dateFrom} TO ${dateTo}`,
+          resultCount: 0,
+          executionTimeMs: Date.now() - startTime,
+          status: 'error',
+          errorMessage: err.message
+        })
+      }
     }
   }
 

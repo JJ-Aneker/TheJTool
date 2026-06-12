@@ -1,0 +1,20 @@
+fieldName,label,type,required,placeholder,defaultValue,options,validation,helpText
+projectName,Nombre del Proyecto,textfield,true,Ingrese el nombre del proyecto,,,,Campo obligatorio
+projectCode,Código del Proyecto,textfield,true,Ej: PROJ-2026-001,,,,"Código único del proyecto"
+description,Descripción,textarea,false,Describa brevemente el proyecto,,,,Máximo 500 caracteres
+startDate,Fecha de Inicio,datetime,true,,,,,Fecha de inicio del proyecto
+endDate,Fecha de Fin,datetime,false,,,,,Fecha estimada de finalización
+budget,Presupuesto,number,true,0.00,0,,,Presupuesto total del proyecto en EUR
+priority,Prioridad,select,true,,Normal,"Baja|Normal|Alta|Urgente",,"Nivel de prioridad"
+status,Estado,select,true,,Pendiente,"Pendiente|En Progreso|En Revisión|Completado|Cancelado",,"Estado actual del proyecto"
+department,Departamento,select,true,,,IT|HR|Finance|Sales|Operations|Legal,,"Departamento responsable"
+projectManager,Responsable del Proyecto,textfield,true,Nombre del responsable,,,,Persona a cargo del proyecto
+team,Equipo,textarea,false,"Miembros del equipo (uno por línea)",,,,Lista de miembros del equipo
+objectives,Objetivos,textarea,true,Liste los objetivos principales,,,,Objetivos clave del proyecto
+deliverables,Entregables,textarea,false,Describa los entregables esperados,,,,Productos o resultados esperados
+risks,Riesgos Identificados,textarea,false,Liste los riesgos potenciales,,,,Riesgos y estrategias de mitigación
+approved,Aprobado,checkbox,false,,false,,,Marque si el proyecto está aprobado
+approvalDate,Fecha de Aprobación,datetime,false,,,,,Fecha en que fue aprobado
+approvedBy,Aprobado Por,textfield,false,Nombre del aprobador,,,,Persona que aprobó el proyecto
+comments,Comentarios,textarea,false,Comentarios adicionales,,,,Notas o comentarios generales
+attachments,Archivos Adjuntos,file,false,,,,,Documentos relacionados con el proyecto
