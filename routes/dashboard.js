@@ -192,4 +192,126 @@ router.get('/system-status', async (req, res) => {
   }
 })
 
+/**
+ * GET /api/dashboard/stats-history
+ * Returns activity stats for the last 7 days (for charts)
+ */
+router.get('/stats-history', async (req, res) => {
+  try {
+    const supabase = getSupabaseClient()
+
+    // Get date range (last 7 days)
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - 7)
+
+    // Get reports by day
+    const { data: reports } = await supabase
+      .from('report_executions')
+      .select('executed_at, result_count')
+      .gte('executed_at', startDate.toISOString())
+      .order('executed_at', { ascending: true })
+
+    // Get documents by day
+    const { data: documents } = await supabase
+      .from('generated_documents')
+      .select('generated_at, pages')
+      .gte('generated_at', startDate.toISOString())
+      .order('generated_at', { ascending: true })
+
+    // Aggregate by day
+    const dailyStats = {}
+
+    // Initialize all 7 days
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date()
+      date.setDate(date.getDate() - i)
+      const dateKey = date.toISOString().split('T')[0]
+      dailyStats[dateKey] = {
+        date: dateKey,
+        reports: 0,
+        documents: 0,
+        totalDocs: 0
+      }
+    }
+
+    // Aggregate reports
+    reports?.forEach(report => {
+      const dateKey = report.executed_at.split('T')[0]
+      if (dailyStats[dateKey]) {
+        dailyStats[dateKey].reports++
+        dailyStats[dateKey].totalDocs += report.result_count || 0
+      }
+    })
+
+    // Aggregate documents
+    documents?.forEach(doc => {
+      const dateKey = doc.generated_at.split('T')[0]
+      if (dailyStats[dateKey]) {
+        dailyStats[dateKey].documents++
+      }
+    })
+
+    const history = Object.values(dailyStats)
+
+    res.json({ success: true, data: history })
+  } catch (error) {
+    console.error('Error fetching stats history:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+/**
+ * GET /api/dashboard/performance-metrics
+ * Returns performance metrics (execution times, top users, etc.)
+ */
+router.get('/performance-metrics', async (req, res) => {
+  try {
+    const supabase = getSupabaseClient()
+
+    // Average execution time
+    const { data: reportMetrics } = await supabase
+      .from('report_executions')
+      .select('execution_time_ms, result_count, status')
+      .eq('status', 'success')
+      .order('executed_at', { ascending: false })
+      .limit(100)
+
+    const avgExecutionTime = reportMetrics?.length > 0
+      ? Math.round(reportMetrics.reduce((sum, r) => sum + (r.execution_time_ms || 0), 0) / reportMetrics.length)
+      : 0
+
+    const totalDocsProcessed = reportMetrics?.reduce((sum, r) => sum + (r.result_count || 0), 0) || 0
+
+    // Top users by activity
+    const { data: activityByUser } = await supabase
+      .from('activity_log')
+      .select('user_name')
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+
+    const userCounts = {}
+    activityByUser?.forEach(a => {
+      const user = a.user_name || 'Unknown'
+      userCounts[user] = (userCounts[user] || 0) + 1
+    })
+
+    const topUsers = Object.entries(userCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
+
+    res.json({
+      success: true,
+      data: {
+        avgExecutionTime,
+        totalDocsProcessed,
+        topUsers
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching performance metrics:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 export default router

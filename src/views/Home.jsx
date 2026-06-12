@@ -21,9 +21,12 @@ import {
   getRecentDocuments,
   getRecentActivity,
   getSystemStatus,
+  getStatsHistory,
+  getPerformanceMetrics,
   formatTimeAgo,
   documentTypeIcons
 } from '../services/dashboardService'
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import '../styles/home-pro.css'
 
 export default function Home() {
@@ -42,6 +45,8 @@ export default function Home() {
   const [recentDocs, setRecentDocs] = useState([])
   const [activities, setActivities] = useState([])
   const [systemStatus, setSystemStatus] = useState([])
+  const [statsHistory, setStatsHistory] = useState([])
+  const [performanceMetrics, setPerformanceMetrics] = useState(null)
 
   // Load all dashboard data
   useEffect(() => {
@@ -51,12 +56,14 @@ export default function Home() {
         const userId = user?.id
 
         // Load all data in parallel
-        const [statsData, reportsData, docsData, activityData, statusData] = await Promise.all([
+        const [statsData, reportsData, docsData, activityData, statusData, historyData, metricsData] = await Promise.all([
           getDashboardStats(userId),
           getRecentReports(userId),
           getRecentDocuments(userId),
           getRecentActivity(),
-          getSystemStatus()
+          getSystemStatus(),
+          getStatsHistory(),
+          getPerformanceMetrics()
         ])
 
         if (statsData) setStats(statsData)
@@ -64,6 +71,8 @@ export default function Home() {
         if (docsData) setRecentDocs(docsData)
         if (activityData) setActivities(activityData)
         if (statusData) setSystemStatus(statusData)
+        if (historyData) setStatsHistory(historyData)
+        if (metricsData) setPerformanceMetrics(metricsData)
       } catch (error) {
         console.error('Error loading dashboard data:', error)
       } finally {
@@ -285,13 +294,66 @@ export default function Home() {
                 </div>
               )}
             </div>
-            <div className="chart-placeholder">
-              📈 Gráfico de uso (últimos 7 días)
-            </div>
+
+            {/* Performance Metrics */}
+            {performanceMetrics && (
+              <div style={{ marginTop: '20px', padding: '16px', background: 'var(--bg-canvas)', borderRadius: '8px' }}>
+                <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                  📊 Métricas de Performance
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', fontSize: '12px' }}>
+                  <div>
+                    <div style={{ color: 'var(--text-secondary)', marginBottom: '4px' }}>Tiempo Promedio</div>
+                    <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                      {performanceMetrics.avgExecutionTime}ms
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ color: 'var(--text-secondary)', marginBottom: '4px' }}>Docs Procesados</div>
+                    <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                      {performanceMetrics.totalDocsProcessed.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Activity Chart */}
+            {statsHistory.length > 0 && (
+              <div style={{ marginTop: '20px' }}>
+                <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                  📈 Actividad (últimos 7 días)
+                </div>
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={statsHistory}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" />
+                    <XAxis
+                      dataKey="date"
+                      stroke="var(--text-secondary)"
+                      tick={{ fontSize: 11 }}
+                      tickFormatter={(date) => new Date(date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                    />
+                    <YAxis stroke="var(--text-secondary)" tick={{ fontSize: 11 }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: '8px',
+                        fontSize: '12px'
+                      }}
+                      labelFormatter={(date) => new Date(date).toLocaleDateString('es-ES')}
+                    />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
+                    <Line type="monotone" dataKey="reports" stroke="#3b82f6" name="Reports" strokeWidth={2} />
+                    <Line type="monotone" dataKey="documents" stroke="#10b981" name="Documentos" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </Card>
         </Col>
 
-        {/* Recent Activity */}
+        {/* Recent Activity & Top Users */}
         <Col xs={24} lg={12}>
           <Card className="dashboard-card">
             <div className="card-header">
@@ -332,6 +394,37 @@ export default function Home() {
                 </div>
               )}
             </div>
+
+            {/* Top Users Chart */}
+            {performanceMetrics?.topUsers && performanceMetrics.topUsers.length > 0 && (
+              <div style={{ marginTop: '24px' }}>
+                <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                  👥 Usuarios Más Activos (últimos 7 días)
+                </div>
+                <ResponsiveContainer width="100%" height={160}>
+                  <BarChart data={performanceMetrics.topUsers} layout="horizontal">
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" />
+                    <XAxis type="number" stroke="var(--text-secondary)" tick={{ fontSize: 11 }} />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      stroke="var(--text-secondary)"
+                      tick={{ fontSize: 11 }}
+                      width={100}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: '8px',
+                        fontSize: '12px'
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#f59e0b" name="Acciones" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </Card>
         </Col>
 

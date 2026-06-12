@@ -86,6 +86,34 @@ export async function getSystemStatus() {
 }
 
 /**
+ * Get stats history (last 7 days) for charts
+ */
+export async function getStatsHistory() {
+  try {
+    const response = await fetch(`${API_URL}/api/dashboard/stats-history`)
+    const result = await response.json()
+    return result.data
+  } catch (error) {
+    console.error('Error fetching stats history:', error)
+    return []
+  }
+}
+
+/**
+ * Get performance metrics
+ */
+export async function getPerformanceMetrics() {
+  try {
+    const response = await fetch(`${API_URL}/api/dashboard/performance-metrics`)
+    const result = await response.json()
+    return result.data
+  } catch (error) {
+    console.error('Error fetching performance metrics:', error)
+    return null
+  }
+}
+
+/**
  * Helper to format time ago (seconds to human readable)
  */
 export function formatTimeAgo(secondsAgo) {
