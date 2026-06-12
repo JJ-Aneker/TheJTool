@@ -5,40 +5,27 @@ export const authService = {
   // Sign up new user
   async signUp(email, password, userData) {
     try {
+      // Split fullName into name and surname for metadata
+      const [name, surname] = (userData.fullName || '').split(' ', 2)
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData
+          data: {
+            name: name || '',
+            surname: surname || '',
+            phone: userData.phone || '',
+            department: userData.department || ''
+          }
         }
       })
 
       if (error) throw error
 
-      // Profile is automatically created by Supabase trigger
-      // Upsert to ensure data consistency (handles case where trigger might not have fired yet)
-      if (data.user) {
-        const [name, surname] = (userData.fullName || '').split(' ', 2)
-
-        const { error: upsertError } = await supabase
-          .from('profiles')
-          .upsert({
-            user_id: data.user.id,
-            email: data.user.email,
-            name: name || '',
-            surname: surname || '',
-            phone: userData.phone || '',
-            approved: false,
-            created_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id'
-          })
-
-        if (upsertError) {
-          logger.error('Error creating profile:', upsertError)
-          throw new Error(`Error al crear perfil: ${upsertError.message}`)
-        }
-      }
+      // Profile is automatically created by Supabase trigger (handle_new_user)
+      // No need to manually insert/upsert - the database trigger handles it
+      // This avoids RLS permission issues during signup
 
       return { success: true, user: data.user }
     } catch (error) {
