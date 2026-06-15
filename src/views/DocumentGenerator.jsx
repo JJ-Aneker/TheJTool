@@ -87,11 +87,22 @@ export default function DocumentGenerator() {
     setLoadingVerticales(true)
     try {
       const data = await verticalesService.getAllVerticals()
+
+      // Mapa de iconos por nombre de vertical
+      const iconMap = {
+        'notifapp': '📬',
+        'hr': '👥',
+        'facturas': '🧾',
+        'sage': '🔗',
+        'evolutivo': '🔄',
+        'generico': '📄'
+      }
+
       // Transform DB format to component format
       const formattedVerticales = data.map(v => ({
-        value: v.key,
-        label: v.nombre,        // Solo nombre, sin icono
-        desc: v.descripcion     // Descripción completa
+        value: v.nombre,  // key para el backend (notifapp, hr, etc.)
+        label: `${iconMap[v.nombre] || '📄'} ${v.titulo}`,  // Nombre bonito con icono
+        desc: v.descripcion_intro || v.descripcion_implementacion || ''  // Descripción
       }))
       setVerticales(formattedVerticales)
     } catch (err) {
