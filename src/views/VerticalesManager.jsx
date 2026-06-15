@@ -730,57 +730,36 @@ export default function VerticalesManager() {
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Herramientas Recomendadas</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Array de strings: ["DOCAI", "IVNEOS", "IvSign"]
+              Herramientas externas (DOCAI, IVNEOS, IvSign, etc.)
             </p>
-            <Input.TextArea
-              value={JSON.stringify(herramientasRecomendadas, null, 2)}
-              onChange={(e) => {
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  setHerramientasRecomendadas(Array.isArray(parsed) ? parsed : []);
-                } catch (err) {}
-              }}
-              rows={4}
-              style={{ fontFamily: 'monospace', fontSize: '12px' }}
-              placeholder='["DOCAI", "IVNEOS", "IvSign"]'
+            <EditableList
+              value={herramientasRecomendadas}
+              onChange={setHerramientasRecomendadas}
+              placeholder="ej: DOCAI"
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Integraciones Comunes</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Array de strings: ["SAP", "Sage X3", "API REST"]
+              Sistemas con los que típicamente se integra (SAP, Sage, APIs)
             </p>
-            <Input.TextArea
-              value={JSON.stringify(integracionesComunes, null, 2)}
-              onChange={(e) => {
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  setIntegracionesComunes(Array.isArray(parsed) ? parsed : []);
-                } catch (err) {}
-              }}
-              rows={4}
-              style={{ fontFamily: 'monospace', fontSize: '12px' }}
-              placeholder='["SAP", "Sage X3"]'
+            <EditableList
+              value={integracionesComunes}
+              onChange={setIntegracionesComunes}
+              placeholder="ej: SAP ERP"
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Integraciones Usuario</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Array de strings de integraciones visibles al usuario
+              Integraciones visibles al usuario final
             </p>
-            <Input.TextArea
-              value={JSON.stringify(integracionesUsuario, null, 2)}
-              onChange={(e) => {
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  setIntegracionesUsuario(Array.isArray(parsed) ? parsed : []);
-                } catch (err) {}
-              }}
-              rows={4}
-              style={{ fontFamily: 'monospace', fontSize: '12px' }}
-              placeholder='["Portal web", "App móvil"]'
+            <EditableList
+              value={integracionesUsuario}
+              onChange={setIntegracionesUsuario}
+              placeholder="ej: Portal web"
             />
           </div>
         </div>
@@ -810,57 +789,36 @@ export default function VerticalesManager() {
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Criterios de Aceptación</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Array de strings: ["criterio1", "criterio2"]
+              Criterios para considerar el proyecto completado
             </p>
-            <Input.TextArea
-              value={JSON.stringify(criteriosAceptacion, null, 2)}
-              onChange={(e) => {
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  setCriteriosAceptacion(Array.isArray(parsed) ? parsed : []);
-                } catch (err) {}
-              }}
-              rows={4}
-              style={{ fontFamily: 'monospace', fontSize: '12px' }}
-              placeholder='["Todo funciona correctamente", "Usuario capacitado"]'
+            <EditableList
+              value={criteriosAceptacion}
+              onChange={setCriteriosAceptacion}
+              placeholder="ej: Todo funciona correctamente"
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Módulos Funcionales</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Array de strings: ["módulo1", "módulo2"]
+              Módulos funcionales que incluye el vertical
             </p>
-            <Input.TextArea
-              value={JSON.stringify(modulosFuncionales, null, 2)}
-              onChange={(e) => {
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  setModulosFuncionales(Array.isArray(parsed) ? parsed : []);
-                } catch (err) {}
-              }}
-              rows={4}
-              style={{ fontFamily: 'monospace', fontSize: '12px' }}
-              placeholder='["Gestión documental", "Workflows", "Reporting"]'
+            <EditableList
+              value={modulosFuncionales}
+              onChange={setModulosFuncionales}
+              placeholder="ej: Gestión documental"
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Procesos Clave</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Array de strings: ["proceso1", "proceso2"]
+              Procesos de negocio clave del vertical
             </p>
-            <Input.TextArea
-              value={JSON.stringify(procesosClave, null, 2)}
-              onChange={(e) => {
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  setProcesosClave(Array.isArray(parsed) ? parsed : []);
-                } catch (err) {}
-              }}
-              rows={4}
-              style={{ fontFamily: 'monospace', fontSize: '12px' }}
-              placeholder='["Alta de documento", "Tramitación", "Cierre"]'
+            <EditableList
+              value={procesosClave}
+              onChange={setProcesosClave}
+              placeholder="ej: Alta de documento"
             />
           </div>
         </div>
