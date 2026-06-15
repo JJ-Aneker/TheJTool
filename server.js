@@ -16,6 +16,7 @@ import analyzeHandler from './api/analyze.js';
 import buildDocxHandler from './api/build-docx.js';
 // import ganttHandler from './api/generate-gantt.js'; // DISABLED: file not found
 import exportGanttHandler from './api/export-gantt.js';
+import exportVerticalHandler from './api/export-vertical.js';
 // import convertGanttScriptHandler from './api/convert-gantt-script.js'; // DISABLED: file not found
 // import executeSqlHandler from './api/execute-sql.js'; // DISABLED: file not found
 // import updateUserRoleHandler from './api/update-user-role.js'; // DISABLED: file not found
@@ -82,6 +83,7 @@ app.post('/api/analyze', analyzeHandler);
 app.post('/api/build-docx', buildDocxHandler);
 // app.post('/api/generate-gantt', ganttHandler); // DISABLED: handler not found
 app.post('/api/export-gantt', exportGanttHandler);
+app.post('/api/export-vertical', exportVerticalHandler);
 // app.get('/api/gantt-converter-script', convertGanttScriptHandler); // DISABLED: handler not found
 
 // Admin routes (DISABLED: handlers not found)
