@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert, Select } from 'antd';
+import { Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert, Select } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, CloseOutlined, EyeOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
 import { useTranslation } from 'react-i18next';
@@ -456,75 +456,22 @@ export default function VerticalesManager() {
     }
   };
 
-  const columns = [
-    {
-      title: 'Nombre',
-      dataIndex: 'nombre',
-      key: 'nombre',
-      render: (text) => <span style={{ fontWeight: '600', fontSize: '14px' }}>{text}</span>
-    },
-    {
-      title: 'Título',
-      dataIndex: 'titulo',
-      key: 'titulo',
-      render: (text) => text || '-'
-    },
-    {
-      title: 'Tarifa Diaria',
-      dataIndex: 'tarifa_diaria',
-      key: 'tarifa_diaria',
-      render: (value) => `${value || 0}€`
-    },
-    {
-      title: 'Estado',
-      dataIndex: 'activo',
-      key: 'activo',
-      render: (activo) => (
-        <Tag color={activo ? 'green' : 'red'}>
-          {activo ? 'Activo' : 'Inactivo'}
-        </Tag>
-      )
-    },
-    {
-      title: 'Creado',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (text) => text ? new Date(text).toLocaleDateString('es-ES') : '-'
-    },
-    {
-      title: 'Acciones',
-      key: 'actions',
-      fixed: 'right',
-      width: 100,
-      render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Tooltip title="Editar vertical">
-            <button
-              className="btn-link"
-              onClick={() => editVertical(record)}
-              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-            >
-              <EditOutlined style={{ fontSize: '12px' }} />
-            </button>
-          </Tooltip>
-          <Popconfirm
-            title="Eliminar vertical"
-            description="¿Estás seguro de que quieres eliminar este vertical?"
-            onConfirm={() => deleteVertical(record)}
-            okText="Sí"
-            cancelText="No"
-          >
-            <button
-              className="btn-link danger"
-              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-            >
-              <DeleteOutlined style={{ fontSize: '12px' }} />
-            </button>
-          </Popconfirm>
-        </div>
-      )
-    }
-  ];
+  // Mapa de iconos para cada vertical (basado en nombre)
+  const getVerticalIcon = (nombre) => {
+    const iconMap = {
+      'evolutivo': '🔄',
+      'facturas': '📄',
+      'hr': '👥',
+      'notifapp': '📨',
+      'sage': '📊',
+      'legal': '⚖️',
+      'contabilidad': '💰',
+      'crm': '🤝',
+      'inventario': '📦',
+      'ventas': '💼'
+    };
+    return iconMap[nombre?.toLowerCase()] || '📁';
+  };
 
   const editVertical = (vertical) => {
     setSelectedVertical(vertical);
@@ -936,20 +883,116 @@ export default function VerticalesManager() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {/* GRID DE TARJETAS */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
-        <Spin spinning={loading}>
-          <Table
-            columns={columns}
-            dataSource={verticales}
-            rowKey="id"
-            loading={loading}
-            pagination={{ pageSize: 10 }}
-            size="small"
-            scroll={{ x: 1200 }}
-            style={{ height: '100%' }}
-          />
-        </Spin>
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Spin size="large" />
+          </div>
+        ) : verticales.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ fontSize: '48px', opacity: 0.3 }}>📁</div>
+            <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>No hay verticales creados</div>
+            <button onClick={createNewVertical} className="btn-primary">
+              + Crear Primer Vertical
+            </button>
+          </div>
+        ) : (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gap: '16px',
+            overflow: 'auto',
+            padding: '0'
+          }}>
+            {verticales.map(v => (
+              <Card key={v.id} className="profile-card" hoverable>
+                {/* Header con título y acciones */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '20px' }}>{getVerticalIcon(v.nombre)}</span>
+                    {v.titulo || v.nombre}
+                  </h3>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <Tooltip title="Editar vertical">
+                      <button
+                        className="btn-link"
+                        onClick={() => editVertical(v)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <EditOutlined style={{ fontSize: '12px' }} />
+                      </button>
+                    </Tooltip>
+                    <Popconfirm
+                      title="Eliminar vertical"
+                      description="¿Estás seguro de que quieres eliminar este vertical?"
+                      onConfirm={() => deleteVertical(v)}
+                      okText="Sí"
+                      cancelText="No"
+                    >
+                      <button
+                        className="btn-link danger"
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <DeleteOutlined style={{ fontSize: '12px' }} />
+                      </button>
+                    </Popconfirm>
+                  </div>
+                </div>
+
+                {/* Descripción */}
+                <div style={{
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '12px',
+                  minHeight: '36px',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden'
+                }}>
+                  {v.descripcion_intro || 'Sin descripción'}
+                </div>
+
+                {/* Chips informativos */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                  <span className="meta-chip">💰 {v.tarifa_diaria || 0}€/día</span>
+                  <span className="meta-chip">📅 {v.duracion_tipica_dias || 0} días</span>
+                  <span className="meta-chip" style={{
+                    backgroundColor: v.activo ? 'var(--kpi-green-bg)' : 'var(--kpi-red-bg)',
+                    color: v.activo ? 'var(--kpi-green)' : 'var(--kpi-red)'
+                  }}>
+                    {v.activo ? '✓ Activo' : '✗ Inactivo'}
+                  </span>
+                </div>
+
+                {/* Estadísticas de contenido */}
+                <div style={{
+                  fontSize: '11px',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  gap: '12px',
+                  marginBottom: '12px',
+                  paddingTop: '8px',
+                  borderTop: '1px solid var(--border-default)'
+                }}>
+                  {(v.claves?.length || 0) > 0 && <span>🔑 {v.claves.length} claves</span>}
+                  {(v.ejemplo_workflows?.length || 0) > 0 && <span>🔄 {v.ejemplo_workflows.length} workflows</span>}
+                  {(v.modulos_funcionales?.length || 0) > 0 && <span>📦 {v.modulos_funcionales.length} módulos</span>}
+                </div>
+
+                {/* Botón de acción principal */}
+                <button
+                  className="btn-primary"
+                  style={{ width: '100%' }}
+                  onClick={() => editVertical(v)}
+                >
+                  ✏️ Editar Vertical
+                </button>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* DRAWER LATERAL GRANDE */}
