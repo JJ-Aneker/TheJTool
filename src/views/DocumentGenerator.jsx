@@ -1,5 +1,5 @@
 // src/views/DocumentGenerator.jsx
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import pako from 'pako'
 import {
   Upload, Button, Select, Input, Steps, Tag, Alert, Spin,
@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons'
 import { DOCUMENT_TYPES, getDocumentTypeOptions } from '../constants/documentTypes.js'
 import { ganttService } from '../services/ganttService.js'
+import { verticalesService } from '../services/verticalesService.js'
 import GanttViewer from '../components/GanttViewer.jsx'
 import { useTranslation } from 'react-i18next'
 import { useMessages } from '../utils/i18nMessages'
@@ -25,16 +26,6 @@ const { TextArea } = Input
 const { Dragger } = Upload
 const { Option } = Select
 const { Panel } = Collapse
-
-// ── CONSTANTES ────────────────────────────────────────────────────────────────
-const VERTICALES = [
-  { value: 'notifapp',  label: '📬 Notificaciones AAPP',        desc: 'Gestión de notificaciones de Administraciones Públicas' },
-  { value: 'hr',        label: '👥 HR Expedientes',              desc: 'Gestión de expedientes digitales de empleados' },
-  { value: 'facturas',  label: '🧾 Facturas de Proveedores',     desc: 'Gestión y aprobación de facturas con Smart Capture' },
-  { value: 'sage',      label: '🔗 Integración SAGE X3',         desc: 'Therefore™ + ERP Sage X3 (compras y ventas)' },
-  { value: 'evolutivo', label: '🔄 Change Request / Evolutivo',  desc: 'Evolutivo sobre implementación existente' },
-  { value: 'generico',  label: '📄 Proyecto Genérico',           desc: 'Otro tipo de proyecto Therefore™' },
-]
 
 // Document type options (generated from constants)
 const TIPOS_DOC = getDocumentTypeOptions()
@@ -52,6 +43,8 @@ export default function DocumentGenerator() {
   const MESSAGES = useMessages()
   const [currentStep, setCurrentStep]           = useState(0)
   const [files, setFiles]                       = useState([])
+  const [verticales, setVerticales]             = useState([])
+  const [loadingVerticales, setLoadingVerticales] = useState(false)
   const [vertical, setVertical]                 = useState(null)
   const [tipoDoc, setTipoDoc]                   = useState('efdt')
   const [otrosDocDescription, setOtrosDocDescription] = useState('')
@@ -84,6 +77,32 @@ export default function DocumentGenerator() {
     'Finalizando análisis...'
   ]
   const [analysisMessageIdx, setAnalysisMessageIdx] = useState(0)
+
+  // ── LOAD VERTICALES FROM API ─────────────────────────────────────────────────
+  useEffect(() => {
+    loadVerticales()
+  }, [])
+
+  const loadVerticales = async () => {
+    setLoadingVerticales(true)
+    try {
+      const data = await verticalesService.getAllVerticals()
+      // Transform DB format to component format
+      const formattedVerticales = data.map(v => ({
+        value: v.key,
+        label: `${v.icon || '📄'} ${v.nombre}`,
+        desc: v.descripcion
+      }))
+      setVerticales(formattedVerticales)
+    } catch (err) {
+      console.error('Error loading verticales:', err)
+      message.error('Error al cargar verticales: ' + err.message)
+      // Fallback to empty array
+      setVerticales([])
+    } finally {
+      setLoadingVerticales(false)
+    }
+  }
 
   // ── FILE HANDLING ───────────────────────────────────────────────────────────
   const handleFileAdd = useCallback((file) => {
