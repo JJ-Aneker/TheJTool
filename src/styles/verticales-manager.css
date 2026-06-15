@@ -1,0 +1,189 @@
+/* Estilos para VerticalesManager con Drawer mejorado */
+
+/* ── DRAWER STYLES ──────────────────────────────────────────────────────────── */
+.verticales-drawer .ant-drawer-body {
+  padding: 24px;
+  background-color: var(--bg-primary);
+}
+
+.verticales-drawer .ant-drawer-header {
+  border-bottom: 1px solid var(--border-default);
+  background-color: var(--bg-secondary);
+}
+
+/* ── TABS STYLES ────────────────────────────────────────────────────────────── */
+.verticales-drawer .ant-tabs-nav {
+  margin-bottom: 24px;
+  background-color: var(--bg-secondary);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.verticales-drawer .ant-tabs-tab {
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.verticales-drawer .ant-tabs-tab-active {
+  background-color: var(--accent-primary);
+  color: white;
+  border-radius: 6px;
+}
+
+/* ── EDITABLE LIST STYLES ───────────────────────────────────────────────────── */
+.editable-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.editable-list-item:hover {
+  background-color: var(--bg-hover);
+  transform: translateX(2px);
+}
+
+.editable-list-item-remove {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.editable-list-item:hover .editable-list-item-remove {
+  opacity: 1;
+}
+
+/* ── SECTION HEADERS ────────────────────────────────────────────────────────── */
+.section-header {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.section-description {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+/* ── PREVIEW PANEL ──────────────────────────────────────────────────────────── */
+.preview-panel {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-default);
+}
+
+.preview-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--accent-primary);
+}
+
+.preview-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ── VALIDATION STYLES ──────────────────────────────────────────────────────── */
+.ant-form-item-has-error .ant-input,
+.ant-form-item-has-error .ant-input-number {
+  border-color: var(--kpi-red);
+}
+
+.ant-form-item-has-error .ant-form-item-explain-error {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ── CARD STYLES FOR OBJECT LIST ────────────────────────────────────────────── */
+.object-list-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.object-list-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.object-list-card .ant-card-head {
+  min-height: auto;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.object-list-card .ant-card-body {
+  padding: 12px;
+}
+
+/* ── RESPONSIVE ADJUSTMENTS ─────────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .verticales-drawer .ant-drawer-content-wrapper {
+    width: 90% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .verticales-drawer .ant-drawer-content-wrapper {
+    width: 100% !important;
+  }
+
+  .section-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── EMPTY STATE ────────────────────────────────────────────────────────────── */
+.empty-list-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  border: 2px dashed var(--border-default);
+}
+
+.empty-list-state svg {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* ── LIGHT/DARK MODE ADAPTATIONS ────────────────────────────────────────────── */
+:root[data-theme="light"] .editable-list-item {
+  background-color: #f5f5f5;
+}
+
+:root[data-theme="light"] .editable-list-item:hover {
+  background-color: #e8e8e8;
+}
+
+:root[data-theme="dark"] .editable-list-item {
+  background-color: #1f1f1f;
+}
+
+:root[data-theme="dark"] .editable-list-item:hover {
+  background-color: #2a2a2a;
+}

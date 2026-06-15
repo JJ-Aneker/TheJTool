@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Table, Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
+import { Table, Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, CloseOutlined, EyeOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
 import { useTranslation } from 'react-i18next';
 import { useMessages } from '../utils/i18nMessages';
+import '../styles/verticales-manager.css';
 
 // ── COMPONENTE DE LISTA EDITABLE ─────────────────────────────────────────────
 function EditableList({ value = [], onChange, placeholder = "Nuevo item", type = "text" }) {
@@ -347,7 +348,20 @@ export default function VerticalesManager() {
 
   const handleSave = async () => {
     try {
+      // Validación personalizada
       const values = await form.validateFields();
+
+      // Validación adicional
+      if (!values.nombre || !values.titulo) {
+        message.error('Nombre y Título son obligatorios');
+        return;
+      }
+
+      if (values.tarifa_diaria && values.tarifa_diaria <= 0) {
+        message.error('La tarifa diaria debe ser mayor a 0');
+        return;
+      }
+
       setLoading(true);
 
       const data = {
@@ -738,18 +752,24 @@ export default function VerticalesManager() {
 
       {/* DRAWER LATERAL GRANDE */}
       <Drawer
-        title={selectedVertical ? 'Editar Vertical' : 'Crear Nuevo Vertical'}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {selectedVertical ? <EditOutlined /> : <PlusOutlined />}
+            <span>{selectedVertical ? 'Editar Vertical' : 'Crear Nuevo Vertical'}</span>
+          </div>
+        }
         open={isDrawerVisible}
         onClose={() => {
           setIsDrawerVisible(false);
           setSelectedVertical(null);
         }}
         width="80%"
+        className="verticales-drawer"
         extra={
           <Space>
             <Button onClick={() => setIsDrawerVisible(false)}>Cancelar</Button>
-            <Button type="primary" onClick={handleSave} loading={loading}>
-              Guardar
+            <Button type="primary" icon={<CheckCircleOutlined />} onClick={handleSave} loading={loading}>
+              Guardar Vertical
             </Button>
           </Space>
         }
