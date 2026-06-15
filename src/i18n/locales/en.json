@@ -48,6 +48,9 @@
     "tenantManager": "Tenant Management",
     "verticalesManager": "Vertical Management",
     "webServices": "Web Services",
+    "apiExplorer": "API Explorer",
+    "workflowConfig": "Workflow Configuration",
+    "projectDocs": "Project Documentation",
     "userProfile": "User Profile",
     "bedrock": "AWS Bedrock",
     "logout": "Logout"

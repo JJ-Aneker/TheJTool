@@ -125,19 +125,19 @@ const getMenuItems = (isAdmin = false, t = (key) => key) => {
     {
       key: 'api-explorer',
       icon: <ApiOutlined />,
-      label: 'Explorador API REST',
+      label: t('nav.apiExplorer'),
       path: '/api-explorer'
     },
     {
       key: 'workflows',
       icon: <SettingOutlined />,
-      label: 'Configuración de Workflows',
+      label: t('nav.workflowConfig'),
       path: '/workflows'
     },
     {
       key: 'docs',
       icon: <FileTextOutlined />,
-      label: 'Documentación de Proyectos',
+      label: t('nav.projectDocs'),
       path: '/docs'
     }
   ]
