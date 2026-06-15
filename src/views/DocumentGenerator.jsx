@@ -90,8 +90,8 @@ export default function DocumentGenerator() {
       // Transform DB format to component format
       const formattedVerticales = data.map(v => ({
         value: v.key,
-        label: `${v.icon || '📄'} ${v.nombre}`,
-        desc: v.descripcion
+        label: v.nombre,        // Solo nombre, sin icono
+        desc: v.descripcion     // Descripción completa
       }))
       setVerticales(formattedVerticales)
     } catch (err) {
