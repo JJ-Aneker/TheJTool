@@ -502,8 +502,10 @@ export default function DocumentGenerator() {
                   <Select
                     value={vertical} onChange={setVertical}
                     placeholder="Selecciona la vertical..." style={{ width: '100%' }} size="small" allowClear
+                    loading={loadingVerticales}
+                    notFoundContent={loadingVerticales ? <Spin size="small" /> : 'No hay verticales configuradas'}
                   >
-                    {VERTICALES.map(v => (
+                    {verticales.map(v => (
                       <Option key={v.value} value={v.value}>
                         <div style={{ lineHeight: 1.3 }}>
                           <div>{v.label}</div>
