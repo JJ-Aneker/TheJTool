@@ -35,6 +35,7 @@ export default function Home() {
 
   // State for real data
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null)
   const [stats, setStats] = useState({
     activeTenantsCount: 0,
     categoriesCount: 0,
@@ -52,8 +53,11 @@ export default function Home() {
   useEffect(() => {
     async function loadDashboardData() {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        const userId = user?.id
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        const userId = authUser?.id
+
+        // Save user data
+        if (authUser) setUser(authUser)
 
         // Load all data in parallel
         const [statsData, reportsData, docsData, activityData, statusData, historyData, metricsData] = await Promise.all([
@@ -83,31 +87,35 @@ export default function Home() {
     loadDashboardData()
   }, [])
 
+  // Extract user name
+  const userName = user?.email?.split('@')[0] || 'Usuario'
+  const displayName = userName.charAt(0).toUpperCase() + userName.slice(1)
+
   // Quick Actions Data
   const quickActions = [
     {
-      icon: <FileTextOutlined style={{ fontSize: '48px', color: '#3b82f6' }} />,
+      icon: <FileTextOutlined style={{ fontSize: '36px', color: '#3b82f6' }} />,
       title: t('home.tools.thereforeReporter.title'),
       description: t('home.tools.thereforeReporter.description'),
       path: '/reporter',
       color: '#3b82f6'
     },
     {
-      icon: <FormOutlined style={{ fontSize: '48px', color: '#10b981' }} />,
+      icon: <FormOutlined style={{ fontSize: '36px', color: '#10b981' }} />,
       title: t('home.tools.eformBuilder.title'),
       description: t('home.tools.eformBuilder.description'),
       path: '/eforms',
       color: '#10b981'
     },
     {
-      icon: <ThunderboltOutlined style={{ fontSize: '48px', color: '#f59e0b' }} />,
+      icon: <ThunderboltOutlined style={{ fontSize: '36px', color: '#f59e0b' }} />,
       title: t('home.tools.documentGenerator.title'),
       description: t('home.tools.documentGenerator.description'),
       path: '/document-generator',
       color: '#f59e0b'
     },
     {
-      icon: <AppstoreOutlined style={{ fontSize: '48px', color: '#ec4899' }} />,
+      icon: <AppstoreOutlined style={{ fontSize: '36px', color: '#ec4899' }} />,
       title: t('home.tools.categoryBuilder.title'),
       description: t('home.tools.categoryBuilder.description'),
       path: '/category-builder',
@@ -131,6 +139,7 @@ export default function Home() {
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <p className="hero-subtitle">Therefore™ Administration Panel</p>
+          <h1 className="hero-welcome">👋 ¡Hola, {displayName}!</h1>
 
           <div className="hero-stats">
             <div className="hero-stat">
