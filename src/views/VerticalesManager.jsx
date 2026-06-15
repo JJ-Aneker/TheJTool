@@ -6,26 +6,43 @@ import { useTranslation } from 'react-i18next';
 import { useMessages } from '../utils/i18nMessages';
 import '../styles/verticales-manager.css';
 
+// ── UTILIDAD: SANITIZAR ARRAY ────────────────────────────────────────────────
+// Convierte cualquier valor a string simple (maneja objetos legacy)
+function sanitizeArray(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(item => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) {
+      // Si es objeto con nombre, usar nombre; sino JSON
+      return item.nombre || item.name || JSON.stringify(item);
+    }
+    return String(item);
+  }).filter(Boolean); // Eliminar vacíos
+}
+
 // ── COMPONENTE DE LISTA EDITABLE ─────────────────────────────────────────────
 function EditableList({ value = [], onChange, placeholder = "Nuevo item", type = "text" }) {
   const [newItem, setNewItem] = useState('');
 
+  // Sanitizar value al recibir (defensa contra datos legacy)
+  const sanitizedValue = sanitizeArray(value);
+
   const addItem = () => {
     if (!newItem.trim()) return;
-    onChange([...value, newItem.trim()]);
+    onChange([...sanitizedValue, newItem.trim()]);
     setNewItem('');
   };
 
   const removeItem = (index) => {
-    onChange(value.filter((_, i) => i !== index));
+    onChange(sanitizedValue.filter((_, i) => i !== index));
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       {/* Lista de items */}
-      {value.length > 0 && (
+      {sanitizedValue.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
-          {value.map((item, index) => (
+          {sanitizedValue.map((item, index) => (
             <div key={index} style={{
               display: 'flex',
               alignItems: 'center',
@@ -391,17 +408,18 @@ export default function VerticalesManager() {
         plantilla_html_manual: selectedVertical.plantilla_html_manual
       });
 
-      setClaves(selectedVertical.claves || []);
-      setPremisasEspecificas(selectedVertical.premisas_especificas || []);
-      setTablasMaestras(selectedVertical.tablas_maestras || []);
-      setHerramientasRecomendadas(selectedVertical.herramientas_recomendadas || []);
-      setEjemploWorkflows(selectedVertical.ejemplo_workflows || []);
-      setIntegracionesComunes(selectedVertical.integraciones_comunes || []);
-      setCasosPruebaTipicos(selectedVertical.casos_prueba_tipicos || []);
-      setCriteriosAceptacion(selectedVertical.criterios_aceptacion || []);
-      setModulosFuncionales(selectedVertical.modulos_funcionales || []);
-      setProcesosClave(selectedVertical.procesos_clave || []);
-      setIntegracionesUsuario(selectedVertical.integraciones_usuario || []);
+      // Sanitizar arrays para prevenir errores con datos legacy
+      setClaves(sanitizeArray(selectedVertical.claves));
+      setPremisasEspecificas(sanitizeArray(selectedVertical.premisas_especificas));
+      setTablasMaestras(sanitizeArray(selectedVertical.tablas_maestras));
+      setHerramientasRecomendadas(sanitizeArray(selectedVertical.herramientas_recomendadas));
+      setEjemploWorkflows(selectedVertical.ejemplo_workflows || []); // Workflows son objetos válidos
+      setIntegracionesComunes(sanitizeArray(selectedVertical.integraciones_comunes));
+      setCasosPruebaTipicos(sanitizeArray(selectedVertical.casos_prueba_tipicos));
+      setCriteriosAceptacion(sanitizeArray(selectedVertical.criterios_aceptacion));
+      setModulosFuncionales(sanitizeArray(selectedVertical.modulos_funcionales));
+      setProcesosClave(sanitizeArray(selectedVertical.procesos_clave));
+      setIntegracionesUsuario(sanitizeArray(selectedVertical.integraciones_usuario));
     } else if (isDrawerVisible && !selectedVertical) {
       // Reset para nuevo vertical
       form.resetFields();
