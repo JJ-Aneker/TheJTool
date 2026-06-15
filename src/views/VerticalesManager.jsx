@@ -392,6 +392,9 @@ export default function VerticalesManager() {
   // Estado para búsqueda/filtro
   const [searchText, setSearchText] = useState('');
 
+  // Estado para exportación
+  const [exportingVertical, setExportingVertical] = useState(false);
+
   useEffect(() => {
     loadVerticales();
   }, []);
@@ -507,6 +510,43 @@ export default function VerticalesManager() {
       message.error('Error al eliminar: ' + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const exportVertical = async () => {
+    if (!selectedVertical) {
+      message.error('No hay vertical seleccionado para exportar');
+      return;
+    }
+
+    setExportingVertical(true);
+    try {
+      const response = await fetch('/api/export-vertical', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vertical: selectedVertical })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error al exportar');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Vertical_${selectedVertical.nombre}_${Date.now()}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      message.success('Vertical exportado correctamente');
+    } catch (err) {
+      message.error('Error al exportar: ' + err.message);
+    } finally {
+      setExportingVertical(false);
     }
   };
 
@@ -1054,6 +1094,15 @@ export default function VerticalesManager() {
         className="verticales-drawer"
         extra={
           <Space>
+            {selectedVertical && (
+              <Button
+                icon={<EyeOutlined />}
+                onClick={exportVertical}
+                loading={exportingVertical}
+              >
+                Exportar Word
+              </Button>
+            )}
             <Button onClick={() => setIsDrawerVisible(false)}>Cancelar</Button>
             <Button type="primary" icon={<CheckCircleOutlined />} onClick={handleSave} loading={loading}>
               Guardar Vertical
