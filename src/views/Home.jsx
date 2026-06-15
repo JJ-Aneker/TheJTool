@@ -87,29 +87,29 @@ export default function Home() {
   const quickActions = [
     {
       icon: <FileTextOutlined style={{ fontSize: '48px', color: '#3b82f6' }} />,
-      title: t('home.tools.apiExplorer.title'),
-      description: 'Ejecutar consulta',
+      title: t('home.tools.thereforeReporter.title'),
+      description: t('home.tools.thereforeReporter.description'),
       path: '/reporter',
       color: '#3b82f6'
     },
     {
       icon: <FormOutlined style={{ fontSize: '48px', color: '#10b981' }} />,
-      title: 'Crear eForm',
-      description: 'Diseñar formulario',
+      title: t('home.tools.eformBuilder.title'),
+      description: t('home.tools.eformBuilder.description'),
       path: '/eforms',
       color: '#10b981'
     },
     {
       icon: <ThunderboltOutlined style={{ fontSize: '48px', color: '#f59e0b' }} />,
-      title: 'Generar Documento',
-      description: 'Con IA',
+      title: t('home.tools.documentGenerator.title'),
+      description: t('home.tools.documentGenerator.description'),
       path: '/document-generator',
       color: '#f59e0b'
     },
     {
       icon: <AppstoreOutlined style={{ fontSize: '48px', color: '#ec4899' }} />,
-      title: 'Nueva Categoría',
-      description: 'Category Builder',
+      title: t('home.tools.categoryBuilder.title'),
+      description: t('home.tools.categoryBuilder.description'),
       path: '/category-builder',
       color: '#ec4899'
     }
@@ -217,7 +217,7 @@ export default function Home() {
                     key={report.id || index}
                     className="report-item"
                     onClick={() => navigate('/reporter')}
-                    title="Haz click para ir a Therefore Reporter"
+                    title={t('home.tooltips.thereforeReporter')}
                   >
                     <div className="report-info">
                       <div className="report-name">{report.report_name || 'Sin nombre'}</div>
@@ -257,7 +257,7 @@ export default function Home() {
                     key={doc.id || index}
                     className="doc-item"
                     onClick={() => navigate('/document-generator')}
-                    title="Haz click para ir a Document Generator"
+                    title={t('home.tooltips.documentGenerator')}
                   >
                     <div className="doc-icon">{documentTypeIcons[doc.document_type] || '📄'}</div>
                     <div className="doc-info">

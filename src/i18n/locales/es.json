@@ -516,8 +516,20 @@
     "recentActivity": "Últimas Actividades",
     "tools": {
       "eformBuilder": {
-        "title": "Generador de eForms",
-        "description": "Crea y gestiona formularios electrónicos"
+        "title": "Crear eForm",
+        "description": "Diseñar formulario"
+      },
+      "categoryBuilder": {
+        "title": "Nueva Categoría",
+        "description": "Constructor de Categorías"
+      },
+      "documentGenerator": {
+        "title": "Generar Documento",
+        "description": "Con IA"
+      },
+      "thereforeReporter": {
+        "title": "Ejecutar Consulta",
+        "description": "Generador de Informes"
       },
       "categoryCloner": {
         "title": "Clonador de Categorías",
@@ -531,6 +543,10 @@
         "title": "Explorador API REST",
         "description": "Explora y prueba endpoints de la API"
       }
+    },
+    "tooltips": {
+      "thereforeReporter": "Haz click para ir a Generador de Informes",
+      "documentGenerator": "Haz click para ir a Generador de Documentos"
     },
     "activities": {
       "categoriesSync": "Sincronización de categorías completada",

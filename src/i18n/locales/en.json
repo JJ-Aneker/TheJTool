@@ -516,8 +516,20 @@
     "recentActivity": "Recent Activity",
     "tools": {
       "eformBuilder": {
-        "title": "eForm Builder",
-        "description": "Create and manage electronic forms"
+        "title": "Create eForm",
+        "description": "Design form"
+      },
+      "categoryBuilder": {
+        "title": "New Category",
+        "description": "Category Builder"
+      },
+      "documentGenerator": {
+        "title": "Generate Document",
+        "description": "With AI"
+      },
+      "thereforeReporter": {
+        "title": "Run Query",
+        "description": "Report Generator"
       },
       "categoryCloner": {
         "title": "Category Cloner",
@@ -531,6 +543,10 @@
         "title": "REST API Explorer",
         "description": "Explore and test API endpoints"
       }
+    },
+    "tooltips": {
+      "thereforeReporter": "Click to go to Report Generator",
+      "documentGenerator": "Click to go to Document Generator"
     },
     "activities": {
       "categoriesSync": "Category synchronization completed",
