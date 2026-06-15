@@ -933,6 +933,7 @@ export default function VerticalesManager() {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             allowClear
+            className="search-input-borderless"
             style={{ width: '300px' }}
           />
           <button
