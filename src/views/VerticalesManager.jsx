@@ -1,10 +1,168 @@
 import { useState, useEffect } from 'react';
-import { Table, Modal, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Collapse, InputNumber, Checkbox } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
 import { useTranslation } from 'react-i18next';
 import { useMessages } from '../utils/i18nMessages';
 
+// ── COMPONENTE DE LISTA EDITABLE ─────────────────────────────────────────────
+function EditableList({ value = [], onChange, placeholder = "Nuevo item", type = "text" }) {
+  const [newItem, setNewItem] = useState('');
+
+  const addItem = () => {
+    if (!newItem.trim()) return;
+    onChange([...value, newItem.trim()]);
+    setNewItem('');
+  };
+
+  const removeItem = (index) => {
+    onChange(value.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {/* Lista de items */}
+      {value.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
+          {value.map((item, index) => (
+            <div key={index} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 12px',
+              backgroundColor: 'var(--bg-secondary)',
+              borderRadius: '6px',
+              fontSize: '13px'
+            }}>
+              <span style={{ flex: 1 }}>{item}</span>
+              <button
+                onClick={() => removeItem(index)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: '2px 4px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <CloseOutlined style={{ fontSize: '11px' }} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Input para agregar nuevo */}
+      <Space.Compact style={{ width: '100%' }}>
+        <Input
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          onPressEnter={addItem}
+          placeholder={placeholder}
+          style={{ flex: 1 }}
+        />
+        <Button type="primary" icon={<PlusOutlined />} onClick={addItem}>
+          Agregar
+        </Button>
+      </Space.Compact>
+    </div>
+  );
+}
+
+// ── COMPONENTE PARA EDITAR OBJETOS EN ARRAY ──────────────────────────────────
+function EditableObjectList({ value = [], onChange, fields, itemLabel = "Item" }) {
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingValues, setEditingValues] = useState({});
+
+  const startAdd = () => {
+    const emptyValues = {};
+    fields.forEach(f => emptyValues[f.key] = '');
+    setEditingValues(emptyValues);
+    setEditingIndex(-1);
+  };
+
+  const startEdit = (index) => {
+    setEditingValues({ ...value[index] });
+    setEditingIndex(index);
+  };
+
+  const saveItem = () => {
+    if (editingIndex === -1) {
+      onChange([...value, editingValues]);
+    } else {
+      const newValue = [...value];
+      newValue[editingIndex] = editingValues;
+      onChange(newValue);
+    }
+    setEditingIndex(null);
+    setEditingValues({});
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditingValues({});
+  };
+
+  const removeItem = (index) => {
+    onChange(value.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Lista de items */}
+      {value.map((item, index) => (
+        <Card
+          key={index}
+          size="small"
+          style={{ backgroundColor: 'var(--bg-secondary)' }}
+          extra={
+            <Space size="small">
+              <Button size="small" icon={<EditOutlined />} onClick={() => startEdit(index)} />
+              <Button size="small" danger icon={<DeleteOutlined />} onClick={() => removeItem(index)} />
+            </Space>
+          }
+        >
+          {fields.map(field => (
+            <div key={field.key} style={{ marginBottom: '4px' }}>
+              <strong style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{field.label}:</strong>
+              <span style={{ marginLeft: '8px', fontSize: '13px' }}>{item[field.key] || '-'}</span>
+            </div>
+          ))}
+        </Card>
+      ))}
+
+      {/* Form para agregar/editar */}
+      {editingIndex !== null ? (
+        <Card size="small" title={editingIndex === -1 ? `Nuevo ${itemLabel}` : `Editar ${itemLabel}`}>
+          {fields.map(field => (
+            <div key={field.key} style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: 500 }}>
+                {field.label}
+              </label>
+              <Input
+                value={editingValues[field.key] || ''}
+                onChange={(e) => setEditingValues({ ...editingValues, [field.key]: e.target.value })}
+                placeholder={field.placeholder}
+              />
+            </div>
+          ))}
+          <Space style={{ marginTop: '12px' }}>
+            <Button type="primary" size="small" onClick={saveItem}>Guardar</Button>
+            <Button size="small" onClick={cancelEdit}>Cancelar</Button>
+          </Space>
+        </Card>
+      ) : (
+        <Button icon={<PlusOutlined />} onClick={startAdd}>
+          Agregar {itemLabel}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+// ── COMPONENTE PRINCIPAL ──────────────────────────────────────────────────────
 export default function VerticalesManager() {
   const { t } = useTranslation();
   const MESSAGES = useMessages();
@@ -12,14 +170,29 @@ export default function VerticalesManager() {
   const [loading, setLoading] = useState(false);
   const [verticales, setVerticales] = useState([]);
   const [selectedVertical, setSelectedVertical] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+
+  // Estados para arrays editables
+  const [claves, setClaves] = useState([]);
+  const [premisasEspecificas, setPremisasEspecificas] = useState([]);
+  const [tablasMaestras, setTablasMaestras] = useState([]);
+  const [herramientasRecomendadas, setHerramientasRecomendadas] = useState([]);
+  const [ejemploWorkflows, setEjemploWorkflows] = useState([]);
+  const [integracionesComunes, setIntegracionesComunes] = useState([]);
+  const [casosPruebaTipicos, setCasosPruebaTipicos] = useState([]);
+  const [criteriosAceptacion, setCriteriosAceptacion] = useState([]);
+  const [modulosFuncionales, setModulosFuncionales] = useState([]);
+  const [procesosClave, setProcesosClave] = useState([]);
+  const [integracionesUsuario, setIntegracionesUsuario] = useState([]);
 
   useEffect(() => {
     loadVerticales();
   }, []);
 
   useEffect(() => {
-    if (isModalVisible && selectedVertical) {
+    if (isDrawerVisible && selectedVertical) {
+      // Cargar datos del vertical seleccionado
       form.setFieldsValue({
         nombre: selectedVertical.nombre,
         titulo: selectedVertical.titulo,
@@ -29,40 +202,43 @@ export default function VerticalesManager() {
         duracion_tipica_dias: selectedVertical.duracion_tipica_dias,
         margen_oferta_pct: selectedVertical.margen_oferta_pct,
         descripcion_implementacion: selectedVertical.descripcion_implementacion,
-        plantilla_html_manual: selectedVertical.plantilla_html_manual,
-        claves: selectedVertical.claves ? JSON.stringify(selectedVertical.claves, null, 2) : '[]',
-        premisas_especificas: selectedVertical.premisas_especificas ? JSON.stringify(selectedVertical.premisas_especificas, null, 2) : '[]',
-        tablas_maestras: selectedVertical.tablas_maestras ? JSON.stringify(selectedVertical.tablas_maestras, null, 2) : '[]',
-        herramientas_recomendadas: selectedVertical.herramientas_recomendadas ? JSON.stringify(selectedVertical.herramientas_recomendadas, null, 2) : '[]',
-        ejemplo_workflows: selectedVertical.ejemplo_workflows ? JSON.stringify(selectedVertical.ejemplo_workflows, null, 2) : '[]',
-        integraciones_comunes: selectedVertical.integraciones_comunes ? JSON.stringify(selectedVertical.integraciones_comunes, null, 2) : '[]',
-        casos_prueba_tipicos: selectedVertical.casos_prueba_tipicos ? JSON.stringify(selectedVertical.casos_prueba_tipicos, null, 2) : '[]',
-        criterios_aceptacion: selectedVertical.criterios_aceptacion ? JSON.stringify(selectedVertical.criterios_aceptacion, null, 2) : '[]',
-        modulos_funcionales: selectedVertical.modulos_funcionales ? JSON.stringify(selectedVertical.modulos_funcionales, null, 2) : '[]',
-        procesos_clave: selectedVertical.procesos_clave ? JSON.stringify(selectedVertical.procesos_clave, null, 2) : '[]',
-        integraciones_usuario: selectedVertical.integraciones_usuario ? JSON.stringify(selectedVertical.integraciones_usuario, null, 2) : '[]'
+        plantilla_html_manual: selectedVertical.plantilla_html_manual
       });
-    } else if (isModalVisible && !selectedVertical) {
+
+      setClaves(selectedVertical.claves || []);
+      setPremisasEspecificas(selectedVertical.premisas_especificas || []);
+      setTablasMaestras(selectedVertical.tablas_maestras || []);
+      setHerramientasRecomendadas(selectedVertical.herramientas_recomendadas || []);
+      setEjemploWorkflows(selectedVertical.ejemplo_workflows || []);
+      setIntegracionesComunes(selectedVertical.integraciones_comunes || []);
+      setCasosPruebaTipicos(selectedVertical.casos_prueba_tipicos || []);
+      setCriteriosAceptacion(selectedVertical.criterios_aceptacion || []);
+      setModulosFuncionales(selectedVertical.modulos_funcionales || []);
+      setProcesosClave(selectedVertical.procesos_clave || []);
+      setIntegracionesUsuario(selectedVertical.integraciones_usuario || []);
+    } else if (isDrawerVisible && !selectedVertical) {
+      // Reset para nuevo vertical
       form.resetFields();
       form.setFieldsValue({
         activo: true,
         tarifa_diaria: 800,
         duracion_tipica_dias: 10,
-        margen_oferta_pct: 20,
-        claves: '[]',
-        premisas_especificas: '[]',
-        tablas_maestras: '[]',
-        herramientas_recomendadas: '[]',
-        ejemplo_workflows: '[]',
-        integraciones_comunes: '[]',
-        casos_prueba_tipicos: '[]',
-        criterios_aceptacion: '[]',
-        modulos_funcionales: '[]',
-        procesos_clave: '[]',
-        integraciones_usuario: '[]'
+        margen_oferta_pct: 20
       });
+
+      setClaves([]);
+      setPremisasEspecificas([]);
+      setTablasMaestras([]);
+      setHerramientasRecomendadas([]);
+      setEjemploWorkflows([]);
+      setIntegracionesComunes([]);
+      setCasosPruebaTipicos([]);
+      setCriteriosAceptacion([]);
+      setModulosFuncionales([]);
+      setProcesosClave([]);
+      setIntegracionesUsuario([]);
     }
-  }, [isModalVisible, selectedVertical, form]);
+  }, [isDrawerVisible, selectedVertical, form]);
 
   const loadVerticales = async () => {
     setLoading(true);
@@ -70,7 +246,7 @@ export default function VerticalesManager() {
       const data = await verticalesService.getAllVerticals();
       setVerticales(data);
     } catch (err) {
-      handleError(err, 'cargar verticales', false); message.error(MESSAGES.ERROR.LOAD('verticales') + ': ' + err.message);
+      message.error(MESSAGES.ERROR.LOAD('verticales') + ': ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -93,7 +269,7 @@ export default function VerticalesManager() {
       title: 'Tarifa Diaria',
       dataIndex: 'tarifa_diaria',
       key: 'tarifa_diaria',
-      render: (value) => `$${value || 0}`
+      render: (value) => `${value || 0}€`
     },
     {
       title: 'Estado',
@@ -148,13 +324,12 @@ export default function VerticalesManager() {
 
   const editVertical = (vertical) => {
     setSelectedVertical(vertical);
-    setIsModalVisible(true);
+    setIsDrawerVisible(true);
   };
 
   const createNewVertical = () => {
     setSelectedVertical(null);
-    form.resetFields();
-    setIsModalVisible(true);
+    setIsDrawerVisible(true);
   };
 
   const deleteVertical = async (vertical) => {
@@ -170,22 +345,24 @@ export default function VerticalesManager() {
     }
   };
 
-  const handleModalOk = async (values) => {
-    setLoading(true);
+  const handleSave = async () => {
     try {
+      const values = await form.validateFields();
+      setLoading(true);
+
       const data = {
         ...values,
-        claves: JSON.parse(values.claves || '[]'),
-        premisas_especificas: JSON.parse(values.premisas_especificas || '[]'),
-        tablas_maestras: JSON.parse(values.tablas_maestras || '[]'),
-        herramientas_recomendadas: JSON.parse(values.herramientas_recomendadas || '[]'),
-        ejemplo_workflows: JSON.parse(values.ejemplo_workflows || '[]'),
-        integraciones_comunes: JSON.parse(values.integraciones_comunes || '[]'),
-        casos_prueba_tipicos: JSON.parse(values.casos_prueba_tipicos || '[]'),
-        criterios_aceptacion: JSON.parse(values.criterios_aceptacion || '[]'),
-        modulos_funcionales: JSON.parse(values.modulos_funcionales || '[]'),
-        procesos_clave: JSON.parse(values.procesos_clave || '[]'),
-        integraciones_usuario: JSON.parse(values.integraciones_usuario || '[]')
+        claves,
+        premisas_especificas: premisasEspecificas,
+        tablas_maestras: tablasMaestras,
+        herramientas_recomendadas: herramientasRecomendadas,
+        ejemplo_workflows: ejemploWorkflows,
+        integraciones_comunes: integracionesComunes,
+        casos_prueba_tipicos: casosPruebaTipicos,
+        criterios_aceptacion: criteriosAceptacion,
+        modulos_funcionales: modulosFuncionales,
+        procesos_clave: procesosClave,
+        integraciones_usuario: integracionesUsuario
       };
 
       if (selectedVertical) {
@@ -202,12 +379,11 @@ export default function VerticalesManager() {
         message.success(MESSAGES.SUCCESS.CREATE('Vertical'));
       }
 
-      setIsModalVisible(false);
-      form.resetFields();
+      setIsDrawerVisible(false);
       setSelectedVertical(null);
     } catch (error) {
-      if (error.message.includes('JSON')) {
-        message.error('Error en formato JSON de uno de los campos');
+      if (error.errorFields) {
+        message.error('Por favor completa todos los campos requeridos');
       } else {
         message.error('Error al guardar: ' + error.message);
       }
@@ -216,13 +392,14 @@ export default function VerticalesManager() {
     }
   };
 
-  const collapseSections = [
+  // ── TABS DEL DRAWER ───────────────────────────────────────────────────────────
+  const drawerTabs = [
     {
       key: '1',
       label: 'Información Básica',
       children: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--gap-xl)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <Form.Item
               label="Nombre (ID)"
               name="nombre"
@@ -235,14 +412,20 @@ export default function VerticalesManager() {
               name="titulo"
               rules={[{ required: true, message: 'El título es requerido' }]}
             >
-              <Input placeholder="ej: Aplicación de Notificaciones" />
+              <Input placeholder="ej: Gestión de Notificaciones AAPP" />
             </Form.Item>
           </div>
           <Form.Item
             label="Descripción Introducción"
             name="descripcion_intro"
           >
-            <Input.TextArea rows={3} placeholder="Descripción breve del vertical" />
+            <Input.TextArea rows={4} placeholder="Descripción breve del vertical" />
+          </Form.Item>
+          <Form.Item
+            label="Descripción Implementación"
+            name="descripcion_implementacion"
+          >
+            <Input.TextArea rows={3} placeholder="Descripción de la implementación" />
           </Form.Item>
           <Form.Item
             name="activo"
@@ -250,138 +433,275 @@ export default function VerticalesManager() {
           >
             <Checkbox>Activo</Checkbox>
           </Form.Item>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginTop: '16px' }}>
+            <Form.Item
+              label="Tarifa Diaria (€)"
+              name="tarifa_diaria"
+            >
+              <InputNumber style={{ width: '100%' }} min={0} />
+            </Form.Item>
+            <Form.Item
+              label="Duración Típica (días)"
+              name="duracion_tipica_dias"
+            >
+              <InputNumber style={{ width: '100%' }} min={1} />
+            </Form.Item>
+            <Form.Item
+              label="Margen de Oferta (%)"
+              name="margen_oferta_pct"
+            >
+              <InputNumber style={{ width: '100%' }} min={0} max={100} />
+            </Form.Item>
+          </div>
         </div>
       )
     },
     {
       key: '2',
-      label: 'Estimación y Oferta',
+      label: 'Claves y Premisas',
       children: (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--gap-xl)' }}>
-          <Form.Item
-            label="Tarifa Diaria ($)"
-            name="tarifa_diaria"
-          >
-            <InputNumber style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            label="Duración Típica (días)"
-            name="duracion_tipica_dias"
-          >
-            <InputNumber style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            label="Margen de Oferta (%)"
-            name="margen_oferta_pct"
-          >
-            <InputNumber style={{ width: '100%' }} />
-          </Form.Item>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Claves del Proyecto</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Puntos clave que definen el proyecto
+            </p>
+            <EditableList
+              value={claves}
+              onChange={setClaves}
+              placeholder="Nueva clave del proyecto..."
+            />
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Premisas Específicas</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Premisas específicas de este tipo de proyecto
+            </p>
+            <EditableObjectList
+              value={premisasEspecificas}
+              onChange={setPremisasEspecificas}
+              itemLabel="Premisa"
+              fields={[
+                { key: 'premisa', label: 'Premisa', placeholder: 'ej: Acceso API AAPP' },
+                { key: 'descripcion', label: 'Descripción', placeholder: 'Detalle de la premisa' },
+                { key: 'impacto', label: 'Impacto', placeholder: 'Alto/Medio/Bajo' }
+              ]}
+            />
+          </div>
         </div>
       )
     },
     {
       key: '3',
-      label: 'Configuración EFDT',
+      label: 'Estructura y Workflows',
       children: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Form.Item
-            label="Descripción Implementación"
-            name="descripcion_implementacion"
-          >
-            <Input.TextArea rows={3} placeholder="Descripción general de la implementación" />
-          </Form.Item>
-          <Form.Item
-            label="Claves (JSON array)"
-            name="claves"
-          >
-            <Input.TextArea rows={2} placeholder='["clave1", "clave2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Premisas Específicas (JSON array)"
-            name="premisas_especificas"
-          >
-            <Input.TextArea rows={2} placeholder='["premisa1", "premisa2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Tablas Maestras (JSON array)"
-            name="tablas_maestras"
-          >
-            <Input.TextArea rows={2} placeholder='["tabla1", "tabla2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Herramientas Recomendadas (JSON array)"
-            name="herramientas_recomendadas"
-          >
-            <Input.TextArea rows={2} placeholder='["herramienta1", "herramienta2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Ejemplo Workflows (JSON array)"
-            name="ejemplo_workflows"
-          >
-            <Input.TextArea rows={2} placeholder='["workflow1", "workflow2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Integraciones Comunes (JSON array)"
-            name="integraciones_comunes"
-          >
-            <Input.TextArea rows={2} placeholder='["integracion1", "integracion2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Tablas Maestras</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Tablas maestras típicas de este vertical
+            </p>
+            <EditableList
+              value={tablasMaestras}
+              onChange={setTablasMaestras}
+              placeholder="Nueva tabla maestra..."
+            />
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Ejemplo de Workflows</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Workflows típicos de este tipo de proyecto
+            </p>
+            <EditableList
+              value={ejemploWorkflows}
+              onChange={setEjemploWorkflows}
+              placeholder="Nuevo workflow..."
+            />
+          </div>
         </div>
       )
     },
     {
       key: '4',
-      label: 'Configuración UAT',
+      label: 'Integraciones',
       children: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Form.Item
-            label="Casos de Prueba Típicos (JSON array)"
-            name="casos_prueba_tipicos"
-          >
-            <Input.TextArea rows={2} placeholder='["caso1", "caso2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Criterios de Aceptación (JSON array)"
-            name="criterios_aceptacion"
-          >
-            <Input.TextArea rows={2} placeholder='["criterio1", "criterio2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Herramientas Recomendadas</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Herramientas externas recomendadas (DOCAI, IVNEOS, IvSign, etc.)
+            </p>
+            <EditableList
+              value={herramientasRecomendadas}
+              onChange={setHerramientasRecomendadas}
+              placeholder="Nueva herramienta..."
+            />
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Integraciones Comunes</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Sistemas con los que típicamente se integra
+            </p>
+            <EditableList
+              value={integracionesComunes}
+              onChange={setIntegracionesComunes}
+              placeholder="Nueva integración..."
+            />
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Integraciones Usuario</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Integraciones visibles al usuario final
+            </p>
+            <EditableList
+              value={integracionesUsuario}
+              onChange={setIntegracionesUsuario}
+              placeholder="Nueva integración..."
+            />
+          </div>
         </div>
       )
     },
     {
       key: '5',
-      label: 'Configuración Manual HTML',
+      label: 'Testing y Módulos',
       children: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Form.Item
-            label="Módulos Funcionales (JSON array)"
-            name="modulos_funcionales"
-          >
-            <Input.TextArea rows={2} placeholder='["modulo1", "modulo2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Procesos Clave (JSON array)"
-            name="procesos_clave"
-          >
-            <Input.TextArea rows={2} placeholder='["proceso1", "proceso2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
-          <Form.Item
-            label="Integraciones Usuario (JSON array)"
-            name="integraciones_usuario"
-          >
-            <Input.TextArea rows={2} placeholder='["integracion1", "integracion2"]' style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-          </Form.Item>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Casos de Prueba Típicos</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Casos de prueba estándar para UAT
+            </p>
+            <EditableObjectList
+              value={casosPruebaTipicos}
+              onChange={setCasosPruebaTipicos}
+              itemLabel="Caso de Prueba"
+              fields={[
+                { key: 'caso', label: 'Caso', placeholder: 'ej: Crear y tramitar documento' },
+                { key: 'descripcion', label: 'Descripción', placeholder: 'Detalle del caso de prueba' }
+              ]}
+            />
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Criterios de Aceptación</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Criterios para considerar el proyecto completado
+            </p>
+            <EditableList
+              value={criteriosAceptacion}
+              onChange={setCriteriosAceptacion}
+              placeholder="Nuevo criterio..."
+            />
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Módulos Funcionales</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Módulos funcionales que incluye el vertical
+            </p>
+            <EditableList
+              value={modulosFuncionales}
+              onChange={setModulosFuncionales}
+              placeholder="Nuevo módulo..."
+            />
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Procesos Clave</h4>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+              Procesos de negocio clave del vertical
+            </p>
+            <EditableList
+              value={procesosClave}
+              onChange={setProcesosClave}
+              placeholder="Nuevo proceso..."
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      key: '6',
+      label: 'Plantilla HTML',
+      children: (
+        <div>
           <Form.Item
             label="Plantilla HTML Manual"
             name="plantilla_html_manual"
           >
-            <Input.TextArea rows={4} placeholder="<html>...</html>" style={{ fontFamily: 'monospace', fontSize: '12px' }} />
+            <Input.TextArea
+              rows={12}
+              placeholder="<html>...</html>"
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+            />
           </Form.Item>
         </div>
       )
     }
   ];
+
+  // ── VISTA PREVIA ──────────────────────────────────────────────────────────────
+  const PreviewPanel = () => {
+    const values = form.getFieldsValue();
+    return (
+      <Collapse
+        items={[{
+          key: '1',
+          label: (
+            <span style={{ fontWeight: 600 }}>
+              <EyeOutlined /> Vista Previa del Vertical
+            </span>
+          ),
+          children: (
+            <div style={{ fontSize: '13px', lineHeight: 1.6 }}>
+              <div style={{ marginBottom: '16px' }}>
+                <strong style={{ display: 'block', marginBottom: '4px' }}>Nombre:</strong>
+                <span>{values.nombre || '(sin nombre)'}</span>
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                <strong style={{ display: 'block', marginBottom: '4px' }}>Título:</strong>
+                <span>{values.titulo || '(sin título)'}</span>
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                <strong style={{ display: 'block', marginBottom: '4px' }}>Descripción:</strong>
+                <span style={{ color: 'var(--text-secondary)' }}>
+                  {values.descripcion_intro || '(sin descripción)'}
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                <div>
+                  <strong style={{ display: 'block', marginBottom: '4px', fontSize: '11px' }}>Tarifa:</strong>
+                  <Tag color="blue">{values.tarifa_diaria || 800}€/día</Tag>
+                </div>
+                <div>
+                  <strong style={{ display: 'block', marginBottom: '4px', fontSize: '11px' }}>Duración:</strong>
+                  <Tag color="green">{values.duracion_tipica_dias || 10} días</Tag>
+                </div>
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                <strong style={{ display: 'block', marginBottom: '8px' }}>Contenido:</strong>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {claves.length > 0 && <Tag>Claves: {claves.length}</Tag>}
+                  {premisasEspecificas.length > 0 && <Tag>Premisas: {premisasEspecificas.length}</Tag>}
+                  {tablasMaestras.length > 0 && <Tag>Tablas: {tablasMaestras.length}</Tag>}
+                  {ejemploWorkflows.length > 0 && <Tag>Workflows: {ejemploWorkflows.length}</Tag>}
+                  {herramientasRecomendadas.length > 0 && <Tag>Herramientas: {herramientasRecomendadas.length}</Tag>}
+                </div>
+              </div>
+            </div>
+          )
+        }]}
+        defaultActiveKey={[]}
+        style={{ marginBottom: '16px' }}
+      />
+    );
+  };
 
   return (
     <div className="container-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-xl)', height: '100%', minWidth: 0, overflow: 'hidden' }}>
@@ -416,30 +736,32 @@ export default function VerticalesManager() {
         </Spin>
       </div>
 
-      {/* MODAL */}
-      <Modal
+      {/* DRAWER LATERAL GRANDE */}
+      <Drawer
         title={selectedVertical ? 'Editar Vertical' : 'Crear Nuevo Vertical'}
-        open={isModalVisible}
-        onOk={() => form.submit()}
-        onCancel={() => {
-          setIsModalVisible(false);
-          form.resetFields();
+        open={isDrawerVisible}
+        onClose={() => {
+          setIsDrawerVisible(false);
           setSelectedVertical(null);
         }}
-        width={920}
-        confirmLoading={loading}
-        okText="Guardar"
-        cancelText="Cancelar"
+        width="80%"
+        extra={
+          <Space>
+            <Button onClick={() => setIsDrawerVisible(false)}>Cancelar</Button>
+            <Button type="primary" onClick={handleSave} loading={loading}>
+              Guardar
+            </Button>
+          </Space>
+        }
       >
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleModalOk}
-          style={{ marginTop: '-8px' }}
         >
-          <Collapse items={collapseSections} />
+          <PreviewPanel />
+          <Tabs items={drawerTabs} />
         </Form>
-      </Modal>
+      </Drawer>
     </div>
   );
 }
