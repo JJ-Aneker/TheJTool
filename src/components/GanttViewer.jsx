@@ -44,6 +44,13 @@ function countWorkingDays(start, end) {
 }
 
 export default function GanttViewer({ projectData }) {
+  // Calcular fecha de inicio: HOY + 7 días
+  const calculateDefaultStartDate = () => {
+    const today = new Date()
+    today.setDate(today.getDate() + 7) // Añadir 7 días
+    return today
+  }
+
   const [tasksState, setTasksState] = useState(
     projectData?.estimacion?.tareas?.map((t, i) => ({
       ...t,
@@ -52,9 +59,9 @@ export default function GanttViewer({ projectData }) {
       progress: t.progress || 0
     })) || []
   )
-  const [projectStart] = useState(new Date(2026, 2, 1))
+  const [projectStart] = useState(calculateDefaultStartDate())
   const [isDownloading, setIsDownloading] = useState(false)
-  const [exportStartDate, setExportStartDate] = useState(dayjs(new Date(2026, 2, 1)))
+  const [exportStartDate, setExportStartDate] = useState(dayjs(calculateDefaultStartDate()))
 
   // Recalcular fechas basadas en duración en días laborables
   const tasksWithDates = useMemo(() => {

@@ -277,6 +277,14 @@ ${ejemplosInyectados}
 Antes de generar, valida que cumple TODOS estos puntos:
 ${QUALITY_CHECKLIST.map(item => `- ${item}`).join('\n')}
 
+## REGLAS CRÍTICAS - INFORMACIÓN DEL CLIENTE
+
+⚠️ **MUY IMPORTANTE**:
+- Si el **nombre del cliente** NO está explícitamente mencionado en los documentos del briefing, dejar el campo \`cliente.nombre\` VACÍO ('')
+- **NUNCA inventar, asumir o inferir nombres de cliente** basándose en proyectos anteriores, contexto o memoria
+- Solo usar información **explícita y presente** en los documentos proporcionados
+- Si no hay información del cliente, usar campos vacíos: { nombre: '', razonSocial: '', sector: '', interlocutor: '', cif: '' }
+
 ## FORMATO DE RESPUESTA
 
 Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta. Sin markdown, sin explicaciones adicionales.
