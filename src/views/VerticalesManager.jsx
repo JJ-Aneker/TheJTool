@@ -389,6 +389,9 @@ export default function VerticalesManager() {
   const [procesosClave, setProcesosClave] = useState([]);
   const [integracionesUsuario, setIntegracionesUsuario] = useState([]);
 
+  // Estado para búsqueda/filtro
+  const [searchText, setSearchText] = useState('');
+
   useEffect(() => {
     loadVerticales();
   }, []);
@@ -472,6 +475,17 @@ export default function VerticalesManager() {
     };
     return iconMap[nombre?.toLowerCase()] || '📁';
   };
+
+  // Filtrar verticales por búsqueda
+  const filteredVerticales = verticales.filter(v => {
+    if (!searchText.trim()) return true;
+    const search = searchText.toLowerCase();
+    return (
+      v.nombre?.toLowerCase().includes(search) ||
+      v.titulo?.toLowerCase().includes(search) ||
+      v.descripcion_intro?.toLowerCase().includes(search)
+    );
+  });
 
   const editVertical = (vertical) => {
     setSelectedVertical(vertical);
@@ -873,7 +887,14 @@ export default function VerticalesManager() {
         <h1 className="header-title" style={{ margin: 0 }}>
           Gestión de Verticales
         </h1>
-        <div className="header-actions">
+        <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <Input
+            placeholder="🔍 Buscar verticales..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            allowClear
+            style={{ width: '300px' }}
+          />
           <button
             onClick={createNewVertical}
             className="btn-primary"
@@ -889,13 +910,19 @@ export default function VerticalesManager() {
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <Spin size="large" />
           </div>
-        ) : verticales.length === 0 ? (
+        ) : filteredVerticales.length === 0 ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ fontSize: '48px', opacity: 0.3 }}>📁</div>
-            <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>No hay verticales creados</div>
-            <button onClick={createNewVertical} className="btn-primary">
-              + Crear Primer Vertical
-            </button>
+            <div style={{ fontSize: '48px', opacity: 0.3 }}>
+              {searchText ? '🔍' : '📁'}
+            </div>
+            <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+              {searchText ? `No se encontraron verticales con "${searchText}"` : 'No hay verticales creados'}
+            </div>
+            {!searchText && (
+              <button onClick={createNewVertical} className="btn-primary">
+                + Crear Primer Vertical
+              </button>
+            )}
           </div>
         ) : (
           <div style={{
@@ -905,7 +932,7 @@ export default function VerticalesManager() {
             overflow: 'auto',
             padding: '0'
           }}>
-            {verticales.map(v => (
+            {filteredVerticales.map(v => (
               <Card key={v.id} className="profile-card" hoverable>
                 {/* Header con título y acciones */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -998,9 +1025,24 @@ export default function VerticalesManager() {
       {/* DRAWER LATERAL GRANDE */}
       <Drawer
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {selectedVertical ? <EditOutlined /> : <PlusOutlined />}
-            <span>{selectedVertical ? 'Editar Vertical' : 'Crear Nuevo Vertical'}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {selectedVertical ? <EditOutlined /> : <PlusOutlined />}
+              <span>{selectedVertical ? 'Editar Vertical' : 'Crear Nuevo Vertical'}</span>
+            </div>
+            {selectedVertical && (
+              <div style={{
+                fontSize: '14px',
+                fontWeight: 600,
+                color: 'var(--accent-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <span>{getVerticalIcon(selectedVertical.nombre)}</span>
+                <span>{selectedVertical.titulo || selectedVertical.nombre}</span>
+              </div>
+            )}
           </div>
         }
         open={isDrawerVisible}
