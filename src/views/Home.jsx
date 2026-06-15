@@ -168,7 +168,7 @@ export default function Home() {
           <div className="hero-band-left">
             <div className="hero-greeting">{getGreeting()}, {displayName}</div>
             <div className="hero-subtitle">
-              {getFormattedDate()} · buildingcenter.thereforeonline.com
+              {getFormattedDate()} · TheJay
             </div>
           </div>
           <div className="hero-band-right">
@@ -185,33 +185,38 @@ export default function Home() {
         <div className="kpi-cards-row">
           <div className="kpi-card-compact">
             <UserOutlined className="kpi-icon" style={{ color: '#60a5fa' }} />
-            <div className="kpi-label">Tenants Activos</div>
-            <div className="kpi-value">{stats.activeTenantsCount}</div>
-            <div className="kpi-delta">—</div>
+            <div className="kpi-content">
+              <div className="kpi-label">Tenants Activos</div>
+              <div className="kpi-value">{stats.activeTenantsCount}</div>
+            </div>
           </div>
           <div className="kpi-card-compact">
             <AppstoreOutlined className="kpi-icon" style={{ color: '#fb923c' }} />
-            <div className="kpi-label">Categorías</div>
-            <div className="kpi-value">{stats.categoriesCount}</div>
-            <div className="kpi-delta">—</div>
+            <div className="kpi-content">
+              <div className="kpi-label">Categorías</div>
+              <div className="kpi-value">{stats.categoriesCount}</div>
+            </div>
           </div>
           <div className="kpi-card-compact">
             <FormOutlined className="kpi-icon" style={{ color: '#34d399' }} />
-            <div className="kpi-label">Formularios</div>
-            <div className="kpi-value">{stats.eformsCount}</div>
-            <div className="kpi-delta">—</div>
+            <div className="kpi-content">
+              <div className="kpi-label">Formularios</div>
+              <div className="kpi-value">{stats.eformsCount}</div>
+            </div>
           </div>
           <div className="kpi-card-compact">
             <FileTextOutlined className="kpi-icon" style={{ color: '#a78bfa' }} />
-            <div className="kpi-label">Docs este mes</div>
-            <div className="kpi-value">{stats.docsThisMonth}</div>
-            <div className="kpi-delta">—</div>
+            <div className="kpi-content">
+              <div className="kpi-label">Docs este mes</div>
+              <div className="kpi-value">{stats.docsThisMonth}</div>
+            </div>
           </div>
           <div className="kpi-card-compact">
             <ApiOutlined className="kpi-icon" style={{ color: '#f472b6' }} />
-            <div className="kpi-label">Integraciones</div>
-            <div className="kpi-value">3</div>
-            <div className="kpi-delta">—</div>
+            <div className="kpi-content">
+              <div className="kpi-label">Integraciones</div>
+              <div className="kpi-value">3</div>
+            </div>
           </div>
         </div>
       </div>
