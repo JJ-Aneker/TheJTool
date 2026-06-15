@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert } from 'antd';
+import { Table, Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert, Select } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, CloseOutlined, EyeOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
 import { useTranslation } from 'react-i18next';
@@ -68,6 +68,191 @@ function EditableList({ value = [], onChange, placeholder = "Nuevo item", type =
           Agregar
         </Button>
       </Space.Compact>
+    </div>
+  );
+}
+
+// ── COMPONENTE ESPECIALIZADO PARA WORKFLOWS ─────────────────────────────────
+function WorkflowEditor({ value = [], onChange }) {
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingValues, setEditingValues] = useState({ nombre: '', descripcion: '', tipo: '', etapas: [] });
+  const [newEtapa, setNewEtapa] = useState('');
+
+  const startAdd = () => {
+    setEditingValues({ nombre: '', descripcion: '', tipo: 'automatico', etapas: [] });
+    setEditingIndex(-1);
+  };
+
+  const startEdit = (index) => {
+    setEditingValues({ ...value[index], etapas: [...(value[index].etapas || [])] });
+    setEditingIndex(index);
+  };
+
+  const saveWorkflow = () => {
+    if (editingIndex === -1) {
+      onChange([...value, editingValues]);
+    } else {
+      const newValue = [...value];
+      newValue[editingIndex] = editingValues;
+      onChange(newValue);
+    }
+    setEditingIndex(null);
+    setEditingValues({ nombre: '', descripcion: '', tipo: '', etapas: [] });
+    setNewEtapa('');
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditingValues({ nombre: '', descripcion: '', tipo: '', etapas: [] });
+    setNewEtapa('');
+  };
+
+  const removeWorkflow = (index) => {
+    onChange(value.filter((_, i) => i !== index));
+  };
+
+  const addEtapa = () => {
+    if (!newEtapa.trim()) return;
+    setEditingValues({ ...editingValues, etapas: [...editingValues.etapas, newEtapa.trim()] });
+    setNewEtapa('');
+  };
+
+  const removeEtapa = (etapaIndex) => {
+    setEditingValues({ ...editingValues, etapas: editingValues.etapas.filter((_, i) => i !== etapaIndex) });
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Lista de workflows */}
+      {value.map((workflow, index) => (
+        <Card
+          key={index}
+          size="small"
+          style={{ backgroundColor: 'var(--bg-secondary)', borderLeft: '4px solid var(--accent-primary)' }}
+          extra={
+            <Space size="small">
+              <Button size="small" icon={<EditOutlined />} onClick={() => startEdit(index)} />
+              <Button size="small" danger icon={<DeleteOutlined />} onClick={() => removeWorkflow(index)} />
+            </Space>
+          }
+        >
+          <div style={{ marginBottom: '8px' }}>
+            <strong style={{ fontSize: '14px' }}>{workflow.nombre || 'Sin nombre'}</strong>
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+            {workflow.descripcion || 'Sin descripción'}
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+            <Tag color="blue">{workflow.tipo || 'automatico'}</Tag>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+              {workflow.etapas?.length || 0} etapas
+            </span>
+          </div>
+          {workflow.etapas && workflow.etapas.length > 0 && (
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+              {workflow.etapas.map((etapa, i) => `${i + 1}. ${etapa}`).join(' → ')}
+            </div>
+          )}
+        </Card>
+      ))}
+
+      {/* Form para agregar/editar */}
+      {editingIndex !== null ? (
+        <Card size="small" title={editingIndex === -1 ? 'Nuevo Workflow' : 'Editar Workflow'} style={{ backgroundColor: 'var(--bg-hover)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: 500 }}>Nombre</label>
+              <Input
+                value={editingValues.nombre || ''}
+                onChange={(e) => setEditingValues({ ...editingValues, nombre: e.target.value })}
+                placeholder="ej: WF Asignación de Equipo"
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: 500 }}>Descripción</label>
+              <Input.TextArea
+                value={editingValues.descripcion || ''}
+                onChange={(e) => setEditingValues({ ...editingValues, descripcion: e.target.value })}
+                placeholder="Descripción del workflow..."
+                rows={2}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: 500 }}>Tipo</label>
+              <Select
+                value={editingValues.tipo || 'automatico'}
+                onChange={(tipo) => setEditingValues({ ...editingValues, tipo })}
+                style={{ width: '100%' }}
+                options={[
+                  { label: 'Automático', value: 'automatico' },
+                  { label: 'Manual', value: 'manual' },
+                  { label: 'Manual + Automático', value: 'manual_automatico' }
+                ]}
+              />
+            </div>
+
+            {/* Etapas del workflow */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '12px', fontWeight: 500 }}>
+                Etapas del Workflow ({editingValues.etapas?.length || 0})
+              </label>
+              {editingValues.etapas?.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
+                  {editingValues.etapas.map((etapa, etapaIndex) => (
+                    <div key={etapaIndex} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 12px',
+                      backgroundColor: 'var(--bg-primary)',
+                      borderRadius: '4px',
+                      fontSize: '12px'
+                    }}>
+                      <span style={{ color: 'var(--text-secondary)', minWidth: '20px' }}>{etapaIndex + 1}.</span>
+                      <span style={{ flex: 1 }}>{etapa}</span>
+                      <button
+                        onClick={() => removeEtapa(etapaIndex)}
+                        style={{
+                          border: 'none',
+                          background: 'transparent',
+                          color: 'var(--text-secondary)',
+                          cursor: 'pointer',
+                          padding: '2px 4px'
+                        }}
+                      >
+                        <CloseOutlined style={{ fontSize: '10px' }} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Space.Compact style={{ width: '100%' }}>
+                <Input
+                  value={newEtapa}
+                  onChange={(e) => setNewEtapa(e.target.value)}
+                  onPressEnter={addEtapa}
+                  placeholder="Nueva etapa..."
+                  size="small"
+                />
+                <Button size="small" type="primary" icon={<PlusOutlined />} onClick={addEtapa}>
+                  Agregar Etapa
+                </Button>
+              </Space.Compact>
+            </div>
+
+            <Space style={{ marginTop: '8px' }}>
+              <Button type="primary" onClick={saveWorkflow} disabled={!editingValues.nombre}>
+                Guardar Workflow
+              </Button>
+              <Button onClick={cancelEdit}>Cancelar</Button>
+            </Space>
+          </div>
+        </Card>
+      ) : (
+        <Button icon={<PlusOutlined />} onClick={startAdd} type="dashed" style={{ width: '100%' }}>
+          Agregar Workflow
+        </Button>
+      )}
     </div>
   );
 }
@@ -527,28 +712,12 @@ export default function VerticalesManager() {
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Workflows</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Formato: [{"{"}"nombre": "...", "descripcion": "...", "tipo": "automatico", "etapas": ["paso1", "paso2"]{"}"}]
+              Workflows típicos del vertical con sus etapas
             </p>
-            <Input.TextArea
-              value={JSON.stringify(ejemploWorkflows, null, 2)}
-              onChange={(e) => {
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  setEjemploWorkflows(parsed);
-                } catch (err) {
-                  // Permite edición temporal con JSON inválido
-                  // Solo actualiza si es JSON válido
-                }
-              }}
-              rows={8}
-              style={{ fontFamily: 'monospace', fontSize: '12px' }}
-              placeholder='[{"nombre": "WF Ejemplo", "descripcion": "...", "tipo": "automatico", "etapas": ["paso1"]}]'
+            <WorkflowEditor
+              value={ejemploWorkflows}
+              onChange={setEjemploWorkflows}
             />
-            {ejemploWorkflows.length > 0 && (
-              <div style={{ marginTop: '8px', fontSize: '11px', color: 'var(--text-secondary)' }}>
-                ✓ {ejemploWorkflows.length} workflow(s) configurado(s)
-              </div>
-            )}
           </div>
         </div>
       )
