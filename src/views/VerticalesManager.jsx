@@ -525,15 +525,30 @@ export default function VerticalesManager() {
           </div>
 
           <div>
-            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Ejemplo de Workflows</h4>
+            <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Workflows</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Workflows típicos de este tipo de proyecto
+              Formato: [{"{"}"nombre": "...", "descripcion": "...", "tipo": "automatico", "etapas": ["paso1", "paso2"]{"}"}]
             </p>
-            <EditableList
-              value={ejemploWorkflows}
-              onChange={setEjemploWorkflows}
-              placeholder="Nuevo workflow..."
+            <Input.TextArea
+              value={JSON.stringify(ejemploWorkflows, null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  setEjemploWorkflows(parsed);
+                } catch (err) {
+                  // Permite edición temporal con JSON inválido
+                  // Solo actualiza si es JSON válido
+                }
+              }}
+              rows={8}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder='[{"nombre": "WF Ejemplo", "descripcion": "...", "tipo": "automatico", "etapas": ["paso1"]}]'
             />
+            {ejemploWorkflows.length > 0 && (
+              <div style={{ marginTop: '8px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+                ✓ {ejemploWorkflows.length} workflow(s) configurado(s)
+              </div>
+            )}
           </div>
         </div>
       )
@@ -546,36 +561,57 @@ export default function VerticalesManager() {
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Herramientas Recomendadas</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Herramientas externas recomendadas (DOCAI, IVNEOS, IvSign, etc.)
+              Array de strings: ["DOCAI", "IVNEOS", "IvSign"]
             </p>
-            <EditableList
-              value={herramientasRecomendadas}
-              onChange={setHerramientasRecomendadas}
-              placeholder="Nueva herramienta..."
+            <Input.TextArea
+              value={JSON.stringify(herramientasRecomendadas, null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  setHerramientasRecomendadas(Array.isArray(parsed) ? parsed : []);
+                } catch (err) {}
+              }}
+              rows={4}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder='["DOCAI", "IVNEOS", "IvSign"]'
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Integraciones Comunes</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Sistemas con los que típicamente se integra
+              Array de strings: ["SAP", "Sage X3", "API REST"]
             </p>
-            <EditableList
-              value={integracionesComunes}
-              onChange={setIntegracionesComunes}
-              placeholder="Nueva integración..."
+            <Input.TextArea
+              value={JSON.stringify(integracionesComunes, null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  setIntegracionesComunes(Array.isArray(parsed) ? parsed : []);
+                } catch (err) {}
+              }}
+              rows={4}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder='["SAP", "Sage X3"]'
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Integraciones Usuario</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Integraciones visibles al usuario final
+              Array de strings de integraciones visibles al usuario
             </p>
-            <EditableList
-              value={integracionesUsuario}
-              onChange={setIntegracionesUsuario}
-              placeholder="Nueva integración..."
+            <Input.TextArea
+              value={JSON.stringify(integracionesUsuario, null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  setIntegracionesUsuario(Array.isArray(parsed) ? parsed : []);
+                } catch (err) {}
+              }}
+              rows={4}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder='["Portal web", "App móvil"]'
             />
           </div>
         </div>
@@ -605,36 +641,57 @@ export default function VerticalesManager() {
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Criterios de Aceptación</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Criterios para considerar el proyecto completado
+              Array de strings: ["criterio1", "criterio2"]
             </p>
-            <EditableList
-              value={criteriosAceptacion}
-              onChange={setCriteriosAceptacion}
-              placeholder="Nuevo criterio..."
+            <Input.TextArea
+              value={JSON.stringify(criteriosAceptacion, null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  setCriteriosAceptacion(Array.isArray(parsed) ? parsed : []);
+                } catch (err) {}
+              }}
+              rows={4}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder='["Todo funciona correctamente", "Usuario capacitado"]'
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Módulos Funcionales</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Módulos funcionales que incluye el vertical
+              Array de strings: ["módulo1", "módulo2"]
             </p>
-            <EditableList
-              value={modulosFuncionales}
-              onChange={setModulosFuncionales}
-              placeholder="Nuevo módulo..."
+            <Input.TextArea
+              value={JSON.stringify(modulosFuncionales, null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  setModulosFuncionales(Array.isArray(parsed) ? parsed : []);
+                } catch (err) {}
+              }}
+              rows={4}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder='["Gestión documental", "Workflows", "Reporting"]'
             />
           </div>
 
           <div>
             <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Procesos Clave</h4>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Procesos de negocio clave del vertical
+              Array de strings: ["proceso1", "proceso2"]
             </p>
-            <EditableList
-              value={procesosClave}
-              onChange={setProcesosClave}
-              placeholder="Nuevo proceso..."
+            <Input.TextArea
+              value={JSON.stringify(procesosClave, null, 2)}
+              onChange={(e) => {
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  setProcesosClave(Array.isArray(parsed) ? parsed : []);
+                } catch (err) {}
+              }}
+              rows={4}
+              style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder='["Alta de documento", "Tramitación", "Cierre"]'
             />
           </div>
         </div>

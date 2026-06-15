@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Verticales Data</title>
+</head>
+<body>
+    <h1>Testing Verticales API</h1>
+    <pre id="output"></pre>
+    <script>
+        fetch('http://localhost:3002/api/verticales')
+            .then(r => r.json())
+            .then(data => {
+                // Find first vertical with ejemplo_workflows
+                const withWorkflows = data.find(v => v.ejemplo_workflows && v.ejemplo_workflows.length > 0);
+                document.getElementById('output').textContent = JSON.stringify(withWorkflows, null, 2);
+                console.log('All verticales:', data);
+                console.log('With workflows:', withWorkflows);
+            })
+            .catch(e => {
+                document.getElementById('output').textContent = 'Error: ' + e.message;
+            });
+    </script>
+</body>
+</html>
