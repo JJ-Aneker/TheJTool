@@ -86,7 +86,16 @@ export default function DocumentGenerator() {
   const loadVerticales = async () => {
     setLoadingVerticales(true)
     try {
+      console.log('[DocumentGenerator] Cargando verticales...')
       const data = await verticalesService.getAllVerticals()
+      console.log('[DocumentGenerator] Verticales recibidos:', data?.length || 0, data)
+
+      if (!data || data.length === 0) {
+        console.warn('[DocumentGenerator] No se recibieron verticales')
+        message.warning('No hay verticales disponibles')
+        setVerticales([])
+        return
+      }
 
       // Mapa de iconos por nombre de vertical
       const iconMap = {
@@ -104,9 +113,12 @@ export default function DocumentGenerator() {
         label: `${iconMap[v.nombre] || '📄'} ${v.titulo}`,  // Nombre bonito con icono
         desc: v.descripcion_intro || v.descripcion_implementacion || ''  // Descripción
       }))
+
+      console.log('[DocumentGenerator] Verticales formateados:', formattedVerticales.length)
       setVerticales(formattedVerticales)
+      message.success(`${formattedVerticales.length} verticales cargados`)
     } catch (err) {
-      console.error('Error loading verticales:', err)
+      console.error('[DocumentGenerator] Error loading verticales:', err)
       message.error('Error al cargar verticales: ' + err.message)
       // Fallback to empty array
       setVerticales([])
