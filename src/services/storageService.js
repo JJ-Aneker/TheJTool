@@ -51,6 +51,44 @@ export const storageService = {
   },
 
   /**
+   * Lista portadas guardadas del usuario
+   * @param {string} userId - ID del usuario
+   * @returns {Promise<Array>} Lista de portadas
+   */
+  async listUserCovers(userId) {
+    try {
+      console.log('[Storage] Listando portadas de usuario:', userId)
+
+      const { data, error } = await supabase.storage
+        .from(DOCUMENT_BUCKET)
+        .list(userId, {
+          limit: 100,
+          offset: 0,
+          sortBy: { column: 'created_at', order: 'desc' }
+        })
+
+      if (error) throw error
+
+      // Filtrar solo PNG (portadas)
+      const covers = data
+        .filter(file => file.name.toLowerCase().endsWith('.png'))
+        .map(file => ({
+          name: file.name,
+          path: `${userId}/${file.name}`,
+          url: supabase.storage.from(DOCUMENT_BUCKET).getPublicUrl(`${userId}/${file.name}`).data.publicUrl,
+          created_at: file.created_at,
+          size: file.metadata?.size || 0
+        }))
+
+      console.log('[Storage] Portadas encontradas:', covers.length)
+      return covers
+    } catch (error) {
+      logger.error('Error listing covers:', error)
+      return []
+    }
+  },
+
+  /**
    * Elimina documentos temporales
    * @param {string[]} paths - Array de paths a eliminar
    */

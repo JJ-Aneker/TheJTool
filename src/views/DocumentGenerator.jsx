@@ -67,6 +67,8 @@ export default function DocumentGenerator() {
   const [useDefaultPortada, setUseDefaultPortada] = useState(false)
   const [portadaDragActive, setPortadaDragActive] = useState(false)
   const [filesDragActive, setFilesDragActive]   = useState(false)
+  const [savedCovers, setSavedCovers]           = useState([])
+  const [loadingCovers, setLoadingCovers]       = useState(false)
 
   // Progress messages
   const analysisMessages = [
@@ -83,6 +85,7 @@ export default function DocumentGenerator() {
   // ── LOAD VERTICALES FROM API ─────────────────────────────────────────────────
   useEffect(() => {
     loadVerticales()
+    loadSavedCovers()
   }, [])
 
   const loadVerticales = async () => {
@@ -126,6 +129,57 @@ export default function DocumentGenerator() {
       setVerticales([])
     } finally {
       setLoadingVerticales(false)
+    }
+  }
+
+  // ── LOAD SAVED COVERS ─────────────────────────────────────────────────────────
+  const loadSavedCovers = async () => {
+    setLoadingCovers(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const covers = await storageService.listUserCovers(user.id)
+      setSavedCovers(covers)
+    } catch (err) {
+      console.error('[DocumentGenerator] Error cargando portadas:', err)
+    } finally {
+      setLoadingCovers(false)
+    }
+  }
+
+  // Seleccionar portada guardada
+  const selectSavedCover = async (cover) => {
+    try {
+      message.loading({ content: 'Cargando portada...', key: 'cover' })
+
+      // Descargar imagen para obtener dimensiones
+      const response = await fetch(cover.url)
+      const blob = await response.blob()
+      const reader = new FileReader()
+
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          const base64 = e.target.result.split(',')[1]
+          setPortada({
+            name: cover.name,
+            base64,
+            storagePath: cover.path,
+            storageUrl: cover.url,
+            width: img.width,
+            height: img.height
+          })
+          setPortadaPreview(e.target.result)
+          setUseDefaultPortada(false)
+          message.success({ content: 'Portada cargada', key: 'cover' })
+        }
+        img.src = e.target.result
+      }
+      reader.readAsDataURL(blob)
+    } catch (err) {
+      console.error('[DocumentGenerator] Error cargando portada guardada:', err)
+      message.error({ content: 'Error cargando portada', key: 'cover' })
     }
   }
 
@@ -666,15 +720,35 @@ export default function DocumentGenerator() {
                         </p>
                       </Dragger>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '0 4px' }}>
-                      <input
-                        type="checkbox" id="use-default-portada"
-                        checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
-                        style={{ cursor: 'pointer', width: 11, height: 11 }}
-                      />
-                      <label htmlFor="use-default-portada" style={{ fontSize: 8, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
-                        Default
-                      </label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '0 4px' }}>
+                        <input
+                          type="checkbox" id="use-default-portada"
+                          checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
+                          style={{ cursor: 'pointer', width: 11, height: 11 }}
+                        />
+                        <label htmlFor="use-default-portada" style={{ fontSize: 8, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
+                          Default
+                        </label>
+                      </div>
+                      {savedCovers.length > 0 && (
+                        <Select
+                          size="small"
+                          placeholder="O usar portada guardada..."
+                          style={{ width: '100%', fontSize: '9px' }}
+                          onChange={(value) => {
+                            const cover = savedCovers.find(c => c.path === value)
+                            if (cover) selectSavedCover(cover)
+                          }}
+                          loading={loadingCovers}
+                        >
+                          {savedCovers.map(cover => (
+                            <Option key={cover.path} value={cover.path}>
+                              {cover.name.substring(0, 30)}...
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
                     </div>
                   </div>
                 )}
