@@ -13,7 +13,14 @@ import { EFDT_EJEMPLOS } from './_lib/knowledge/efdt_ejemplos.js'
 import { EFDT_STYLE_GUIDE, QUALITY_CHECKLIST, PROMPTS_ENHANCEMENT } from './_lib/knowledge/efdt_prompts.js'
 import { DOCUMENT_EJEMPLOS, formatearEjemplosParaPrompt } from './_lib/knowledge/document_ejemplos.js'
 
-export const config = { maxDuration: 120 }
+export const config = {
+  maxDuration: 120,
+  api: {
+    bodyParser: {
+      sizeLimit: '4mb'
+    }
+  }
+}
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
