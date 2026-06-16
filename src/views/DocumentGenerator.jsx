@@ -703,53 +703,124 @@ export default function DocumentGenerator() {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div className="efdt-portada-dropzone">
-                      <Dragger
-                        multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
-                        accept=".png" className={`efdt-dragger ${portadaDragActive ? 'efdt-dragger-active' : ''}`}
-                        style={{ padding: 0, minHeight: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', border: 'none', background: 'transparent' }}
-                        onDragEnter={() => setPortadaDragActive(true)}
-                        onDragLeave={() => setPortadaDragActive(false)}
-                        onDrop={() => setPortadaDragActive(false)}
-                      >
-                        <p className="ant-upload-drag-icon">
-                          <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 16 }} />
-                        </p>
-                        <p style={{ fontSize: 9, fontWeight: 500, color: 'var(--text-primary)', margin: '3px 0 0', textAlign: 'center' }}>
-                          PNG A4
-                        </p>
-                      </Dragger>
+                    {/* Checkbox Default */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '0 4px' }}>
+                      <input
+                        type="checkbox" id="use-default-portada"
+                        checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
+                        style={{ cursor: 'pointer', width: 11, height: 11 }}
+                      />
+                      <label htmlFor="use-default-portada" style={{ fontSize: 8, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
+                        Default
+                      </label>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '0 4px' }}>
-                        <input
-                          type="checkbox" id="use-default-portada"
-                          checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
-                          style={{ cursor: 'pointer', width: 11, height: 11 }}
-                        />
-                        <label htmlFor="use-default-portada" style={{ fontSize: 8, color: 'var(--text-secondary)', cursor: 'pointer', margin: 0 }}>
-                          Default
-                        </label>
-                      </div>
-                      {savedCovers.length > 0 && (
-                        <Select
-                          size="small"
-                          placeholder="O usar portada guardada..."
-                          style={{ width: '100%', fontSize: '9px' }}
-                          onChange={(value) => {
-                            const cover = savedCovers.find(c => c.path === value)
-                            if (cover) selectSavedCover(cover)
-                          }}
-                          loading={loadingCovers}
-                        >
+
+                    {/* Mosaico de portadas guardadas */}
+                    {savedCovers.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <div style={{ fontSize: 8, color: 'var(--text-secondary)', padding: '0 4px', fontWeight: 500 }}>
+                          Portadas guardadas:
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          gap: 6,
+                          flexWrap: 'wrap',
+                          padding: '4px'
+                        }}>
                           {savedCovers.map(cover => (
-                            <Option key={cover.path} value={cover.path}>
-                              {cover.name.substring(0, 30)}...
-                            </Option>
+                            <div
+                              key={cover.path}
+                              onClick={() => selectSavedCover(cover)}
+                              style={{
+                                position: 'relative',
+                                width: '60px',
+                                height: '85px',
+                                border: '1.5px solid var(--color-border-secondary)',
+                                borderRadius: '4px',
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.05)'
+                                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)'
+                                e.currentTarget.style.borderColor = 'var(--accent-primary)'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)'
+                                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)'
+                                e.currentTarget.style.borderColor = 'var(--color-border-secondary)'
+                              }}
+                            >
+                              <img
+                                src={cover.url}
+                                alt={cover.name}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                }}
+                              />
+                            </div>
                           ))}
-                        </Select>
-                      )}
-                    </div>
+                          {/* Botón Nueva Portada */}
+                          <Dragger
+                            multiple={false}
+                            beforeUpload={handlePortadaUpload}
+                            showUploadList={false}
+                            accept=".png"
+                            style={{
+                              width: '60px',
+                              height: '85px',
+                              padding: 0,
+                              margin: 0,
+                              border: '1.5px dashed var(--color-border-secondary)',
+                              borderRadius: '4px',
+                              background: 'var(--color-background-tertiary)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                            }}
+                            className="cover-upload-btn"
+                          >
+                            <div style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 2
+                            }}>
+                              <PlusOutlined style={{ fontSize: 16, color: 'var(--accent-primary)' }} />
+                              <span style={{ fontSize: 7, color: 'var(--text-secondary)' }}>Nueva</span>
+                            </div>
+                          </Dragger>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Dropzone grande (solo si no hay portadas guardadas) */}
+                    {savedCovers.length === 0 && (
+                      <div className="efdt-portada-dropzone">
+                        <Dragger
+                          multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
+                          accept=".png" className={`efdt-dragger ${portadaDragActive ? 'efdt-dragger-active' : ''}`}
+                          style={{ padding: 0, minHeight: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', border: 'none', background: 'transparent' }}
+                          onDragEnter={() => setPortadaDragActive(true)}
+                          onDragLeave={() => setPortadaDragActive(false)}
+                          onDrop={() => setPortadaDragActive(false)}
+                        >
+                          <p className="ant-upload-drag-icon">
+                            <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 16 }} />
+                          </p>
+                          <p style={{ fontSize: 9, fontWeight: 500, color: 'var(--text-primary)', margin: '3px 0 0', textAlign: 'center' }}>
+                            PNG A4
+                          </p>
+                        </Dragger>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

@@ -277,10 +277,18 @@ function buildPortadaWithImage(imgBase64, d) {
     const version = d.proyecto?.version || 'v1.0';
     const fecha = d.proyecto?.fecha || '';
 
-    // Imagen anclada detrás del documento (como en el ejemplo)
+    // CRÍTICO: Usar dimensiones de página completa (A4 en TWIPs, no pixels)
+    // PAGE_W y PAGE_H ya están definidos arriba en TWIPs
+    const imageWidthEMU = Math.round(PAGE_W * 635); // Convertir TWIPs a EMUs
+    const imageHeightEMU = Math.round(PAGE_H * 635);
+
+    // Imagen anclada detrás del documento ocupando página completa
     const imageRunWithFloating = new ImageRun({
       data: imgBuffer,
-      transformation: { width: 794, height: 1123 }, // A4 en pixels (96 DPI)
+      transformation: {
+        width: Math.round(imageWidthEMU / 9525), // EMUs a pixels (1 pixel = 9525 EMUs)
+        height: Math.round(imageHeightEMU / 9525)
+      },
       floating: {
         horizontalPosition: { offset: 0, relative: 'page' },
         verticalPosition: { offset: 0, relative: 'page' },
@@ -361,12 +369,18 @@ function buildPortadaWithImage(imgBase64, d) {
 }
 
 function buildPortada(d, forceNoImage = false) {
+  // DEBUG
+  console.log('[BUILD-DOCX] buildPortada() - tiene portada?', !!d.portada?.imgBase64);
+  console.log('[BUILD-DOCX] buildPortada() - forceNoImage?', forceNoImage);
+
   // Si hay portada PNG disponible y no se fuerza, usarla
   if (d.portada?.imgBase64 && !forceNoImage) {
+    console.log('[BUILD-DOCX] ✅ Usando portada con imagen');
     return buildPortadaWithImage(d.portada.imgBase64, d);
   }
 
   // Fallback: portada simple (si no hay PNG)
+  console.log('[BUILD-DOCX] ⚠️ Usando portada SIN imagen (fallback)');
   const cliente = d.cliente?.razonSocial || d.cliente?.nombre || '<<CLIENTE>>';
   const tipoDoc = d.tipoDoc || 'efdt';
   const tipoDocLabel = tipoDoc === 'efdt' ? 'Aproximación económica' : tipoDoc === 'requirements' ? 'Análisis de requerimientos' : 'Documento técnico';

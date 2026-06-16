@@ -678,6 +678,14 @@
   border-color: var(--border-default);
 }
 
+/* ── MOSAICO PORTADAS ──────────────────────────────────────────────────────────── */
+.cover-upload-btn:hover {
+  background: var(--color-background-secondary) !important;
+  border-color: var(--accent-primary) !important;
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+}
+
 /* ── SCROLLBAR ────────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
