@@ -21,7 +21,7 @@ import exportVerticalHandler from './api/export-vertical.js';
 // import executeSqlHandler from './api/execute-sql.js'; // DISABLED: file not found
 // import updateUserRoleHandler from './api/update-user-role.js'; // DISABLED: file not found
 import bedrockHandler from './api/bedrock.js';
-import verticalesHandlers from './api/verticales.js';
+import * as verticalesHandlers from './api/verticales.js';
 import dashboardRouter from './routes/dashboard.js';
 import adminRouter from './routes/admin.js';
 
