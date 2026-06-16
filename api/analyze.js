@@ -386,7 +386,9 @@ export default async function handler(req, res) {
     }
 
     // ── DESCARGAR DOCUMENTO DE REFERENCIA ──────────────────────────────────
-    const refDoc = await fetchReferenceDoc(verticalKey)
+    // DESACTIVADO: Causa error 413 por payload muy grande
+    // La información de efdt_prompts.js y efdt_ejemplos.js es suficiente
+    const refDoc = null // await fetchReferenceDoc(verticalKey)
 
     // ── SYSTEM PROMPT — DINÁMICO SEGÚN TIPO DE DOCUMENTO ──────────────────
     const systemPrompt = buildSystemPrompt(tipoDoc, verticalKey, verticalData)
