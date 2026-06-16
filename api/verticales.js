@@ -195,7 +195,50 @@ async function deleteVertical(req, res) {
   }
 }
 
-export default {
+// Vercel-compatible default export handler
+export default async function handler(req, res) {
+  const { method } = req;
+  const { id } = req.query;
+
+  try {
+    // GET /api/verticales - Get all verticales
+    if (method === 'GET' && !id) {
+      return await getAllVerticals(req, res);
+    }
+
+    // GET /api/verticales/[id] - Get vertical by ID
+    if (method === 'GET' && id) {
+      req.params = { id }; // Adapt query to params
+      return await getVerticalById(req, res);
+    }
+
+    // POST /api/verticales - Create vertical
+    if (method === 'POST') {
+      return await createVertical(req, res);
+    }
+
+    // PUT /api/verticales/[id] - Update vertical
+    if (method === 'PUT' && id) {
+      req.params = { id };
+      return await updateVertical(req, res);
+    }
+
+    // DELETE /api/verticales/[id] - Delete vertical
+    if (method === 'DELETE' && id) {
+      req.params = { id };
+      return await deleteVertical(req, res);
+    }
+
+    // Method not allowed
+    res.status(405).json({ error: 'Method not allowed' });
+  } catch (error) {
+    console.error('[API] Handler error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+}
+
+// Named exports for server.js compatibility
+export {
   getAllVerticals,
   getVerticalById,
   createVertical,
