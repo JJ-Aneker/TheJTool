@@ -490,6 +490,10 @@ export default function DocumentGenerator() {
     setBuilding(true)
     setBuildError(null)
     setDocxUrl(null)
+
+    // Obtener usuario para logging
+    const { data: { user } } = await supabase.auth.getUser()
+
     try {
       const res = await fetch('/api/build-docx', {
         method: 'POST',
