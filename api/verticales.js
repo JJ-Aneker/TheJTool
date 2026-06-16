@@ -15,6 +15,7 @@ async function getAllVerticals(req, res) {
     const { data, error } = await supabase
       .from('verticales')
       .select('*')
+      .eq('activo', true)  // Solo verticales activos
       .order('nombre', { ascending: true });
 
     if (error) {
