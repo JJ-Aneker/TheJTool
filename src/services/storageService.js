@@ -57,7 +57,7 @@ export const storageService = {
    */
   async listUserCovers(userId) {
     try {
-      console.log('[Storage] Listando portadas de usuario:', userId)
+      console.log('[Storage] 🔍 Listando archivos de usuario:', userId)
 
       const { data, error } = await supabase.storage
         .from(DOCUMENT_BUCKET)
@@ -67,11 +67,21 @@ export const storageService = {
           sortBy: { column: 'created_at', order: 'desc' }
         })
 
-      if (error) throw error
+      if (error) {
+        console.error('[Storage] ❌ Error listando:', error)
+        throw error
+      }
+
+      console.log('[Storage] 📁 Archivos totales encontrados:', data?.length || 0)
+      console.log('[Storage] Archivos:', data)
 
       // Filtrar solo PNG (portadas)
       const covers = data
-        .filter(file => file.name.toLowerCase().endsWith('.png'))
+        .filter(file => {
+          const isPNG = file.name.toLowerCase().endsWith('.png')
+          console.log(`[Storage] Archivo ${file.name} es PNG? ${isPNG}`)
+          return isPNG
+        })
         .map(file => ({
           name: file.name,
           path: `${userId}/${file.name}`,
@@ -80,7 +90,8 @@ export const storageService = {
           size: file.metadata?.size || 0
         }))
 
-      console.log('[Storage] Portadas encontradas:', covers.length)
+      console.log('[Storage] ✅ Portadas PNG encontradas:', covers.length)
+      console.log('[Storage] Portadas:', covers)
       return covers
     } catch (error) {
       logger.error('Error listing covers:', error)

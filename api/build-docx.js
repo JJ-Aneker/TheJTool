@@ -949,10 +949,16 @@ export default async function handler(req, res) {
     const { projectData, tipoDoc, portada, useDefaultPortada } = req.body;
     if (!projectData) return res.status(400).json({ error: 'projectData requerido' });
 
+    console.log('[BUILD-DOCX] ═══════════════════════════════════════════════════')
+    console.log('[BUILD-DOCX] Handler recibió:')
+    console.log('[BUILD-DOCX] - portada?.storageUrl:', portada?.storageUrl)
+    console.log('[BUILD-DOCX] - portada?.base64:', portada?.base64 ? `${portada.base64.substring(0, 50)}...` : null)
+    console.log('[BUILD-DOCX] - useDefaultPortada:', useDefaultPortada)
+
     // Agregar portada a projectData si existe
     if (portada?.storageUrl) {
       // Descargar desde Storage
-      console.log('[BUILD-DOCX] Descargando portada desde Storage:', portada.storageUrl)
+      console.log('[BUILD-DOCX] 🔄 Descargando portada desde Storage:', portada.storageUrl)
       try {
         const response = await fetch(portada.storageUrl)
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
@@ -963,24 +969,34 @@ export default async function handler(req, res) {
           width: portada.width,
           height: portada.height,
         }
-        console.log('[BUILD-DOCX] Portada descargada:', base64.length, 'bytes')
+        console.log('[BUILD-DOCX] ✅ Portada descargada:', base64.length, 'bytes')
+        console.log('[BUILD-DOCX] ✅ projectData.portada seteado correctamente')
       } catch (err) {
-        console.error('[BUILD-DOCX] Error descargando portada:', err)
+        console.error('[BUILD-DOCX] ❌ Error descargando portada:', err)
       }
     } else if (portada?.base64) {
       // Fallback: base64 directo
+      console.log('[BUILD-DOCX] 🔄 Usando base64 directo')
       projectData.portada = {
         imgBase64: portada.base64,
         width: portada.width,
         height: portada.height,
       }
+      console.log('[BUILD-DOCX] ✅ projectData.portada seteado desde base64')
+    } else {
+      console.log('[BUILD-DOCX] ⚠️ NO HAY PORTADA - ni storageUrl ni base64')
     }
+
     if (useDefaultPortada) {
       projectData.useDefaultPortada = true;
+      console.log('[BUILD-DOCX] ✅ useDefaultPortada activado')
     }
     if (tipoDoc) {
       projectData.tipoDoc = tipoDoc;
     }
+
+    console.log('[BUILD-DOCX] Llamando a buildDocument()...')
+    console.log('[BUILD-DOCX] ═══════════════════════════════════════════════════')
 
     const buffer = await buildDocument(projectData);
     const base64 = buffer.toString('base64');

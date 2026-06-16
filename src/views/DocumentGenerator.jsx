@@ -137,12 +137,18 @@ export default function DocumentGenerator() {
     setLoadingCovers(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      console.log('[DocumentGenerator] 🔍 Cargando portadas guardadas para user:', user?.id)
+      if (!user) {
+        console.log('[DocumentGenerator] ⚠️ No hay usuario autenticado')
+        return
+      }
 
       const covers = await storageService.listUserCovers(user.id)
+      console.log('[DocumentGenerator] ✅ Portadas encontradas:', covers.length)
+      console.log('[DocumentGenerator] Portadas:', covers)
       setSavedCovers(covers)
     } catch (err) {
-      console.error('[DocumentGenerator] Error cargando portadas:', err)
+      console.error('[DocumentGenerator] ❌ Error cargando portadas:', err)
     } finally {
       setLoadingCovers(false)
     }
@@ -493,7 +499,12 @@ export default function DocumentGenerator() {
         body: JSON.stringify({
           projectData,
           tipoDoc,
-          portada: portada ? { base64: portada.base64, width: portada.width, height: portada.height } : null,
+          portada: portada ? {
+            storageUrl: portada.storageUrl || null,  // CRÍTICO: URL en Storage
+            base64: portada.base64,  // Fallback
+            width: portada.width,
+            height: portada.height
+          } : null,
           useDefaultPortada
         })
       })
