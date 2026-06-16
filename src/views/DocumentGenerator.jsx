@@ -16,6 +16,8 @@ import {
 import { DOCUMENT_TYPES, getDocumentTypeOptions } from '../constants/documentTypes.js'
 import { ganttService } from '../services/ganttService.js'
 import { verticalesService } from '../services/verticalesService.js'
+import { storageService } from '../services/storageService.js'
+import { supabase } from '../config/supabaseClient'
 import GanttViewer from '../components/GanttViewer.jsx'
 import { useTranslation } from 'react-i18next'
 import { useMessages } from '../utils/i18nMessages'
@@ -128,21 +130,46 @@ export default function DocumentGenerator() {
   }
 
   // ── FILE HANDLING ───────────────────────────────────────────────────────────
-  const handleFileAdd = useCallback((file) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const base64 = e.target.result.split(',')[1]
-      const newFile = { uid: `${Date.now()}-${Math.random()}`, name: file.name, type: file.type, size: file.size, base64, textContent: null }
+  const handleFileAdd = useCallback(async (file) => {
+    try {
+      console.log('[DocumentGenerator] Subiendo archivo a Storage:', file.name)
+      message.loading({ content: `Subiendo ${file.name}...`, key: file.name })
 
+      // Obtener userId
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Usuario no autenticado')
+
+      // Subir a Supabase Storage
+      const uploadedFile = await storageService.uploadDocument(file, user.id)
+
+      // Leer texto si es HTML/TXT para análisis
+      let textContent = null
       if (file.type === 'text/html' || file.type === 'text/plain') {
-        const tr = new FileReader()
-        tr.onload = (te) => { newFile.textContent = te.target.result; setFiles(prev => [...prev, newFile]) }
-        tr.readAsText(file)
-      } else {
-        setFiles(prev => [...prev, newFile])
+        const reader = new FileReader()
+        textContent = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result)
+          reader.readAsText(file)
+        })
       }
+
+      // Agregar a la lista con datos de Storage
+      const newFile = {
+        uid: `${Date.now()}-${Math.random()}`,
+        name: uploadedFile.name,
+        type: uploadedFile.type,
+        size: uploadedFile.size,
+        storagePath: uploadedFile.path,  // Path en Storage para eliminar después
+        storageUrl: uploadedFile.url,    // URL para el backend
+        textContent
+      }
+
+      setFiles(prev => [...prev, newFile])
+      message.success({ content: `${file.name} subido`, key: file.name })
+    } catch (err) {
+      console.error('[DocumentGenerator] Error subiendo archivo:', err)
+      message.error({ content: `Error al subir ${file.name}`, key: file.name })
     }
-    reader.readAsDataURL(file)
+
     return false
   }, [])
 
@@ -207,8 +234,19 @@ export default function DocumentGenerator() {
         vertical: vertical || 'generico',
         tipoDoc,
         extraInstructions: finalInstructions,
-        files: files.map(f => ({ name: f.name, type: f.type, base64: f.base64, textContent: f.textContent })),
-        portada: portada ? { name: portada.name, base64: portada.base64, width: portada.width, height: portada.height } : null,
+        files: files.map(f => ({
+          name: f.name,
+          type: f.type,
+          storageUrl: f.storageUrl,  // URL en Storage en lugar de base64
+          textContent: f.textContent
+        })),
+        portada: portada ? {
+          name: portada.name,
+          storageUrl: portada.storageUrl || null,  // URL en Storage
+          base64: portada.base64,  // Fallback por si es preview local
+          width: portada.width,
+          height: portada.height
+        } : null,
         useDefaultPortada
       }
 
@@ -237,7 +275,16 @@ export default function DocumentGenerator() {
       if (!res.ok || data.error) throw new Error(data.error || 'Error al analizar')
       setProjectData(data.data)
 
-      // Limpiar archivos después de análisis exitoso para evitar error 413 en siguientes consultas
+      // Limpiar archivos después de análisis exitoso
+      // Eliminar de Supabase Storage
+      const storagePaths = files.map(f => f.storagePath).filter(Boolean)
+      if (storagePaths.length > 0) {
+        storageService.deleteDocuments(storagePaths).catch(err =>
+          console.error('[DocumentGenerator] Error limpiando Storage:', err)
+        )
+      }
+
+      // Limpiar estado local
       setFiles([])
       setPortada(null)
       setPortadaPreview(null)
@@ -630,7 +677,18 @@ export default function DocumentGenerator() {
                       <span>{files.length} fichero{files.length > 1 ? 's' : ''}</span>
                       <button
                         className="btn-link danger"
-                        onClick={() => { setFiles([]); setPortada(null); setPortadaPreview(null); message.success('Archivos limpiados'); }}
+                        onClick={async () => {
+                          // Eliminar de Storage
+                          const storagePaths = files.map(f => f.storagePath).filter(Boolean)
+                          if (storagePaths.length > 0) {
+                            await storageService.deleteDocuments(storagePaths)
+                          }
+                          // Limpiar estado
+                          setFiles([])
+                          setPortada(null)
+                          setPortadaPreview(null)
+                          message.success('Archivos limpiados')
+                        }}
                         style={{ fontSize: '10px', padding: '2px 6px' }}
                         title="Limpiar todos los archivos"
                       >

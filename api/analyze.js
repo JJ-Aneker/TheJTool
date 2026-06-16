@@ -85,6 +85,24 @@ async function fetchReferenceDoc(vertical) {
   }
 }
 
+// Descarga un archivo desde una URL de Supabase Storage
+async function fetchFileFromStorage(url) {
+  try {
+    console.log('[API] Descargando desde Storage:', url)
+    const response = await fetch(url)
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    console.log('[API] Archivo descargado:', buffer.length, 'bytes')
+    return buffer
+  } catch (err) {
+    console.error('[API] Error descargando desde Storage:', err)
+    throw new Error(`Error descargando archivo: ${err.message}`)
+  }
+}
+
 // Construye el system prompt dinámico basado en tipoDoc
 function buildSystemPrompt(tipoDoc, verticalKey, verticalData) {
   const docType = DOCUMENT_TYPES[tipoDoc] || DOCUMENT_TYPES.efdt
@@ -397,26 +415,51 @@ ${refDoc.text}
         text: `--- DOCUMENTOS DEL BRIEFING DEL CLIENTE ---`
       })
       for (const file of files) {
-        // Limpiar prefijo data URL si viene incluido (data:...;base64,XXXX)
-        const cleanBase64 = (b64) => b64 ? b64.replace(/^data:[^;]+;base64,/, '') : b64
-
         // Detectar tipo por nombre además del mime type
         const isPdf  = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf')
         const isDocx = file.type?.includes('word') || file.type?.includes('document') ||
                        file.name?.toLowerCase().endsWith('.docx') || file.name?.toLowerCase().endsWith('.doc')
         const isImg  = file.type?.startsWith('image/')
 
-        const b64 = cleanBase64(file.base64)
+        // Obtener contenido del archivo (desde Storage URL o base64 fallback)
+        let buffer = null
+        let b64 = null
+
+        if (file.storageUrl) {
+          // Descargar desde Supabase Storage
+          try {
+            buffer = await fetchFileFromStorage(file.storageUrl)
+            b64 = buffer.toString('base64')
+          } catch (err) {
+            console.error('[API] Error descargando archivo:', err)
+            userContent.push({
+              type: 'text',
+              text: `[DOCUMENTO: ${file.name}] - Error al descargar: ${err.message}\n`
+            })
+            continue
+          }
+        } else if (file.base64) {
+          // Fallback: usar base64 directo (compatibilidad)
+          const cleanBase64 = (b64) => b64 ? b64.replace(/^data:[^;]+;base64,/, '') : b64
+          b64 = cleanBase64(file.base64)
+          buffer = Buffer.from(b64, 'base64')
+        } else {
+          // Sin contenido disponible
+          userContent.push({
+            type: 'text',
+            text: `[DOCUMENTO: ${file.name}]\n${file.textContent || '(contenido no disponible)'}\n`
+          })
+          continue
+        }
 
         if (isPdf && b64) {
           userContent.push({
             type: 'document',
             source: { type: 'base64', media_type: 'application/pdf', data: b64 }
           })
-        } else if (isDocx && b64) {
+        } else if (isDocx && buffer) {
           try {
-            const buf  = Buffer.from(b64, 'base64')
-            const text = await extractDocxText(buf)
+            const text = await extractDocxText(buffer)
             if (text) {
               userContent.push({
                 type: 'text',
