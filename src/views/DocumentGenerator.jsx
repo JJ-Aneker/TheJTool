@@ -373,10 +373,11 @@ export default function DocumentGenerator() {
         )
       }
 
-      // Limpiar estado local
+      // Limpiar estado local (EXCEPTO portada - se necesita para generar DOCX)
       setFiles([])
-      setPortada(null)
-      setPortadaPreview(null)
+      // NO limpiar portada aquí - se usa en paso siguiente
+      // setPortada(null)
+      // setPortadaPreview(null)
 
       setCurrentStep(1)
     } catch (err) {
