@@ -35,6 +35,18 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Servir archivos estáticos desde public/
 app.use(express.static(join(__dirname, 'public')));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[SERVER] ${req.method} ${req.path}`);
+  next();
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('[SERVER] Error:', err);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
+});
+
 // Admin authentication middleware
 async function verifyAdmin(req, res, next) {
   try {
