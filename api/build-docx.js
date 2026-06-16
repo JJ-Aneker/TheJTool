@@ -936,12 +936,30 @@ export default async function handler(req, res) {
     if (!projectData) return res.status(400).json({ error: 'projectData requerido' });
 
     // Agregar portada a projectData si existe
-    if (portada?.base64) {
+    if (portada?.storageUrl) {
+      // Descargar desde Storage
+      console.log('[BUILD-DOCX] Descargando portada desde Storage:', portada.storageUrl)
+      try {
+        const response = await fetch(portada.storageUrl)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        const arrayBuffer = await response.arrayBuffer()
+        const base64 = Buffer.from(arrayBuffer).toString('base64')
+        projectData.portada = {
+          imgBase64: base64,
+          width: portada.width,
+          height: portada.height,
+        }
+        console.log('[BUILD-DOCX] Portada descargada:', base64.length, 'bytes')
+      } catch (err) {
+        console.error('[BUILD-DOCX] Error descargando portada:', err)
+      }
+    } else if (portada?.base64) {
+      // Fallback: base64 directo
       projectData.portada = {
         imgBase64: portada.base64,
         width: portada.width,
         height: portada.height,
-      };
+      }
     }
     if (useDefaultPortada) {
       projectData.useDefaultPortada = true;
