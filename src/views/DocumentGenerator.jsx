@@ -176,31 +176,59 @@ export default function DocumentGenerator() {
   const removeFile = (uid) => setFiles(prev => prev.filter(f => f.uid !== uid))
 
   // ── PORTADA HANDLING ────────────────────────────────────────────────────────
-  const handlePortadaUpload = useCallback((file) => {
+  const handlePortadaUpload = useCallback(async (file) => {
     if (file.type !== 'image/png') {
       message.error('Solo se aceptan archivos PNG para la portada')
       return false
     }
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const base64 = e.target.result.split(',')[1]
-      const img = new Image()
-      img.onload = () => {
-        if (img.width !== 794 || img.height !== 1123) {
-          message.warning(`Dimensiones detectadas: ${img.width}×${img.height}px. Recomendado: 794×1123px (A4 a 96dpi)`)
+    try {
+      message.loading({ content: 'Subiendo portada...', key: 'portada' })
+
+      // Obtener userId
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Usuario no autenticado')
+
+      // Subir a Supabase Storage
+      const uploadedFile = await storageService.uploadDocument(file, user.id)
+
+      // Leer imagen para obtener dimensiones y preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const base64 = e.target.result.split(',')[1]
+        const img = new Image()
+        img.onload = () => {
+          if (img.width !== 794 || img.height !== 1123) {
+            message.warning(`Dimensiones detectadas: ${img.width}×${img.height}px. Recomendado: 794×1123px (A4 a 96dpi)`)
+          }
+          setPortada({
+            name: file.name,
+            base64: base64,  // Solo para preview local
+            storagePath: uploadedFile.path,
+            storageUrl: uploadedFile.url,
+            width: img.width,
+            height: img.height
+          })
+          setPortadaPreview(e.target.result)
+          setUseDefaultPortada(false)
+          message.success({ content: 'Portada subida', key: 'portada' })
         }
-        setPortada({ name: file.name, base64: e.target.result, width: img.width, height: img.height })
-        setPortadaPreview(e.target.result)
-        setUseDefaultPortada(false)
+        img.src = e.target.result
       }
-      img.src = e.target.result
+      reader.readAsDataURL(file)
+    } catch (err) {
+      console.error('[DocumentGenerator] Error subiendo portada:', err)
+      message.error({ content: 'Error al subir portada', key: 'portada' })
     }
-    reader.readAsDataURL(file)
+
     return false
   }, [])
 
-  const removePortada = () => {
+  const removePortada = async () => {
+    // Eliminar de Storage si existe
+    if (portada?.storagePath) {
+      await storageService.deleteDocuments([portada.storagePath])
+    }
     setPortada(null)
     setPortadaPreview(null)
   }
@@ -278,6 +306,9 @@ export default function DocumentGenerator() {
       // Limpiar archivos después de análisis exitoso
       // Eliminar de Supabase Storage
       const storagePaths = files.map(f => f.storagePath).filter(Boolean)
+      if (portada?.storagePath) {
+        storagePaths.push(portada.storagePath)
+      }
       if (storagePaths.length > 0) {
         storageService.deleteDocuments(storagePaths).catch(err =>
           console.error('[DocumentGenerator] Error limpiando Storage:', err)
