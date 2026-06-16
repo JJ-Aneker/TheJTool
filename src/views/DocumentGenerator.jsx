@@ -364,11 +364,9 @@ export default function DocumentGenerator() {
       setProjectData(data.data)
 
       // Limpiar archivos después de análisis exitoso
-      // Eliminar de Supabase Storage
+      // Eliminar SOLO documentos de referencia (PDFs, DOCX), NO portadas
       const storagePaths = files.map(f => f.storagePath).filter(Boolean)
-      if (portada?.storagePath) {
-        storagePaths.push(portada.storagePath)
-      }
+      // NOTA: NO eliminamos portada - las portadas son permanentes para reutilizar
       if (storagePaths.length > 0) {
         storageService.deleteDocuments(storagePaths).catch(err =>
           console.error('[DocumentGenerator] Error limpiando Storage:', err)
