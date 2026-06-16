@@ -9,8 +9,10 @@ function getSupabaseClient() {
 
 // GET /api/verticales - Obtener todos los verticales
 async function getAllVerticals(req, res) {
+  console.log('[API] GET /api/verticales - Iniciando...');
   try {
     const supabase = getSupabaseClient();
+    console.log('[API] Supabase client creado');
 
     const { data, error } = await supabase
       .from('verticales')
@@ -19,13 +21,16 @@ async function getAllVerticals(req, res) {
       .order('nombre', { ascending: true });
 
     if (error) {
-      console.error('Error getting verticales:', error);
+      console.error('[API] Error getting verticales:', error);
       return res.status(400).json({ error: error.message });
     }
 
+    console.log('[API] Verticales obtenidos:', data?.length || 0);
+    console.log('[API] Datos:', JSON.stringify(data, null, 2));
+
     res.json(data || []);
   } catch (err) {
-    console.error('Error in getAllVerticals:', err);
+    console.error('[API] Error in getAllVerticals:', err);
     res.status(500).json({ error: err.message });
   }
 }
