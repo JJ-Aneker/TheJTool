@@ -236,6 +236,12 @@ export default function DocumentGenerator() {
       const data = await res.json()
       if (!res.ok || data.error) throw new Error(data.error || 'Error al analizar')
       setProjectData(data.data)
+
+      // Limpiar archivos después de análisis exitoso para evitar error 413 en siguientes consultas
+      setFiles([])
+      setPortada(null)
+      setPortadaPreview(null)
+
       setCurrentStep(1)
     } catch (err) {
       setAnalysisError(err.message)
@@ -620,7 +626,17 @@ export default function DocumentGenerator() {
                 {/* File list */}
                 {files.length > 0 && (
                   <div className="efdt-file-list">
-                    <div className="efdt-file-list-title">{files.length} fichero{files.length > 1 ? 's' : ''}</div>
+                    <div className="efdt-file-list-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>{files.length} fichero{files.length > 1 ? 's' : ''}</span>
+                      <button
+                        className="btn-link danger"
+                        onClick={() => { setFiles([]); setPortada(null); setPortadaPreview(null); message.success('Archivos limpiados'); }}
+                        style={{ fontSize: '10px', padding: '2px 6px' }}
+                        title="Limpiar todos los archivos"
+                      >
+                        <DeleteOutlined /> Limpiar todos
+                      </button>
+                    </div>
                     {files.map(f => (
                       <div key={f.uid} className="efdt-file-item" style={{ padding: '5px 8px', gap: 6 }}>
                         {getFileIcon(f.type)}
