@@ -3,7 +3,7 @@ import { Table, Button, Space, Modal, Form, Input, Select, Tag, message, Spin, B
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, CheckCircleOutlined, CloseCircleOutlined, MailOutlined, PhoneOutlined, CameraOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'
-import { activateUserEmail, approveUser, activateAndApproveUser } from '../services/adminService'
+import { activateUserEmail, approveUser, activateAndApproveUser, getUserStatus } from '../services/adminService'
 import { useTranslation } from 'react-i18next'
 import { useMessages } from '../utils/i18nMessages'
 import { handleError } from '../utils/errorHandler'
@@ -57,8 +57,7 @@ export default function UserManager() {
       const usersWithStatus = await Promise.all(
         (profiles || []).map(async (profile) => {
           try {
-            const response = await fetch(`http://localhost:3002/api/admin/user-status/${profile.user_id}`)
-            const result = await response.json()
+            const result = await getUserStatus(profile.user_id)
 
             if (result.success) {
               return {
