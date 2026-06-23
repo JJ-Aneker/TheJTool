@@ -5,6 +5,7 @@ import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined,
 import { supabase } from '../config/supabaseClient'
 import { storageService } from '../services/storageService'
 import { activateUserEmail, approveUser, activateAndApproveUser, getUserStatus } from '../services/adminService'
+import HelpButton from '../components/HelpButton'
 import { useTranslation } from 'react-i18next'
 import { useMessages } from '../utils/i18nMessages'
 import { handleError } from '../utils/errorHandler'
@@ -461,6 +462,7 @@ export default function UserManager() {
           <UserOutlined /> Gestión de Usuarios
         </h1>
         <div className="header-actions">
+          <HelpButton section="userManager" />
           <button
             onClick={createNewUser}
             className="btn-primary"

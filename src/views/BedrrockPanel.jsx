@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, Button, Space, Modal, Form, Input, Select, Spin, Tag, Tooltip, InputNumber, Tabs } from 'antd'
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import { CloudOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { useTranslation } from 'react-i18next'
@@ -151,6 +152,9 @@ export default function BedrrockPanel() {
           <CloudOutlined /> Gestión AWS Bedrock
         </h1>
         <Tag color="cyan">Converse API</Tag>
+        <div style={{ marginLeft: 'auto' }}>
+          <HelpButton section="bedrockPanel" />
+        </div>
       </div>
 
       <Tabs

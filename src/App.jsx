@@ -18,7 +18,8 @@ import {
   MoonOutlined,
   ThunderboltOutlined,
   KeyOutlined,
-  GlobalOutlined
+  GlobalOutlined,
+  BookOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useRole } from './hooks/useRole'
@@ -47,6 +48,7 @@ const CategoryBuilder = lazy(() => import('./views/CategoryBuilder'))
 const DocumentGenerator = lazy(() => import('./views/DocumentGenerator'))
 const ThereforeReporter = lazy(() => import('./views/ThereforeReporter'))
 const BedrrockPanel = lazy(() => import('./views/BedrrockPanel'))
+const Manual = lazy(() => import('./views/Manual'))
 
 const { Sider, Content } = Layout
 
@@ -115,6 +117,12 @@ const getMenuItems = (isAdmin = false, t = (key) => key) => {
       icon: <CloudOutlined />,
       label: t('nav.webServices'),
       path: '/web-services'
+    },
+    {
+      key: 'manual',
+      icon: <BookOutlined />,
+      label: 'Manual',
+      path: '/manual'
     }
   ]
 
@@ -471,6 +479,7 @@ function AppContent() {
               <Route path="/document-generator" element={<DocumentGenerator />} />
               <Route path="/reporter" element={<ThereforeReporter />} />
               <Route path="/web-services" element={<WebServicesManager />} />
+              <Route path="/manual" element={<Manual />} />
               <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" status="construction" />} />
               <Route path="/workflows" element={<Placeholder icon={<SettingOutlined />} title="Configuración de Workflows" status="construction" />} />
               <Route path="/docs" element={<Placeholder icon={<FileTextOutlined />} title="Documentación de Proyectos" status="construction" />} />

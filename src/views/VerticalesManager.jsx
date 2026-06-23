@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Drawer, Form, Input, Tag, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert, Select } from 'antd';
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import { EditOutlined, DeleteOutlined, PlusOutlined, CloseOutlined, EyeOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
 import { useTranslation } from 'react-i18next';
@@ -929,6 +930,7 @@ export default function VerticalesManager() {
           Gestión de Verticales
         </h1>
         <div className="header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <HelpButton section="verticalesManager" />
           <Input
             placeholder="🔍 Buscar verticales..."
             value={searchText}

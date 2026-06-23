@@ -2,6 +2,7 @@ import { useState } from 'react'
 import React from 'react'
 import { Modal, Button, Spin } from 'antd'
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import { useTranslation } from 'react-i18next'
@@ -798,6 +799,7 @@ export default function EFormBuilder() {
           <p className="eform-subtitle">Genera el XML de importación de eForms para Therefore Solution Designer · Form.io JSON · v2.0</p>
         </div>
         <div className="eform-header-actions">
+          <HelpButton section="eformBuilder" />
           <div className="eform-view-toggle">
             {['editor', 'preview'].map(v => (
               <button

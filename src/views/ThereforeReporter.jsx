@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Table, Button, Space, Modal, Form, Input, Select, Spin, Popconfirm, Tooltip, Card, Empty, Tree } from 'antd'
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import { ThunderboltOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ReloadOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
@@ -615,6 +616,7 @@ export default function ThereforeReporter() {
           <ThunderboltOutlined /> Therefore Reporter
         </h1>
         <div className="header-actions">
+          <HelpButton section="thereforeReporter" />
           <button
             className="btn-secondary"
             onClick={loadTenants}

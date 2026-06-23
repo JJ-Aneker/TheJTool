@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Table, Button, Space, Modal, Form, Input, Spin, Tag, Popconfirm, Tooltip } from 'antd'
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, LinkOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useTranslation } from 'react-i18next'
@@ -247,6 +248,7 @@ export default function WebServicesManager() {
             <CloudOutlined /> Gestión de Servicios Web
           </h1>
           <div className="header-actions">
+            <HelpButton section="webServices" />
             <button
               className="btn-primary"
               onClick={() => {

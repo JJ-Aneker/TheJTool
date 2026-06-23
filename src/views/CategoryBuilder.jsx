@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, Modal, Input, Table, Space, Tag, Empty, Spin, Tabs } from 'antd'
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import '../styles/category-builder.css'
@@ -3215,6 +3216,7 @@ export default function CategoryBuilder() {
           <p className="header-subtitle">Crea múltiples categorías con secciones y campos · XML · v2.0</p>
         </div>
         <div className="header-actions">
+          <HelpButton section="categoryBuilder" />
           <button
             onClick={() => setActiveView('editor')}
             className={activeView === 'editor' ? 'btn-primary' : 'btn-default'}

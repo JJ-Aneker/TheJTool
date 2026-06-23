@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Table, Button, Space, Modal, Form, Input, Spin, Tag, Popconfirm, Tooltip, Checkbox } from 'antd'
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LinkOutlined, GlobalOutlined, LockOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
@@ -300,6 +301,7 @@ export default function TenantManager() {
           <CloudOutlined /> Gestión de Tenants
         </h1>
         <div className="header-actions">
+          <HelpButton section="tenantManager" />
           <button
             onClick={createNewTenant}
             className="btn-primary"

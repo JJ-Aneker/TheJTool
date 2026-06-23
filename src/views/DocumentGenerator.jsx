@@ -7,6 +7,7 @@ import {
   Divider, Card, InputNumber, Switch, Modal
 } from 'antd'
 import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
 import {
   InboxOutlined, FileTextOutlined, FilePdfOutlined, FileWordOutlined,
   MailOutlined, DeleteOutlined, RobotOutlined, EditOutlined,
@@ -599,6 +600,9 @@ export default function DocumentGenerator() {
           <div className="efdt-header-content">
             <div className="efdt-header-title">Generador de Documentación</div>
           </div>
+        </div>
+        <div style={{ marginLeft: 'auto', paddingRight: 8 }}>
+          <HelpButton section="documentGenerator" />
         </div>
       </div>
 
