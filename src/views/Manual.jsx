@@ -1,12 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
 import { BookOutlined } from '@ant-design/icons'
-import { HELP_SECTIONS, MANUAL_TOC } from '../help/helpContent'
+import { useTranslation } from 'react-i18next'
+import { getHelpSections, MANUAL_TOC } from '../help/helpContent'
 import '../styles/manual.css'
 
 export default function Manual() {
+  const { i18n } = useTranslation()
+  const lang = i18n.language
   const [activeSection, setActiveSection] = useState('home')
   const contentRef = useRef(null)
   const sectionRefs = useRef({})
+
+  const sections = getHelpSections(lang)
+  const pageSubtitle = lang === 'en'
+    ? 'Complete documentation for all platform tools.'
+    : 'Documentación completa de todas las herramientas de la plataforma.'
+  const pageTitle = lang === 'en' ? 'User Manual' : 'Manual de usuario'
+  const tocHeader = lang === 'en' ? 'Contents' : 'Contenido'
 
   // Sync active TOC item while scrolling
   useEffect(() => {
@@ -48,7 +58,7 @@ export default function Manual() {
       {/* Page header */}
       <div className="header-main" style={{ flexShrink: 0 }}>
         <h1 className="header-title" style={{ display: 'flex', alignItems: 'center', gap: 10, margin: 0 }}>
-          <BookOutlined /> Manual de usuario
+          <BookOutlined /> {pageTitle}
         </h1>
         <div className="header-actions">
           <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
@@ -62,7 +72,7 @@ export default function Manual() {
 
         {/* TOC sidebar */}
         <nav className="manual-toc">
-          <div className="manual-toc-header">Contenido</div>
+          <div className="manual-toc-header">{tocHeader}</div>
           {MANUAL_TOC.map(item => (
             <button
               key={item.key}
@@ -70,19 +80,17 @@ export default function Manual() {
               onClick={() => scrollTo(item.key)}
             >
               <span>{item.icon}</span>
-              <span>{item.label}</span>
+              <span>{lang === 'en' ? item.labelEn : item.labelEs}</span>
             </button>
           ))}
         </nav>
 
         {/* Content area */}
         <main className="manual-content" ref={contentRef}>
-          <p className="manual-page-subtitle">
-            Documentación completa de todas las herramientas de la plataforma.
-          </p>
+          <p className="manual-page-subtitle">{pageSubtitle}</p>
 
           {MANUAL_TOC.map(tocItem => {
-            const sec = HELP_SECTIONS[tocItem.key]
+            const sec = sections[tocItem.key]
             if (!sec) return null
             return (
               <section

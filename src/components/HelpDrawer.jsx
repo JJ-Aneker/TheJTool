@@ -1,14 +1,19 @@
 import { Drawer, Button } from 'antd'
 import { QuestionCircleOutlined, BookOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-import { HELP_SECTIONS } from '../help/helpContent'
+import { useTranslation } from 'react-i18next'
+import { getHelpSections } from '../help/helpContent'
 import '../styles/manual.css'
 
 export default function HelpDrawer({ sectionKey, open, onClose }) {
   const navigate = useNavigate()
-  const section = HELP_SECTIONS[sectionKey]
+  const { i18n, t } = useTranslation()
+  const sections = getHelpSections(i18n.language)
+  const section = sections[sectionKey]
 
   if (!section) return null
+
+  const footerLabel = i18n.language === 'en' ? 'View full manual' : 'Ver manual completo'
 
   return (
     <Drawer
@@ -40,7 +45,7 @@ export default function HelpDrawer({ sectionKey, open, onClose }) {
             onClick={() => { onClose(); navigate(`/manual#${section.id}`) }}
             style={{ color: 'var(--accent-primary)', fontSize: 13 }}
           >
-            Ver manual completo
+            {footerLabel}
           </Button>
         </div>
       }
