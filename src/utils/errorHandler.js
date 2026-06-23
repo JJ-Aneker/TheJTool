@@ -3,7 +3,7 @@
  * Manejo unificado de errores en la aplicación
  */
 
-import { message } from 'antd'
+import { message } from './message'
 
 /**
  * Maneja errores de manera consistente mostrando mensaje al usuario

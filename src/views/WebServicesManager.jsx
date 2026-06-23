@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Table, Button, Space, Modal, Form, Input, message, Spin, Tag, Popconfirm, Tooltip } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, Spin, Tag, Popconfirm, Tooltip } from 'antd'
+import { message } from '../utils/message'
 import { CloudOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, LinkOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { useTranslation } from 'react-i18next'

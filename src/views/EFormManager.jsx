@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Table, Button, Modal, message, Spin, Space, Tag, Input, Empty } from 'antd'
+import { Table, Button, Modal, Spin, Space, Tag, Input, Empty } from 'antd'
+import { message } from '../utils/message'
 import { DeleteOutlined, EditOutlined, CopyOutlined, DownloadOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { MESSAGES } from '../constants/messages'

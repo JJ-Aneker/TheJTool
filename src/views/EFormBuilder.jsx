@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import React from 'react'
-import { Modal, Button, message, Spin } from 'antd'
+import { Modal, Button, Spin } from 'antd'
+import { message } from '../utils/message'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import { useTranslation } from 'react-i18next'

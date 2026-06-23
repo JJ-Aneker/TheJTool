@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Drawer, Form, Input, Tag, message, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert, Select } from 'antd';
+import { Drawer, Form, Input, Tag, Spin, Tooltip, Popconfirm, Tabs, InputNumber, Checkbox, Space, Button, Card, Collapse, Alert, Select } from 'antd';
+import { message } from '../utils/message'
 import { EditOutlined, DeleteOutlined, PlusOutlined, CloseOutlined, EyeOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { verticalesService } from '../services/verticalesService';
 import { useTranslation } from 'react-i18next';

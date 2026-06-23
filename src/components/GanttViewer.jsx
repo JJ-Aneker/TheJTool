@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, message, DatePicker } from 'antd'
+import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, DatePicker } from 'antd'
+import { message } from '../utils/message'
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import '../styles/gantt-viewer.css'

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Card, Button, Space, Modal, Form, Input, Select, message, Spin, Tag, Tooltip, InputNumber, Tabs } from 'antd'
+import { Card, Button, Space, Modal, Form, Input, Select, Spin, Tag, Tooltip, InputNumber, Tabs } from 'antd'
+import { message } from '../utils/message'
 import { CloudOutlined, CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { useTranslation } from 'react-i18next'

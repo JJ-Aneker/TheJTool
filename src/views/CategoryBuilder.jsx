@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Button, Modal, message, Input, Table, Space, Tag, Empty, Spin, Tabs } from 'antd'
+import { Button, Modal, Input, Table, Space, Tag, Empty, Spin, Tabs } from 'antd'
+import { message } from '../utils/message'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
 import '../styles/category-builder.css'

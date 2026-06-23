@@ -3,9 +3,10 @@ import { useState, useCallback, useEffect } from 'react'
 import pako from 'pako'
 import {
   Upload, Button, Select, Input, Steps, Tag, Alert, Spin,
-  Typography, Space, Badge, Collapse, Table, Tooltip, message,
-  Divider, Card, InputNumber, Switch
+  Typography, Space, Badge, Collapse, Table, Tooltip,
+  Divider, Card, InputNumber, Switch, Modal
 } from 'antd'
+import { message } from '../utils/message'
 import {
   InboxOutlined, FileTextOutlined, FilePdfOutlined, FileWordOutlined,
   MailOutlined, DeleteOutlined, RobotOutlined, EditOutlined,
@@ -65,10 +66,10 @@ export default function DocumentGenerator() {
   const [portada, setPortada]                   = useState(null)
   const [portadaPreview, setPortadaPreview]     = useState(null)
   const [useDefaultPortada, setUseDefaultPortada] = useState(false)
-  const [portadaDragActive, setPortadaDragActive] = useState(false)
   const [filesDragActive, setFilesDragActive]   = useState(false)
   const [savedCovers, setSavedCovers]           = useState([])
   const [loadingCovers, setLoadingCovers]       = useState(false)
+  const [portadaModalOpen, setPortadaModalOpen] = useState(false)
 
   // Progress messages
   const analysisMessages = [
@@ -121,7 +122,7 @@ export default function DocumentGenerator() {
 
       console.log('[DocumentGenerator] Verticales formateados:', formattedVerticales.length)
       setVerticales(formattedVerticales)
-      message.success(`${formattedVerticales.length} verticales cargados`)
+      message.success({ content: `${formattedVerticales.length} verticales cargados`, key: 'load-verticales' })
     } catch (err) {
       console.error('[DocumentGenerator] Error loading verticales:', err)
       message.error('Error al cargar verticales: ' + err.message)
@@ -178,6 +179,7 @@ export default function DocumentGenerator() {
           })
           setPortadaPreview(e.target.result)
           setUseDefaultPortada(false)
+          setPortadaModalOpen(false)
           message.success({ content: 'Portada cargada', key: 'cover' })
         }
         img.src = e.target.result
@@ -271,7 +273,9 @@ export default function DocumentGenerator() {
           })
           setPortadaPreview(e.target.result)
           setUseDefaultPortada(false)
+          setPortadaModalOpen(false)
           message.success({ content: 'Portada subida', key: 'portada' })
+          loadSavedCovers()
         }
         img.src = e.target.result
       }
@@ -713,9 +717,9 @@ export default function DocumentGenerator() {
                     </button>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                     {/* Checkbox Default */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '0 4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                       <input
                         type="checkbox" id="use-default-portada"
                         checked={useDefaultPortada} onChange={e => setUseDefaultPortada(e.target.checked)}
@@ -726,112 +730,15 @@ export default function DocumentGenerator() {
                       </label>
                     </div>
 
-                    {/* Mosaico de portadas guardadas */}
-                    {savedCovers.length > 0 && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <div style={{ fontSize: 8, color: 'var(--text-secondary)', padding: '0 4px', fontWeight: 500 }}>
-                          Portadas guardadas:
-                        </div>
-                        <div style={{
-                          display: 'flex',
-                          gap: 6,
-                          flexWrap: 'wrap',
-                          padding: '4px'
-                        }}>
-                          {savedCovers.map(cover => (
-                            <div
-                              key={cover.path}
-                              onClick={() => selectSavedCover(cover)}
-                              style={{
-                                position: 'relative',
-                                width: '60px',
-                                height: '85px',
-                                border: '1.5px solid var(--color-border-secondary)',
-                                borderRadius: '4px',
-                                overflow: 'hidden',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'scale(1.05)'
-                                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)'
-                                e.currentTarget.style.borderColor = 'var(--accent-primary)'
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'scale(1)'
-                                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)'
-                                e.currentTarget.style.borderColor = 'var(--color-border-secondary)'
-                              }}
-                            >
-                              <img
-                                src={cover.url}
-                                alt={cover.name}
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  objectFit: 'cover',
-                                }}
-                              />
-                            </div>
-                          ))}
-                          {/* Botón Nueva Portada */}
-                          <Dragger
-                            multiple={false}
-                            beforeUpload={handlePortadaUpload}
-                            showUploadList={false}
-                            accept=".png"
-                            style={{
-                              width: '60px',
-                              height: '85px',
-                              padding: 0,
-                              margin: 0,
-                              border: '1.5px dashed var(--color-border-secondary)',
-                              borderRadius: '4px',
-                              background: 'var(--color-background-tertiary)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                            }}
-                            className="cover-upload-btn"
-                          >
-                            <div style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: 2
-                            }}>
-                              <PlusOutlined style={{ fontSize: 16, color: 'var(--accent-primary)' }} />
-                              <span style={{ fontSize: 7, color: 'var(--text-secondary)' }}>Nueva</span>
-                            </div>
-                          </Dragger>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Dropzone grande (solo si no hay portadas guardadas) */}
-                    {savedCovers.length === 0 && (
-                      <div className="efdt-portada-dropzone">
-                        <Dragger
-                          multiple={false} beforeUpload={handlePortadaUpload} showUploadList={false}
-                          accept=".png" className={`efdt-dragger ${portadaDragActive ? 'efdt-dragger-active' : ''}`}
-                          style={{ padding: 0, minHeight: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', border: 'none', background: 'transparent' }}
-                          onDragEnter={() => setPortadaDragActive(true)}
-                          onDragLeave={() => setPortadaDragActive(false)}
-                          onDrop={() => setPortadaDragActive(false)}
-                        >
-                          <p className="ant-upload-drag-icon">
-                            <InboxOutlined style={{ color: 'var(--accent-primary)', fontSize: 16 }} />
-                          </p>
-                          <p style={{ fontSize: 9, fontWeight: 500, color: 'var(--text-primary)', margin: '3px 0 0', textAlign: 'center' }}>
-                            PNG A4
-                          </p>
-                        </Dragger>
-                      </div>
-                    )}
+                    {/* Botón para abrir modal */}
+                    <button
+                      className="btn-default"
+                      onClick={() => setPortadaModalOpen(true)}
+                      style={{ fontSize: 10, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 4 }}
+                    >
+                      <InboxOutlined style={{ fontSize: 11 }} />
+                      {savedCovers.length > 0 ? `${savedCovers.length} portadas` : 'Añadir portada'}
+                    </button>
                   </div>
                 )}
               </div>
@@ -1207,6 +1114,95 @@ export default function DocumentGenerator() {
           <GanttViewer projectData={projectData} />
         </div>
       )}
+
+      {/* ── MODAL PORTADAS ────────────────────────────────────────────────── */}
+      <Modal
+        open={portadaModalOpen}
+        onCancel={() => setPortadaModalOpen(false)}
+        title="Seleccionar portada"
+        footer={null}
+        width={580}
+        styles={{ body: { padding: '16px 12px' } }}
+      >
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 12,
+          maxHeight: '65vh',
+          overflowY: 'auto',
+          padding: '4px 2px'
+        }}>
+          {/* Primer cuadro: subir nueva portada */}
+          <Dragger
+            multiple={false}
+            beforeUpload={handlePortadaUpload}
+            showUploadList={false}
+            accept=".png"
+            style={{
+              padding: 0,
+              margin: 0,
+              border: '2px dashed var(--color-border-secondary)',
+              borderRadius: '6px',
+              background: 'var(--color-background-tertiary)',
+              cursor: 'pointer',
+              aspectRatio: '794 / 1123',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '8px' }}>
+              <PlusOutlined style={{ fontSize: 24, color: 'var(--accent-primary)' }} />
+              <span style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.3 }}>
+                Nueva portada<br />
+                <span style={{ fontSize: 9 }}>PNG · A4</span>
+              </span>
+            </div>
+          </Dragger>
+
+          {/* Portadas guardadas */}
+          {savedCovers.map(cover => (
+            <div
+              key={cover.path}
+              onClick={() => selectSavedCover(cover)}
+              title={cover.name}
+              style={{
+                position: 'relative',
+                aspectRatio: '794 / 1123',
+                border: '2px solid var(--color-border-secondary)',
+                borderRadius: '6px',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.03)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.18)'
+                e.currentTarget.style.borderColor = 'var(--accent-primary)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)'
+                e.currentTarget.style.borderColor = 'var(--color-border-secondary)'
+              }}
+            >
+              <img
+                src={cover.url}
+                alt={cover.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </div>
+          ))}
+
+          {/* Mensaje si no hay portadas guardadas */}
+          {savedCovers.length === 0 && !loadingCovers && (
+            <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: 12 }}>
+              No hay portadas guardadas aún
+            </div>
+          )}
+        </div>
+      </Modal>
 
       {/* ── STEP 2: DESCARGA ──────────────────────────────────────────────── */}
       {currentStep === 2 && docxUrl && (

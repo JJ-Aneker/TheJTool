@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Form, Input, Button, message, Spin } from 'antd'
+import { Form, Input, Button, Spin } from 'antd'
+import { message } from '../utils/message'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'

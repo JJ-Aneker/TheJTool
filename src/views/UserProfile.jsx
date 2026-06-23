@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Modal, Form, Input, Button, Avatar, message, Spin, Alert, Upload } from 'antd'
+import { Modal, Form, Input, Button, Avatar, Spin, Alert, Upload } from 'antd'
+import { message } from '../utils/message'
 import { UserOutlined, CameraOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
