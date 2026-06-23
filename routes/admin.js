@@ -181,4 +181,85 @@ router.get('/user-status/:userId', async (req, res) => {
   }
 })
 
+/**
+ * POST /api/admin/storage/signed-upload-url
+ * Returns a signed upload URL so the frontend can upload directly to Storage
+ * without needing RLS INSERT policy
+ */
+router.post('/storage/signed-upload-url', async (req, res) => {
+  try {
+    const { userId, fileName } = req.body
+    if (!userId || !fileName) {
+      return res.status(400).json({ success: false, error: 'userId and fileName are required' })
+    }
+
+    const supabaseAdmin = getSupabaseAdmin()
+    const timestamp = Date.now()
+    const sanitized = fileName.replace(/[^a-zA-Z0-9.-]/g, '_')
+    const filePath = `${userId}/${timestamp}-${sanitized}`
+
+    const { data, error } = await supabaseAdmin.storage
+      .from('document-uploads')
+      .createSignedUploadUrl(filePath)
+
+    if (error) {
+      return res.status(500).json({ success: false, error: error.message })
+    }
+
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('document-uploads')
+      .getPublicUrl(filePath)
+
+    res.json({ success: true, signedUrl: data.signedUrl, token: data.token, path: filePath, publicUrl })
+  } catch (error) {
+    console.error('[Admin] signed-upload-url error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+/**
+ * GET /api/admin/storage/covers/:userId
+ * List user's saved cover images — uses service key to bypass RLS on storage.list()
+ */
+router.get('/storage/covers/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'userId is required' })
+    }
+
+    const supabaseAdmin = getSupabaseAdmin()
+
+    const { data, error } = await supabaseAdmin.storage
+      .from('document-uploads')
+      .list(userId, { limit: 100, offset: 0, sortBy: { column: 'created_at', order: 'desc' } })
+
+    if (error) {
+      console.error('[Admin] Error listing covers:', error)
+      return res.status(500).json({ success: false, error: error.message })
+    }
+
+    const covers = (data || [])
+      .filter(f => f.name.toLowerCase().endsWith('.png'))
+      .map(f => {
+        const path = `${userId}/${f.name}`
+        const { data: { publicUrl } } = supabaseAdmin.storage
+          .from('document-uploads')
+          .getPublicUrl(path)
+        return {
+          name: f.name,
+          path,
+          url: publicUrl,
+          created_at: f.created_at,
+          size: f.metadata?.size || 0
+        }
+      })
+
+    res.json({ success: true, covers })
+  } catch (error) {
+    console.error('[Admin] List covers error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 export default router

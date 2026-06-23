@@ -16,30 +16,27 @@ export const storageService = {
    */
   async uploadDocument(file, userId) {
     try {
-      const timestamp = Date.now()
-      const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-      const filePath = `${userId}/${timestamp}-${sanitizedName}`
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
-      console.log('[Storage] Subiendo documento:', filePath)
+      // 1. Get a signed upload URL from backend (bypasses RLS INSERT policy)
+      const sigRes = await fetch(`${API_URL}/api/admin/storage/signed-upload-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, fileName: file.name })
+      })
+      const sig = await sigRes.json()
+      if (!sig.success) throw new Error(sig.error || 'Error obteniendo URL de subida')
 
-      const { data, error } = await supabase.storage
+      // 2. Upload directly to Storage using the signed URL (no RLS needed)
+      const { error: uploadError } = await supabase.storage
         .from(DOCUMENT_BUCKET)
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+        .uploadToSignedUrl(sig.path, sig.token, file, { cacheControl: '3600' })
 
-      if (error) throw error
-
-      const { data: { publicUrl } } = supabase.storage
-        .from(DOCUMENT_BUCKET)
-        .getPublicUrl(filePath)
-
-      console.log('[Storage] Documento subido:', publicUrl)
+      if (uploadError) throw uploadError
 
       return {
-        path: data.path,
-        url: publicUrl,
+        path: sig.path,
+        url: sig.publicUrl,
         name: file.name,
         type: file.type,
         size: file.size
@@ -57,42 +54,11 @@ export const storageService = {
    */
   async listUserCovers(userId) {
     try {
-      console.log('[Storage] 🔍 Listando archivos de usuario:', userId)
-
-      const { data, error } = await supabase.storage
-        .from(DOCUMENT_BUCKET)
-        .list(userId, {
-          limit: 100,
-          offset: 0,
-          sortBy: { column: 'created_at', order: 'desc' }
-        })
-
-      if (error) {
-        console.error('[Storage] ❌ Error listando:', error)
-        throw error
-      }
-
-      console.log('[Storage] 📁 Archivos totales encontrados:', data?.length || 0)
-      console.log('[Storage] Archivos:', data)
-
-      // Filtrar solo PNG (portadas)
-      const covers = data
-        .filter(file => {
-          const isPNG = file.name.toLowerCase().endsWith('.png')
-          console.log(`[Storage] Archivo ${file.name} es PNG? ${isPNG}`)
-          return isPNG
-        })
-        .map(file => ({
-          name: file.name,
-          path: `${userId}/${file.name}`,
-          url: supabase.storage.from(DOCUMENT_BUCKET).getPublicUrl(`${userId}/${file.name}`).data.publicUrl,
-          created_at: file.created_at,
-          size: file.metadata?.size || 0
-        }))
-
-      console.log('[Storage] ✅ Portadas PNG encontradas:', covers.length)
-      console.log('[Storage] Portadas:', covers)
-      return covers
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+      const res = await fetch(`${API_URL}/api/admin/storage/covers/${userId}`)
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error || 'Error listando portadas')
+      return json.covers
     } catch (error) {
       logger.error('Error listing covers:', error)
       return []
