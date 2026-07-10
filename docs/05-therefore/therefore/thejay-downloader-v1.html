@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheJay Downloader</title>
+<style>
+:root {
+  --bg:#0f1117;--sf:#181b23;--sf2:#1f2330;--sf3:#252a3a;
+  --b:rgba(255,255,255,0.07);--bm:rgba(255,255,255,0.12);--bh:rgba(255,255,255,0.22);
+  --t:#e8eaf0;--tm:#8890a8;--th:#4a5068;
+  --ac:#4f8ef7;--ac2:#7c3aed;--ag:rgba(79,142,247,0.15);
+  --ok:#34d399;--okb:rgba(52,211,153,0.1);
+  --er:#f87171;--erb:rgba(248,113,113,0.1);
+  --am:#fbbf24;--amb:rgba(251,191,36,0.1);
+  --r:12px;--rs:8px;--rx:5px;
+  --f:'Trebuchet MS','Segoe UI',sans-serif;--m:'Cascadia Code','Consolas',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--t);font-family:var(--f);font-size:13.5px;line-height:1.5;min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:var(--bm);border-radius:3px;}
+
+/* TOPBAR */
+.tb{background:var(--sf);border-bottom:1px solid var(--b);display:flex;align-items:center;gap:12px;padding:0 24px;height:50px;position:sticky;top:0;z-index:100;}
+.logo{font-size:16px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:10px;}
+.li{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:17px;}
+.badge{font-size:11px;color:var(--tm);background:var(--sf2);border:1px solid var(--bm);padding:2px 8px;border-radius:20px;}
+.tbr{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:var(--tm);}
+.ci{display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--th);transition:all .3s;}
+.dot.ok{background:var(--ok);box-shadow:0 0 5px var(--ok);}
+.dot.er{background:var(--er);}
+
+/* WIZARD */
+.wz{max-width:800px;margin:36px auto;padding:0 20px 80px;}
+
+/* STEPS */
+.steps{display:flex;align-items:center;margin-bottom:36px;}
+.si{display:flex;align-items:center;gap:7px;}
+.sc{width:30px;height:30px;border-radius:50%;border:2px solid var(--bm);background:var(--sf);color:var(--th);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.sc.active{border-color:var(--ac);background:var(--ac);color:#fff;}
+.sc.done{border-color:var(--ok);background:var(--okb);color:var(--ok);}
+.sl{font-size:11px;color:var(--th);}
+.sl.active{color:var(--ac);font-weight:600;}
+.sl.done{color:var(--ok);}
+.sln{flex:1;height:1px;background:var(--bm);margin:0 6px;min-width:14px;}
+.sln.done{background:var(--ok);}
+
+/* PANELS */
+.panel{display:none;flex-direction:column;gap:18px;animation:fi .2s ease;}
+.panel.active{display:flex;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.pt{font-size:20px;font-weight:800;letter-spacing:-.5px;}
+.ps{font-size:13px;color:var(--tm);margin-top:3px;}
+
+/* CARD */
+.card{background:var(--sf);border:1px solid var(--b);border-radius:var(--r);padding:20px 22px;}
+.cl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--tm);margin-bottom:14px;}
+
+/* FORM */
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;}
+.fld:last-child{margin-bottom:0;}
+label{font-size:12px;color:var(--tm);font-weight:500;}
+.hint{font-size:11px;color:var(--th);margin-top:2px;}
+input[type=text],input[type=password],input[type=number],select,textarea{
+  background:var(--sf2);border:1px solid var(--bm);border-radius:var(--rx);
+  color:var(--t);padding:8px 11px;font-size:13px;font-family:var(--f);outline:none;
+  transition:border-color .15s,box-shadow .15s;width:100%;}
+input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ag);}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.r3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;}
+
+/* TABS */
+.tabs{display:flex;gap:6px;margin-bottom:14px;}
+.tab{flex:1;padding:8px;border-radius:var(--rs);border:1px solid var(--bm);background:var(--sf2);color:var(--tm);cursor:pointer;text-align:center;font-size:13px;font-weight:500;transition:all .12s;}
+.tab:hover{border-color:var(--bh);color:var(--t);}
+.tab.active{background:var(--ag);border-color:rgba(79,142,247,.4);color:var(--ac);}
+.asec{display:none;}.asec.on{display:block;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--rs);border:1px solid var(--bm);background:var(--sf2);color:var(--t);font-size:13px;font-family:var(--f);cursor:pointer;transition:all .12s;font-weight:500;white-space:nowrap;}
+.btn:hover{background:var(--sf3);border-color:var(--bh);}
+.btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.btn-p{background:var(--ac);border-color:var(--ac);color:#fff;}
+.btn-p:hover{opacity:.88;background:var(--ac);}
+.btn-lg{padding:10px 24px;font-size:14px;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
+/* ALERTS */
+.al{padding:10px 14px;border-radius:var(--rs);font-size:13px;display:flex;gap:9px;align-items:flex-start;line-height:1.5;}
+.a-ok{background:var(--okb);color:var(--ok);border:1px solid rgba(52,211,153,.2);}
+.a-er{background:var(--erb);color:var(--er);border:1px solid rgba(248,113,113,.2);}
+.a-in{background:var(--ag);color:#93b8fa;border:1px solid rgba(79,142,247,.2);}
+.a-wa{background:var(--amb);color:var(--am);border:1px solid rgba(251,191,36,.2);}
+
+/* DST TOGGLE */
+.dtog{display:flex;gap:8px;margin-bottom:0;}
+.dtb{flex:1;padding:14px;border-radius:var(--rs);border:2px solid var(--bm);background:var(--sf2);cursor:pointer;transition:all .15s;text-align:center;}
+.dtb:hover{border-color:var(--bh);}
+.dtb.active{border-color:var(--ac);background:var(--ag);}
+.dtb-i{font-size:24px;margin-bottom:6px;}
+.dtb-t{font-size:13px;font-weight:600;}
+.dtb-s{font-size:11px;color:var(--tm);margin-top:2px;}
+
+/* MAP TABLE */
+.maptbl{width:100%;border-collapse:collapse;font-size:13px;}
+.maptbl th{background:var(--sf2);color:var(--tm);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--bm);}
+.maptbl td{padding:7px 12px;border-bottom:1px solid var(--b);}
+.maptbl tr:last-child td{border-bottom:none;}
+.msel{background:var(--sf3);border:1px solid var(--bm);border-radius:var(--rx);color:var(--t);padding:5px 8px;font-size:12px;font-family:var(--f);outline:none;width:100%;}
+.msel:focus{border-color:var(--ac);}
+.mbadge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 6px;border-radius:8px;font-weight:600;}
+.mb-m{background:var(--ag);color:var(--ac);border:1px solid rgba(79,142,247,.3);}
+.mb-s{background:var(--sf3);color:var(--th);border:1px solid var(--b);}
+
+/* PROGRESS */
+.pw{height:5px;background:var(--sf3);border-radius:3px;overflow:hidden;}
+.pf{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px;transition:width .3s;}
+.sr{display:flex;gap:24px;margin-top:12px;}
+.sv{font-size:24px;font-weight:800;letter-spacing:-.5px;}
+.sl2{font-size:11px;color:var(--tm);}
+
+/* LOG */
+.log{background:var(--sf2);border:1px solid var(--b);border-radius:var(--rs);height:220px;overflow-y:auto;padding:10px 13px;font-family:var(--m);font-size:12px;line-height:1.7;}
+.le{display:flex;gap:10px;}
+.lt{color:var(--th);flex-shrink:0;}
+.lm{flex:1;word-break:break-all;}
+.lm.ok{color:var(--ok);}.lm.er{color:var(--er);}.lm.wa{color:var(--am);}.lm.in{color:var(--ac);}
+
+.sp{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--t);color:var(--bg);padding:10px 18px;border-radius:var(--rs);font-size:13px;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;font-weight:500;}
+.chkrow{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 0;font-size:13px;}
+.chkrow input{accent-color:var(--ac);width:14px;height:14px;}
+
+/* CATEGORY TREE */
+.cat-tree-wrap{background:var(--sf2);border:1px solid var(--bm);border-radius:var(--rx);max-height:340px;overflow-y:auto;padding:8px 4px;}
+.tree-search{background:var(--sf2);border:1px solid var(--bm);border-radius:var(--rx);color:var(--t);padding:7px 10px;font-size:13px;font-family:var(--f);outline:none;width:100%;margin-bottom:8px;}
+.tree-search:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ag);}
+.tf{margin-left:0;}
+.tf-hdr{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:var(--rx);cursor:pointer;user-select:none;color:var(--tm);font-size:13px;}
+.tf-hdr:hover{background:var(--sf3);}
+.tf-icon{font-size:13px;transition:transform .15s;flex-shrink:0;}
+.tf-icon.open{transform:rotate(90deg);}
+.tf-name{flex:1;font-weight:500;}
+.tf-children{margin-left:16px;border-left:1px solid var(--b);padding-left:4px;display:none;}
+.tf-children.open{display:block;}
+.tc{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:var(--rx);cursor:pointer;font-size:13px;color:var(--tm);transition:all .12s;}
+.tc:hover{background:var(--sf3);color:var(--t);}
+.tc.selected{background:var(--ag);color:var(--ac);border:1px solid rgba(79,142,247,.3);}
+.tc-no{font-size:11px;color:var(--th);font-family:var(--m);margin-left:auto;}
+.tree-loading{padding:20px;text-align:center;color:var(--th);font-size:13px;}
+.cat-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.ctab{flex:1;padding:7px;border-radius:var(--rx);border:1px solid var(--bm);background:var(--sf2);color:var(--tm);cursor:pointer;text-align:center;font-size:12px;font-weight:500;transition:all .12s;}
+.ctab:hover{border-color:var(--bh);color:var(--t);}
+.ctab.active{background:var(--ag);border-color:rgba(79,142,247,.4);color:var(--ac);}
+</style>
+</head>
+<body>
+<div class="tb">
+  <div class="logo"><div class="li">⬇</div><span style="color:var(--ac)">TheJay</span>&nbsp;Downloader</div>
+  <div class="badge">v2.0</div>
+  <div class="tbr">
+    <div class="ci"><div class="dot" id="dotSrc"></div><span id="lblSrc">Origen: sin conectar</span></div>
+    <span style="color:var(--b)">|</span>
+    <div class="ci"><div class="dot" id="dotDst"></div><span id="lblDst">Destino: sin configurar</span></div>
+  </div>
+</div>
+
+<div class="wz">
+  <div class="steps">
+    <div class="si"><div class="sc active" id="sc1">1</div><div class="sl active" id="sl1">Origen</div></div>
+    <div class="sln" id="ln1"></div>
+    <div class="si"><div class="sc" id="sc2">2</div><div class="sl" id="sl2">Categoría</div></div>
+    <div class="sln" id="ln2"></div>
+    <div class="si"><div class="sc" id="sc3">3</div><div class="sl" id="sl3">Filtro</div></div>
+    <div class="sln" id="ln3"></div>
+    <div class="si"><div class="sc" id="sc4">4</div><div class="sl" id="sl4">Destino</div></div>
+    <div class="sln" id="ln4"></div>
+    <div class="si"><div class="sc" id="sc5">5</div><div class="sl" id="sl5">Ejecutar</div></div>
+  </div>
+
+  <!-- ═══ PASO 1: ORIGEN ═══ -->
+  <div class="panel active" id="p1">
+    <div><div class="pt">Servidor Origen</div><div class="ps">Conecta al servidor Therefore desde el que se leerán los documentos</div></div>
+    <div class="card">
+      <div class="fld"><label>URL del servidor</label><input type="text" id="srcUrl" value="https://dpa.cgn.canon-europa.com:8450"/><span class="hint">Sin barra final</span></div>
+      <div class="fld"><label>Tenant Name <span style="color:var(--th);font-weight:400">(solo Therefore Online — vacío si On-Premise)</span></label><input type="text" id="srcTenant" placeholder="vacío para On-Premise"/></div>
+    </div>
+    <div class="card">
+      <div class="cl">Autenticación</div>
+      <div class="tabs">
+        <div class="tab active" id="srcTU" onclick="setAuth('src','user')">👤 Usuario / Contraseña</div>
+        <div class="tab" id="srcTW" onclick="setAuth('src','win')">🏢 Windows / SSO</div>
+      </div>
+      <div class="asec on" id="srcSU">
+        <div class="r2">
+          <div class="fld"><label>Usuario</label><input type="text" id="srcUser" value="CANONINTRA\jimenezjj"/></div>
+          <div class="fld"><label>Contraseña</label><input type="password" id="srcPass" placeholder="••••••••"/></div>
+        </div>
+      </div>
+      <div class="asec" id="srcSW"><div class="al a-in">🏢 El navegador usará tus credenciales de dominio Windows automáticamente.</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p btn-lg" onclick="connect('src')"><span class="sp" id="spSrc" style="display:none"></span>Conectar al origen</button>
+      <span id="msgSrc" style="font-size:13px;color:var(--tm)"></span>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 2: CATEGORÍA ORIGEN ═══ -->
+  <div class="panel" id="p2">
+    <div><div class="pt">Categoría Origen</div><div class="ps">Selecciona la categoría de la que se leerán los documentos</div></div>
+
+    <div class="card">
+      <div class="cl">Seleccionar categoría</div>
+      <div class="cat-tabs">
+        <div class="ctab active" id="ctabTree" onclick="setCatMode('tree')">🌳 Árbol de categorías</div>
+        <div class="ctab" id="ctabNum" onclick="setCatMode('num')">🔢 Por número</div>
+      </div>
+
+      <!-- Modo árbol -->
+      <div id="catModeTree">
+        <input class="tree-search" id="treeSearch" placeholder="🔍 Buscar categoría..." oninput="filterTree(this.value)"/>
+        <div class="cat-tree-wrap" id="srcTreeWrap">
+          <div class="tree-loading"><span class="sp"></span> Cargando árbol...</div>
+        </div>
+        <div id="srcCatSelected" style="margin-top:10px;display:none">
+          <div class="al a-ok" id="srcCatSelectedInfo"></div>
+        </div>
+      </div>
+
+      <!-- Modo número -->
+      <div id="catModeNum" style="display:none">
+        <div class="r2" style="align-items:end">
+          <div class="fld" style="margin:0"><label>Número de categoría</label><input type="number" id="srcCatNo" value="71" min="1" onkeydown="if(event.key==='Enter')loadCat('src')"/></div>
+          <button class="btn btn-p" onclick="loadCat('src')"><span class="sp" id="spSrcCat" style="display:none"></span>Cargar info</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="srcCatOut" style="display:none">
+      <div class="card"><div id="srcCatContent"></div></div>
+      <div class="btn-row"><button class="btn" onclick="goStep(1)">← Atrás</button><button class="btn btn-p btn-lg" onclick="goStep(3)">Configurar filtro →</button></div>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 3: FILTRO ═══ -->
+  <div class="panel" id="p3">
+    <div><div class="pt">Filtro de documentos</div><div class="ps">Opcional — vacío descarga todos los documentos de la categoría</div></div>
+    <div class="card">
+      <div class="cl">Condición de búsqueda</div>
+      <div class="r3" style="align-items:end">
+        <div class="fld" style="margin:0"><label>Campo</label><select id="fField"><option value="">— Sin filtro (todos) —</option></select></div>
+        <div class="fld" style="margin:0"><label>Operador</label>
+          <select id="fOp">
+            <option value="0">= Igual</option>
+            <option value="1">Like (comodín *)</option>
+            <option value="2">≤ Menor o igual</option>
+            <option value="3">≥ Mayor o igual</option>
+            <option value="4">&gt; Mayor que</option>
+            <option value="5">&lt; Menor que</option>
+            <option value="6">≠ Distinto</option>
+          </select>
+        </div>
+        <div class="fld" style="margin:0"><label>Valor</label><input type="text" id="fVal" placeholder="ej: *contrat*"/></div>
+      </div>
+      <div class="al a-in" style="margin-top:12px">ℹ Operador "Like" soporta comodines: <code>*contrat*</code> · Para rangos de fecha usa "≥" y "≤" con formato <code>YYYY-MM-DD</code></div>
+    </div>
+    <div class="card">
+      <div class="cl">Límite y rendimiento</div>
+      <div class="r2">
+        <div class="fld" style="margin:0"><label>Máximo de documentos</label><input type="number" id="maxDocs" placeholder="Sin límite" min="1"/><span class="hint">Vacío = todos</span></div>
+        <div class="fld" style="margin:0"><label>Concurrencia (docs en paralelo)</label><input type="number" id="concurrency" value="4" min="1" max="10"/><span class="hint">1-10. Recomendado: 3-5</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cl">Control de duplicados</div>
+      <label class="chkrow"><input type="checkbox" id="optSkipDone" checked> Saltar documentos ya procesados anteriormente</label>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span id="cacheInfo" style="font-size:12px;color:var(--tm)">Cargando registro...</span>
+        <button class="btn btn-sm" onclick="clearCache()">🗑 Limpiar registro</button>
+        <button class="btn btn-sm" onclick="exportCache()">⬇ Exportar registro</button>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn" onclick="goStep(2)">← Atrás</button><button class="btn btn-p btn-lg" onclick="goStep(4)">Configurar destino →</button></div>
+  </div>
+
+  <!-- ═══ PASO 4: DESTINO ═══ -->
+  <div class="panel" id="p4">
+    <div><div class="pt">Destino</div><div class="ps">¿Dónde quieres enviar los documentos?</div></div>
+
+    <div class="card">
+      <div class="dtog">
+        <div class="dtb active" id="dtLocal" onclick="setDst('local')"><div class="dtb-i">⬇</div><div class="dtb-t">Descarga local</div><div class="dtb-s">Guardar ficheros en el navegador</div></div>
+        <div class="dtb" id="dtSrv" onclick="setDst('server')"><div class="dtb-i">🖥</div><div class="dtb-t">Servidor Therefore</div><div class="dtb-s">Copiar a otro servidor</div></div>
+      </div>
+    </div>
+
+    <!-- DESTINO LOCAL -->
+    <div id="secLocal">
+      <div class="al a-in">ℹ Los ficheros se descargarán directamente en la carpeta de descargas del navegador, con su nombre original.</div>
+    </div>
+
+    <!-- DESTINO SERVIDOR -->
+    <div id="secSrv" style="display:none">
+      <div class="card">
+        <div class="fld"><label>URL del servidor destino</label><input type="text" id="dstUrl" value="https://ces-mad1-dms05.canonintra.net"/></div>
+        <div class="fld"><label>Tenant Name <span style="color:var(--th);font-weight:400">(solo Therefore Online)</span></label><input type="text" id="dstTenant" placeholder="vacío para On-Premise"/></div>
+      </div>
+      <div class="card">
+        <div class="cl">Autenticación destino</div>
+        <div class="tabs">
+          <div class="tab active" id="dstTU" onclick="setAuth('dst','user')">👤 Usuario / Contraseña</div>
+          <div class="tab" id="dstTW" onclick="setAuth('dst','win')">🏢 Windows / SSO</div>
+        </div>
+        <div class="asec on" id="dstSU">
+          <div class="r2">
+            <div class="fld"><label>Usuario</label><input type="text" id="dstUser" value="CANONINTRA\jimenezjj"/></div>
+            <div class="fld"><label>Contraseña</label><input type="password" id="dstPass" placeholder="••••••••"/></div>
+          </div>
+        </div>
+        <div class="asec" id="dstSW"><div class="al a-in">🏢 Credenciales Windows del dominio.</div></div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-p btn-sm" onclick="connect('dst')"><span class="sp" id="spDst" style="display:none"></span>Probar conexión</button>
+          <span id="msgDst" style="font-size:12px;color:var(--tm)"></span>
+        </div>
+      </div>
+
+      <div id="dstCatSec" style="display:none">
+        <div class="card">
+          <div class="cl">Categoría destino</div>
+          <div class="cat-tabs">
+            <div class="ctab active" id="dctabTree" onclick="setDstCatMode('tree')">🌳 Árbol de categorías</div>
+            <div class="ctab" id="dctabNum" onclick="setDstCatMode('num')">🔢 Por número</div>
+          </div>
+
+          <!-- Modo árbol destino -->
+          <div id="dstCatModeTree">
+            <input class="tree-search" id="dstTreeSearch" placeholder="🔍 Buscar categoría destino..." oninput="filterDstTree(this.value)"/>
+            <div class="cat-tree-wrap" id="dstTreeWrap">
+              <div class="tree-loading">Conecta al servidor destino para cargar el árbol</div>
+            </div>
+            <div id="dstCatSelected" style="margin-top:10px;display:none">
+              <div class="al a-ok" id="dstCatSelectedInfo"></div>
+            </div>
+          </div>
+
+          <!-- Modo número destino -->
+          <div id="dstCatModeNum" style="display:none">
+            <div class="r2" style="align-items:end">
+              <div class="fld" style="margin:0"><label>Número de categoría destino</label><input type="number" id="dstCatNo" value="588" min="1" onkeydown="if(event.key==='Enter')loadCat('dst')"/></div>
+              <button class="btn btn-p btn-sm" onclick="loadCat('dst')"><span class="sp" id="spDstCat" style="display:none"></span>Cargar y mapear</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="mapSec" style="display:none">
+          <div class="card">
+            <div class="cl" style="margin-bottom:8px">Mapeo de campos Origen → Destino</div>
+            <div class="al a-in" style="margin-bottom:14px">🗂 Selecciona manualmente el campo destino para cada campo origen que quieras copiar. Deja "No mapear" para campos que no necesitas.</div>
+            <label class="chkrow" style="margin-bottom:14px"><input type="checkbox" id="optMeta" checked> Copiar metadatos (IndexData) al crear documentos en destino</label>
+            <div style="overflow-x:auto"><table class="maptbl"><thead><tr><th>Campo origen</th><th>Tipo</th><th>→ Campo destino</th><th>Estado</th></tr></thead><tbody id="mapBody"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:4px">
+      <button class="btn" onclick="goStep(3)">← Atrás</button>
+      <button class="btn btn-p btn-lg" onclick="validateRun()">▶ Ejecutar</button>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 5: EJECUCIÓN ═══ -->
+  <div class="panel" id="p5">
+    <div><div class="pt">Ejecución</div><div class="ps" id="p5s">Procesando...</div></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:600" id="progPh">Iniciando...</div>
+        <div style="font-size:13px;color:var(--tm)" id="progPct">0%</div>
+      </div>
+      <div class="pw"><div class="pf" id="progF" style="width:0%"></div></div>
+      <div class="sr">
+        <div><div class="sv" style="color:var(--tm)" id="stT">—</div><div class="sl2">Total</div></div>
+        <div><div class="sv" style="color:var(--ok)" id="stO">0</div><div class="sl2">OK</div></div>
+        <div><div class="sv" style="color:var(--er)" id="stE">0</div><div class="sl2">Errores</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cl" style="margin-bottom:8px">Log</div>
+      <div class="log" id="runLog"></div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn btn-sm" id="btnStop" onclick="doStop()" style="display:none;color:var(--er);border-color:var(--er)">⏹ Detener</button>
+        <button class="btn btn-sm" onclick="exportLog()">Exportar log</button>
+        <button class="btn btn-sm" id="btnAgain" style="display:none" onclick="goStep(3)">↩ Nueva consulta</button>
+      </div>
+    </div>
+    <div id="sumCard" style="display:none"><div class="card"><div id="sumContent"></div></div></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ══════════════ STATE ══════════════
+const S = {
+  src: { authMode:'user', base:'', tenant:'', user:'', pass:'', catNo:null, fields:[] },
+  dst: { authMode:'user', base:'', tenant:'', user:'', pass:'', catNo:null, fields:[] },
+  dstMode: 'local',
+  fieldMap: [],   // [{srcColName, srcFieldNo, srcTypeNo, dstColName, dstFieldNo, dstTypeNo}]
+  running:false, stop:false,
+  logs:[], stats:{total:0,ok:0,err:0}, t0:null,
+};
+
+// FieldType mapping según documentación real de Therefore:
+// String=1, Int=2, Date=3, Label=4, Money=5, Logical=6, NumericCounter=8, TextCounter=9, Table=10, Custom=99
+// (en algunos servidores FieldType puede ser 1-7 con variaciones; excluimos tablas y contadores)
+const FT = {1:'Texto',2:'Entero',3:'Fecha',4:'Label',5:'Money',6:'Lógico',7:'Keyword',8:'Tabla',10:'Tabla',99:'Custom'};
+
+// ══════════════ NAV ══════════════
+function goStep(n) {
+  if(n===3) setTimeout(updateCacheInfo, 50);
+  if(n===2 && _treeData.length===0) setTimeout(loadCategoriesTree, 50);
+  for(let i=1;i<=5;i++){
+    document.getElementById('p'+i).classList.toggle('active',i===n);
+    const sc=document.getElementById('sc'+i),sl=document.getElementById('sl'+i);
+    sc.classList.toggle('active',i===n); sc.classList.toggle('done',i<n);
+    sl.classList.toggle('active',i===n); sl.classList.toggle('done',i<n);
+    const ln=document.getElementById('ln'+i); if(ln) ln.classList.toggle('done',i<n);
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════ UI HELPERS ══════════════
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const ts  = () => new Date().toTimeString().slice(0,8);
+
+function toast(msg,d=2500){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',d);}
+
+const LOG_DOM_MAX=300; // máximo de entradas visibles en el DOM
+function log(msg,type=''){
+  S.logs.push({t:ts(),msg,type});
+  const el=document.getElementById('runLog');
+  // Limitar entradas DOM para no saturar el navegador con 40K+ docs
+  if(el.children.length>=LOG_DOM_MAX){
+    // Eliminar las 50 más antiguas de golpe
+    for(let i=0;i<50&&el.firstChild;i++) el.removeChild(el.firstChild);
+    // Insertar aviso si no existe ya
+    if(!document.getElementById('logTruncNotice')){
+      el.insertAdjacentHTML('afterbegin','<div id="logTruncNotice" class="le"><span class="lt">...</span><span class="lm wa">Log limitado a las últimas entradas — usa "Exportar log" para el historial completo</span></div>');
+    }
+  }
+  el.insertAdjacentHTML('beforeend',`<div class="le"><span class="lt">${ts()}</span><span class="lm ${type}">${esc(msg)}</span></div>`);
+  el.scrollTop=el.scrollHeight;
+}
+function exportLog(){
+  const a=Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([S.logs.map(e=>`[${e.t}] ${e.msg}`).join('\n')],{type:'text/plain'})),
+    download:'thejay-downloader-log.txt'
+  });a.click();
+}
+function setP(pct,ph){
+  document.getElementById('progF').style.width=pct+'%';
+  document.getElementById('progPct').textContent=Math.round(pct)+'%';
+  if(ph)document.getElementById('progPh').textContent=ph;
+}
+function updStats(){
+  document.getElementById('stT').textContent=S.stats.total||'—';
+  document.getElementById('stO').textContent=S.stats.ok;
+  document.getElementById('stE').textContent=S.stats.err;
+}
+
+// ══════════════ AUTH / DST MODE ══════════════
+function setAuth(side,mode){
+  S[side].authMode=mode;
+  document.getElementById(side+'TU').classList.toggle('active',mode==='user');
+  document.getElementById(side+'TW').classList.toggle('active',mode==='win');
+  document.getElementById(side+'SU').classList.toggle('on',mode==='user');
+  document.getElementById(side+'SW').classList.toggle('on',mode==='win');
+}
+function setDst(m){
+  S.dstMode=m;
+  document.getElementById('dtLocal').classList.toggle('active',m==='local');
+  document.getElementById('dtSrv').classList.toggle('active',m==='server');
+  document.getElementById('secLocal').style.display=m==='local'?'block':'none';
+  document.getElementById('secSrv').style.display=m==='server'?'block':'none';
+}
+
+// ══════════════ API ══════════════
+function ep(side,op){
+  return S[side].base.replace(/\/$/,'')+'/theservice/v0001/'+(S[side].authMode==='win'?'restwin':'restun')+'/'+op;
+}
+function hdrs(side){
+  const h={'Content-Type':'application/json','Accept':'application/json'};
+  if(S[side].authMode==='user')
+    h['Authorization']='Basic '+btoa(unescape(encodeURIComponent(S[side].user+':'+S[side].pass)));
+  if(S[side].tenant) h['TenantName']=S[side].tenant;
+  return h;
+}
+async function api(side,op,body,retries=3){
+  const delay=ms=>new Promise(r=>setTimeout(r,ms));
+  for(let attempt=1;attempt<=retries;attempt++){
+    try{
+      const r=await fetch(ep(side,op),{
+        method:'POST',headers:hdrs(side),body:JSON.stringify(body),
+        credentials:S[side].authMode==='win'?'include':'same-origin'
+      });
+      if(!r.ok){const txt=await r.text().catch(()=>String(r.status));throw new Error(`HTTP ${r.status}: ${txt.slice(0,300)}`);}
+      return r.json();
+    }catch(e){
+      if(attempt===retries) throw e;
+      const wait=attempt*2000; // 2s, 4s entre reintentos
+      log(`  Reintento ${attempt}/${retries-1} para ${op} en ${wait/1000}s: ${e.message}`,'wa');
+      await delay(wait);
+    }
+  }
+}
+
+// ══════════════ STEP 1: CONNECT ══════════════
+async function connect(side){
+  const isSrc=side==='src';
+  S[side].base=(document.getElementById(isSrc?'srcUrl':'dstUrl').value||'').trim();
+  S[side].tenant=(document.getElementById(isSrc?'srcTenant':'dstTenant').value||'').trim();
+  S[side].user=(document.getElementById(isSrc?'srcUser':'dstUser').value||'').trim();
+  S[side].pass=(document.getElementById(isSrc?'srcPass':'dstPass').value||'');
+
+  if(!S[side].base){toast('Introduce la URL del servidor');return;}
+  if(S[side].authMode==='user'&&(!S[side].user||!S[side].pass)){toast('Introduce usuario y contraseña');return;}
+
+  const sp=document.getElementById(isSrc?'spSrc':'spDst');
+  const msg=document.getElementById(isSrc?'msgSrc':'msgDst');
+  const dot=document.getElementById(isSrc?'dotSrc':'dotDst');
+  const lbl=document.getElementById(isSrc?'lblSrc':'lblDst');
+
+  sp.style.display='inline-block'; msg.textContent='Conectando...'; msg.style.color='var(--tm)';
+
+  try{
+    const d=await api(side,'GetWebAPIServerVersion',{});
+    const ver=d.Version||d.version||'?';
+    dot.className='dot ok';
+    lbl.textContent=`${isSrc?'Origen':'Destino'}: v${ver}`;
+    msg.textContent=`✓ Conectado — Therefore v${ver}`; msg.style.color='var(--ok)';
+    if(isSrc){
+      goStep(2);
+      // Pre-cargar árbol inmediatamente tras conectar
+      setTimeout(loadCategoriesTree, 100);
+    } else {
+      document.getElementById('dstCatSec').style.display='block';
+      toast('Destino OK — cargando árbol de categorías...');
+      setTimeout(loadDstCategoriesTree, 100);
+    }
+  }catch(e){
+    dot.className='dot er';
+    lbl.textContent=`${isSrc?'Origen':'Destino'}: error`;
+    msg.textContent='✗ '+e.message; msg.style.color='var(--er)';
+  }finally{sp.style.display='none';}
+}
+
+// ══════════════ STEP 2: CATEGORY TREE ══════════════
+let _treeData = [];   // árbol completo en memoria
+let _catMode = 'tree';
+
+function setCatMode(m){
+  _catMode = m;
+  document.getElementById('ctabTree').classList.toggle('active', m==='tree');
+  document.getElementById('ctabNum').classList.toggle('active', m==='num');
+  document.getElementById('catModeTree').style.display = m==='tree' ? 'block' : 'none';
+  document.getElementById('catModeNum').style.display  = m==='num'  ? 'block' : 'none';
+}
+
+async function loadCategoriesTree(){
+  const wrap = document.getElementById('srcTreeWrap');
+  wrap.innerHTML = '<div class="tree-loading"><span class="sp"></span> Cargando árbol de categorías...</div>';
+  try{
+    const resp = await api('src', 'GetCategoriesTree', {});
+    _treeData = resp.TreeItems || resp.Categories || [];
+    renderTreeNodes(_treeData, wrap, '');
+  }catch(e){
+    wrap.innerHTML = `<div class="al a-er" style="margin:8px">✗ ${esc(e.message)}</div>`;
+  }
+}
+
+function renderTreeNodes(nodes, container, searchTerm){
+  container.innerHTML = '';
+  if(!nodes.length){
+    container.innerHTML = '<div class="tree-loading" style="color:var(--th)">Sin categorías</div>';
+    return;
+  }
+  nodes.forEach(node => renderNode(node, container, searchTerm));
+}
+
+function renderNode(node, parent, searchTerm){
+  const children = node.ChildItems || node.Children || node.SubCategories || [];
+  const isFolder = node.ItemType === 1 || (children.length > 0 && node.ItemType !== 2);
+  const isCat    = node.ItemType === 2 || (node.ItemNo !== undefined && node.ItemType !== 1);
+  const name     = node.Name || '(sin nombre)';
+  const catNo    = node.ItemNo || node.CategoryNo;
+
+  // Filtro de búsqueda
+  const matchesSelf = !searchTerm || name.toLowerCase().includes(searchTerm.toLowerCase()) || String(catNo).includes(searchTerm);
+  const childrenFiltered = children.filter(c => nodeMatchesSearch(c, searchTerm));
+  if(searchTerm && !matchesSelf && !childrenFiltered.length) return;
+
+  if(isFolder){
+    const div = document.createElement('div');
+    div.className = 'tf';
+    const open = !searchTerm ? '' : 'open';
+    div.innerHTML = `
+      <div class="tf-hdr" onclick="toggleTreeFolder(this)">
+        <span class="tf-icon ${open}">▶</span>
+        <span>📁</span>
+        <span class="tf-name">${esc(name)}</span>
+      </div>
+      <div class="tf-children ${open}"></div>`;
+    const childWrap = div.querySelector('.tf-children');
+    const childList = searchTerm ? childrenFiltered : children;
+    childList.forEach(c => renderNode(c, childWrap, searchTerm));
+    parent.appendChild(div);
+  }
+
+  if(isCat && catNo !== undefined){
+    const div = document.createElement('div');
+    div.className = 'tc';
+    div.dataset.catno = catNo;
+    div.dataset.name = name;
+    div.innerHTML = `<span>📄</span><span>${esc(name)}</span><span class="tc-no">#${catNo}</span>`;
+    div.onclick = () => selectTreeCat(catNo, name, div);
+    parent.appendChild(div);
+  }
+}
+
+function nodeMatchesSearch(node, term){
+  if(!term) return true;
+  const name = (node.Name||'').toLowerCase();
+  const no   = String(node.ItemNo||node.CategoryNo||'');
+  if(name.includes(term.toLowerCase()) || no.includes(term)) return true;
+  const children = node.ChildItems||node.Children||node.SubCategories||[];
+  return children.some(c => nodeMatchesSearch(c, term));
+}
+
+function toggleTreeFolder(el){
+  el.querySelector('.tf-icon').classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+
+function filterTree(term){
+  const wrap = document.getElementById('srcTreeWrap');
+  renderTreeNodes(_treeData, wrap, term.trim());
+}
+
+function selectTreeCat(catNo, name, el){
+  // Deseleccionar anterior
+  document.querySelectorAll('.tc.selected').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+
+  // Actualizar input oculto y mostrar selección
+  document.getElementById('srcCatNo').value = catNo;
+  const info = document.getElementById('srcCatSelectedInfo');
+  info.innerHTML = `✓ <strong>${esc(name)}</strong> seleccionada (No. ${catNo})`;
+  document.getElementById('srcCatSelected').style.display = 'block';
+
+  // Cargar automáticamente la info de categoría
+  loadCat('src');
+}
+
+// ══════════════ DST CATEGORY TREE ══════════════
+let _dstTreeData = [];
+
+function setDstCatMode(m){
+  document.getElementById('dctabTree').classList.toggle('active', m==='tree');
+  document.getElementById('dctabNum').classList.toggle('active', m==='num');
+  document.getElementById('dstCatModeTree').style.display = m==='tree' ? 'block' : 'none';
+  document.getElementById('dstCatModeNum').style.display  = m==='num'  ? 'block' : 'none';
+}
+
+async function loadDstCategoriesTree(){
+  const wrap = document.getElementById('dstTreeWrap');
+  wrap.innerHTML = '<div class="tree-loading"><span class="sp"></span> Cargando árbol destino...</div>';
+  try{
+    const resp = await api('dst', 'GetCategoriesTree', {});
+    _dstTreeData = resp.TreeItems || resp.Categories || [];
+    renderDstTreeNodes(_dstTreeData, wrap, '');
+  }catch(e){
+    wrap.innerHTML = `<div class="al a-er" style="margin:8px">✗ ${esc(e.message)}</div>`;
+  }
+}
+
+function renderDstTreeNodes(nodes, container, searchTerm){
+  container.innerHTML = '';
+  if(!nodes.length){
+    container.innerHTML = '<div class="tree-loading" style="color:var(--th)">Sin categorías</div>';
+    return;
+  }
+  nodes.forEach(node => renderDstNode(node, container, searchTerm));
+}
+
+function renderDstNode(node, parent, searchTerm){
+  const children = node.ChildItems || node.Children || node.SubCategories || [];
+  const isFolder = node.ItemType === 1 || (children.length > 0 && node.ItemType !== 2);
+  const isCat    = node.ItemType === 2 || (node.ItemNo !== undefined && node.ItemType !== 1);
+  const name     = node.Name || '(sin nombre)';
+  const catNo    = node.ItemNo || node.CategoryNo;
+
+  const matchesSelf = !searchTerm || name.toLowerCase().includes(searchTerm.toLowerCase()) || String(catNo).includes(searchTerm);
+  const childrenFiltered = children.filter(c => nodeMatchesSearch(c, searchTerm));
+  if(searchTerm && !matchesSelf && !childrenFiltered.length) return;
+
+  if(isFolder){
+    const div = document.createElement('div');
+    div.className = 'tf';
+    const open = searchTerm ? 'open' : '';
+    div.innerHTML = `
+      <div class="tf-hdr" onclick="toggleTreeFolder(this)">
+        <span class="tf-icon ${open}">▶</span>
+        <span>📁</span>
+        <span class="tf-name">${esc(name)}</span>
+      </div>
+      <div class="tf-children ${open}"></div>`;
+    const childWrap = div.querySelector('.tf-children');
+    const childList = searchTerm ? childrenFiltered : children;
+    childList.forEach(c => renderDstNode(c, childWrap, searchTerm));
+    parent.appendChild(div);
+  }
+
+  if(isCat && catNo !== undefined){
+    const div = document.createElement('div');
+    div.className = 'tc';
+    div.dataset.catno = catNo;
+    div.dataset.name = name;
+    div.innerHTML = `<span>📄</span><span>${esc(name)}</span><span class="tc-no">#${catNo}</span>`;
+    div.onclick = () => selectDstTreeCat(catNo, name, div);
+    parent.appendChild(div);
+  }
+}
+
+function filterDstTree(term){
+  const wrap = document.getElementById('dstTreeWrap');
+  renderDstTreeNodes(_dstTreeData, wrap, term.trim());
+}
+
+function selectDstTreeCat(catNo, name, el){
+  document.querySelectorAll('#dstTreeWrap .tc.selected').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('dstCatNo').value = catNo;
+  const info = document.getElementById('dstCatSelectedInfo');
+  info.innerHTML = `✓ <strong>${esc(name)}</strong> seleccionada (No. ${catNo})`;
+  document.getElementById('dstCatSelected').style.display = 'block';
+  // Cargar automáticamente
+  loadCat('dst');
+}
+
+// ══════════════ STEP 2: LOAD CATEGORY ══════════════
+function fieldsFromCatInfo(data){
+  // GetCategoryInfo devuelve Fields o CategoryFields con WSCategoryField
+  // Excluir: tabla (FieldType=10 o 8 según versión), Label(4), contadores(8,9), sin ColName
+  const raw=data.Fields||data.CategoryFields||[];
+  return raw.filter(f=>{
+    const ft=f.FieldType;
+    return (f.ColName||f.FieldName) && ft!==4 && ft!==8 && ft!==9 && ft!==10 && ft!==99;
+  });
+}
+
+async function loadCat(side){
+  const isSrc=side==='src';
+  const catNo=parseInt(document.getElementById(isSrc?'srcCatNo':'dstCatNo').value);
+  if(!catNo){toast('Introduce un número de categoría');return;}
+
+  const sp=document.getElementById(isSrc?'spSrcCat':'spDstCat');
+  sp.style.display='inline-block';
+  if(isSrc) document.getElementById('srcCatOut').style.display='none';
+  else document.getElementById('mapSec').style.display='none';
+
+  try{
+    const data=await api(side,'GetCategoryInfo',{CategoryNo:catNo});
+    S[side].catNo=catNo;
+    S[side].fields=fieldsFromCatInfo(data);
+    const name=data.Name||data.CategoryName||'(sin nombre)';
+
+    if(isSrc){
+      // Poblar filtro
+      const sel=document.getElementById('fField');
+      sel.innerHTML='<option value="">— Sin filtro (todos) —</option>';
+      S.src.fields.forEach(f=>{
+        const o=document.createElement('option');
+        o.value=JSON.stringify({col:f.ColName||f.FieldName,ft:f.FieldType});
+        o.textContent=`${f.Caption||f.ColName||f.FieldName} (${FT[f.FieldType]||f.FieldType})`;
+        sel.appendChild(o);
+      });
+
+      document.getElementById('srcCatContent').innerHTML=`
+        <div class="al a-ok">✓ <strong>${esc(name)}</strong> (No. ${catNo}) — ${S.src.fields.length} campos indexables</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+          ${S.src.fields.slice(0,20).map(f=>`<span style="background:var(--sf3);border:1px solid var(--b);padding:3px 9px;border-radius:5px;font-size:12px;font-family:var(--m)">${esc(f.Caption||f.ColName)}</span>`).join('')}
+          ${S.src.fields.length>20?`<span style="font-size:12px;color:var(--th)">+${S.src.fields.length-20} más</span>`:''}
+        </div>`;
+      document.getElementById('srcCatOut').style.display='block';
+    } else {
+      buildMap();
+      document.getElementById('mapSec').style.display='block';
+      toast(`Categoría destino "${name}" cargada — configura el mapeo`);
+    }
+  }catch(e){
+    if(isSrc){
+      document.getElementById('srcCatContent').innerHTML=`<div class="al a-er">✗ ${esc(e.message)}</div>`;
+      document.getElementById('srcCatOut').style.display='block';
+    } else toast('Error al cargar cat. destino: '+e.message);
+  }finally{sp.style.display='none';}
+}
+
+// ══════════════ STEP 4: MAPPING ══════════════
+function buildMap(){
+  const tbody=document.getElementById('mapBody');
+  tbody.innerHTML=''; S.fieldMap=[];
+
+  S.src.fields.forEach(sf=>{
+    const srcCol=sf.ColName||sf.FieldName;
+    const entry={srcColName:srcCol,srcFieldNo:sf.FieldNo,srcTypeNo:sf.FieldType,dstColName:null,dstFieldNo:null,dstTypeNo:null};
+    S.fieldMap.push(entry);
+
+    const opts='<option value="">— No mapear —</option>'+
+      S.dst.fields.map(df=>`<option value="${esc(df.ColName||df.FieldName)}">${esc(df.Caption||df.ColName||df.FieldName)} (${FT[df.FieldType]||df.FieldType})</option>`).join('');
+
+    tbody.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td><strong>${esc(sf.Caption||srcCol)}</strong><br><span style="font-size:11px;color:var(--th);font-family:var(--m)">${esc(srcCol)}</span></td>
+        <td><span style="font-size:12px;color:var(--tm)">${FT[sf.FieldType]||sf.FieldType}</span></td>
+        <td><select class="msel" data-src="${esc(srcCol)}" onchange="updMap(this)">${opts}</select></td>
+        <td id="mb_${esc(srcCol)}"><span class="mbadge mb-s">Sin mapear</span></td>
+      </tr>`);
+  });
+}
+
+function updMap(sel){
+  const srcCol=sel.dataset.src, dstCol=sel.value;
+  const e=S.fieldMap.find(x=>x.srcColName===srcCol);
+  if(!e) return;
+  if(dstCol){
+    const df=S.dst.fields.find(f=>(f.ColName||f.FieldName)===dstCol);
+    e.dstColName=dstCol; e.dstFieldNo=df?df.FieldNo:null; e.dstTypeNo=df?df.FieldType:null;
+  } else { e.dstColName=null; e.dstFieldNo=null; e.dstTypeNo=null; }
+  const bd=document.getElementById('mb_'+srcCol);
+  if(bd) bd.innerHTML=dstCol?'<span class="mbadge mb-m">✎ Mapeado</span>':'<span class="mbadge mb-s">Sin mapear</span>';
+}
+
+// ══════════════ VALIDATE + RUN ══════════════
+function validateRun(){
+  if(S.dstMode==='server'){
+    if(!S.dst.base){toast('Conecta primero al servidor destino');return;}
+    if(!S.dst.catNo){toast('Carga primero la categoría destino');return;}
+  }
+  if(!S.src.catNo){toast('Carga primero la categoría origen');return;}
+  startRun();
+}
+
+async function startRun(){
+  goStep(5);
+  S.running=true; S.stop=false;
+  S.stats={total:0,ok:0,err:0}; S.logs=[];
+  S.t0=Date.now();
+  document.getElementById('runLog').innerHTML='';
+  document.getElementById('sumCard').style.display='none';
+  document.getElementById('btnStop').style.display='inline-flex';
+  document.getElementById('btnStop').disabled=false;
+  document.getElementById('btnAgain').style.display='none';
+
+  const fFieldRaw=document.getElementById('fField').value;
+  const fOp=document.getElementById('fOp').value;
+  const fVal=document.getElementById('fVal').value.trim();
+  const maxDocs=parseInt(document.getElementById('maxDocs').value)||null;
+  const concurrency=Math.max(1,Math.min(10,parseInt(document.getElementById('concurrency').value)||4));
+  const copyMeta=document.getElementById('optMeta')?document.getElementById('optMeta').checked:false;
+
+  document.getElementById('p5s').textContent=`Cat. ${S.src.catNo} → ${S.dstMode==='local'?'Descarga local':'Cat. '+S.dst.catNo}`;
+
+  log('=== TheJay Downloader iniciado ===','in');
+  log(`Origen: ${S.src.base} Cat.${S.src.catNo}`,'in');
+  log(`Destino: ${S.dstMode==='local'?'Descarga local':S.dst.base+' Cat.'+S.dst.catNo}`,'in');
+
+  // 1. Obtener DocNos
+  setP(2,'Consultando documentos...');
+  let docNos;
+  try{ docNos=await getDocNos(fFieldRaw,fOp,fVal,maxDocs); }
+  catch(e){ log('Error al consultar: '+e.message,'er'); setP(0,'Error'); finish(); return; }
+
+  if(!docNos.length){ log('No se encontraron documentos.','wa'); setP(100,'Sin resultados'); finish(); return; }
+
+  S.stats.total=docNos.length; updStats();
+  log(`${docNos.length} documentos encontrados. Concurrencia: ${concurrency}`,'in');
+
+  // 2. Pool de concurrencia
+  const skipDone=document.getElementById('optSkipDone')&&document.getElementById('optSkipDone').checked;
+  let idx=0, done=0, skipped=0;
+  async function worker(){
+    while(idx<docNos.length){
+      if(S.stop) break;
+      const i=idx++; const docNo=docNos[i];
+
+      // Skip si ya procesado
+      if(skipDone && isDone(docNo)){
+        skipped++;
+        done++;
+        log(`↷ DocNo ${docNo} ya procesado — saltando`,'wa');
+        setP(5+(done/docNos.length)*93,`Procesando ${done}/${docNos.length}`);
+        continue;
+      }
+
+      try{
+        // Reconectar si llevan más de 25 min procesando (tokens pueden expirar)
+        if(done>0 && done%500===0){
+          const mins=Math.round((Date.now()-S.t0)/60000);
+          log(`Checkpoint: ${done} docs procesados en ${mins} min`,'in');
+        }
+        const result=await processDoc(docNo,copyMeta);
+        S.stats.ok++;
+        markDone(docNo, result&&result.newDocNo);
+        log(`✓ DocNo ${docNo} (${S.stats.ok+S.stats.err}/${S.stats.total})`,'ok');
+      }catch(e){
+        S.stats.err++;
+        log(`✗ DocNo ${docNo}: ${e.message}`,'er');
+      }
+      done++;
+      const pct=5+(done/docNos.length)*93;
+      const elapsed=(Date.now()-S.t0)/1000;
+      const rate=done/elapsed; // docs/seg
+      const remaining=Math.round((docNos.length-done)/rate);
+      const eta=remaining>0?` — ETA: ${fmtTime(remaining)}`:'';
+      const rateStr=rate>=1?`${rate.toFixed(1)} docs/s`:`${(rate*60).toFixed(1)} docs/min`;
+      setP(pct,`Procesando ${done}/${docNos.length} (${rateStr}${eta})`);
+      updStats();
+    }
+  }
+  await Promise.all(Array.from({length:concurrency},()=>worker()));
+  if(S.stop) log('Detenido por el usuario.','wa');
+  setP(100,'Completado');
+  finish();
+}
+
+// ══════════════ GET DOC NOS ══════════════
+async function getDocNos(fFieldRaw,fOp,fVal,maxDocs){
+  const conds=[];
+  if(fFieldRaw&&fVal){
+    let fi; try{fi=JSON.parse(fFieldRaw);}catch(e){}
+    if(fi){
+      conds.push({FieldNoOrName:fi.col, Operator:parseInt(fOp), Condition:fVal});
+      log(`Filtro: [${fi.col}] op=${fOp} "${fVal}"`,'in');
+    }
+  } else log('Sin filtro — procesando todos los documentos de la categoría','in');
+
+  const body={Queries:[{CategoryNo:S.src.catNo,Mode:0,MaxRows:500000,Conditions:conds}],MaxRows:500000,RowBlockSize:500};
+  const resp=await api('src','ExecuteMultiQuery',body);
+  const docNos=[];
+
+  function extract(data){
+    (data.QueryResults||[]).forEach(qr=>(qr.ResultRows||[]).forEach(r=>{if(r.DocNo!=null)docNos.push(r.DocNo);}));
+  }
+  extract(resp);
+  log(`Página 1: ${docNos.length} docs`,'');
+
+  let more=resp.HasMoreRows, qid=resp.QueryID||resp.QueryId, pg=1;
+  while(more&&qid){
+    if(S.stop) break;
+    pg++;
+    const nx=await api('src','GetNextMultiQueryRows',{QueryID:qid});
+    extract(nx); more=nx.HasMoreRows;
+    log(`Página ${pg}: total ${docNos.length}`,'');
+  }
+  // ReleaseMultiQuery fire-and-forget
+  if(qid){
+    const _u=ep('src','ReleaseMultiQuery'),_h=hdrs('src');
+    setTimeout(()=>fetch(_u,{method:'POST',headers:_h,body:JSON.stringify({QueryID:qid})}).catch(()=>{}),200);
+  }
+  return maxDocs&&docNos.length>maxDocs?docNos.slice(0,maxDocs):docNos;
+}
+
+// ══════════════ PROCESS ONE DOC ══════════════
+async function processDoc(docNo,copyMeta){
+  // 1. Obtener info del documento (streams + index data)
+  // Nota: IsIndexDataNeeded (no IsIndexDataValuesNeeded) es el param correcto en On-Premise
+  const docInfo=await api('src','GetDocument',{
+    DocNo:docNo, VersionNo:0,
+    IsStreamsInfoNeeded:true,
+    IsIndexDataNeeded:true,
+    IsIndexDataValuesNeeded:true
+  });
+
+  const streamsInfo=docInfo.StreamsInfo||[];
+  const count=Math.max(streamsInfo.length,1);
+
+  // 2. Descargar todos los streams en paralelo
+  const streams=await Promise.all(
+    Array.from({length:count},async(_,s)=>{
+      const sd=await api('src','GetDocumentStream',{DocNo:docNo,StreamNo:s,VersionNo:0});
+      const raw=sd.FileData!==undefined?sd.FileData:(sd.StreamData!==undefined?sd.StreamData:sd.Data);
+      if(raw===undefined||raw===null) throw new Error(`Stream ${s}: sin datos`);
+      const fileName=sd.FileName||(streamsInfo[s]&&(streamsInfo[s].StreamName||streamsInfo[s].FileName))||`${docNo}_s${s}`;
+      const sizeKB=Math.round((Array.isArray(raw)?raw.length:String(raw).length)/1024);
+      return {raw,fileName,idx:s,sizeKB};
+    })
+  );
+
+  if(S.dstMode==='local'){
+    // Descarga directa al navegador
+    streams.forEach(str=>{
+      const blob=rawToBlob(str.raw);
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=str.fileName;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(a.href),8000);
+    });
+  } else {
+    // Copiar al servidor destino via CreateDocument
+    const streamsToUpload=streams.map((str,i)=>{
+      const b64=rawToBase64(str.raw);
+      log(`  ↑ Stream ${i}: "${str.fileName}" (${str.sizeKB} KB)`,'');
+      return {FileName:str.fileName, FileData:null, StreamNo:i, FileDataBase64JSON:b64};
+    });
+
+    // Construir IndexDataItems mapeados
+    const indexDataItems=[];
+    if(copyMeta && docInfo.IndexData){
+      // IndexData puede venir como {IndexDataItems:[...], ...} o directamente como array
+      let srcItems=[];
+      if(Array.isArray(docInfo.IndexData)) srcItems=docInfo.IndexData;
+      else if(Array.isArray(docInfo.IndexData.IndexDataItems)) srcItems=docInfo.IndexData.IndexDataItems;
+      else if(Array.isArray(docInfo.IndexData.Items)) srcItems=docInfo.IndexData.Items;
+
+      // IndexDataItems tiene estructura WSIndexData*: cada item es {IntIndexData:{FieldNo,DataValue,FieldName}, ...}
+      // o {StringIndexData:{...}}, {DateIndexData:{...}}, etc.
+      // Extraer el wrapper y el FieldName real para buscar por nombre
+      function getWrapper(item){
+        const keys=['IntIndexData','StringIndexData','DateIndexData','MoneyIndexData',
+                    'LogicalIndexData','KeywordIndexData','MultipleKeywordIndexData','DecimalIndexData'];
+        for(const k of keys){ if(item[k]) return {key:k, inner:item[k]}; }
+        return null;
+      }
+
+      S.fieldMap.forEach(m=>{
+        if(!m.dstColName||!m.dstFieldNo) return;
+        // Buscar item por FieldName dentro del wrapper o por FieldNo
+        const si=srcItems.find(it=>{
+          const w=getWrapper(it);
+          if(!w) return false;
+          return w.inner.FieldName===m.srcColName || w.inner.FieldNo===m.srcFieldNo;
+        });
+        if(!si) return;
+        const w=getWrapper(si);
+        if(!w) return;
+        // FieldNo=0 + FieldName = Therefore resuelve por nombre (confirmado código VB)
+        // Copiamos DataValue del origen, con el FieldName del campo destino
+        const newInner=Object.assign({},w.inner,{FieldNo:0, FieldName:m.dstColName});
+        indexDataItems.push({[w.key]:newInner});
+      });
+
+    }
+
+    // Streams es el campo correcto (confirmado por código VB de referencia)
+    const payload={CategoryNo:S.dst.catNo, Streams:streamsToUpload};
+    if(indexDataItems.length>0) payload.IndexDataItems=indexDataItems;
+
+    const res=await api('dst','CreateDocument',payload);
+    const newNo=res.DocNo||res.NewDocNo||'?';
+    log(`  ↳ Creado DocNo ${newNo} en destino`,'');
+    return {newDocNo: newNo};
+  }
+  return {newDocNo: null};
+}
+
+// ══════════════ BINARY HELPERS ══════════════
+function rawToBlob(raw){
+  if(Array.isArray(raw)) return new Blob([new Uint8Array(raw)],{type:'application/octet-stream'});
+  // base64 string
+  const clean=String(raw).replace(/[\s\r\n]/g,'');
+  const bin=atob(clean); const b=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i);
+  return new Blob([b],{type:'application/octet-stream'});
+}
+
+function rawToBase64(raw){
+  if(Array.isArray(raw)){
+    // Conversión eficiente por chunks (evita stack overflow en ficheros grandes)
+    const bytes=new Uint8Array(raw);
+    let bin=''; const chunk=8192;
+    for(let i=0;i<bytes.length;i+=chunk)
+      bin+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+    return btoa(bin);
+  }
+  return String(raw).replace(/[\s\r\n]/g,'');
+}
+
+// ══════════════ FINISH ══════════════
+function fmtTime(s){
+  if(s<60) return s+'s';
+  if(s<3600) return Math.floor(s/60)+'m '+Math.round(s%60)+'s';
+  return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m';
+}
+
+function finish(){
+  S.running=false;
+  const elSec=(Date.now()-S.t0)/1000;
+  const el=elSec.toFixed(1);
+  const rate=S.stats.total>0?(S.stats.ok/elSec).toFixed(2):'—';
+  log(`=== Fin: OK ${S.stats.ok} | Errores ${S.stats.err} | ${fmtTime(Math.round(elSec))} | ${rate} docs/s ===`,'ok');
+  document.getElementById('btnStop').style.display='none';
+  document.getElementById('btnAgain').style.display='inline-flex';
+  const sc=document.getElementById('sumCard'); sc.style.display='block';
+  const tp=S.stats.err===0?'a-ok':S.stats.ok===0?'a-er':'a-wa';
+  const errPct=S.stats.total>0?((S.stats.err/S.stats.total)*100).toFixed(1):0;
+  document.getElementById('sumContent').innerHTML=
+    `<div class="al ${tp}">${S.stats.err===0?'✅':S.stats.ok===0?'❌':'⚠'}
+    <div>
+      <strong>${S.stats.ok} de ${S.stats.total} documentos procesados correctamente</strong>
+      ${S.stats.err>0?`<br><span style="color:var(--er)">${S.stats.err} errores (${errPct}%)</span>`:''}
+      <br><span style="font-size:12px;opacity:.8">Tiempo total: ${fmtTime(Math.round(elSec))} · Velocidad media: ${rate} docs/s</span>
+    </div></div>`;
+}
+function doStop(){S.stop=true;document.getElementById('btnStop').disabled=true;log('Deteniendo...','wa');}
+
+// ══════════════ CACHE DE DOCUMENTOS PROCESADOS ══════════════
+const CACHE_KEY = 'thejay_processed_docs';
+
+function getCache(){
+  try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); }
+  catch(e){ return {}; }
+}
+function saveCache(cache){
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }
+  catch(e){ log('Aviso: no se pudo guardar el registro en localStorage','wa'); }
+}
+function markDone(docNo, dstDocNo){
+  try{
+    const cache=getCache();
+    cache[String(docNo)]={dstDocNo, ts:new Date().toISOString().slice(0,19), cat:S.src.catNo};
+    // Control de tamaño: si supera 4MB, eliminar los más antiguos (FIFO)
+    let json=JSON.stringify(cache);
+    if(json.length>4*1024*1024){
+      const keys=Object.keys(cache).sort((a,b)=>
+        (cache[a].ts||'').localeCompare(cache[b].ts||''));
+      // Eliminar el 20% más antiguo
+      const toRemove=Math.ceil(keys.length*0.2);
+      for(let i=0;i<toRemove;i++) delete cache[keys[i]];
+      log(`Registro compactado — eliminados ${toRemove} docs antiguos`,'wa');
+      json=JSON.stringify(cache);
+    }
+    localStorage.setItem(CACHE_KEY, json);
+  }catch(e){
+    // localStorage lleno — continuar sin guardar
+  }
+}
+function isDone(docNo){
+  const cache=getCache();
+  return !!cache[String(docNo)];
+}
+function updateCacheInfo(){
+  const cache=getCache();
+  const count=Object.keys(cache).length;
+  const el=document.getElementById('cacheInfo');
+  if(el) el.textContent=count>0
+    ? `${count} documento(s) en el registro (procesados anteriormente)`
+    : 'Registro vacío — no hay documentos procesados aún';
+}
+function clearCache(){
+  if(!confirm('¿Borrar el registro de documentos procesados? Esto permitirá volver a descargarlos.')) return;
+  localStorage.removeItem(CACHE_KEY);
+  updateCacheInfo();
+  toast('Registro limpiado');
+}
+function exportCache(){
+  const cache=getCache();
+  const lines=['DocNo Origen\tDocNo Destino\tFecha\tServidor\tCategoria'];
+  Object.entries(cache).forEach(([src,v])=>lines.push(`${src}\t${v.dstDocNo||'-'}\t${v.ts||'-'}\t${v.src||'-'}\t${v.cat||'-'}`));
+  const a=Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'})),
+    download:'thejay-registro-procesados.txt'
+  }); a.click();
+}
+// Inicializar info de cache al cargar
+document.addEventListener('DOMContentLoaded', updateCacheInfo);
+</script>
+</body>
+</html>

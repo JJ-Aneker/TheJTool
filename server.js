@@ -20,6 +20,8 @@ import bedrockHandler from './api/bedrock.js';
 import * as verticalesHandlers from './api/verticales.js';
 import dashboardRouter from './routes/dashboard.js';
 import adminRouter from './routes/admin.js';
+import questionnaireUploadHandler from './api/questionnaires/upload.js';
+import questionnaireStatusHandler from './api/questionnaires/status.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -123,6 +125,10 @@ app.use('/api/dashboard', dashboardRouter);
 // Admin routes (user management with Supabase Admin API)
 app.use('/api/admin', adminRouter);
 
+// Questionnaires routes (procesamiento de cuestionarios de seguridad IT)
+app.post('/api/questionnaires/upload', questionnaireUploadHandler);
+app.get('/api/questionnaires/:id/status', questionnaireStatusHandler);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
@@ -130,6 +136,8 @@ app.listen(PORT, () => {
   console.log(`📍 Build endpoint: http://localhost:${PORT}/api/build-docx`);
   console.log(`📍 Bedrock endpoint: http://localhost:${PORT}/api/bedrock?action=status|test|credentials|usage`);
   console.log(`📍 Health check: http://localhost:${PORT}/api/bedrock-health`);
+  console.log(`📍 Questionnaires upload: http://localhost:${PORT}/api/questionnaires/upload`);
+  console.log(`📍 Questionnaires status: http://localhost:${PORT}/api/questionnaires/:id/status`);
   console.log(`\n📋 Environment:`);
   console.log(`   AWS_REGION: ${process.env.AWS_REGION || 'NOT SET'}`);
   console.log(`   AWS_ACCESS_KEY_ID: ${process.env.AWS_ACCESS_KEY_ID ? '***' : 'NOT SET'}`);
