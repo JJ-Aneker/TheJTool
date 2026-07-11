@@ -22,6 +22,8 @@ import dashboardRouter from './routes/dashboard.js';
 import adminRouter from './routes/admin.js';
 import questionnaireUploadHandler from './api/questionnaires/upload.js';
 import questionnaireStatusHandler from './api/questionnaires/status.js';
+import questionnaireGenerateAnswersHandler from './api/questionnaires/generate-answers.js';
+import questionnaireDownloadExcelHandler from './api/questionnaires/download-excel.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -128,6 +130,8 @@ app.use('/api/admin', adminRouter);
 // Questionnaires routes (procesamiento de cuestionarios de seguridad IT)
 app.post('/api/questionnaires/upload', questionnaireUploadHandler);
 app.get('/api/questionnaires/:id/status', questionnaireStatusHandler);
+app.post('/api/questionnaires/:id/generate-answers', questionnaireGenerateAnswersHandler);
+app.get('/api/questionnaires/:id/download-excel', questionnaireDownloadExcelHandler);
 
 // Start server
 app.listen(PORT, () => {
@@ -138,6 +142,8 @@ app.listen(PORT, () => {
   console.log(`📍 Health check: http://localhost:${PORT}/api/bedrock-health`);
   console.log(`📍 Questionnaires upload: http://localhost:${PORT}/api/questionnaires/upload`);
   console.log(`📍 Questionnaires status: http://localhost:${PORT}/api/questionnaires/:id/status`);
+  console.log(`📍 Questionnaires generate: http://localhost:${PORT}/api/questionnaires/:id/generate-answers`);
+  console.log(`📍 Questionnaires download: http://localhost:${PORT}/api/questionnaires/:id/download-excel`);
   console.log(`\n📋 Environment:`);
   console.log(`   AWS_REGION: ${process.env.AWS_REGION || 'NOT SET'}`);
   console.log(`   AWS_ACCESS_KEY_ID: ${process.env.AWS_ACCESS_KEY_ID ? '***' : 'NOT SET'}`);

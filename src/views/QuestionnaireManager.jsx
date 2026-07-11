@@ -47,6 +47,8 @@ export default function QuestionnaireManager() {
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [preguntas, setPreguntas] = useState([]);
   const [estadisticas, setEstadisticas] = useState(null);
+  const [generatingAnswers, setGeneratingAnswers] = useState(false);
+  const [downloadingExcel, setDownloadingExcel] = useState(false);
 
   // Form state
   const [cliente, setCliente] = useState('');
@@ -173,6 +175,78 @@ export default function QuestionnaireManager() {
     }
   };
 
+  // Generar respuestas con IA
+  const handleGenerateAnswers = async (formularioId) => {
+    setGeneratingAnswers(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      message.loading({ content: 'Generando respuestas con IA...', key: 'generating', duration: 0 });
+
+      const response = await axios.post(
+        `${API_URL}/api/questionnaires/${formularioId}/generate-answers`,
+        {},
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      message.success({
+        content: `${response.data.generadas} respuestas generadas correctamente`,
+        key: 'generating',
+        duration: 3
+      });
+
+      // Recargar formularios y detalles si el modal está abierto
+      loadFormularios();
+      if (detailModalVisible && selectedFormulario?.id === formularioId) {
+        viewDetails(selectedFormulario);
+      }
+
+    } catch (err) {
+      console.error('Error generando respuestas:', err);
+      message.error({ content: err.response?.data?.error || 'Error al generar respuestas', key: 'generating' });
+    } finally {
+      setGeneratingAnswers(false);
+    }
+  };
+
+  // Descargar Excel completado
+  const handleDownloadExcel = async (formularioId, formularioNombre) => {
+    setDownloadingExcel(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      message.loading({ content: 'Preparando descarga...', key: 'downloading', duration: 0 });
+
+      const response = await axios.get(
+        `${API_URL}/api/questionnaires/${formularioId}/download-excel`,
+        {
+          headers: { 'Authorization': `Bearer ${token}` },
+          responseType: 'blob'
+        }
+      );
+
+      // Crear link de descarga
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${formularioNombre}_COMPLETADO.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      message.success({ content: 'Excel descargado correctamente', key: 'downloading', duration: 2 });
+
+    } catch (err) {
+      console.error('Error descargando Excel:', err);
+      message.error({ content: err.response?.data?.error || 'Error al descargar el Excel', key: 'downloading' });
+    } finally {
+      setDownloadingExcel(false);
+    }
+  };
+
   // Ver detalles de un formulario
   const viewDetails = async (formulario) => {
     setSelectedFormulario(formulario);
@@ -274,6 +348,7 @@ export default function QuestionnaireManager() {
     {
       title: 'Acciones',
       key: 'acciones',
+      width: 300,
       render: (_, record) => (
         <Space>
           <Button
@@ -284,13 +359,26 @@ export default function QuestionnaireManager() {
             Ver
           </Button>
           {record.estado === 'completado' && (
-            <Button
-              type="link"
-              icon={<DownloadOutlined />}
-              onClick={() => message.info('Descarga en desarrollo')}
-            >
-              Exportar
-            </Button>
+            <>
+              <Button
+                type="primary"
+                size="small"
+                icon={<SyncOutlined />}
+                onClick={() => handleGenerateAnswers(record.id)}
+                loading={generatingAnswers}
+              >
+                Generar IA
+              </Button>
+              <Button
+                type="default"
+                size="small"
+                icon={<DownloadOutlined />}
+                onClick={() => handleDownloadExcel(record.id, `${record.cliente}_${record.nombre_formulario}`)}
+                loading={downloadingExcel}
+              >
+                Descargar
+              </Button>
+            </>
           )}
         </Space>
       )
@@ -445,7 +533,32 @@ export default function QuestionnaireManager() {
           setEstadisticas(null);
         }}
         width={1200}
-        footer={null}
+        footer={selectedFormulario?.estado === 'completado' ? (
+          <Space>
+            <Button
+              type="primary"
+              icon={<SyncOutlined />}
+              onClick={() => handleGenerateAnswers(selectedFormulario.id)}
+              loading={generatingAnswers}
+            >
+              Generar Respuestas con IA
+            </Button>
+            <Button
+              type="default"
+              icon={<DownloadOutlined />}
+              onClick={() => handleDownloadExcel(
+                selectedFormulario.id,
+                `${selectedFormulario.cliente}_${selectedFormulario.nombre_formulario}`
+              )}
+              loading={downloadingExcel}
+            >
+              Descargar Excel Completado
+            </Button>
+            <Button onClick={() => setDetailModalVisible(false)}>
+              Cerrar
+            </Button>
+          </Space>
+        ) : null}
       >
         {selectedFormulario && (
           <>
