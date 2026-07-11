@@ -20,7 +20,8 @@ import {
   KeyOutlined,
   GlobalOutlined,
   BookOutlined,
-  MenuOutlined
+  MenuOutlined,
+  FileExcelOutlined
 } from '@ant-design/icons'
 import { useAuth } from './hooks/useAuth'
 import { useRole } from './hooks/useRole'
@@ -50,6 +51,7 @@ const DocumentGenerator = lazy(() => import('./views/DocumentGenerator'))
 const ThereforeReporter = lazy(() => import('./views/ThereforeReporter'))
 const BedrrockPanel = lazy(() => import('./views/BedrrockPanel'))
 const Manual = lazy(() => import('./views/Manual'))
+const QuestionnaireManager = lazy(() => import('./views/QuestionnaireManager'))
 
 const { Content } = Layout
 
@@ -64,6 +66,7 @@ const getMenuItems = (isAdmin = false, t = (key) => key) => {
     { key: 'eforms',           icon: <FormOutlined />,         label: t('nav.eformBuilder'),        path: '/eforms' },
     { key: 'category-builder', icon: <AppstoreOutlined />,     label: t('nav.categoryBuilder'),     path: '/category-builder' },
     { key: 'tenants',          icon: <CloudOutlined />,        label: t('nav.tenantManager'),       path: '/tenants' },
+    { key: 'questionnaires',   icon: <FileExcelOutlined />,    label: 'Cuestionarios IT',           path: '/questionnaires' },
     { key: 'document-generator', icon: <ThunderboltOutlined />, label: t('nav.documentGenerator'), path: '/document-generator' },
     { key: 'reporter',         icon: <FileTextOutlined />,     label: t('nav.thereforeReporter'),   path: '/reporter' },
     { key: 'web-services',     icon: <CloudOutlined />,        label: t('nav.webServices'),         path: '/web-services' },
@@ -393,6 +396,7 @@ function AppContent() {
               <Route path="/eforms" element={<EFormBuilder />} />
               <Route path="/category-builder" element={<CategoryBuilder />} />
               <Route path="/tenants" element={<TenantManager />} />
+              <Route path="/questionnaires" element={<QuestionnaireManager />} />
               <Route path="/document-generator" element={<DocumentGenerator />} />
               <Route path="/reporter" element={<ThereforeReporter />} />
               <Route path="/web-services" element={<WebServicesManager />} />
