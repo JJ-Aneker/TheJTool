@@ -53,12 +53,18 @@ async function generateAnswer(pregunta, contexto) {
   try {
     const prompt = buildEnrichedPrompt(pregunta, contexto);
 
-    const response = await callBedrock(prompt, {
-      maxTokens: 300,
-      temperature: 0.3 // Respuestas más deterministas
+    const response = await callBedrock({
+      model: 'claude-sonnet-4-5',
+      messages: [{
+        role: 'user',
+        content: prompt
+      }],
+      max_tokens: 300
+    }, {
+      module: 'questionnaires'
     });
 
-    return response.trim();
+    return response.content[0].text.trim();
   } catch (err) {
     console.error('[generate-answers] Error en Bedrock:', err.message);
     return `[ERROR: No se pudo generar respuesta automática]`;

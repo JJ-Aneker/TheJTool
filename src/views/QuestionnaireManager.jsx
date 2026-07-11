@@ -101,12 +101,16 @@ export default function QuestionnaireManager() {
     name: 'file',
     multiple: false,
     fileList,
-    accept: '.xlsx,.xls',
+    accept: '.xlsx,.xls,.xml',
     beforeUpload: (file) => {
       const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
                       file.type === 'application/vnd.ms-excel';
-      if (!isExcel) {
-        message.error('Solo se permiten ficheros Excel (.xlsx)');
+      const isXML = file.type === 'application/xml' ||
+                    file.type === 'text/xml' ||
+                    file.name.toLowerCase().endsWith('.xml');
+
+      if (!isExcel && !isXML) {
+        message.error('Solo se permiten ficheros Excel (.xlsx) o XML (.xml)');
         return Upload.LIST_IGNORE;
       }
       const isLt20M = file.size / 1024 / 1024 < 20;
@@ -481,9 +485,9 @@ export default function QuestionnaireManager() {
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
-          <p className="ant-upload-text">Click o arrastra el fichero Excel aquí</p>
+          <p className="ant-upload-text">Click o arrastra el fichero aquí</p>
           <p className="ant-upload-hint">
-            Solo ficheros .xlsx (máximo 20MB)
+            Ficheros Excel (.xlsx) o XML (.xml) - Máximo 20MB
           </p>
         </Dragger>
 

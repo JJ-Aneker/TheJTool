@@ -14,6 +14,7 @@
 import { createClient } from '@supabase/supabase-js';
 import multer from 'multer';
 import { parseWorkbook } from '../_lib/questionnaires/excelParser.js';
+import { isXML, convertXMLToExcel } from '../_lib/questionnaires/xmlToExcel.js';
 
 // Configuración de multer: en memoria, límite 20MB
 const upload = multer({
@@ -22,12 +23,17 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'application/vnd.ms-excel' // .xls (por si acaso, aunque preferimos xlsx)
+      'application/vnd.ms-excel', // .xls
+      'application/xml', // .xml
+      'text/xml' // .xml (alternativo)
     ];
-    if (allowedMimeTypes.includes(file.mimetype)) {
+    const allowedExtensions = ['.xlsx', '.xls', '.xml'];
+    const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
+
+    if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Solo se permiten ficheros Excel (.xlsx)'));
+      cb(new Error('Solo se permiten ficheros Excel (.xlsx) o XML (.xml)'));
     }
   }
 });
@@ -163,8 +169,15 @@ async function processQuestionnaireBackground(formularioId, fileBuffer, supabase
       .update({ estado: 'procesando' })
       .eq('id', formularioId);
 
+    // Si es XML, convertir a Excel primero
+    let bufferToProcess = fileBuffer;
+    if (isXML(fileBuffer)) {
+      console.log(`[bg-processor] Formulario ${formularioId}: Detectado XML, convirtiendo a Excel...`);
+      bufferToProcess = await convertXMLToExcel(fileBuffer);
+    }
+
     // Parsear Excel
-    const questions = await parseWorkbook(fileBuffer);
+    const questions = await parseWorkbook(bufferToProcess);
 
     console.log(`[bg-processor] Formulario ${formularioId}: ${questions.length} preguntas extraídas`);
 
