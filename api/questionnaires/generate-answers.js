@@ -64,10 +64,19 @@ async function generateAnswer(pregunta, contexto) {
       module: 'questionnaires'
     });
 
-    return response.content[0].text.trim();
+    const respuestaTexto = response.content[0].text.trim();
+
+    // Log de la primera respuesta para verificar
+    if (!generateAnswer.logged) {
+      console.log('[generate-answers] Primera respuesta generada (sample):', respuestaTexto.substring(0, 100) + '...');
+      generateAnswer.logged = true;
+    }
+
+    return respuestaTexto;
   } catch (err) {
     console.error('[generate-answers] Error en Bedrock:', err.message);
-    return `[ERROR: No se pudo generar respuesta automática]`;
+    console.error('[generate-answers] Stack:', err.stack);
+    return `[ERROR: ${err.message}]`;
   }
 }
 
@@ -129,8 +138,12 @@ async function generateAnswersHandler(req, res) {
       // Generar respuestas en paralelo para el lote actual
       const respuestasBatch = await Promise.all(
         batch.map(async (pregunta) => {
-          // Si ya tiene respuesta existente, no generar nueva
-          if (pregunta.respuesta_existente && pregunta.respuesta_existente.trim() !== '') {
+          // Si ya tiene respuesta existente Y NO ES UN ERROR, no generar nueva
+          const tieneRespuesta = pregunta.respuesta_existente &&
+                                 pregunta.respuesta_existente.trim() !== '' &&
+                                 !pregunta.respuesta_existente.includes('[ERROR:');
+
+          if (tieneRespuesta) {
             return {
               id: pregunta.id,
               respuesta: pregunta.respuesta_existente,
