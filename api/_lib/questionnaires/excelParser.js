@@ -86,18 +86,44 @@ function norm(text) {
 }
 
 /**
+ * Convierte un valor de celda de ExcelJS a texto plano.
+ * ExcelJS puede devolver objetos RichText cuando hay formato enriquecido.
+ * @param {*} value - Valor de la celda
+ * @returns {string} - Texto plano
+ */
+function cellValueToText(value) {
+  if (value == null) {
+    return '';
+  }
+
+  // Si es un objeto RichText (tiene propiedad richText)
+  if (typeof value === 'object' && value.richText) {
+    return value.richText.map(part => part.text || '').join('');
+  }
+
+  // Si es un objeto de fórmula (tiene propiedad result)
+  if (typeof value === 'object' && 'result' in value) {
+    return cellValueToText(value.result);
+  }
+
+  // Si es un string o número, devolverlo tal cual
+  return String(value);
+}
+
+/**
  * Devuelve el valor de una celda, resolviendo celdas combinadas.
  * En ExcelJS, las celdas combinadas tienen master cell; el resto son undefined.
  * @param {ExcelJS.Worksheet} sheet
  * @param {number} row - Fila (1-indexed)
  * @param {number} col - Columna (1-indexed)
  * @param {Map} mergedLookup - Mapa {address: masterAddress}
- * @returns {*} - Valor de la celda
+ * @returns {string} - Valor de la celda como texto plano
  */
 function cellValue(sheet, row, col, mergedLookup) {
   const address = sheet.getCell(row, col).address;
   const masterAddress = mergedLookup.get(address) || address;
-  return sheet.getCell(masterAddress).value;
+  const rawValue = sheet.getCell(masterAddress).value;
+  return cellValueToText(rawValue);
 }
 
 /**
