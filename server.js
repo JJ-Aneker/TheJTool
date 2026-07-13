@@ -24,6 +24,7 @@ import questionnaireUploadHandler from './api/questionnaires/upload.js';
 import questionnaireStatusHandler from './api/questionnaires/status.js';
 import questionnaireGenerateAnswersHandler from './api/questionnaires/generate-answers.js';
 import questionnaireDownloadExcelHandler from './api/questionnaires/download-excel.js';
+import questionnaireDeleteHandler from './api/questionnaires/delete.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -132,6 +133,7 @@ app.post('/api/questionnaires/upload', questionnaireUploadHandler);
 app.get('/api/questionnaires/:id/status', questionnaireStatusHandler);
 app.post('/api/questionnaires/:id/generate-answers', questionnaireGenerateAnswersHandler);
 app.get('/api/questionnaires/:id/download-excel', questionnaireDownloadExcelHandler);
+app.delete('/api/questionnaires/:id', questionnaireDeleteHandler);
 
 // Start server
 app.listen(PORT, () => {

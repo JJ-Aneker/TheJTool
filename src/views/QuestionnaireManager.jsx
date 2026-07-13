@@ -29,7 +29,9 @@ import {
   SyncOutlined,
   EyeOutlined,
   DownloadOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { supabase } from '../config/supabaseClient';
@@ -251,6 +253,45 @@ export default function QuestionnaireManager() {
     }
   };
 
+  // Eliminar formulario completo
+  const handleDeleteFormulario = (formulario) => {
+    Modal.confirm({
+      title: '¿Eliminar cuestionario?',
+      icon: <ExclamationCircleOutlined />,
+      content: `Se eliminará el cuestionario "${formulario.nombre_formulario}" de ${formulario.cliente} y todas sus ${formulario.total_preguntas || 0} preguntas. Esta acción no se puede deshacer.`,
+      okText: 'Eliminar',
+      okType: 'danger',
+      cancelText: 'Cancelar',
+      async onOk() {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const token = session?.access_token;
+
+          message.loading({ content: 'Eliminando...', key: 'deleting', duration: 0 });
+
+          await axios.delete(
+            `${API_URL}/api/questionnaires/${formulario.id}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+          );
+
+          message.success({ content: 'Cuestionario eliminado correctamente', key: 'deleting', duration: 2 });
+
+          // Cerrar modal si está abierto
+          if (detailModalVisible && selectedFormulario?.id === formulario.id) {
+            setDetailModalVisible(false);
+          }
+
+          // Recargar lista
+          loadFormularios();
+
+        } catch (err) {
+          console.error('Error eliminando formulario:', err);
+          message.error({ content: err.response?.data?.error || 'Error al eliminar el cuestionario', key: 'deleting' });
+        }
+      }
+    });
+  };
+
   // Ver detalles de un formulario
   const viewDetails = async (formulario) => {
     setSelectedFormulario(formulario);
@@ -352,7 +393,7 @@ export default function QuestionnaireManager() {
     {
       title: 'Acciones',
       key: 'acciones',
-      width: 300,
+      width: 400,
       render: (_, record) => (
         <Space>
           <Button
@@ -384,6 +425,15 @@ export default function QuestionnaireManager() {
               </Button>
             </>
           )}
+          <Button
+            type="text"
+            danger
+            size="small"
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteFormulario(record)}
+          >
+            Eliminar
+          </Button>
         </Space>
       )
     }
