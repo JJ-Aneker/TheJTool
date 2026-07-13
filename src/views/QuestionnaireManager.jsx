@@ -451,13 +451,28 @@ export default function QuestionnaireManager() {
       title: 'Sección',
       dataIndex: 'seccion',
       key: 'seccion',
-      width: 200
+      width: 150
     },
     {
       title: 'Pregunta',
       dataIndex: 'texto_pregunta',
       key: 'texto_pregunta',
-      ellipsis: true
+      width: 300
+    },
+    {
+      title: 'Respuesta',
+      dataIndex: 'respuesta_existente',
+      key: 'respuesta_existente',
+      width: 400,
+      render: (text) => {
+        if (!text || text.trim() === '') {
+          return <Text type="secondary" italic>Sin respuesta</Text>;
+        }
+        if (text.includes('[ERROR:')) {
+          return <Text type="danger">{text}</Text>;
+        }
+        return <Text style={{ color: '#0066CC' }}>{text}</Text>;
+      }
     },
     {
       title: 'Confianza',
