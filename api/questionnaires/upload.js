@@ -23,17 +23,18 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm
       'application/vnd.ms-excel', // .xls
       'application/xml', // .xml
       'text/xml' // .xml (alternativo)
     ];
-    const allowedExtensions = ['.xlsx', '.xls', '.xml'];
+    const allowedExtensions = ['.xlsx', '.xlsm', '.xls', '.xml'];
     const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
 
     if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Solo se permiten ficheros Excel (.xlsx) o XML (.xml)'));
+      cb(new Error('Solo se permiten ficheros Excel (.xlsx, .xlsm, .xls) o XML (.xml)'));
     }
   }
 });

@@ -103,16 +103,20 @@ export default function QuestionnaireManager() {
     name: 'file',
     multiple: false,
     fileList,
-    accept: '.xlsx,.xls,.xml',
+    accept: '.xlsx,.xlsm,.xls,.xml',
     beforeUpload: (file) => {
       const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-                      file.type === 'application/vnd.ms-excel';
+                      file.type === 'application/vnd.ms-excel.sheet.macroEnabled.12' ||
+                      file.type === 'application/vnd.ms-excel' ||
+                      file.name.toLowerCase().endsWith('.xlsx') ||
+                      file.name.toLowerCase().endsWith('.xlsm') ||
+                      file.name.toLowerCase().endsWith('.xls');
       const isXML = file.type === 'application/xml' ||
                     file.type === 'text/xml' ||
                     file.name.toLowerCase().endsWith('.xml');
 
       if (!isExcel && !isXML) {
-        message.error('Solo se permiten ficheros Excel (.xlsx) o XML (.xml)');
+        message.error('Solo se permiten ficheros Excel (.xlsx, .xlsm, .xls) o XML (.xml)');
         return Upload.LIST_IGNORE;
       }
       const isLt20M = file.size / 1024 / 1024 < 20;
@@ -504,7 +508,7 @@ export default function QuestionnaireManager() {
         <FileExcelOutlined /> Gestión de Cuestionarios de Seguridad IT
       </Title>
       <Paragraph type="secondary">
-        Procesa cuestionarios de seguridad IT de proveedores (Excel) mediante extracción inteligente de preguntas con IA.
+        Procesa cuestionarios de seguridad IT de proveedores (Excel/XML) mediante extracción inteligente de preguntas con IA.
       </Paragraph>
 
       {/* Formulario de subida */}
