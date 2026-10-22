@@ -52,6 +52,7 @@ const ThereforeReporter = lazy(() => import('./views/ThereforeReporter'))
 const BedrrockPanel = lazy(() => import('./views/BedrrockPanel'))
 const Manual = lazy(() => import('./views/Manual'))
 const QuestionnaireManager = lazy(() => import('./views/QuestionnaireManager'))
+const EFormGeneratorAI = lazy(() => import('./views/EFormGeneratorAI'))
 
 const { Content } = Layout
 
@@ -64,6 +65,7 @@ const getMenuItems = (isAdmin = false, t = (key) => key) => {
     { key: 'verticales',       icon: <AppstoreOutlined />,     label: t('nav.verticalesManager'),   path: '/verticales',       adminOnly: true },
     { key: 'bedrock',          icon: <CloudOutlined />,        label: t('nav.bedrock'),             path: '/bedrock',          adminOnly: true },
     { key: 'eforms',           icon: <FormOutlined />,         label: t('nav.eformBuilder'),        path: '/eforms' },
+    { key: 'eform-generator-ai', icon: <ThunderboltOutlined />, label: 'Generador eForms IA',       path: '/eform-generator-ai', adminOnly: true },
     { key: 'category-builder', icon: <AppstoreOutlined />,     label: t('nav.categoryBuilder'),     path: '/category-builder' },
     { key: 'tenants',          icon: <CloudOutlined />,        label: t('nav.tenantManager'),       path: '/tenants' },
     { key: 'questionnaires',   icon: <FileExcelOutlined />,    label: 'Cuestionarios IT',           path: '/questionnaires' },
@@ -393,6 +395,7 @@ function AppContent() {
               <Route path="/users" element={<AdminRoute><UserManager /></AdminRoute>} />
               <Route path="/verticales" element={<AdminRoute><VerticalesManager /></AdminRoute>} />
               <Route path="/bedrock" element={<AdminRoute><BedrrockPanel /></AdminRoute>} />
+              <Route path="/eform-generator-ai" element={<AdminRoute><EFormGeneratorAI /></AdminRoute>} />
               <Route path="/eforms" element={<EFormBuilder />} />
               <Route path="/category-builder" element={<CategoryBuilder />} />
               <Route path="/tenants" element={<TenantManager />} />
