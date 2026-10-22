@@ -20,6 +20,7 @@ import bedrockHandler from './api/bedrock.js';
 import * as verticalesHandlers from './api/verticales.js';
 import dashboardRouter from './routes/dashboard.js';
 import adminRouter from './routes/admin.js';
+import eformAiRouter from './routes/eformAi.js';
 import questionnaireUploadHandler from './api/questionnaires/upload.js';
 import questionnaireStatusHandler from './api/questionnaires/status.js';
 import questionnaireGenerateAnswersHandler from './api/questionnaires/generate-answers.js';
@@ -127,6 +128,9 @@ app.use('/api/dashboard', dashboardRouter);
 
 // Admin routes (user management with Supabase Admin API)
 app.use('/api/admin', adminRouter);
+
+// eForm AI routes (generador de eForms con IA - solo admin)
+app.use('/api/eform-ai', eformAiRouter);
 
 // Questionnaires routes (procesamiento de cuestionarios de seguridad IT)
 app.post('/api/questionnaires/upload', questionnaireUploadHandler);
