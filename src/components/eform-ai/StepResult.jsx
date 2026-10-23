@@ -67,6 +67,23 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
 
   const tabItems = [
     {
+      key: 'fields',
+      label: 'Resumen',
+      children: (
+        <Table
+          dataSource={fieldsTableData}
+          columns={[
+            { title: 'Key', dataIndex: 'field', key: 'field' },
+            { title: 'Label', dataIndex: 'label', key: 'label' },
+            { title: 'Tipo', dataIndex: 'type', key: 'type' },
+            { title: 'Obligatorio', dataIndex: 'required', key: 'required' }
+          ]}
+          pagination={false}
+          size="small"
+        />
+      )
+    },
+    {
       key: 'json',
       label: 'JSON',
       children: (
@@ -86,23 +103,6 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
             {JSON.stringify(components, null, 2)}
           </pre>
         </div>
-      )
-    },
-    {
-      key: 'fields',
-      label: 'Resumen',
-      children: (
-        <Table
-          dataSource={fieldsTableData}
-          columns={[
-            { title: 'Key', dataIndex: 'field', key: 'field' },
-            { title: 'Label', dataIndex: 'label', key: 'label' },
-            { title: 'Tipo', dataIndex: 'type', key: 'type' },
-            { title: 'Obligatorio', dataIndex: 'required', key: 'required' }
-          ]}
-          pagination={false}
-          size="small"
-        />
       )
     }
   ]
