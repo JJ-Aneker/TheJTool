@@ -19,11 +19,14 @@ export default function AdminRoute({ children }) {
     return (
       <div style={{
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        gap: 16
       }}>
-        <Spin size="large" tip="Verificando permisos..." />
+        <Spin size="large" />
+        <div>Verificando permisos...</div>
       </div>
     )
   }

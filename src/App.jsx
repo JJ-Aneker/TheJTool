@@ -391,8 +391,9 @@ function AppContent() {
           overflow: 'hidden'
         }}>
           <Suspense fallback={
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-              <Spin size="large" tip="Cargando..." />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '400px', gap: 16 }}>
+              <Spin size="large" />
+              <div>Cargando...</div>
             </div>
           }>
             <Routes>
