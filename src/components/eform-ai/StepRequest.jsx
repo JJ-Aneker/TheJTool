@@ -49,7 +49,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         answers: []
       }
 
-      const response = await axios.post('/api/eform-ai/propose', payload, {
+      const response = await axios.post('/api/eform-ai?action=propose', payload, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
@@ -105,7 +105,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         setLoading(true)
         const { data: { session } } = await supabase.auth.getSession()
 
-        const response = await axios.post('/api/eform-ai/parse-category',
+        const response = await axios.post('/api/eform-ai?action=parse-category',
           { categoryXml: xml },
           { headers: { 'Authorization': `Bearer ${session.access_token}` } }
         )

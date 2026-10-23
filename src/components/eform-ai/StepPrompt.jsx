@@ -13,7 +13,7 @@ export default function StepPrompt({ formData, updateFormData, goToStep, setLoad
       setLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
 
-      const response = await axios.post('/api/eform-ai/generate', {
+      const response = await axios.post('/api/eform-ai?action=generate', {
         detailedPrompt: values.detailedPrompt,
         formName: values.formName,
         formId: values.formId,

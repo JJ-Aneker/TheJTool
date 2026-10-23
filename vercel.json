@@ -2,7 +2,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
-    "api/eform-ai/**/*.js": {
+    "api/eform-ai.js": {
       "maxDuration": 120,
       "memory": 1024
     },

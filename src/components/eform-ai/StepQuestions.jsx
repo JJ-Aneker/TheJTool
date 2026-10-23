@@ -19,7 +19,7 @@ export default function StepQuestions({ formData, updateFormData, goToStep, setL
 
       const { data: { session } } = await supabase.auth.getSession()
 
-      const response = await axios.post('/api/eform-ai/propose', {
+      const response = await axios.post('/api/eform-ai?action=propose', {
         request: formData.request,
         environment: formData.environment,
         tenant: formData.tenant,

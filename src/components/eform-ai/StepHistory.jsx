@@ -16,7 +16,7 @@ export default function StepHistory({ formData, updateFormData, goToStep, setLoa
       setLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
 
-      const response = await axios.get('/api/eform-ai/history', {
+      const response = await axios.get('/api/eform-ai?action=history', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       })
 
@@ -33,7 +33,7 @@ export default function StepHistory({ formData, updateFormData, goToStep, setLoa
       setLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
 
-      const response = await axios.get(`/api/eform-ai/${id}`, {
+      const response = await axios.get(`/api/eform-ai?action=get&id=${id}`, {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       })
 
