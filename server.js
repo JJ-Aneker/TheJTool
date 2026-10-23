@@ -21,11 +21,11 @@ import * as verticalesHandlers from './api/verticales.js';
 import dashboardRouter from './routes/dashboard.js';
 import adminRouter from './routes/admin.js';
 import eformAiRouter from './routes/eformAi.js';
-import questionnaireUploadHandler from './api/questionnaires/upload.js';
-import questionnaireStatusHandler from './api/questionnaires/status.js';
-import questionnaireGenerateAnswersHandler from './api/questionnaires/generate-answers.js';
-import questionnaireDownloadExcelHandler from './api/questionnaires/download-excel.js';
-import questionnaireDeleteHandler from './api/questionnaires/delete.js';
+import questionnaireUploadHandler from './api/_lib/questionnaires-handlers/upload.js';
+import questionnaireStatusHandler from './api/_lib/questionnaires-handlers/status.js';
+import questionnaireGenerateAnswersHandler from './api/_lib/questionnaires-handlers/generate-answers.js';
+import questionnaireDownloadExcelHandler from './api/_lib/questionnaires-handlers/download-excel.js';
+import questionnaireDeleteHandler from './api/_lib/questionnaires-handlers/delete.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;

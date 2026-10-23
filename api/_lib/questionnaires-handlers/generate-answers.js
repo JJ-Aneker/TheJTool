@@ -9,8 +9,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { callBedrock } from '../_lib/bedrockClient.js';
-import { buildEnrichedPrompt } from '../_lib/questionnaires/knowledge-base.js';
+import { callBedrock } from '../bedrockClient.js';
+import { buildEnrichedPrompt } from '../questionnaires/knowledge-base.js';
 
 /**
  * Middleware de autenticación: verifica JWT de Supabase Auth.

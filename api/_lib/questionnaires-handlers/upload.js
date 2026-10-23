@@ -13,8 +13,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 import multer from 'multer';
-import { parseWorkbook } from '../_lib/questionnaires/excelParser.js';
-import { isXML, convertXMLToExcel } from '../_lib/questionnaires/xmlToExcel.js';
+import { parseWorkbook } from '../questionnaires/excelParser.js';
+import { isXML, convertXMLToExcel } from '../questionnaires/xmlToExcel.js';
 
 // Configuración de multer: en memoria, límite 20MB
 const upload = multer({
