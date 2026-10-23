@@ -118,6 +118,10 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       })
 
+      console.log('🔍 Respuesta del servidor:', response.data)
+      console.log('🔍 Components:', response.data.components)
+      console.log('🔍 Validation:', response.data.validation)
+
       updateFormData({
         request: values.request,
         environment: values.environment,

@@ -1,7 +1,8 @@
-import { Button, Space, Alert, Tabs, Table } from 'antd'
+import { Button, Space, Alert, Tabs, Table, theme } from 'antd'
 import { DownloadOutlined, CopyOutlined } from '@ant-design/icons'
 
 export default function StepResult({ formData, updateFormData, goToStep, setLoading }) {
+  const { token } = theme.useToken()
   const { validation, xml, components } = formData
 
   const handleDownload = () => {
@@ -58,11 +59,13 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
             Copiar JSON
           </Button>
           <pre style={{
-            background: '#f5f5f5',
+            background: token.colorBgLayout,
+            color: token.colorText,
             padding: 16,
             borderRadius: 4,
             maxHeight: 400,
-            overflow: 'auto'
+            overflow: 'auto',
+            border: `1px solid ${token.colorBorder}`
           }}>
             {JSON.stringify(components, null, 2)}
           </pre>
