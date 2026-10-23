@@ -23,8 +23,21 @@ const router = express.Router()
 
 // Middleware para soportar tanto query params (?action=X) como rutas separadas (/X)
 router.use((req, res, next) => {
-  if (req.query.action && !req.path.includes(req.query.action)) {
-    req.url = `/${req.query.action}${req.url.replace(/\?.*/, '')}`
+  const action = req.query.action
+
+  if (action && !req.path.includes(action)) {
+    // Caso especial: ?action=get&id=xxx → ruta /:id
+    if (action === 'get' && req.query.id) {
+      req.url = `/${req.query.id}`
+    }
+    // Otros casos: ?action=propose → /propose (manteniendo otros query params)
+    else {
+      const otherParams = Object.keys(req.query)
+        .filter(k => k !== 'action')
+        .map(k => `${k}=${req.query[k]}`)
+        .join('&')
+      req.url = `/${action}${otherParams ? '?' + otherParams : ''}`
+    }
   }
   next()
 })

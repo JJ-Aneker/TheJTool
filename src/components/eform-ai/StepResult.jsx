@@ -36,18 +36,34 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
     goToStep(0)
   }
 
-  const fieldsTableData = components?.map((comp, i) => {
-    if (comp.input && comp.key && comp.key !== 'submit') {
-      return {
-        key: i,
-        field: comp.key,
-        label: comp.label || comp.key,
-        type: comp.type,
-        required: comp.validate?.required ? 'Sí' : 'No'
+  // Extraer campos recursivamente (también dentro de paneles, columns, etc.)
+  const extractFields = (comps, fields = []) => {
+    if (!comps) return fields
+
+    comps.forEach(comp => {
+      if (comp.input && comp.key && comp.key !== 'submit') {
+        fields.push({
+          key: comp.key,
+          field: comp.key,
+          label: comp.label || comp.key,
+          type: comp.type,
+          required: comp.validate?.required ? 'Sí' : 'No'
+        })
       }
-    }
-    return null
-  }).filter(Boolean) || []
+
+      // Recursión en componentes hijos
+      if (comp.components) extractFields(comp.components, fields)
+      if (comp.columns) {
+        comp.columns.forEach(col => {
+          if (col.components) extractFields(col.components, fields)
+        })
+      }
+    })
+
+    return fields
+  }
+
+  const fieldsTableData = extractFields(components)
 
   const tabItems = [
     {
