@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Form, Input, Select, Button, Upload, Tag, Alert, Space, Card } from 'antd'
-import { CloudUploadOutlined, ArrowRightOutlined } from '@ant-design/icons'
+import { Form, Input, Select, Button, Upload, Tag, Alert, Space, Card, Row, Col } from 'antd'
+import { CloudUploadOutlined, BulbOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import { supabase } from '../../config/supabaseClient'
 
@@ -29,9 +29,11 @@ const EXAMPLES = [
 export default function StepRequest({ formData, updateFormData, goToStep, setLoading }) {
   const [form] = Form.useForm()
   const [categoryFileName, setCategoryFileName] = useState(null)
+  const [promptImproved, setPromptImproved] = useState(false)
 
-  const handleSubmit = async (values) => {
+  const handleImprovePrompt = async () => {
     try {
+      const values = await form.validateFields(['request', 'environment', 'tenant', 'serverUrl'])
       setLoading(true)
 
       const { data: { session } } = await supabase.auth.getSession()
@@ -57,7 +59,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
       })
 
       if (response.data.questions) {
-        // Hay preguntas aclaratorias
+        // Hay preguntas aclaratorias - ir al paso de preguntas
         updateFormData({
           request: values.request,
           environment: values.environment,
@@ -65,11 +67,15 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           serverUrl: values.serverUrl,
           questions: response.data.questions
         })
-        goToStep(1) // Ir a paso de preguntas
+        goToStep(1)
       } else {
-        // Prompt detallado directo
+        // Actualizar el textarea con el prompt mejorado
+        form.setFieldsValue({
+          request: response.data.detailedPrompt,
+          formName: response.data.suggestedFormName,
+          formId: response.data.suggestedFormId
+        })
         updateFormData({
-          request: values.request,
           environment: values.environment,
           tenant: values.tenant,
           serverUrl: values.serverUrl,
@@ -77,10 +83,57 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           formName: response.data.suggestedFormName,
           formId: response.data.suggestedFormId
         })
-        goToStep(2) // Ir directamente al prompt
+        setPromptImproved(true)
       }
     } catch (err) {
-      console.error('Error en propose:', err)
+      console.error('Error mejorando prompt:', err)
+      const errorMsg = err.response?.data?.error || err.message
+      alert(`Error: ${errorMsg}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGenerate = async () => {
+    try {
+      const values = await form.validateFields()
+      setLoading(true)
+
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('No autenticado')
+      }
+
+      const response = await axios.post('/api/eform-ai?action=generate', {
+        detailedPrompt: values.request,
+        formName: values.formName,
+        formId: values.formId,
+        environment: values.environment,
+        tenant: values.tenant,
+        serverUrl: values.serverUrl,
+        blocks: formData.blocks,
+        categoryXml: formData.categoryXml,
+        requestText: formData.request || values.request
+      }, {
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      })
+
+      updateFormData({
+        request: values.request,
+        environment: values.environment,
+        tenant: values.tenant,
+        serverUrl: values.serverUrl,
+        detailedPrompt: values.request,
+        formName: values.formName,
+        formId: values.formId,
+        generationId: response.data.generationId,
+        components: response.data.components,
+        xml: response.data.xml,
+        validation: response.data.validation
+      })
+      goToStep(3) // Ir a resultado
+    } catch (err) {
+      console.error('Error generando eForm:', err)
       const errorMsg = err.response?.data?.error || err.message
       alert(`Error: ${errorMsg}`)
     } finally {
@@ -137,7 +190,8 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         description={
           <ol style={{ marginBottom: 0, paddingLeft: 20 }}>
             <li>Describe el formulario en lenguaje natural</li>
-            <li>Revisa el prompt detallado que propone la IA</li>
+            <li>Haz clic en "Mejorar Prompt" para obtener un prompt detallado (editable)</li>
+            <li>Haz clic en "Generar eForm" para crear el XML</li>
             <li>Descarga el XML listo para importar en Therefore</li>
           </ol>
         }
@@ -159,25 +213,67 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         form={form}
         layout="vertical"
         initialValues={{
-          request: formData.request,
+          request: formData.request || formData.detailedPrompt,
           environment: formData.environment || 'online',
           tenant: formData.tenant,
-          serverUrl: formData.serverUrl
+          serverUrl: formData.serverUrl,
+          formName: formData.formName,
+          formId: formData.formId
         }}
-        onFinish={handleSubmit}
       >
         <Form.Item
-          label="Describe tu eForm"
+          label="Describe tu eForm (editable)"
           name="request"
           rules={[{ required: true, message: 'Describe el formulario' }]}
         >
           <TextArea
-            rows={6}
+            rows={promptImproved ? 12 : 6}
             placeholder="Ejemplo: Crea un eForm para el registro de libros que además lea QRs. Campos: código QR, título, autor, ISBN, fecha de alta. El código QR es obligatorio."
             showCount
-            maxLength={2000}
+            maxLength={5000}
           />
         </Form.Item>
+
+        <Row gutter={8} style={{ marginBottom: 24 }}>
+          <Col>
+            <Button
+              icon={<BulbOutlined />}
+              onClick={handleImprovePrompt}
+            >
+              Mejorar Prompt
+            </Button>
+          </Col>
+          {promptImproved && (
+            <Col>
+              <Button
+                type="primary"
+                icon={<ThunderboltOutlined />}
+                onClick={handleGenerate}
+              >
+                Generar eForm
+              </Button>
+            </Col>
+          )}
+        </Row>
+
+        {promptImproved && (
+          <>
+            <Form.Item label="Nombre del formulario" name="formName" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="FormID (sin espacios)"
+              name="formId"
+              rules={[
+                { required: true },
+                { pattern: /^[A-Za-z][A-Za-z0-9_]*$/, message: 'Solo [A-Za-z0-9_], empezando con letra' }
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </>
+        )}
 
         <Form.Item label="Entorno destino" name="environment" rules={[{ required: true }]}>
           <Select>
@@ -236,11 +332,6 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           )}
         </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" icon={<ArrowRightOutlined />}>
-            Proponer prompt
-          </Button>
-        </Form.Item>
       </Form>
     </Space>
   )
