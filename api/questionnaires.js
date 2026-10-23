@@ -10,11 +10,11 @@
  * - DELETE /api/questionnaires?action=delete&id=<id>
  */
 
-import uploadHandler from './questionnaires/upload.js'
-import statusHandler from './questionnaires/status.js'
-import generateAnswersHandler from './questionnaires/generate-answers.js'
-import downloadExcelHandler from './questionnaires/download-excel.js'
-import deleteHandler from './questionnaires/delete.js'
+import uploadHandler from './_lib/questionnaires-handlers/upload.js'
+import statusHandler from './_lib/questionnaires-handlers/status.js'
+import generateAnswersHandler from './_lib/questionnaires-handlers/generate-answers.js'
+import downloadExcelHandler from './_lib/questionnaires-handlers/download-excel.js'
+import deleteHandler from './_lib/questionnaires-handlers/delete.js'
 
 export default async function handler(req, res) {
   const action = req.query.action || ''
