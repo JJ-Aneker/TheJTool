@@ -77,12 +77,31 @@ async function verifyAdmin(req) {
 }
 
 function extractJSON(text) {
-  const jsonMatch = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
-  if (!jsonMatch) {
-    throw new Error('No se encontró JSON en la respuesta')
+  // Intentar extraer JSON de bloque markdown ```json
+  const markdownMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\}|\[[\s\S]*?\])\s*```/)
+  if (markdownMatch) {
+    try {
+      return JSON.parse(markdownMatch[1])
+    } catch (e) {
+      console.error('Error parseando JSON de markdown:', e.message)
+    }
   }
 
-  return JSON.parse(jsonMatch[1])
+  // Intentar extraer JSON sin markdown (no-greedy)
+  const jsonMatch = text.match(/(\{[\s\S]*?\}|\[[\s\S]*?\])/)
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[1])
+    } catch (e) {
+      console.error('Error parseando JSON directo:', e.message)
+      console.error('Texto que intentó parsear:', jsonMatch[1].substring(0, 200))
+    }
+  }
+
+  // Si nada funcionó, loggear y lanzar error
+  console.error('❌ No se encontró JSON válido en respuesta de IA')
+  console.error('Respuesta completa:', text.substring(0, 500))
+  throw new Error('No se encontró JSON en la respuesta')
 }
 
 // POST /api/eform-ai/propose
