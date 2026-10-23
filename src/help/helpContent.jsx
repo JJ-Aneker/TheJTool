@@ -249,6 +249,242 @@ Motivo;motivo;text;no;Descripción breve del motivo;;300;SOLICITUD</pre>
       ]
     },
 
+    eformGeneratorAI: {
+      id: 'eformGeneratorAI',
+      title: 'Generador de eForms IA',
+      icon: '⚡',
+      intro: 'Crea eForms de Therefore™ usando lenguaje natural. Describe el formulario que necesitas y la IA lo genera automáticamente con todas las funcionalidades avanzadas: QR, lookups, modales, firmas, validaciones JavaScript y más.',
+      sections: [
+        {
+          id: 'eform-ai-how',
+          title: 'Cómo funciona — Flujo en 3 pasos',
+          body: `<ol>
+  <li><strong>Describe tu eForm</strong> en lenguaje natural (ej: "Formulario de alta de cliente con NIF, nombre, email y teléfono")</li>
+  <li><strong>Mejorar Prompt</strong> — La IA analiza tu descripción y genera un prompt detallado (editable)</li>
+  <li><strong>Generar eForm</strong> — La IA crea el JSON de form.io y el XML de Therefore™ listo para importar</li>
+</ol>
+<strong>Todo en una pantalla</strong> — no necesitas navegar entre pasos. El prompt se muestra en el mismo cuadro de texto para que puedas editarlo antes de generar.`
+        },
+        {
+          id: 'eform-ai-basic',
+          title: 'Ejemplos básicos — Copia y pega',
+          body: `<strong>Alta de cliente simple:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Crear eForm para dar de alta clientes. Campos: NIF (obligatorio), nombre completo, email, teléfono, dirección fiscal.</pre>
+
+<strong>Solicitud de vacaciones:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de solicitud de vacaciones. Campos: empleado (nombre), departamento (desplegable: RRHH, Ventas, IT, Dirección), fecha inicio, fecha fin, días solicitados (número), motivo.</pre>
+
+<strong>Registro de facturas:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">eForm de registro de facturas. Campos: número factura, proveedor, fecha, importe (dinero), estado (desplegable: Pendiente, Aprobada, Pagada).</pre>`
+        },
+        {
+          id: 'eform-ai-columns',
+          title: 'Organizar en columnas',
+          body: `Para formularios con muchos campos, puedes organizarlos en **varias columnas** para aprovechar mejor el espacio.
+
+<strong>Ejemplo — 2 columnas:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Crear eForm de alta de proveedor organizado en 2 columnas.
+
+Columna izquierda:
+- Nombre fiscal (obligatorio)
+- NIF (obligatorio)
+- Email
+- Teléfono
+
+Columna derecha:
+- Dirección
+- Ciudad
+- Código postal
+- País</pre>
+
+<strong>Ejemplo — 3 columnas:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de datos personales en 3 columnas: nombre, apellidos y DNI en fila 1; email, teléfono y fecha nacimiento en fila 2.</pre>`
+        },
+        {
+          id: 'eform-ai-logo',
+          title: 'Logo o imagen de cabecera',
+          body: `Puedes incluir un **logo o imagen** en la parte superior del formulario.
+
+<strong>Con URL específica:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de solicitud de material. Incluir logo en la parte superior con URL: https://empresa.com/logo.png
+
+Campos: solicitante, departamento, material solicitado, cantidad, urgente (sí/no).</pre>
+
+<strong>Con placeholder:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">eForm de registro con una imagen de cabecera centrada (placeholder para logo corporativo).
+
+Campos: título, descripción, categoría, fecha.</pre>`
+        },
+        {
+          id: 'eform-ai-lookup',
+          title: 'Lookup — Campo desde categoría Therefore™',
+          body: `Los **lookups** poblan un campo dropdown consultando otra categoría de Therefore™ (tabla maestra).
+
+<strong>Activar el bloque predefinido:</strong>
+<ol>
+  <li>Marca **"🔍 Buscar en categoría maestra"** en bloques predefinidos</li>
+  <li>Describe en el prompt qué campo se llena desde dónde</li>
+</ol>
+
+<strong>Ejemplo — Cliente desde maestro:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de pedido. El campo "Cliente" debe poblarse consultando la categoría Therefore™ "Maestro_Clientes". Mostrar en el dropdown: nombre del cliente (IdxF_NombreCliente) y NIF (IdxF_NIF).
+
+Otros campos: número pedido, fecha, importe.</pre>
+
+<strong>Ejemplo — Proyecto activo:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">eForm de imputación de horas. Campo "Proyecto" es un dropdown que consulta la categoría "Proyectos_Activos" mostrando código proyecto (IdxF_Codigo) y nombre (IdxF_Nombre).
+
+Al seleccionar un proyecto, rellenar automáticamente el campo "Cliente" con IdxF_Cliente de ese proyecto.
+
+Otros campos: empleado, fecha, horas, descripción tarea.</pre>`
+        },
+        {
+          id: 'eform-ai-qr',
+          title: 'Lector QR / Códigos de barras',
+          body: `Activa el bloque **"📷 Lector QR"** para incluir un botón que abre la cámara y lee códigos QR o de barras.
+
+<strong>Ejemplo — Registro de libros:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de registro de libros en biblioteca con lector QR.
+
+Campo "Código" con botón QR que rellena el campo al escanear.
+
+Otros campos: título, autor, ISBN, editorial, fecha alta.</pre>
+
+<strong>Ejemplo — Control de activos:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">eForm de inventario con lector de código de barras en campo "Código activo".
+
+Campos: código activo (con QR), descripción, ubicación, estado (desplegable: Operativo, Mantenimiento, Baja), responsable.</pre>`
+        },
+        {
+          id: 'eform-ai-autofill',
+          title: 'Autorrelleno con usuario conectado',
+          body: `El bloque **"👤 Autorrelleno"** rellena automáticamente campos con los datos del usuario que está conectado en Therefore™.
+
+<strong>Ejemplo — Solicitud genérica:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de solicitud interna.
+
+Campos "Solicitante" y "Email solicitante" deben rellenarse automáticamente con el nombre y email del usuario conectado en Therefore™.
+
+Otros campos: tipo solicitud (desplegable), descripción, fecha necesaria, urgente (sí/no).</pre>`
+        },
+        {
+          id: 'eform-ai-signature',
+          title: 'Firma manuscrita (canvas)',
+          body: `El bloque **"✍️ Firma"** añade un canvas donde el usuario puede firmar con el ratón o el dedo (en tablet/móvil).
+
+<strong>Ejemplo — Conformidad:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de conformidad de entrega.
+
+Campos: número albarán, cliente, fecha entrega, conforme (sí/no), observaciones.
+
+Campo final "Firma del receptor" como canvas de firma manuscrita (obligatorio).</pre>`
+        },
+        {
+          id: 'eform-ai-modal',
+          title: 'Modal de actualización de datos',
+          body: `El bloque **"✏️ Modal"** crea un botón que abre una ventana emergente para actualizar datos de una categoría existente.
+
+<strong>Ejemplo — Actualizar cliente:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de pedido con botón "Actualizar datos cliente".
+
+Al hacer clic, abre modal que permite modificar: teléfono, email y dirección del cliente seleccionado en la categoría "Maestro_Clientes".</pre>`
+        },
+        {
+          id: 'eform-ai-category',
+          title: 'Subir XML de categoría (opcional)',
+          body: `Si subes el **XML de la categoría destino**, la IA puede:
+<ul>
+  <li>Usar los nombres exactos de los campos (ColName) de Therefore™</li>
+  <li>Detectar campos obligatorios automáticamente</li>
+  <li>Validar que todos los campos obligatorios estén cubiertos</li>
+</ul>
+
+<strong>Cómo hacerlo:</strong>
+<ol>
+  <li>En Therefore™ Solution Designer: selecciona la categoría → File → Export Configuration</li>
+  <li>En el Generador IA: sección "Categoría destino (opcional)" → sube el XML</li>
+  <li>Aparece un mensaje verde con el nº de campos detectados</li>
+  <li>En tu prompt, usa los nombres de campo tal como están en Therefore™</li>
+</ol>
+
+<strong>Ejemplo con categoría:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Crear eForm para la categoría "Facturas_Proveedor" que tengo en Therefore™.
+
+Campos del eForm deben coincidir con los índices de la categoría: numeroFactura, proveedor, fechaFactura, importeTotal, estado.
+
+Añadir campo adicional "Observaciones" que no se guarda en índice.</pre>`
+        },
+        {
+          id: 'eform-ai-environment',
+          title: 'Entorno: Online vs On-Premise',
+          body: `Selecciona el **entorno destino** para que la IA genere código compatible:
+
+<table style="width:100%;font-size:11px;border-collapse:collapse;margin:8px 0">
+  <thead><tr style="border-bottom:1px solid var(--border-default)">
+    <th style="text-align:left;padding:6px 8px">Entorno</th>
+    <th style="text-align:left;padding:6px 8px">Cuándo usar</th>
+    <th style="text-align:left;padding:6px 8px">Diferencias</th>
+  </tr></thead>
+  <tbody>
+    <tr><td style="padding:5px 8px"><strong>Therefore Online</strong></td><td style="padding:5px 8px">Instancia cloud (*.thereforeonline.com)</td><td style="padding:5px 8px">Usa GetConnectionToken para autenticación</td></tr>
+    <tr style="background:var(--bg-canvas)"><td style="padding:5px 8px"><strong>On-Premise</strong></td><td style="padding:5px 8px">Instalación local en servidor de cliente</td><td style="padding:5px 8px">Usa Basic Auth, GetConnectionToken devuelve 500</td></tr>
+  </tbody>
+</table>
+
+**Importante:** Elige el correcto o el eForm no funcionará al consultar la API de Therefore™.`
+        },
+        {
+          id: 'eform-ai-download',
+          title: 'Descargar e importar el XML',
+          body: `Cuando el eForm esté generado:
+<ol>
+  <li>Revisa la pestaña <strong>"Resumen"</strong> — tabla con todos los campos creados</li>
+  <li>Revisa <strong>"Avisos"</strong> (amarillos) — son informativos, no bloquean la descarga</li>
+  <li>Haz clic en <strong>"Descargar XML"</strong></li>
+  <li>Se descarga <code>TheConfiguration_&lt;FormID&gt;.xml</code> en tu carpeta de descargas</li>
+  <li>Abre <strong>Therefore™ Solution Designer</strong></li>
+  <li>Selecciona la categoría destino → pestaña <em>eForms</em></li>
+  <li>Haz clic en <strong>Import eForm</strong> y selecciona el XML</li>
+  <li>Guarda los cambios en Solution Designer</li>
+</ol>
+
+<strong>⚠️ Si el eForm ya existe</strong> en Therefore™ con ese FormID, se sobreescribirá. Exporta primero como backup.`
+        },
+        {
+          id: 'eform-ai-historial',
+          title: 'Historial de generaciones',
+          body: `Todas tus generaciones se guardan automáticamente. Para ver el historial:
+<ol>
+  <li>Haz clic en el paso <strong>"5. Historial"</strong> en la parte superior</li>
+  <li>Verás una tabla con: fecha, nombre del formulario, FormID, entorno, estado</li>
+  <li>Haz clic en <strong>"Ver"</strong> para cargar una generación anterior</li>
+  <li>Puedes descargar de nuevo el XML o editarlo y regenerar</li>
+</ol>`
+        },
+        {
+          id: 'eform-ai-tips',
+          title: 'Consejos y buenas prácticas',
+          body: `<strong>✅ Buenas prácticas:</strong>
+<ul>
+  <li>Sé específico con los nombres de campo: "NIF del proveedor" mejor que solo "NIF"</li>
+  <li>Indica qué campos son obligatorios en el prompt</li>
+  <li>Para selects/dropdowns, lista todas las opciones que quieres</li>
+  <li>Si hay validaciones especiales, descríbelas (ej: "NIF debe validarse con algoritmo")</li>
+  <li>Usa "Mejorar Prompt" siempre — la IA añade detalles técnicos importantes</li>
+</ul>
+
+<strong>⚠️ Evita:</strong>
+<ul>
+  <li>Descripciones muy vagas como "formulario general de datos"</li>
+  <li>Mezclar múltiples formularios en una sola petición</li>
+  <li>Pedir funcionalidades que Therefore™ no soporta nativamente</li>
+</ul>
+
+<strong>💡 Truco:</strong> Si no estás seguro de cómo pedirlo, empieza simple y usa "Refinar" (próximamente) para ir añadiendo funcionalidades.`
+        }
+      ]
+    },
+
     categoryBuilder: {
       id: 'categoryBuilder',
       title: 'Generador de Categorías',
@@ -888,6 +1124,71 @@ Notes;notes;text;no;Brief description;;300;REQUEST</pre>
       ]
     },
 
+    eformGeneratorAI: {
+      id: 'eformGeneratorAI',
+      title: 'AI eForm Generator',
+      icon: '⚡',
+      intro: 'Create Therefore™ eForms using natural language. Describe the form you need and the AI generates it automatically with advanced features: QR, lookups, modals, signatures, JavaScript validations and more.',
+      sections: [
+        {
+          id: 'eform-ai-how',
+          title: 'How it works — 3-step flow',
+          body: `<ol>
+  <li><strong>Describe your eForm</strong> in natural language (e.g., "Customer registration form with VAT, name, email and phone")</li>
+  <li><strong>Improve Prompt</strong> — AI analyzes your description and generates a detailed prompt (editable)</li>
+  <li><strong>Generate eForm</strong> — AI creates the form.io JSON and Therefore™ XML ready to import</li>
+</ol>
+<strong>All in one screen</strong> — no navigation needed. The prompt is shown in the same text area so you can edit it before generating.`
+        },
+        {
+          id: 'eform-ai-basic',
+          title: 'Basic examples',
+          body: `<strong>Simple customer registration:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Create eForm for customer registration. Fields: VAT number (required), full name, email, phone, billing address.</pre>
+
+<strong>Vacation request:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Vacation request form. Fields: employee name, department (dropdown: HR, Sales, IT, Management), start date, end date, days requested (number), reason.</pre>`
+        },
+        {
+          id: 'eform-ai-columns',
+          title: 'Multi-column layouts',
+          body: `<strong>2-column example:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Supplier registration eForm in 2 columns.
+
+Left column: Company name (required), VAT, Email, Phone
+Right column: Address, City, Postal code, Country</pre>`
+        },
+        {
+          id: 'eform-ai-lookup',
+          title: 'Lookup from Therefore™ category',
+          body: `<strong>Enable the predefined block:</strong> check **"🔍 Search in master category"**
+
+<strong>Example:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Order form. "Customer" field should populate from Therefore™ category "Master_Customers". Show in dropdown: customer name (IdxF_CustomerName) and VAT (IdxF_VAT).</pre>`
+        },
+        {
+          id: 'eform-ai-qr',
+          title: 'QR / Barcode scanner',
+          body: `Enable **"📷 QR Reader"** block.
+
+<strong>Example:</strong>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Asset inventory eForm with barcode scanner on "Asset code" field. Fields: asset code (with QR), description, location, status, responsible.</pre>`
+        },
+        {
+          id: 'eform-ai-download',
+          title: 'Download and import XML',
+          body: `<ol>
+  <li>Review the <strong>"Summary"</strong> tab — table with all created fields</li>
+  <li>Click <strong>"Download XML"</strong></li>
+  <li>File downloads as <code>TheConfiguration_&lt;FormID&gt;.xml</code></li>
+  <li>Open <strong>Therefore™ Solution Designer</strong></li>
+  <li>Select target category → <em>eForms</em> tab → <strong>Import eForm</strong></li>
+  <li>Save changes</li>
+</ol>`
+        }
+      ]
+    },
+
     categoryBuilder: {
       id: 'categoryBuilder',
       title: 'Category Builder',
@@ -1137,6 +1438,7 @@ export const MANUAL_TOC = [
   { key: 'home',                labelEs: 'Panel de inicio',           labelEn: 'Home Dashboard',          icon: '🏠' },
   { key: 'documentGenerator',  labelEs: 'Generador de Documentación', labelEn: 'Document Generator',       icon: '⚡' },
   { key: 'eformBuilder',       labelEs: 'eForms Builder',             labelEn: 'eForms Builder',            icon: '📋' },
+  { key: 'eformGeneratorAI',   labelEs: 'Generador eForms IA',        labelEn: 'AI eForm Generator',        icon: '⚡' },
   { key: 'categoryBuilder',    labelEs: 'Generador de Categorías',    labelEn: 'Category Builder',          icon: '🏗️' },
   { key: 'thereforeReporter',  labelEs: 'Therefore Reporter',         labelEn: 'Therefore Reporter',        icon: '🔍' },
   { key: 'tenantManager',      labelEs: 'Gestión de Tenants',         labelEn: 'Tenant Management',         icon: '☁️' },
