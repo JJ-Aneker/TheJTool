@@ -21,6 +21,14 @@ import { validateComponents, validateFormId } from '../api/_lib/eformValidator.j
 
 const router = express.Router()
 
+// Middleware para soportar tanto query params (?action=X) como rutas separadas (/X)
+router.use((req, res, next) => {
+  if (req.query.action && !req.path.includes(req.query.action)) {
+    req.url = `/${req.query.action}${req.url.replace(/\?.*/, '')}`
+  }
+  next()
+})
+
 function getSupabaseClient() {
   return createClient(
     process.env.VITE_SUPABASE_URL,
