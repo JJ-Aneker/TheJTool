@@ -106,9 +106,9 @@ export function validateComponents(components, options = {}) {
                 errors.push(`${path}: onclick contiene comillas dobles dentro del JS. Solo usar comillas simples.`)
               }
 
-              // < o >
+              // < o > (warning en lugar de error)
               if (jsCode.includes('<') || jsCode.includes('>')) {
-                errors.push(`${path}: onclick contiene < o >. Reescribir comparaciones (i !== n, Math.max, etc.)`)
+                warnings.push(`${path}: onclick contiene < o >. Puede causar problemas de parseo XML.`)
               }
             })
           }
@@ -136,14 +136,14 @@ export function validateComponents(components, options = {}) {
               errors.push(`${path}: ${prop} contiene saltos de línea reales. Debe ir en una sola línea.`)
             }
 
-            // < o >
+            // < o > (solo warning, Therefore los soporta)
             if (code.includes('<') || code.includes('>')) {
-              errors.push(`${path}: ${prop} contiene < o >. Prohibido.`)
+              warnings.push(`${path}: ${prop} contiene comparaciones < o >. Verifica que funcionen en Therefore.`)
             }
 
-            // &&
+            // && (solo warning, Therefore lo soporta)
             if (code.includes('&&')) {
-              errors.push(`${path}: ${prop} contiene &&. Usar if anidados o !==.`)
+              warnings.push(`${path}: ${prop} contiene &&. Verifica que funcione en Therefore.`)
             }
           }
         })
