@@ -160,7 +160,7 @@ export default function QuestionnaireManager() {
       formData.append('producto_afectado', productoAfectado);
 
       // Subir al backend
-      const response = await axios.post(`${API_URL}/api/questionnaires/upload`, formData, {
+      const response = await axios.post(`${API_URL}/api/questionnaires?action=upload`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -195,7 +195,7 @@ export default function QuestionnaireManager() {
       message.loading({ content: 'Generando respuestas con IA...', key: 'generating', duration: 0 });
 
       const response = await axios.post(
-        `${API_URL}/api/questionnaires/${formularioId}/generate-answers`,
+        `${API_URL}/api/questionnaires?action=generate-answers&id=${formularioId}`,
         {},
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
@@ -230,7 +230,7 @@ export default function QuestionnaireManager() {
       message.loading({ content: 'Preparando descarga...', key: 'downloading', duration: 0 });
 
       const response = await axios.get(
-        `${API_URL}/api/questionnaires/${formularioId}/download-excel`,
+        `${API_URL}/api/questionnaires?action=download-excel&id=${formularioId}`,
         {
           headers: { 'Authorization': `Bearer ${token}` },
           responseType: 'blob'
@@ -274,7 +274,7 @@ export default function QuestionnaireManager() {
           message.loading({ content: 'Eliminando...', key: 'deleting', duration: 0 });
 
           await axios.delete(
-            `${API_URL}/api/questionnaires/${formulario.id}`,
+            `${API_URL}/api/questionnaires?action=delete&id=${formulario.id}`,
             { headers: { 'Authorization': `Bearer ${token}` } }
           );
 
@@ -308,7 +308,7 @@ export default function QuestionnaireManager() {
         const token = session?.access_token;
 
         const response = await axios.get(
-          `${API_URL}/api/questionnaires/${formulario.id}/status`,
+          `${API_URL}/api/questionnaires?action=status&id=${formulario.id}`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
 
