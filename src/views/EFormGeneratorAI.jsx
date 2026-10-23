@@ -69,7 +69,8 @@ export default function EFormGeneratorAI() {
 
   return (
     <div className="eform-generator-ai" style={{
-      minHeight: 'calc(100vh - 64px)',
+      height: '100%',
+      overflow: 'auto',
       padding: '24px',
       background: 'var(--bg-page)'
     }}>
