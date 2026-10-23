@@ -59,31 +59,37 @@ const { Content } = Layout
 const MOBILE_BREAKPOINT = 768
 
 const getMenuItems = (isAdmin = false, t = (key) => key) => {
-  const activeItems = [
-    { key: 'home',             icon: <HomeOutlined />,         label: t('nav.home'),               path: '/' },
-    { key: 'users',            icon: <UserOutlined />,         label: t('nav.userManager'),         path: '/users',            adminOnly: true },
-    { key: 'verticales',       icon: <AppstoreOutlined />,     label: t('nav.verticalesManager'),   path: '/verticales',       adminOnly: true },
-    { key: 'bedrock',          icon: <CloudOutlined />,        label: t('nav.bedrock'),             path: '/bedrock',          adminOnly: true },
-    { key: 'eforms',           icon: <FormOutlined />,         label: t('nav.eformBuilder'),        path: '/eforms' },
-    { key: 'eform-generator-ai', icon: <ThunderboltOutlined />, label: 'Generador eForms IA',       path: '/eform-generator-ai', adminOnly: true },
-    { key: 'category-builder', icon: <AppstoreOutlined />,     label: t('nav.categoryBuilder'),     path: '/category-builder' },
-    { key: 'tenants',          icon: <CloudOutlined />,        label: t('nav.tenantManager'),       path: '/tenants' },
-    { key: 'questionnaires',   icon: <FileExcelOutlined />,    label: 'Cuestionarios IT',           path: '/questionnaires' },
-    { key: 'document-generator', icon: <ThunderboltOutlined />, label: t('nav.documentGenerator'), path: '/document-generator' },
-    { key: 'reporter',         icon: <FileTextOutlined />,     label: t('nav.thereforeReporter'),   path: '/reporter' },
-    { key: 'web-services',     icon: <CloudOutlined />,        label: t('nav.webServices'),         path: '/web-services' },
-    { key: 'manual',           icon: <BookOutlined />,         label: 'Manual',                     path: '/manual' }
-  ]
+  const items = [
+    // Inicio
+    { key: 'home', icon: <HomeOutlined />, label: t('nav.home'), path: '/' },
 
-  const constructionItems = [
+    // ADMINISTRACIÓN (solo admin)
+    { type: 'divider', adminOnly: true },
+    { key: 'admin-header', type: 'group', label: '🔐 ADMINISTRACIÓN', adminOnly: true },
+    { key: 'users',        icon: <UserOutlined />,      label: t('nav.userManager'),       path: '/users',        adminOnly: true },
+    { key: 'verticales',   icon: <AppstoreOutlined />,  label: t('nav.verticalesManager'), path: '/verticales',   adminOnly: true },
+    { key: 'tenants',      icon: <CloudOutlined />,     label: t('nav.tenantManager'),     path: '/tenants',      adminOnly: true },
+    { key: 'bedrock',      icon: <CloudOutlined />,     label: t('nav.bedrock'),           path: '/bedrock',      adminOnly: true },
+    { key: 'web-services', icon: <CloudOutlined />,     label: t('nav.webServices'),       path: '/web-services', adminOnly: true },
+
+    // CONSULTORÍA (todos)
     { type: 'divider' },
-    { key: 'api-explorer', icon: <ApiOutlined />,    label: t('nav.apiExplorer'),    path: '/api-explorer' },
-    { key: 'workflows',    icon: <SettingOutlined />, label: t('nav.workflowConfig'), path: '/workflows' },
-    { key: 'docs',         icon: <FileTextOutlined />, label: t('nav.projectDocs'),  path: '/docs' }
+    { key: 'consulting-header', type: 'group', label: '💼 CONSULTORÍA' },
+    { key: 'document-generator', icon: <ThunderboltOutlined />, label: t('nav.documentGenerator'), path: '/document-generator' },
+    { key: 'questionnaires',     icon: <FileExcelOutlined />,    label: 'Cuestionarios IT',         path: '/questionnaires' },
+    { key: 'reporter',           icon: <FileTextOutlined />,     label: t('nav.thereforeReporter'), path: '/reporter' },
+    { key: 'manual',             icon: <BookOutlined />,         label: 'Manual',                   path: '/manual' },
+
+    // DESARROLLO TÉCNICO (todos)
+    { type: 'divider' },
+    { key: 'dev-header', type: 'group', label: '🛠️ DESARROLLO TÉCNICO' },
+    { key: 'eforms',             icon: <FormOutlined />,         label: t('nav.eformBuilder'),    path: '/eforms' },
+    { key: 'eform-generator-ai', icon: <ThunderboltOutlined />, label: 'Gen. eForms IA',         path: '/eform-generator-ai', adminOnly: true },
+    { key: 'category-builder',   icon: <AppstoreOutlined />,     label: t('nav.categoryBuilder'), path: '/category-builder' },
+    { key: 'api-explorer',       icon: <ApiOutlined />,          label: t('nav.apiExplorer'),     path: '/api-explorer' },
   ]
 
-  const allItems = [...activeItems, ...constructionItems]
-  return allItems
+  return items
     .filter(item => !item.adminOnly || isAdmin)
     .map(({ adminOnly, ...rest }) => rest)
 }
