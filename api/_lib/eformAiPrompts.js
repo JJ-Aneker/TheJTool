@@ -91,7 +91,48 @@ const PATTERNS = {
   en el canvas y dibuja trazos con ctx.lineTo/stroke.
 - "Confirmar firma": canvas.toDataURL('image/png') → escribir en el campo hidden con el mismo
   mecanismo que qrSetValue (API form.io o input + eventos).
-- "Borrar": ctx.clearRect(0, 0, canvas.width, canvas.height) y vaciar el hidden.`
+- "Borrar": ctx.clearRect(0, 0, canvas.width, canvas.height) y vaciar el hidden.`,
+
+  header: `## [header] Cabecera corporativa
+
+**Propósito:** logo o imagen de cabecera centrada en la parte superior del formulario.
+
+- htmlelement como primer componente (antes de cualquier panel)
+- input: false (no es un campo de formulario)
+- Contenido HTML: <div style='text-align:center;padding:20px 0;border-bottom:2px solid #eee;margin-bottom:20px'>
+- Si hay URL específica: <img src='URL' alt='Logo' style='max-width:300px;height:auto'>
+- Si es placeholder: <img src='data:image/svg+xml,...' alt='Logo corporativo' style='max-width:300px;height:auto'>
+  (usar SVG placeholder simple con texto "LOGO" centrado)
+- Opcional: añadir título debajo del logo con <h2 style='margin:10px 0 0 0;color:#333'>Título del formulario</h2>`,
+
+  columns2: `## [columns2] Diseño en 2 columnas
+
+**Propósito:** organizar campos en 2 columnas side-by-side para aprovechar espacio horizontal.
+
+- Usar componente 'columns' de form.io
+- Configurar columns: [
+    { components: [], width: 6, offset: 0, push: 0, pull: 0 },
+    { components: [], width: 6, offset: 0, push: 0, pull: 0 }
+  ]
+- width: 6 para cada columna (total 12 = 100%)
+- Distribuir campos equitativamente o según especificación del usuario
+- Responsive: en móvil las columnas se apilan automáticamente
+- NO anidar columns dentro de columns (limitación de form.io)`,
+
+  columns3: `## [columns3] Diseño en 3 columnas
+
+**Propósito:** organizar campos en 3 columnas para formularios densos.
+
+- Usar componente 'columns' de form.io
+- Configurar columns: [
+    { components: [], width: 4, offset: 0, push: 0, pull: 0 },
+    { components: [], width: 4, offset: 0, push: 0, pull: 0 },
+    { components: [], width: 4, offset: 0, push: 0, pull: 0 }
+  ]
+- width: 4 para cada columna (total 12 = 100%)
+- Mejor para campos cortos (fechas, números, selects)
+- Evitar campos de texto largo en diseño de 3 columnas
+- Responsive: en móvil se apilan automáticamente`
 }
 
 /**
