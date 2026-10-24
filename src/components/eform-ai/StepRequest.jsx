@@ -7,12 +7,18 @@ import { supabase } from '../../config/supabaseClient'
 const { TextArea } = Input
 const { Option } = Select
 
-const BLOCKS = [
+const FUNCTIONAL_BLOCKS = [
   { key: 'qr', label: '📷 Lector QR / códigos de barras' },
   { key: 'autofill', label: '👤 Autorrelleno con usuario conectado' },
   { key: 'lookup', label: '🔍 Buscar en categoría maestra' },
   { key: 'modal', label: '✏️ Modal de actualización de datos' },
   { key: 'signature', label: '✍️ Firma (canvas)' }
+]
+
+const FORMAT_BLOCKS = [
+  { key: 'header', label: '🖼️ Cabecera corporativa' },
+  { key: 'columns2', label: '📊 Diseño 2 columnas' },
+  { key: 'columns3', label: '📊 Diseño 3 columnas' }
 ]
 
 const EXAMPLES = [
@@ -299,12 +305,26 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           }
         </Form.Item>
 
-        <Form.Item label="Bloques predefinidos (opcional)">
+        <Form.Item label="Bloques funcionales (opcional)">
           <Space wrap>
-            {BLOCKS.map(block => (
+            {FUNCTIONAL_BLOCKS.map(block => (
               <Tag.CheckableTag
                 key={block.key}
-                checked={formData.blocks.includes(block.key)}
+                checked={formData.blocks?.includes(block.key) || false}
+                onChange={() => handleBlockToggle(block.key)}
+              >
+                {block.label}
+              </Tag.CheckableTag>
+            ))}
+          </Space>
+        </Form.Item>
+
+        <Form.Item label="Formato y diseño (opcional)">
+          <Space wrap>
+            {FORMAT_BLOCKS.map(block => (
+              <Tag.CheckableTag
+                key={block.key}
+                checked={formData.blocks?.includes(block.key) || false}
                 onChange={() => handleBlockToggle(block.key)}
               >
                 {block.label}
