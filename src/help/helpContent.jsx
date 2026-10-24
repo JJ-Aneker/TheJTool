@@ -282,6 +282,8 @@ Motivo;motivo;text;no;Descripción breve del motivo;;300;SOLICITUD</pre>
           title: 'Organizar en columnas',
           body: `Para formularios con muchos campos, puedes organizarlos en **varias columnas** para aprovechar mejor el espacio.
 
+<strong>💡 Consejo rápido:</strong> Activa el bloque **"📊 Diseño 2 columnas"** o **"📊 Diseño 3 columnas"** en la sección "Formato y diseño" para que la IA lo aplique automáticamente. O descríbelo en el prompt.
+
 <strong>Ejemplo — 2 columnas:</strong>
 <pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Crear eForm de alta de proveedor organizado en 2 columnas.
 
@@ -304,6 +306,8 @@ Columna derecha:
           id: 'eform-ai-logo',
           title: 'Logo o imagen de cabecera',
           body: `Puedes incluir un **logo o imagen** en la parte superior del formulario.
+
+<strong>💡 Consejo rápido:</strong> Activa el bloque **"🖼️ Cabecera corporativa"** en la sección "Formato y diseño" para que la IA lo incluya automáticamente. O descríbelo en el prompt.
 
 <strong>Con URL específica:</strong>
 <pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario de solicitud de material. Incluir logo en la parte superior con URL: https://empresa.com/logo.png
