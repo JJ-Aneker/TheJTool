@@ -1025,14 +1025,14 @@ export default function LicenseConfigurator() {
                   <Text type="secondary" style={{ fontSize: 12 }}>{tp.descripcion}</Text>
                 </Col>
                 <Col span={6}>
-                  <InputNumber
+                  <Input
+                    type="number"
                     placeholder="Importe"
                     value={tp.importe}
-                    onChange={(val) => updateTempPartnerImporte(tp.nombre, val)}
-                    precision={2}
-                    style={{ width: '100%' }}
-                    suffix="€"
+                    onChange={(e) => updateTempPartnerImporte(tp.nombre, e.target.value)}
+                    style={{ width: '100%', textAlign: 'right' }}
                     min={0}
+                    step="0.01"
                   />
                 </Col>
               </Row>
