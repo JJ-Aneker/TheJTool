@@ -743,6 +743,7 @@ export default function QuestionnaireManager() {
           </>
         )}
       </Modal>
+      </div>
     </div>
   );
 }
