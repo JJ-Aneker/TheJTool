@@ -47,7 +47,7 @@ export default function StepHistory({ formData, updateFormData, goToStep, setLoa
         xml: gen.xml,
         validation: gen.validation
       })
-      goToStep(3)
+      goToStep(2)
     } catch (err) {
       alert('Error: ' + (err.response?.data?.error || err.message))
     } finally {

@@ -6,7 +6,6 @@ import { useAuth } from '../hooks/useAuth'
 import { useTranslation } from 'react-i18next'
 import HelpButton from '../components/HelpButton'
 import StepRequest from '../components/eform-ai/StepRequest'
-import StepQuestions from '../components/eform-ai/StepQuestions'
 import StepPrompt from '../components/eform-ai/StepPrompt'
 import StepResult from '../components/eform-ai/StepResult'
 import StepHistory from '../components/eform-ai/StepHistory'
@@ -48,7 +47,6 @@ export default function EFormGeneratorAI() {
 
   const steps = [
     { title: t('eformGeneratorAI.request'), description: t('eformGeneratorAI.describeForm') },
-    { title: t('eformGeneratorAI.questions'), description: t('eformGeneratorAI.questionsDesc') },
     { title: t('eformGeneratorAI.prompt'), description: t('eformGeneratorAI.promptDesc') },
     { title: t('eformGeneratorAI.result'), description: t('eformGeneratorAI.resultDesc') },
     { title: t('eformGeneratorAI.history'), description: t('eformGeneratorAI.historyDesc') }
@@ -111,15 +109,6 @@ export default function EFormGeneratorAI() {
           )}
 
           {currentStep === 1 && (
-            <StepQuestions
-              formData={formData}
-              updateFormData={updateFormData}
-              goToStep={goToStep}
-              setLoading={setLoading}
-            />
-          )}
-
-          {currentStep === 2 && (
             <StepPrompt
               formData={formData}
               updateFormData={updateFormData}
@@ -128,7 +117,7 @@ export default function EFormGeneratorAI() {
             />
           )}
 
-          {currentStep === 3 && (
+          {currentStep === 2 && (
             <StepResult
               formData={formData}
               updateFormData={updateFormData}
@@ -137,7 +126,7 @@ export default function EFormGeneratorAI() {
             />
           )}
 
-          {currentStep === 4 && (
+          {currentStep === 3 && (
             <StepHistory
               formData={formData}
               updateFormData={updateFormData}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Form, Input, Select, Button, Upload, Tag, Alert, Space, Card, Row, Col } from 'antd'
+import { Form, Input, Select, Button, Upload, Tag, Alert, Space, Card, Row, Col, Modal } from 'antd'
 import { CloudUploadOutlined, BulbOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import { supabase } from '../../config/supabaseClient'
@@ -37,8 +37,11 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
   ]
 
   const [form] = Form.useForm()
+  const [questionsForm] = Form.useForm()
   const [categoryFileName, setCategoryFileName] = useState(null)
   const [promptImproved, setPromptImproved] = useState(false)
+  const [isQuestionsModalOpen, setIsQuestionsModalOpen] = useState(false)
+  const [questions, setQuestions] = useState([])
 
   const handleImprovePrompt = async () => {
     try {
@@ -68,15 +71,15 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
       })
 
       if (response.data.questions) {
-        // Hay preguntas aclaratorias - ir al paso de preguntas
+        // Hay preguntas aclaratorias - abrir modal
+        setQuestions(response.data.questions)
+        setIsQuestionsModalOpen(true)
         updateFormData({
           request: values.request,
           environment: values.environment,
           tenant: values.tenant,
-          serverUrl: values.serverUrl,
-          questions: response.data.questions
+          serverUrl: values.serverUrl
         })
-        goToStep(1)
       } else {
         // Actualizar el textarea con el prompt mejorado
         form.setFieldsValue({
@@ -98,6 +101,55 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
       console.error('Error mejorando prompt:', err)
       const errorMsg = err.response?.data?.error || err.message
       alert(`Error: ${errorMsg}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleQuestionsSubmit = async () => {
+    try {
+      const answers = await questionsForm.validateFields()
+      setLoading(true)
+      setIsQuestionsModalOpen(false)
+
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('No autenticado')
+      }
+
+      const answersArray = Object.values(answers)
+
+      const response = await axios.post('/api/eform-ai?action=propose', {
+        request: formData.request,
+        environment: formData.environment,
+        tenant: formData.tenant,
+        serverUrl: formData.serverUrl,
+        blocks: formData.blocks,
+        categoryXml: formData.categoryXml,
+        answers: answersArray
+      }, {
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      })
+
+      // Actualizar el textarea con el prompt mejorado
+      form.setFieldsValue({
+        request: response.data.detailedPrompt,
+        formName: response.data.suggestedFormName,
+        formId: response.data.suggestedFormId
+      })
+      updateFormData({
+        detailedPrompt: response.data.detailedPrompt,
+        formName: response.data.suggestedFormName,
+        formId: response.data.suggestedFormId,
+        answers: answersArray
+      })
+      setPromptImproved(true)
+      questionsForm.resetFields()
+    } catch (err) {
+      console.error('Error procesando respuestas:', err)
+      const errorMsg = err.response?.data?.error || err.message
+      alert(`Error: ${errorMsg}`)
+      setIsQuestionsModalOpen(true) // Reabrir el modal si hubo error
     } finally {
       setLoading(false)
     }
@@ -140,7 +192,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         xml: response.data.xml,
         validation: response.data.validation
       })
-      goToStep(3) // Ir a resultado
+      goToStep(2) // Ir a resultado
     } catch (err) {
       console.error('Error generando eForm:', err)
       const errorMsg = err.response?.data?.error || err.message
@@ -389,6 +441,33 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         </Form.Item>
 
       </Form>
+
+      <Modal
+        title={t('eformGeneratorAI.aiNeedsClarifications')}
+        open={isQuestionsModalOpen}
+        onOk={handleQuestionsSubmit}
+        onCancel={() => {
+          setIsQuestionsModalOpen(false)
+          questionsForm.resetFields()
+        }}
+        confirmLoading={loading}
+        width={600}
+        okText={t('common.next')}
+        cancelText={t('common.cancel')}
+      >
+        <Form form={questionsForm} layout="vertical">
+          {questions.map((q, i) => (
+            <Form.Item
+              key={i}
+              label={q.question}
+              name={`q${i}`}
+              rules={[{ required: true, message: t('eformGeneratorAI.answerRequired') }]}
+            >
+              <Input placeholder={q.options ? q.options.join(' / ') : ''} />
+            </Form.Item>
+          ))}
+        </Form>
+      </Modal>
     </Space>
   )
 }

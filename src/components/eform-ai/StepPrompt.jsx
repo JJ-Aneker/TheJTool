@@ -36,7 +36,7 @@ export default function StepPrompt({ formData, updateFormData, goToStep, setLoad
         xml: response.data.xml,
         validation: response.data.validation
       })
-      goToStep(3)
+      goToStep(2)
     } catch (err) {
       alert('Error: ' + (err.response?.data?.error || err.message))
     } finally {
@@ -76,7 +76,7 @@ export default function StepPrompt({ formData, updateFormData, goToStep, setLoad
 
       <Form.Item>
         <Space>
-          <Button onClick={() => goToStep(formData.questions ? 1 : 0)} icon={<ArrowLeftOutlined />}>
+          <Button onClick={() => goToStep(0)} icon={<ArrowLeftOutlined />}>
             Volver
           </Button>
           <Button type="primary" htmlType="submit" icon={<ArrowRightOutlined />}>

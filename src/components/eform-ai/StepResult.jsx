@@ -159,7 +159,7 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
         <Button onClick={handleNewEForm}>
           {t('eformGeneratorAI.newEform')}
         </Button>
-        <Button onClick={() => goToStep(4)}>
+        <Button onClick={() => goToStep(3)}>
           {t('eformGeneratorAI.viewHistory')}
         </Button>
       </Space>
