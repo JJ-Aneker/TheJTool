@@ -285,32 +285,38 @@ export default function LicenseConfigurator() {
       const quotation = {
         user_id: user.id,
         nombre: values.nombre,
-        cliente,
-        oportunidad: sfdcOpp,
-        account_manager: accountManager,
+        cliente: cliente || '',
+        oportunidad: sfdcOpp || '',
+        account_manager: accountManager || '',
         edicion,
         items: selectedItems,
         servicios,
-        tech_partners: techPartners,
+        tech_partners: techPartners.filter(tp => tp.importe > 0),
         total_licencias: totalLicencias,
         total_css: totalCSS,
         total_servicios: totalServicios,
         total_general: totalContractValue,
-        notas: values.notas
+        notas: values.notas || ''
       }
 
-      const { error } = await supabase
+      console.log('Guardando cotización:', quotation)
+
+      const { data, error } = await supabase
         .from('therefore_quotations')
         .insert([quotation])
+        .select()
 
-      if (error) throw error
+      if (error) {
+        console.error('Error de Supabase:', error)
+        throw error
+      }
 
       message.success('Cotización guardada')
       setSaveModalOpen(false)
       form.resetFields()
     } catch (err) {
       console.error('Error guardando:', err)
-      message.error('Error al guardar cotización')
+      message.error(`Error al guardar: ${err.message || 'Error desconocido'}`)
     } finally {
       setLoading(false)
     }
