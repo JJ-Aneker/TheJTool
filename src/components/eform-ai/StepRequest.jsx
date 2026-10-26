@@ -283,7 +283,30 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         }}
       >
         <Form.Item
-          label={t('eformGeneratorAI.describeForm')}
+          label={
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <span>{t('eformGeneratorAI.describeForm')}</span>
+              <Space>
+                <Button
+                  size="small"
+                  icon={<BulbOutlined />}
+                  onClick={handleImprovePrompt}
+                >
+                  {t('eformGeneratorAI.improvePrompt')}
+                </Button>
+                {promptImproved && (
+                  <Button
+                    size="small"
+                    type="primary"
+                    icon={<ThunderboltOutlined />}
+                    onClick={handleGenerate}
+                  >
+                    {t('eformGeneratorAI.generateEform')}
+                  </Button>
+                )}
+              </Space>
+            </div>
+          }
           name="request"
           rules={[{ required: true, message: t('eformGeneratorAI.describeForm') }]}
         >
@@ -294,28 +317,6 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
             maxLength={5000}
           />
         </Form.Item>
-
-        <Row gutter={8} style={{ marginBottom: 24 }}>
-          <Col>
-            <Button
-              icon={<BulbOutlined />}
-              onClick={handleImprovePrompt}
-            >
-              {t('eformGeneratorAI.improvePrompt')}
-            </Button>
-          </Col>
-          {promptImproved && (
-            <Col>
-              <Button
-                type="primary"
-                icon={<ThunderboltOutlined />}
-                onClick={handleGenerate}
-              >
-                {t('eformGeneratorAI.generateEform')}
-              </Button>
-            </Col>
-          )}
-        </Row>
 
         {promptImproved && (
           <>
