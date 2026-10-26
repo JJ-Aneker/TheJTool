@@ -42,6 +42,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
   const [promptImproved, setPromptImproved] = useState(false)
   const [isQuestionsModalOpen, setIsQuestionsModalOpen] = useState(false)
   const [questions, setQuestions] = useState([])
+  const [modalLoading, setModalLoading] = useState(false)
 
   const handleImprovePrompt = async () => {
     try {
@@ -109,8 +110,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
   const handleQuestionsSubmit = async () => {
     try {
       const answers = await questionsForm.validateFields()
-      setLoading(true)
-      setIsQuestionsModalOpen(false)
+      setModalLoading(true)
 
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
@@ -145,13 +145,13 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
       })
       setPromptImproved(true)
       questionsForm.resetFields()
+      setIsQuestionsModalOpen(false)
     } catch (err) {
       console.error('Error procesando respuestas:', err)
       const errorMsg = err.response?.data?.error || err.message
       alert(`Error: ${errorMsg}`)
-      setIsQuestionsModalOpen(true) // Reabrir el modal si hubo error
     } finally {
-      setLoading(false)
+      setModalLoading(false)
     }
   }
 
@@ -450,7 +450,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           setIsQuestionsModalOpen(false)
           questionsForm.resetFields()
         }}
-        confirmLoading={loading}
+        confirmLoading={modalLoading}
         width={600}
         okText={t('common.next')}
         cancelText={t('common.cancel')}
