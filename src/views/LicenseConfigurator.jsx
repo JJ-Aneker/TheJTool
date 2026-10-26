@@ -55,6 +55,9 @@ export default function LicenseConfigurator() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedCatalogItems, setSelectedCatalogItems] = useState([])
 
+  const [serviciosModalOpen, setServiciosModalOpen] = useState(false)
+  const [techPartnersModalOpen, setTechPartnersModalOpen] = useState(false)
+
   // Servicios predefinidos
   const serviciosDisponibles = [
     { codigo: '739ZZ051', descripcion: 'Consultoría', pvp_jornada: 880 },
@@ -157,14 +160,32 @@ export default function LicenseConfigurator() {
     setSelectedItems(selectedItems.filter(i => i.codigo !== codigo))
   }
 
-  const addServicio = () => {
+  const addServicioFromCatalog = (servicio) => {
     setServicios([...servicios, {
       id: Date.now(),
-      codigo: '',
-      descripcion: '',
+      codigo: servicio.codigo,
+      descripcion: servicio.descripcion,
       unidades: 1,
-      pvp_jornada: 0
+      pvp_jornada: servicio.pvp_jornada
     }])
+    antMessage.success('Servicio agregado')
+  }
+
+  const addTechPartnerCustom = (nombre) => {
+    if (!nombre || nombre.trim() === '') {
+      antMessage.warning('Ingresa un nombre')
+      return
+    }
+
+    const exists = techPartners.find(tp => tp.nombre.toLowerCase() === nombre.toLowerCase())
+    if (exists) {
+      antMessage.warning('Ya existe ese partner')
+      return
+    }
+
+    setTechPartners([...techPartners, { nombre: nombre.trim(), importe: 0 }])
+    antMessage.success('Tech Partner agregado')
+    setTechPartnersModalOpen(false)
   }
 
   const updateServicio = (id, field, value) => {
@@ -364,14 +385,6 @@ export default function LicenseConfigurator() {
           </Select>
 
           <Button
-            icon={<AppstoreOutlined />}
-            onClick={() => setCatalogDrawerOpen(true)}
-            className="btn-primary"
-          >
-            Catálogo
-          </Button>
-
-          <Button
             icon={<HistoryOutlined />}
             onClick={() => {
               loadQuotations()
@@ -488,6 +501,11 @@ export default function LicenseConfigurator() {
               title={<Text strong style={{ color: '#c00' }}>TECH PARTNERS</Text>}
               size="small"
               style={{ marginBottom: 16 }}
+              extra={
+                <Button size="small" icon={<PlusOutlined />} onClick={() => setTechPartnersModalOpen(true)}>
+                  Agregar partner
+                </Button>
+              }
             >
               {techPartners.map((tp, index) => (
                 <Row key={index} gutter={8} style={{ marginBottom: 8 }}>
@@ -547,8 +565,8 @@ export default function LicenseConfigurator() {
               title={<Text strong style={{ color: '#c00' }}>SERVICIOS</Text>}
               size="small"
               extra={
-                <Button size="small" icon={<PlusOutlined />} onClick={addServicio}>
-                  Agregar
+                <Button size="small" icon={<PlusOutlined />} onClick={() => setServiciosModalOpen(true)}>
+                  Agregar servicio
                 </Button>
               }
             >
@@ -625,6 +643,15 @@ export default function LicenseConfigurator() {
         <Card
           title={<Text strong style={{ color: '#c00' }}>DETALLE SOLUCIONES | PRODUCTO</Text>}
           size="small"
+          extra={
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setCatalogDrawerOpen(true)}
+            >
+              Agregar productos
+            </Button>
+          }
         >
           <Table
             dataSource={selectedItems}
@@ -806,6 +833,76 @@ export default function LicenseConfigurator() {
           ]}
         />
       </Drawer>
+
+      {/* Modal Servicios */}
+      <Modal
+        title="Catálogo de Servicios"
+        open={serviciosModalOpen}
+        onCancel={() => setServiciosModalOpen(false)}
+        footer={null}
+        width={600}
+      >
+        <div style={{ marginTop: 16 }}>
+          {serviciosDisponibles.map((serv, index) => (
+            <Card
+              key={index}
+              size="small"
+              style={{ marginBottom: 12 }}
+              hoverable
+            >
+              <Row gutter={16} align="middle">
+                <Col span={4}>
+                  <Text type="secondary" style={{ fontFamily: 'monospace', fontSize: 12 }}>
+                    {serv.codigo}
+                  </Text>
+                </Col>
+                <Col span={12}>
+                  <Text strong>{serv.descripcion}</Text>
+                </Col>
+                <Col span={5} style={{ textAlign: 'right' }}>
+                  <Text>{serv.pvp_jornada.toFixed(2)} €/jornada</Text>
+                </Col>
+                <Col span={3} style={{ textAlign: 'right' }}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                      addServicioFromCatalog(serv)
+                      setServiciosModalOpen(false)
+                    }}
+                  />
+                </Col>
+              </Row>
+            </Card>
+          ))}
+        </div>
+      </Modal>
+
+      {/* Modal Tech Partners */}
+      <Modal
+        title="Agregar Tech Partner"
+        open={techPartnersModalOpen}
+        onCancel={() => setTechPartnersModalOpen(false)}
+        footer={null}
+        width={500}
+      >
+        <div style={{ marginTop: 16 }}>
+          <Text>Ingresa el nombre del Tech Partner:</Text>
+          <Input
+            placeholder="Ej: Salesforce, Microsoft, etc."
+            style={{ marginTop: 8, marginBottom: 16 }}
+            onPressEnter={(e) => addTechPartnerCustom(e.target.value)}
+            autoFocus
+          />
+
+          <div style={{ marginTop: 16 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Partners existentes: {techPartners.map(tp => tp.nombre).join(', ')}
+            </Text>
+          </div>
+        </div>
+      </Modal>
 
       {/* Modal Guardar */}
       <Modal
