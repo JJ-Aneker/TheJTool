@@ -343,12 +343,45 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
               {categoryFileName || 'Subir XML de categoría'}
             </Button>
           </Upload>
-          {formData.categoryFields.length > 0 && (
-            <Alert
-              type="success"
-              message={`${formData.categoryFields.length} campos detectados`}
+          {formData.categoryFields && formData.categoryFields.length > 0 && (
+            <Card
+              size="small"
+              title={`${formData.categoryFields.length} campos detectados de la categoría`}
               style={{ marginTop: 8 }}
-            />
+            >
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #d9d9d9' }}>
+                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>ColName</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>Caption</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>Tipo</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'center' }}>Long.</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'center' }}>Oblig.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formData.categoryFields.map((field, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '4px 8px', fontFamily: 'monospace' }}>{field.colName}</td>
+                        <td style={{ padding: '4px 8px' }}>{field.caption}</td>
+                        <td style={{ padding: '4px 8px', fontSize: '11px', color: '#666' }}>{field.typeName}</td>
+                        <td style={{ padding: '4px 8px', textAlign: 'center', fontSize: '11px' }}>{field.length > 0 ? field.length : '-'}</td>
+                        <td style={{ padding: '4px 8px', textAlign: 'center' }}>
+                          {field.required ? '✓' : '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <Alert
+                type="info"
+                message="La IA usará estos ColName exactos como keys en el eForm"
+                style={{ marginTop: 8 }}
+                showIcon={false}
+              />
+            </Card>
           )}
         </Form.Item>
 

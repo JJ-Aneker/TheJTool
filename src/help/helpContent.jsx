@@ -395,28 +395,62 @@ Al hacer clic, abre modal que permite modificar: teléfono, email y dirección d
         },
         {
           id: 'eform-ai-category',
-          title: 'Subir XML de categoría (opcional)',
-          body: `Si subes el **XML de la categoría destino**, la IA puede:
+          title: 'Subir XML de categoría (RECOMENDADO)',
+          body: `**⭐ Funcionalidad estrella:** Si subes el **XML de la categoría destino**, la IA detecta automáticamente todos los campos y genera el eForm perfectamente mapeado.
+
+<strong>🎯 Ventajas de usar el XML:</strong>
 <ul>
-  <li>Usar los nombres exactos de los campos (ColName) de Therefore™</li>
-  <li>Detectar campos obligatorios automáticamente</li>
-  <li>Validar que todos los campos obligatorios estén cubiertos</li>
+  <li>✅ La IA usa los **ColName exactos** de Therefore™ (no inventa nombres)</li>
+  <li>✅ Detecta **campos obligatorios** automáticamente</li>
+  <li>✅ Respeta **longitudes máximas** de cada campo</li>
+  <li>✅ Mapea **tipos de datos** correctamente (String → textfield, Integer → number, Date → datetime, etc.)</li>
+  <li>✅ Muestra tabla visual con todos los campos detectados</li>
+  <li>✅ **Cero errores de mapeo** — las keys coinciden 100% con la categoría</li>
 </ul>
 
-<strong>Cómo hacerlo:</strong>
+<strong>📋 Cómo hacerlo:</strong>
 <ol>
-  <li>En Therefore™ Solution Designer: selecciona la categoría → File → Export Configuration</li>
-  <li>En el Generador IA: sección "Categoría destino (opcional)" → sube el XML</li>
-  <li>Aparece un mensaje verde con el nº de campos detectados</li>
-  <li>En tu prompt, usa los nombres de campo tal como están en Therefore™</li>
+  <li>En <strong>Therefore™ Solution Designer</strong>: selecciona la categoría → <em>File → Export Configuration</em> → guarda el XML</li>
+  <li>En el <strong>Generador IA</strong>: sección "Categoría destino (opcional)" → botón <em>"Subir XML de categoría"</em></li>
+  <li>Aparece una **tabla con todos los campos detectados**: ColName, Caption, Tipo, Longitud máxima, Obligatorio</li>
+  <li>Describe tu eForm normalmente — la IA usará automáticamente los campos de la tabla</li>
+  <li>Haz clic en <strong>"Mejorar Prompt"</strong> — verás que el prompt incluye los ColName exactos</li>
 </ol>
 
-<strong>Ejemplo con categoría:</strong>
-<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Crear eForm para la categoría "Facturas_Proveedor" que tengo en Therefore™.
+<strong>✨ Ejemplo con XML subido (categoría "Contratos - Empresas"):</strong>
 
-Campos del eForm deben coincidir con los índices de la categoría: numeroFactura, proveedor, fechaFactura, importeTotal, estado.
+<em>Campos detectados en la tabla:</em>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:6px 10px;font-size:10px;margin:8px 0">ColName           Caption              Tipo     Long.  Oblig.
+CIF               CIF                  String   25     ✓
+Razon_Social      Razón Social         String   50     -
+Domicilio_Social  Domicilio Social     String   500    -
+Nota_Legal        Aviso Legal          String   500    -
+url_logo          url_logo             String   250    -</pre>
 
-Añadir campo adicional "Observaciones" que no se guarda en índice.</pre>`
+<em>Tu prompt puede ser simple:</em>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Formulario para registrar nuevas sociedades contractuales.
+Organizar en 2 secciones: identificación y datos legales.
+El CIF debe validarse con patrón de CIF español.</pre>
+
+<em>La IA generará automáticamente:</em>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">{
+  "components": [
+    { "key": "CIF", "type": "textfield", "validate": {
+        "required": true,
+        "maxLength": 25,
+        "pattern": "^[A-Z][0-9]{8}$"
+      }
+    },
+    { "key": "Razon_Social", "type": "textfield", "validate": { "maxLength": 50 } },
+    { "key": "Domicilio_Social", "type": "textarea", "validate": { "maxLength": 500 } },
+    { "key": "Nota_Legal", "type": "textarea", "validate": { "maxLength": 500 } },
+    { "key": "url_logo", "type": "textfield", "validate": { "maxLength": 250 } }
+  ]
+}</pre>
+
+<strong>💡 ¿Y si NO subo XML?</strong> Sin problema — la IA genera el eForm igual, pero inventará nombres de campos genéricos (cliente, nif, etc.). Luego deberás mapear manualmente en el perfil de indexación de Therefore™.
+
+<strong>⚠️ Importante:</strong> El XML debe ser una **exportación completa de la categoría** desde Solution Designer, no un XML de eForm.`
         },
         {
           id: 'eform-ai-environment',
@@ -1177,6 +1211,64 @@ Right column: Address, City, Postal code, Country</pre>`
 
 <strong>Example:</strong>
 <pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Asset inventory eForm with barcode scanner on "Asset code" field. Fields: asset code (with QR), description, location, status, responsible.</pre>`
+        },
+        {
+          id: 'eform-ai-category',
+          title: 'Upload category XML (RECOMMENDED)',
+          body: `**⭐ Star feature:** If you upload the **target category XML**, the AI automatically detects all fields and generates a perfectly mapped eForm.
+
+<strong>🎯 Advantages of using XML:</strong>
+<ul>
+  <li>✅ AI uses **exact ColNames** from Therefore™ (no invented names)</li>
+  <li>✅ Detects **required fields** automatically</li>
+  <li>✅ Respects **max lengths** for each field</li>
+  <li>✅ Maps **data types** correctly (String → textfield, Integer → number, Date → datetime, etc.)</li>
+  <li>✅ Shows visual table with all detected fields</li>
+  <li>✅ **Zero mapping errors** — keys match 100% with the category</li>
+</ul>
+
+<strong>📋 How to do it:</strong>
+<ol>
+  <li>In <strong>Therefore™ Solution Designer</strong>: select category → <em>File → Export Configuration</em> → save XML</li>
+  <li>In the <strong>AI Generator</strong>: "Target category (optional)" section → <em>"Upload category XML"</em> button</li>
+  <li>A **table appears with all detected fields**: ColName, Caption, Type, Max length, Required</li>
+  <li>Describe your eForm normally — AI will automatically use the fields from the table</li>
+  <li>Click <strong>"Improve Prompt"</strong> — you'll see the prompt includes exact ColNames</li>
+</ol>
+
+<strong>✨ Example with uploaded XML (category "Contracts - Companies"):</strong>
+
+<em>Fields detected in table:</em>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:6px 10px;font-size:10px;margin:8px 0">ColName           Caption              Type     Len.   Req.
+CIF               Tax ID               String   25     ✓
+Razon_Social      Legal Name           String   50     -
+Domicilio_Social  Registered Address   String   500    -
+Nota_Legal        Legal Notice         String   500    -
+url_logo          url_logo             String   250    -</pre>
+
+<em>Your prompt can be simple:</em>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">Form to register new contract companies.
+Organize in 2 sections: identification and legal data.
+Tax ID should be validated with Spanish CIF pattern.</pre>
+
+<em>AI will automatically generate:</em>
+<pre style="background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:10px;font-size:11px;margin:8px 0">{
+  "components": [
+    { "key": "CIF", "type": "textfield", "validate": {
+        "required": true,
+        "maxLength": 25,
+        "pattern": "^[A-Z][0-9]{8}$"
+      }
+    },
+    { "key": "Razon_Social", "type": "textfield", "validate": { "maxLength": 50 } },
+    { "key": "Domicilio_Social", "type": "textarea", "validate": { "maxLength": 500 } },
+    ...
+  ]
+}</pre>
+
+<strong>💡 What if I DON'T upload XML?</strong> No problem — AI generates the eForm anyway, but will invent generic field names (customer, vat, etc.). You'll need to manually map in Therefore™'s indexing profile.
+
+<strong>⚠️ Important:</strong> XML must be a **complete category export** from Solution Designer, not an eForm XML.`
         },
         {
           id: 'eform-ai-download',

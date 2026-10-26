@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Card, Steps, Button, message, Spin } from 'antd'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { Card, Steps, Button, message, Spin, Tooltip } from 'antd'
+import { ArrowLeftOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import StepRequest from '../components/eform-ai/StepRequest'
@@ -76,13 +76,22 @@ export default function EFormGeneratorAI() {
     }}>
       <Card
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Button
-              type="text"
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBack}
-            />
-            <span>Generador de eForms IA</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Button
+                type="text"
+                icon={<ArrowLeftOutlined />}
+                onClick={handleBack}
+              />
+              <span>Generador de eForms IA</span>
+            </div>
+            <Tooltip title="Abrir manual de ayuda">
+              <Button
+                type="text"
+                icon={<QuestionCircleOutlined />}
+                onClick={() => navigate('/manual#eformGeneratorAI')}
+              />
+            </Tooltip>
           </div>
         }
         style={{ maxWidth: 1200, margin: '0 auto' }}

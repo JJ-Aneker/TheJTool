@@ -149,8 +149,23 @@ export function buildProposeSystemPrompt({ environment, tenant, serverUrl, block
   }
 
   let categoryFieldsTable = 'No se ha proporcionado categoría destino.'
+  let categoryInstructions = ''
+
   if (categoryFields.length > 0) {
     categoryFieldsTable = fieldsToMarkdownTable(categoryFields)
+    categoryInstructions = `
+
+⚠️ **IMPORTANTE - CATEGORÍA DE DESTINO DETECTADA:**
+Se han detectado ${categoryFields.length} campos de la categoría de Therefore.
+
+**DEBES USAR ESTOS CAMPOS EXACTAMENTE:**
+- Las keys del eForm DEBEN ser los ColName exactos de la tabla anterior
+- NO uses placeholders genéricos (campo1, campo2, etc.)
+- NO inventes campos adicionales a menos que sean estrictamente necesarios
+- Respeta los tipos de datos (String, Integer, Date, etc.)
+- Marca como obligatorios los campos que en la tabla indican "Sí"
+- Usa las longitudes máximas indicadas en las validaciones
+`
   }
 
   const blocksList = blocks.length > 0 ? blocks.join(', ') : 'Ninguno'
@@ -170,8 +185,9 @@ lista para que otro paso la convierta en JSON form.io. Responde en ${lang}.
 Contexto:
 - Entorno destino: ${environment}${tenantOrUrl}
 - Bloques solicitados: ${blocksList}
-- Campos de la categoría destino (si los hay; usa estos ColName como keys exactas):
+- Campos de la categoría destino:
 ${categoryFieldsTable}
+${categoryInstructions}
 
 Reglas:
 1. Si faltan datos ESENCIALES (propósito poco claro, o no se sabe qué campos llevar) y no se han
@@ -234,8 +250,15 @@ export function buildGenerateSystemPrompt({ environment, tenant, serverUrl, bloc
   }
 
   let categoryFieldsTable = 'No se ha proporcionado categoría destino.'
+  let categoryInstructions = ''
+
   if (categoryFields.length > 0) {
     categoryFieldsTable = fieldsToMarkdownTable(categoryFields)
+    categoryInstructions = `
+
+⚠️ **CATEGORÍA DE DESTINO - USAR CAMPOS EXACTOS:**
+Hay ${categoryFields.length} campos definidos. Las keys del JSON DEBEN coincidir con los ColName de la tabla.
+NO uses nombres genéricos ni placeholders.`
   }
 
   // Concatenar patrones solo de los bloques seleccionados
@@ -250,7 +273,9 @@ export function buildGenerateSystemPrompt({ environment, tenant, serverUrl, bloc
 components de un formulario form.io que se importará en Therefore.
 
 Entorno destino: ${environment}${tenantOrUrl}
-Campos de la categoría destino: ${categoryFieldsTable}
+Campos de la categoría destino:
+${categoryFieldsTable}
+${categoryInstructions}
 
 Requisitos obligatorios:
 - Devuelve SOLO JSON válido con la forma { "components": [ ... ] }. Nada más.
