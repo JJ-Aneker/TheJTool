@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Table, Button, Input, InputNumber, Select, Card, Tabs, Space, Modal, Form, message as antMessage, Spin, Statistic, Row, Col, Tag } from 'antd'
-import { PlusOutlined, SaveOutlined, DownloadOutlined, DeleteOutlined, HistoryOutlined, ShoppingCartOutlined } from '@ant-design/icons'
+import { Table, Button, Input, InputNumber, Select, Card, Drawer, Space, Modal, Form, message as antMessage, Divider, Typography, Statistic, Row, Col, Tag } from 'antd'
+import { PlusOutlined, SaveOutlined, DownloadOutlined, DeleteOutlined, HistoryOutlined, ShoppingCartOutlined, AppstoreOutlined } from '@ant-design/icons'
 import { message } from '../utils/message'
 import HelpButton from '../components/HelpButton'
 import { useAuth } from '../hooks/useAuth'
@@ -9,6 +9,7 @@ import * as XLSX from 'xlsx'
 
 const { TextArea } = Input
 const { Option } = Select
+const { Title, Text } = Typography
 
 export default function LicenseConfigurator() {
   const { user } = useAuth()
@@ -16,10 +17,35 @@ export default function LicenseConfigurator() {
 
   const [loading, setLoading] = useState(false)
   const [edicion, setEdicion] = useState('onpremise') // onpremise, online, suscripcion
-  const [items, setItems] = useState([]) // Catálogo de items
-  const [selectedItems, setSelectedItems] = useState([]) // Items seleccionados con cantidades
-  const [servicios, setServiciosState] = useState([])
-  const [techPartners, setTechPartners] = useState([])
+
+  // Datos de cabecera
+  const [sfdcOpp, setSfdcOpp] = useState('')
+  const [dealSupport, setDealSupport] = useState('')
+  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+  const [accountManager, setAccountManager] = useState('')
+  const [cliente, setCliente] = useState('')
+
+  // Catálogo y selección
+  const [items, setItems] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
+  const [catalogDrawerOpen, setCatalogDrawerOpen] = useState(false)
+
+  // Tech Partners
+  const [techPartners, setTechPartners] = useState([
+    { nombre: 'Docuten', importe: 0 },
+    { nombre: 'IO Digital X', importe: 0 },
+    { nombre: 'Ivnosys', importe: 0 },
+    { nombre: 'Doceo Software', importe: 0 },
+    { nombre: 'Otros', importe: 0 }
+  ])
+
+  // Servicios
+  const [servicios, setServicios] = useState([])
+
+  // Suscripción (solo para edicion=suscripcion)
+  const [cuotaAnual, setCuotaAnual] = useState(0)
+  const [anosContrato, setAnosContrato] = useState(1)
+  const [soporteLocal, setSoporteLocal] = useState(0)
 
   const [saveModalOpen, setSaveModalOpen] = useState(false)
   const [historyModalOpen, setHistoryModalOpen] = useState(false)
@@ -28,13 +54,13 @@ export default function LicenseConfigurator() {
   const [searchText, setSearchText] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
 
-  // Servicios disponibles
+  // Servicios predefinidos
   const serviciosDisponibles = [
-    { descripcion: 'Consultoría', pvp_jornada: 880 },
-    { descripcion: 'Implementación', pvp_jornada: 705 },
-    { descripcion: 'Formación', pvp_jornada: 705 },
-    { descripcion: 'Gestión Proyecto', pvp_jornada: 705 },
-    { descripcion: 'Prueba de Concepto', pvp_jornada: 880 }
+    { codigo: '739ZZ051', descripcion: 'Consultoría', pvp_jornada: 880 },
+    { codigo: '739ZZ049', descripcion: 'Implementación', pvp_jornada: 705 },
+    { codigo: '739ZZ048', descripcion: 'Formación', pvp_jornada: 705 },
+    { codigo: '739ZZ047', descripcion: 'Oficina de Proyecto', pvp_jornada: 705 },
+    { codigo: '739ZZ052', descripcion: 'Prueba de Concepto', pvp_jornada: 880 }
   ]
 
   // Cargar items del catálogo
@@ -106,22 +132,29 @@ export default function LicenseConfigurator() {
   }
 
   const addServicio = () => {
-    setServiciosState([...servicios, {
+    setServicios([...servicios, {
       id: Date.now(),
+      codigo: '',
       descripcion: '',
-      jornadas: 1,
+      unidades: 1,
       pvp_jornada: 0
     }])
   }
 
   const updateServicio = (id, field, value) => {
-    setServiciosState(servicios.map(s =>
+    setServicios(servicios.map(s =>
       s.id === id ? { ...s, [field]: value } : s
     ))
   }
 
   const removeServicio = (id) => {
-    setServiciosState(servicios.filter(s => s.id !== id))
+    setServicios(servicios.filter(s => s.id !== id))
+  }
+
+  const updateTechPartner = (index, importe) => {
+    const updated = [...techPartners]
+    updated[index].importe = parseFloat(importe) || 0
+    setTechPartners(updated)
   }
 
   // Cálculos
@@ -130,14 +163,19 @@ export default function LicenseConfigurator() {
   )
 
   const totalCSS = selectedItems.reduce((sum, item) =>
-    sum + (item.css_pvp * item.cantidad), 0
+    sum + ((item.css_pvp || 0) * item.cantidad), 0
   )
 
   const totalServicios = servicios.reduce((sum, serv) =>
-    sum + (serv.pvp_jornada * serv.jornadas), 0
+    sum + (serv.pvp_jornada * serv.unidades), 0
   )
 
-  const totalGeneral = totalLicencias + totalCSS + totalServicios
+  const totalTechPartners = techPartners.reduce((sum, tp) =>
+    sum + (tp.importe || 0), 0
+  )
+
+  const totalTherefore = totalLicencias + totalCSS
+  const totalContractValue = totalTherefore + totalServicios + totalTechPartners
 
   // Guardar cotización
   const handleSave = async (values) => {
@@ -147,9 +185,9 @@ export default function LicenseConfigurator() {
       const quotation = {
         user_id: user.id,
         nombre: values.nombre,
-        cliente: values.cliente,
-        oportunidad: values.oportunidad,
-        account_manager: values.account_manager,
+        cliente,
+        oportunidad: sfdcOpp,
+        account_manager: accountManager,
         edicion,
         items: selectedItems,
         servicios,
@@ -157,7 +195,7 @@ export default function LicenseConfigurator() {
         total_licencias: totalLicencias,
         total_css: totalCSS,
         total_servicios: totalServicios,
-        total_general: totalGeneral,
+        total_general: totalContractValue,
         notas: values.notas
       }
 
@@ -181,9 +219,12 @@ export default function LicenseConfigurator() {
   // Cargar cotización
   const loadQuotation = (quotation) => {
     setEdicion(quotation.edicion)
+    setSfdcOpp(quotation.oportunidad || '')
+    setCliente(quotation.cliente || '')
+    setAccountManager(quotation.account_manager || '')
     setSelectedItems(quotation.items || [])
-    setServiciosState(quotation.servicios || [])
-    setTechPartners(quotation.tech_partners || [])
+    setServicios(quotation.servicios || [])
+    setTechPartners(quotation.tech_partners || techPartners)
     setHistoryModalOpen(false)
     antMessage.success('Cotización cargada')
   }
@@ -192,64 +233,78 @@ export default function LicenseConfigurator() {
   const exportToExcel = () => {
     const wb = XLSX.utils.book_new()
 
-    // Hoja de items
-    const itemsData = selectedItems.map(item => ({
-      'Código': item.codigo,
-      'Descripción': item.descripcion,
-      'Cantidad': item.cantidad,
-      'PVP': item.pvp,
-      'CSS': item.css_pvp,
-      'Subtotal Licencias': item.pvp * item.cantidad,
-      'Subtotal CSS': item.css_pvp * item.cantidad
-    }))
-
-    const ws1 = XLSX.utils.json_to_sheet(itemsData)
-    XLSX.utils.book_append_sheet(wb, ws1, 'Licencias')
-
-    // Hoja de servicios
-    if (servicios.length > 0) {
-      const serviciosData = servicios.map(serv => ({
-        'Servicio': serv.descripcion,
-        'Jornadas': serv.jornadas,
-        'PVP/Jornada': serv.pvp_jornada,
-        'Subtotal': serv.jornadas * serv.pvp_jornada
-      }))
-      const ws2 = XLSX.utils.json_to_sheet(serviciosData)
-      XLSX.utils.book_append_sheet(wb, ws2, 'Servicios')
-    }
-
-    // Hoja de resumen
-    const resumenData = [
-      { 'Concepto': 'Total Licencias', 'Importe': totalLicencias.toFixed(2) },
-      { 'Concepto': 'Total CSS', 'Importe': totalCSS.toFixed(2) },
-      { 'Concepto': 'Total Servicios', 'Importe': totalServicios.toFixed(2) },
-      { 'Concepto': 'TOTAL GENERAL', 'Importe': totalGeneral.toFixed(2) }
+    // Hoja principal con formato similar al Excel
+    const wsData = [
+      ['', `Configurador Therefore™ ${edicion === 'onpremise' ? 'On Premise' : edicion === 'online' ? 'Online' : 'Suscripción'}`],
+      [],
+      ['', 'SFDC OPP', sfdcOpp, 'DEAL SUPPORT', dealSupport, 'FECHA', fecha],
+      ['', 'A.M.', accountManager],
+      ['', 'CLIENTE', cliente],
+      [],
+      ['', 'TECH PARTNERS', '', 'Importe Total'],
+      ...techPartners.map(tp => ['', tp.nombre, '', tp.importe.toFixed(2)]),
+      ['', 'TOTAL TECH PARTNERS', '', totalTechPartners.toFixed(2)],
+      [],
+      ['', 'SERVICIOS', '', 'Unidades', 'Importe Total'],
+      ...servicios.map(s => ['', s.descripcion, '', s.unidades, (s.pvp_jornada * s.unidades).toFixed(2)]),
+      ['', 'TOTAL SERVICIOS', '', '', totalServicios.toFixed(2)],
+      [],
+      ['', 'RESUMEN', '', 'Importe Total'],
+      ['', 'Tech Partners', '', totalTechPartners.toFixed(2)],
+      ['', 'Servicios', '', totalServicios.toFixed(2)],
+      ['', 'Total Therefore', '', totalTherefore.toFixed(2)],
+      ['', 'TOTAL CONTRACT VALUE', '', totalContractValue.toFixed(2)],
+      [],
+      ['', 'DETALLE SOLUCIONES | PRODUCTO'],
+      ['', 'Clase', 'Código', 'Concepto', 'Unidad', 'PVP', 'PVP Total', 'CSS', 'CSS Total'],
+      ...selectedItems.map(item => [
+        '',
+        item.clase,
+        item.codigo,
+        item.descripcion,
+        item.cantidad,
+        item.pvp.toFixed(2),
+        (item.pvp * item.cantidad).toFixed(2),
+        (item.css_pvp || 0).toFixed(2),
+        ((item.css_pvp || 0) * item.cantidad).toFixed(2)
+      ])
     ]
-    const ws3 = XLSX.utils.json_to_sheet(resumenData)
-    XLSX.utils.book_append_sheet(wb, ws3, 'Resumen')
 
-    XLSX.writeFile(wb, `Therefore_Cotizacion_${edicion}_${new Date().toISOString().split('T')[0]}.xlsx`)
+    const ws = XLSX.utils.aoa_to_sheet(wsData)
+    XLSX.utils.book_append_sheet(wb, ws, 'Cotización')
+
+    XLSX.writeFile(wb, `Therefore_${edicion}_${sfdcOpp || 'Cotizacion'}_${fecha}.xlsx`)
     antMessage.success('Excel exportado')
   }
 
-  // Limpiar configuración
+  // Limpiar
   const clearConfiguration = () => {
     Modal.confirm({
       title: '¿Limpiar configuración?',
-      content: 'Se perderán todos los items y servicios seleccionados',
+      content: 'Se perderán todos los datos ingresados',
       onOk: () => {
         setSelectedItems([])
-        setServiciosState([])
-        setTechPartners([])
+        setServicios([])
+        setTechPartners([
+          { nombre: 'Docuten', importe: 0 },
+          { nombre: 'IO Digital X', importe: 0 },
+          { nombre: 'Ivnosys', importe: 0 },
+          { nombre: 'Doceo Software', importe: 0 },
+          { nombre: 'Otros', importe: 0 }
+        ])
+        setSfdcOpp('')
+        setDealSupport('')
+        setCliente('')
+        setAccountManager('')
         antMessage.info('Configuración limpiada')
       }
     })
   }
 
-  // Categorías únicas
+  // Categorías
   const categories = ['all', ...new Set(items.map(i => i.categoria || 'Sin categoría').filter(Boolean))]
 
-  // Filtrar items
+  // Filtrar items del catálogo
   const filteredItems = items.filter(item => {
     const matchSearch = !searchText ||
       item.descripcion?.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -261,123 +316,13 @@ export default function LicenseConfigurator() {
     return matchSearch && matchCategory
   })
 
-  const catalogColumns = [
-    {
-      title: 'Código',
-      dataIndex: 'codigo',
-      key: 'codigo',
-      width: 120,
-      render: (text) => <span style={{ fontFamily: 'monospace' }}>{text}</span>
-    },
-    {
-      title: 'Descripción',
-      dataIndex: 'descripcion',
-      key: 'descripcion',
-      ellipsis: true
-    },
-    {
-      title: 'PVP',
-      dataIndex: 'pvp',
-      key: 'pvp',
-      width: 100,
-      align: 'right',
-      render: (val) => `${val?.toFixed(2)}€`
-    },
-    {
-      title: 'CSS',
-      dataIndex: 'css_pvp',
-      key: 'css_pvp',
-      width: 100,
-      align: 'right',
-      render: (val) => `${val?.toFixed(2)}€`
-    },
-    ...(edicion === 'onpremise' ? [{
-      title: 'Puntos',
-      dataIndex: 'puntos',
-      key: 'puntos',
-      width: 80,
-      align: 'center'
-    }] : []),
-    {
-      title: '',
-      key: 'action',
-      width: 100,
-      render: (_, record) => (
-        <Button
-          type="primary"
-          size="small"
-          icon={<PlusOutlined />}
-          onClick={() => addItem(record)}
-        >
-          Agregar
-        </Button>
-      )
-    }
-  ]
-
-  const selectedColumns = [
-    {
-      title: 'Código',
-      dataIndex: 'codigo',
-      key: 'codigo',
-      width: 120
-    },
-    {
-      title: 'Descripción',
-      dataIndex: 'descripcion',
-      key: 'descripcion'
-    },
-    {
-      title: 'Cantidad',
-      dataIndex: 'cantidad',
-      key: 'cantidad',
-      width: 120,
-      render: (val, record) => (
-        <InputNumber
-          min={0}
-          value={val}
-          onChange={(v) => updateQuantity(record.codigo, v)}
-          style={{ width: '100%' }}
-        />
-      )
-    },
-    {
-      title: 'PVP Unit.',
-      dataIndex: 'pvp',
-      key: 'pvp',
-      width: 100,
-      align: 'right',
-      render: (val) => `${val?.toFixed(2)}€`
-    },
-    {
-      title: 'Subtotal',
-      key: 'subtotal',
-      width: 120,
-      align: 'right',
-      render: (_, record) => `${(record.pvp * record.cantidad).toFixed(2)}€`
-    },
-    {
-      title: '',
-      key: 'action',
-      width: 60,
-      render: (_, record) => (
-        <Button
-          danger
-          size="small"
-          icon={<DeleteOutlined />}
-          onClick={() => removeItem(record.codigo)}
-        />
-      )
-    }
-  ]
-
   return (
     <div className="container-main" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* HEADER */}
       <div className="header-main">
         <div>
           <h1 className="header-title">💼 Configurador de Licencias Therefore™</h1>
-          <p className="header-subtitle">Genera cotizaciones de licencias OnPremise, Online y Suscripción · Maestro de artículos · Export Excel</p>
+          <p className="header-subtitle">Genera cotizaciones OnPremise, Online y Suscripción · Layout tipo Excel · Export XLSX</p>
         </div>
         <div className="header-actions">
           <HelpButton section="licenseConfigurator" />
@@ -391,6 +336,14 @@ export default function LicenseConfigurator() {
             <Option value="online">Online</Option>
             <Option value="suscripcion">Suscripción</Option>
           </Select>
+
+          <Button
+            icon={<AppstoreOutlined />}
+            onClick={() => setCatalogDrawerOpen(true)}
+            className="btn-primary"
+          >
+            Catálogo
+          </Button>
 
           <Button
             icon={<HistoryOutlined />}
@@ -418,13 +371,12 @@ export default function LicenseConfigurator() {
             disabled={selectedItems.length === 0}
             className="btn-default"
           >
-            Exportar Excel
+            Excel
           </Button>
 
           <Button
             danger
             onClick={clearConfiguration}
-            disabled={selectedItems.length === 0}
             className="btn-default"
           >
             Limpiar
@@ -432,117 +384,383 @@ export default function LicenseConfigurator() {
         </div>
       </div>
 
-      {/* CONTENT */}
-      <div style={{ flex: 1, overflow: 'auto', paddingRight: '4px' }}>
-        <Row gutter={16}>
-          {/* Catálogo */}
-          <Col span={14}>
-            <Card
-              title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>📦 Catálogo de Artículos</span>
-                  <Tag color="blue">{edicion.toUpperCase()}</Tag>
-                </div>
-              }
-              size="small"
-            >
-              <Space style={{ marginBottom: 16, width: '100%' }} direction="vertical">
-                <Input.Search
-                  placeholder="Buscar por código o descripción..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  allowClear
+      {/* CONTENT - Estilo Excel */}
+      <div style={{ flex: 1, overflow: 'auto', padding: '16px', backgroundColor: '#fff' }}>
+
+        {/* CABECERA - Datos del proyecto */}
+        <Card size="small" style={{ marginBottom: 16, backgroundColor: '#f5f5f5' }}>
+          <Row gutter={16}>
+            <Col span={8}>
+              <div style={{ marginBottom: 8 }}>
+                <Text strong>SFDC OPP</Text>
+                <Input
+                  value={sfdcOpp}
+                  onChange={(e) => setSfdcOpp(e.target.value)}
+                  placeholder="OPP-XXXXX"
+                  style={{ marginTop: 4 }}
                 />
-                <Select
-                  value={selectedCategory}
-                  onChange={setSelectedCategory}
-                  style={{ width: '100%' }}
-                >
-                  {categories.map(cat => (
-                    <Option key={cat} value={cat}>
-                      {cat === 'all' ? 'Todas las categorías' : cat}
-                    </Option>
-                  ))}
-                </Select>
-              </Space>
+              </div>
+            </Col>
+            <Col span={8}>
+              <div style={{ marginBottom: 8 }}>
+                <Text strong>DEAL SUPPORT</Text>
+                <Input
+                  value={dealSupport}
+                  onChange={(e) => setDealSupport(e.target.value)}
+                  placeholder="Nombre"
+                  style={{ marginTop: 4 }}
+                />
+              </div>
+            </Col>
+            <Col span={8}>
+              <div style={{ marginBottom: 8 }}>
+                <Text strong>FECHA</Text>
+                <Input
+                  type="date"
+                  value={fecha}
+                  onChange={(e) => setFecha(e.target.value)}
+                  style={{ marginTop: 4 }}
+                />
+              </div>
+            </Col>
+          </Row>
 
-              <Table
-                dataSource={filteredItems}
-                columns={catalogColumns}
-                rowKey="codigo"
-                size="small"
-                pagination={{ pageSize: 10 }}
-                loading={loading}
-                scroll={{ y: 400 }}
-              />
-            </Card>
-          </Col>
+          <Row gutter={16} style={{ marginTop: 8 }}>
+            <Col span={12}>
+              <div>
+                <Text strong>A.M.</Text>
+                <Input
+                  value={accountManager}
+                  onChange={(e) => setAccountManager(e.target.value)}
+                  placeholder="Account Manager"
+                  style={{ marginTop: 4 }}
+                />
+              </div>
+            </Col>
+            <Col span={12}>
+              <div>
+                <Text strong>CLIENTE</Text>
+                <Input
+                  value={cliente}
+                  onChange={(e) => setCliente(e.target.value)}
+                  placeholder="Nombre del cliente"
+                  style={{ marginTop: 4 }}
+                />
+              </div>
+            </Col>
+          </Row>
+        </Card>
 
-          {/* Configuración */}
-          <Col span={10}>
+        {/* DOS COLUMNAS: Tech Partners + Servicios */}
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+
+          {/* COLUMNA IZQUIERDA: Tech Partners + Resumen */}
+          <Col span={12}>
+
+            {/* Tech Partners */}
             <Card
-              title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span><ShoppingCartOutlined /> Configuración</span>
-                  <Tag color="green">{selectedItems.length} items</Tag>
-                </div>
-              }
+              title={<Text strong style={{ color: '#c00' }}>TECH PARTNERS</Text>}
               size="small"
+              style={{ marginBottom: 16 }}
             >
-              <Table
-                dataSource={selectedItems}
-                columns={selectedColumns}
-                rowKey="codigo"
-                size="small"
-                pagination={false}
-                scroll={{ y: 300 }}
-                summary={() => (
-                  <Table.Summary>
-                    <Table.Summary.Row>
-                      <Table.Summary.Cell colSpan={4} align="right">
-                        <strong>Total Licencias:</strong>
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell align="right">
-                        <strong>{totalLicencias.toFixed(2)}€</strong>
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell />
-                    </Table.Summary.Row>
-                    <Table.Summary.Row>
-                      <Table.Summary.Cell colSpan={4} align="right">
-                        <strong>Total CSS:</strong>
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell align="right">
-                        <strong>{totalCSS.toFixed(2)}€</strong>
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell />
-                    </Table.Summary.Row>
-                  </Table.Summary>
-                )}
-              />
-
-              <div style={{ marginTop: 16 }}>
-                <Row gutter={8}>
-                  <Col span={8}>
-                    <Statistic title="Licencias" value={totalLicencias} precision={2} suffix="€" />
+              {techPartners.map((tp, index) => (
+                <Row key={index} gutter={8} style={{ marginBottom: 8 }}>
+                  <Col span={12}>
+                    <Text>{tp.nombre}</Text>
                   </Col>
-                  <Col span={8}>
-                    <Statistic title="CSS" value={totalCSS} precision={2} suffix="€" />
-                  </Col>
-                  <Col span={8}>
-                    <Statistic
-                      title="TOTAL"
-                      value={totalGeneral}
+                  <Col span={12}>
+                    <InputNumber
+                      value={tp.importe}
+                      onChange={(val) => updateTechPartner(index, val)}
                       precision={2}
-                      suffix="€"
-                      valueStyle={{ color: '#3f8600' }}
+                      style={{ width: '100%' }}
+                      prefix="€"
                     />
                   </Col>
                 </Row>
-              </div>
+              ))}
+              <Divider style={{ margin: '8px 0' }} />
+              <Row>
+                <Col span={12}>
+                  <Text strong>TOTAL TECH PARTNERS</Text>
+                </Col>
+                <Col span={12}>
+                  <Text strong style={{ color: '#c00' }}>{totalTechPartners.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+            </Card>
+
+            {/* Resumen */}
+            <Card
+              title={<Text strong style={{ color: '#c00' }}>RESUMEN</Text>}
+              size="small"
+            >
+              <Row style={{ marginBottom: 4 }}>
+                <Col span={16}><Text>Tech Partners</Text></Col>
+                <Col span={8} style={{ textAlign: 'right' }}><Text>{totalTechPartners.toFixed(2)} €</Text></Col>
+              </Row>
+              <Row style={{ marginBottom: 4 }}>
+                <Col span={16}><Text>Servicios</Text></Col>
+                <Col span={8} style={{ textAlign: 'right' }}><Text>{totalServicios.toFixed(2)} €</Text></Col>
+              </Row>
+              <Row style={{ marginBottom: 4 }}>
+                <Col span={16}><Text>Total Therefore {edicion}</Text></Col>
+                <Col span={8} style={{ textAlign: 'right' }}><Text>{totalTherefore.toFixed(2)} €</Text></Col>
+              </Row>
+              <Divider style={{ margin: '8px 0' }} />
+              <Row>
+                <Col span={16}><Text strong style={{ color: '#c00' }}>TOTAL CONTRACT VALUE</Text></Col>
+                <Col span={8} style={{ textAlign: 'right' }}><Text strong style={{ color: '#c00', fontSize: 16 }}>{totalContractValue.toFixed(2)} €</Text></Col>
+              </Row>
+            </Card>
+          </Col>
+
+          {/* COLUMNA DERECHA: Servicios */}
+          <Col span={12}>
+            <Card
+              title={<Text strong style={{ color: '#c00' }}>SERVICIOS</Text>}
+              size="small"
+              extra={
+                <Button size="small" icon={<PlusOutlined />} onClick={addServicio}>
+                  Agregar
+                </Button>
+              }
+            >
+              {servicios.length === 0 ? (
+                <Text type="secondary">No hay servicios agregados</Text>
+              ) : (
+                servicios.map(serv => (
+                  <Row key={serv.id} gutter={8} style={{ marginBottom: 8 }}>
+                    <Col span={1}>
+                      <Button
+                        danger
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        onClick={() => removeServicio(serv.id)}
+                      />
+                    </Col>
+                    <Col span={5}>
+                      <Input
+                        placeholder="Código"
+                        value={serv.codigo}
+                        onChange={(e) => updateServicio(serv.id, 'codigo', e.target.value)}
+                        size="small"
+                      />
+                    </Col>
+                    <Col span={9}>
+                      <Select
+                        placeholder="Servicio"
+                        value={serv.descripcion}
+                        onChange={(val) => {
+                          const selected = serviciosDisponibles.find(s => s.descripcion === val)
+                          updateServicio(serv.id, 'descripcion', val)
+                          updateServicio(serv.id, 'codigo', selected?.codigo || '')
+                          updateServicio(serv.id, 'pvp_jornada', selected?.pvp_jornada || 0)
+                        }}
+                        size="small"
+                        style={{ width: '100%' }}
+                      >
+                        {serviciosDisponibles.map(s => (
+                          <Option key={s.codigo} value={s.descripcion}>{s.descripcion}</Option>
+                        ))}
+                      </Select>
+                    </Col>
+                    <Col span={4}>
+                      <InputNumber
+                        placeholder="Unid."
+                        value={serv.unidades}
+                        onChange={(val) => updateServicio(serv.id, 'unidades', val)}
+                        min={0}
+                        size="small"
+                        style={{ width: '100%' }}
+                      />
+                    </Col>
+                    <Col span={5}>
+                      <Text>{(serv.pvp_jornada * serv.unidades).toFixed(2)} €</Text>
+                    </Col>
+                  </Row>
+                ))
+              )}
+
+              {servicios.length > 0 && (
+                <>
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Row>
+                    <Col span={19}><Text strong>TOTAL SERVICIOS</Text></Col>
+                    <Col span={5}><Text strong style={{ color: '#c00' }}>{totalServicios.toFixed(2)} €</Text></Col>
+                  </Row>
+                </>
+              )}
             </Card>
           </Col>
         </Row>
+
+        {/* TABLA DETALLE SOLUCIONES */}
+        <Card
+          title={<Text strong style={{ color: '#c00' }}>DETALLE SOLUCIONES | PRODUCTO</Text>}
+          size="small"
+        >
+          <Table
+            dataSource={selectedItems}
+            rowKey="codigo"
+            size="small"
+            pagination={false}
+            columns={[
+              {
+                title: 'Clase',
+                dataIndex: 'clase',
+                width: 100
+              },
+              {
+                title: 'Código',
+                dataIndex: 'codigo',
+                width: 120,
+                render: (text) => <Text style={{ fontFamily: 'monospace' }}>{text}</Text>
+              },
+              {
+                title: 'Concepto',
+                dataIndex: 'descripcion',
+                ellipsis: true
+              },
+              {
+                title: 'Unidad',
+                dataIndex: 'cantidad',
+                width: 80,
+                align: 'center',
+                render: (val, record) => (
+                  <InputNumber
+                    min={0}
+                    value={val}
+                    onChange={(v) => updateQuantity(record.codigo, v)}
+                    size="small"
+                    style={{ width: 60 }}
+                  />
+                )
+              },
+              {
+                title: 'PVP',
+                dataIndex: 'pvp',
+                width: 100,
+                align: 'right',
+                render: (val) => `${val?.toFixed(2)} €`
+              },
+              {
+                title: 'PVP Total',
+                key: 'pvp_total',
+                width: 100,
+                align: 'right',
+                render: (_, record) => `${(record.pvp * record.cantidad).toFixed(2)} €`
+              },
+              {
+                title: 'CSS',
+                dataIndex: 'css_pvp',
+                width: 100,
+                align: 'right',
+                render: (val) => `${(val || 0).toFixed(2)} €`
+              },
+              {
+                title: 'CSS Total',
+                key: 'css_total',
+                width: 100,
+                align: 'right',
+                render: (_, record) => `${((record.css_pvp || 0) * record.cantidad).toFixed(2)} €`
+              },
+              {
+                title: '',
+                key: 'action',
+                width: 60,
+                render: (_, record) => (
+                  <Button
+                    danger
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    onClick={() => removeItem(record.codigo)}
+                  />
+                )
+              }
+            ]}
+          />
+
+          {selectedItems.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <Text type="secondary">No hay productos seleccionados. Abrir catálogo para agregar.</Text>
+            </div>
+          )}
+        </Card>
       </div>
+
+      {/* DRAWER CATÁLOGO */}
+      <Drawer
+        title="Catálogo de Artículos"
+        placement="right"
+        width={800}
+        open={catalogDrawerOpen}
+        onClose={() => setCatalogDrawerOpen(false)}
+      >
+        <Space style={{ marginBottom: 16, width: '100%' }} direction="vertical">
+          <Input.Search
+            placeholder="Buscar por código o descripción..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            allowClear
+          />
+          <Select
+            value={selectedCategory}
+            onChange={setSelectedCategory}
+            style={{ width: '100%' }}
+          >
+            {categories.map(cat => (
+              <Option key={cat} value={cat}>
+                {cat === 'all' ? 'Todas las categorías' : cat}
+              </Option>
+            ))}
+          </Select>
+        </Space>
+
+        <Table
+          dataSource={filteredItems}
+          rowKey="codigo"
+          size="small"
+          pagination={{ pageSize: 20 }}
+          loading={loading}
+          scroll={{ y: 600 }}
+          columns={[
+            {
+              title: 'Código',
+              dataIndex: 'codigo',
+              width: 120,
+              render: (text) => <Text style={{ fontFamily: 'monospace' }}>{text}</Text>
+            },
+            {
+              title: 'Descripción',
+              dataIndex: 'descripcion',
+              ellipsis: true
+            },
+            {
+              title: 'PVP',
+              dataIndex: 'pvp',
+              width: 100,
+              align: 'right',
+              render: (val) => `${val?.toFixed(2)}€`
+            },
+            {
+              title: '',
+              key: 'action',
+              width: 100,
+              render: (_, record) => (
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => addItem(record)}
+                >
+                  Agregar
+                </Button>
+              )
+            }
+          ]}
+        />
+      </Drawer>
 
       {/* Modal Guardar */}
       <Modal
@@ -556,15 +774,6 @@ export default function LicenseConfigurator() {
           <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
             <Input placeholder="Ej: Cotización Banco XX - OnPremise" />
           </Form.Item>
-          <Form.Item name="cliente" label="Cliente">
-            <Input placeholder="Nombre del cliente" />
-          </Form.Item>
-          <Form.Item name="oportunidad" label="Oportunidad SFDC">
-            <Input placeholder="OPP-12345" />
-          </Form.Item>
-          <Form.Item name="account_manager" label="Account Manager">
-            <Input placeholder="Nombre del AM" />
-          </Form.Item>
           <Form.Item name="notas" label="Notas">
             <TextArea rows={3} placeholder="Notas adicionales..." />
           </Form.Item>
@@ -577,7 +786,7 @@ export default function LicenseConfigurator() {
         open={historyModalOpen}
         onCancel={() => setHistoryModalOpen(false)}
         footer={null}
-        width={800}
+        width={900}
       >
         <Table
           dataSource={quotations}
@@ -595,10 +804,15 @@ export default function LicenseConfigurator() {
               key: 'cliente'
             },
             {
+              title: 'OPP',
+              dataIndex: 'oportunidad',
+              key: 'oportunidad'
+            },
+            {
               title: 'Edición',
               dataIndex: 'edicion',
               key: 'edicion',
-              render: (val) => <Tag>{val.toUpperCase()}</Tag>
+              render: (val) => <Tag>{val?.toUpperCase()}</Tag>
             },
             {
               title: 'Total',
