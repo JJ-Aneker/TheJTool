@@ -57,6 +57,8 @@ export default function LicenseConfigurator() {
 
   const [serviciosModalOpen, setServiciosModalOpen] = useState(false)
   const [techPartnersModalOpen, setTechPartnersModalOpen] = useState(false)
+  const [selectedServicios, setSelectedServicios] = useState([])
+  const [tempTechPartners, setTempTechPartners] = useState([])
 
   // Servicios predefinidos
   const serviciosDisponibles = [
@@ -65,6 +67,19 @@ export default function LicenseConfigurator() {
     { codigo: '739ZZ048', descripcion: 'Formación', pvp_jornada: 705 },
     { codigo: '739ZZ047', descripcion: 'Oficina de Proyecto', pvp_jornada: 705 },
     { codigo: '739ZZ052', descripcion: 'Prueba de Concepto', pvp_jornada: 880 }
+  ]
+
+  // Tech Partners disponibles
+  const techPartnersDisponibles = [
+    { nombre: 'Docuten', descripcion: 'Firma electrónica y gestión documental' },
+    { nombre: 'IO Digital X', descripcion: 'Transformación digital' },
+    { nombre: 'Ivnosys', descripcion: 'Notificaciones electrónicas' },
+    { nombre: 'Doceo Software', descripcion: 'Soluciones documentales' },
+    { nombre: 'DOCAI', descripcion: 'IA para clasificación y extracción' },
+    { nombre: 'IvSign', descripcion: 'Firma digital avanzada' },
+    { nombre: 'Salesforce', descripcion: 'CRM' },
+    { nombre: 'Microsoft', descripcion: 'Azure / M365' },
+    { nombre: 'Otro', descripcion: 'Partner personalizado' }
   ]
 
   // Cargar items del catálogo
@@ -160,32 +175,70 @@ export default function LicenseConfigurator() {
     setSelectedItems(selectedItems.filter(i => i.codigo !== codigo))
   }
 
-  const addServicioFromCatalog = (servicio) => {
-    setServicios([...servicios, {
-      id: Date.now(),
-      codigo: servicio.codigo,
-      descripcion: servicio.descripcion,
-      unidades: 1,
-      pvp_jornada: servicio.pvp_jornada
-    }])
-    antMessage.success('Servicio agregado')
+  const addMultipleServicios = () => {
+    if (selectedServicios.length === 0) {
+      antMessage.warning('Selecciona al menos un servicio')
+      return
+    }
+
+    const newServicios = [...servicios]
+    selectedServicios.forEach(codigo => {
+      const servicio = serviciosDisponibles.find(s => s.codigo === codigo)
+      if (servicio) {
+        newServicios.push({
+          id: Date.now() + Math.random(),
+          codigo: servicio.codigo,
+          descripcion: servicio.descripcion,
+          unidades: 1,
+          pvp_jornada: servicio.pvp_jornada
+        })
+      }
+    })
+
+    setServicios(newServicios)
+    setSelectedServicios([])
+    setServiciosModalOpen(false)
+    antMessage.success(`${selectedServicios.length} servicios agregados`)
   }
 
-  const addTechPartnerCustom = (nombre) => {
-    if (!nombre || nombre.trim() === '') {
-      antMessage.warning('Ingresa un nombre')
+  const openTechPartnersModal = () => {
+    // Inicializar tech partners temporales con los disponibles
+    const temp = techPartnersDisponibles.map(tp => ({
+      nombre: tp.nombre,
+      descripcion: tp.descripcion,
+      importe: 0,
+      seleccionado: false
+    }))
+    setTempTechPartners(temp)
+    setTechPartnersModalOpen(true)
+  }
+
+  const updateTempPartnerImporte = (nombre, importe) => {
+    setTempTechPartners(tempTechPartners.map(tp =>
+      tp.nombre === nombre ? { ...tp, importe: parseFloat(importe) || 0, seleccionado: importe > 0 } : tp
+    ))
+  }
+
+  const saveTechPartners = () => {
+    const selected = tempTechPartners.filter(tp => tp.seleccionado && tp.importe > 0)
+    if (selected.length === 0) {
+      antMessage.warning('Ingresa al menos un importe')
       return
     }
 
-    const exists = techPartners.find(tp => tp.nombre.toLowerCase() === nombre.toLowerCase())
-    if (exists) {
-      antMessage.warning('Ya existe ese partner')
-      return
-    }
+    const newPartners = [...techPartners]
+    selected.forEach(tp => {
+      const exists = newPartners.find(p => p.nombre === tp.nombre)
+      if (exists) {
+        exists.importe = tp.importe
+      } else {
+        newPartners.push({ nombre: tp.nombre, importe: tp.importe })
+      }
+    })
 
-    setTechPartners([...techPartners, { nombre: nombre.trim(), importe: 0 }])
-    antMessage.success('Tech Partner agregado')
+    setTechPartners(newPartners)
     setTechPartnersModalOpen(false)
+    antMessage.success(`${selected.length} tech partners agregados`)
   }
 
   const updateServicio = (id, field, value) => {
@@ -502,7 +555,7 @@ export default function LicenseConfigurator() {
               size="small"
               style={{ marginBottom: 16 }}
               extra={
-                <Button size="small" icon={<PlusOutlined />} onClick={() => setTechPartnersModalOpen(true)}>
+                <Button size="small" icon={<PlusOutlined />} onClick={openTechPartnersModal}>
                   Agregar partner
                 </Button>
               }
@@ -836,71 +889,96 @@ export default function LicenseConfigurator() {
 
       {/* Modal Servicios */}
       <Modal
-        title="Catálogo de Servicios"
-        open={serviciosModalOpen}
-        onCancel={() => setServiciosModalOpen(false)}
-        footer={null}
-        width={600}
-      >
-        <div style={{ marginTop: 16 }}>
-          {serviciosDisponibles.map((serv, index) => (
-            <Card
-              key={index}
-              size="small"
-              style={{ marginBottom: 12 }}
-              hoverable
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginRight: 40 }}>
+            <span>Catálogo de Servicios</span>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={addMultipleServicios}
+              disabled={selectedServicios.length === 0}
             >
+              Agregar seleccionados ({selectedServicios.length})
+            </Button>
+          </div>
+        }
+        open={serviciosModalOpen}
+        onCancel={() => {
+          setServiciosModalOpen(false)
+          setSelectedServicios([])
+        }}
+        footer={null}
+        width={700}
+      >
+        <Table
+          dataSource={serviciosDisponibles}
+          rowKey="codigo"
+          size="small"
+          pagination={false}
+          rowSelection={{
+            selectedRowKeys: selectedServicios,
+            onChange: (selectedRowKeys) => setSelectedServicios(selectedRowKeys)
+          }}
+          columns={[
+            {
+              title: 'Código',
+              dataIndex: 'codigo',
+              width: 100,
+              render: (text) => <Text style={{ fontFamily: 'monospace', fontSize: 12 }}>{text}</Text>
+            },
+            {
+              title: 'Descripción',
+              dataIndex: 'descripcion'
+            },
+            {
+              title: 'Precio/Jornada',
+              dataIndex: 'pvp_jornada',
+              width: 120,
+              align: 'right',
+              render: (val) => `${val.toFixed(2)} €`
+            }
+          ]}
+        />
+      </Modal>
+
+      {/* Modal Tech Partners */}
+      <Modal
+        title="Catálogo de Tech Partners"
+        open={techPartnersModalOpen}
+        onCancel={() => setTechPartnersModalOpen(false)}
+        onOk={saveTechPartners}
+        okText="Agregar seleccionados"
+        cancelText="Cancelar"
+        width={700}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <Text type="secondary">Ingresa el importe para los tech partners que desees agregar:</Text>
+        </div>
+
+        <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+          {tempTechPartners.map((tp, index) => (
+            <Card key={index} size="small" style={{ marginBottom: 8 }}>
               <Row gutter={16} align="middle">
-                <Col span={4}>
-                  <Text type="secondary" style={{ fontFamily: 'monospace', fontSize: 12 }}>
-                    {serv.codigo}
-                  </Text>
+                <Col span={8}>
+                  <Text strong>{tp.nombre}</Text>
                 </Col>
-                <Col span={12}>
-                  <Text strong>{serv.descripcion}</Text>
+                <Col span={10}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>{tp.descripcion}</Text>
                 </Col>
-                <Col span={5} style={{ textAlign: 'right' }}>
-                  <Text>{serv.pvp_jornada.toFixed(2)} €/jornada</Text>
-                </Col>
-                <Col span={3} style={{ textAlign: 'right' }}>
-                  <Button
-                    type="primary"
-                    size="small"
-                    icon={<PlusOutlined />}
-                    onClick={() => {
-                      addServicioFromCatalog(serv)
-                      setServiciosModalOpen(false)
-                    }}
+                <Col span={6}>
+                  <InputNumber
+                    placeholder="Importe"
+                    value={tp.importe}
+                    onChange={(val) => updateTempPartnerImporte(tp.nombre, val)}
+                    precision={2}
+                    style={{ width: '100%' }}
+                    prefix="€"
+                    min={0}
                   />
                 </Col>
               </Row>
             </Card>
           ))}
-        </div>
-      </Modal>
-
-      {/* Modal Tech Partners */}
-      <Modal
-        title="Agregar Tech Partner"
-        open={techPartnersModalOpen}
-        onCancel={() => setTechPartnersModalOpen(false)}
-        footer={null}
-        width={500}
-      >
-        <div style={{ marginTop: 16 }}>
-          <Text>Ingresa el nombre del Tech Partner:</Text>
-          <Input
-            placeholder="Ej: Salesforce, Microsoft, etc."
-            style={{ marginTop: 8, marginBottom: 16 }}
-            onPressEnter={(e) => addTechPartnerCustom(e.target.value)}
-            autoFocus
-          />
-
-          <div style={{ marginTop: 16 }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Partners existentes: {techPartners.map(tp => tp.nombre).join(', ')}
-            </Text>
-          </div>
         </div>
       </Modal>
 
