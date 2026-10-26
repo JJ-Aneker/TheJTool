@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Table, Button, Space, Modal, Form, Input, Spin, Tag, Popconfirm } from 'antd'
 import { message } from '../utils/message'
 import { FileTextOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons'
+import HelpButton from '../components/HelpButton'
 import { supabase } from '../config/supabaseClient'
 
 export default function TemplateManager() {
@@ -193,6 +194,7 @@ export default function TemplateManager() {
             <FileTextOutlined /> Gestión de Templates
           </h1>
           <div className="header-actions">
+            <HelpButton section="templateManager" />
             <button
               className="btn-primary"
               onClick={() => {

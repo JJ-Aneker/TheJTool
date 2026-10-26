@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Table, Button, Modal, Spin, Space, Tag, Input, Empty } from 'antd'
 import { message } from '../utils/message'
 import { DeleteOutlined, EditOutlined, CopyOutlined, DownloadOutlined } from '@ant-design/icons'
+import HelpButton from '../components/HelpButton'
 import { useAuth } from '../hooks/useAuth'
 import { MESSAGES } from '../constants/messages'
 import { handleError } from '../utils/errorHandler'
@@ -176,6 +177,7 @@ export default function EFormManager() {
           📚 Mis Formularios
         </h1>
         <div className="header-actions">
+          <HelpButton section="eformManager" />
           <Input
             placeholder="Buscar por nombre o descripción..."
             value={searchText}

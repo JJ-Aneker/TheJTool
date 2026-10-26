@@ -33,6 +33,7 @@ import {
   DeleteOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons';
+import HelpButton from '../components/HelpButton';
 import axios from 'axios';
 import { supabase } from '../config/supabaseClient';
 
@@ -503,13 +504,24 @@ export default function QuestionnaireManager() {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Title level={2}>
-        <FileExcelOutlined /> Gestión de Cuestionarios de Seguridad IT
-      </Title>
-      <Paragraph type="secondary">
-        Procesa cuestionarios de seguridad IT de proveedores (Excel/XML) mediante extracción inteligente de preguntas con IA.
-      </Paragraph>
+    <div className="container-main">
+      {/* HEADER */}
+      <div className="header-main">
+        <div>
+          <h1 className="header-title">
+            <FileExcelOutlined /> Gestión de Cuestionarios de Seguridad IT
+          </h1>
+          <p className="header-subtitle">
+            Procesa cuestionarios de seguridad IT de proveedores (Excel/XML) mediante extracción inteligente de preguntas con IA
+          </p>
+        </div>
+        <div className="header-actions">
+          <HelpButton section="questionnaireManager" />
+        </div>
+      </div>
+
+      {/* CONTENT */}
+      <div className="content-main">
 
       {/* Formulario de subida */}
       <Card
