@@ -1,9 +1,11 @@
 import { Form, Input, Button, Space, Alert } from 'antd'
 import { ArrowRightOutlined, ArrowLeftOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import { supabase } from '../../config/supabaseClient'
 
 export default function StepQuestions({ formData, updateFormData, goToStep, setLoading }) {
+  const { t } = useTranslation()
   const [form] = Form.useForm()
 
   // Si no hay preguntas, saltar este paso
@@ -39,7 +41,7 @@ export default function StepQuestions({ formData, updateFormData, goToStep, setL
       })
       goToStep(2)
     } catch (err) {
-      alert('Error: ' + (err.response?.data?.error || err.message))
+      alert(t('common.error') + ': ' + (err.response?.data?.error || err.message))
     } finally {
       setLoading(false)
     }
@@ -52,7 +54,7 @@ export default function StepQuestions({ formData, updateFormData, goToStep, setL
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <Alert
-        message="La IA necesita aclaraciones"
+        message={t('eformGeneratorAI.aiNeedsClarifications')}
         type="info"
         showIcon
       />
@@ -63,7 +65,7 @@ export default function StepQuestions({ formData, updateFormData, goToStep, setL
             key={i}
             label={q.question}
             name={`q${i}`}
-            rules={[{ required: true, message: 'Responde la pregunta' }]}
+            rules={[{ required: true, message: t('eformGeneratorAI.answerRequired') }]}
           >
             <Input />
           </Form.Item>
@@ -72,13 +74,13 @@ export default function StepQuestions({ formData, updateFormData, goToStep, setL
         <Form.Item>
           <Space>
             <Button onClick={() => goToStep(0)} icon={<ArrowLeftOutlined />}>
-              Volver
+              {t('common.back')}
             </Button>
             <Button onClick={handleSkip}>
-              Saltar
+              {t('eformGeneratorAI.skip')}
             </Button>
             <Button type="primary" htmlType="submit" icon={<ArrowRightOutlined />}>
-              Continuar
+              {t('common.next')}
             </Button>
           </Space>
         </Form.Item>

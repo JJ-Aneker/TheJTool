@@ -606,6 +606,9 @@
     "successGenerated": "✅ eForm generated successfully",
     "newEform": "New eForm",
     "viewHistory": "View history",
+    "aiNeedsClarifications": "AI needs clarifications",
+    "answerRequired": "Answer the question",
+    "skip": "Skip",
     "blocks": {
       "qr": "📷 QR / Barcode reader",
       "autofill": "👤 Autofill with connected user",
