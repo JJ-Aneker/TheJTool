@@ -537,45 +537,39 @@ export default function LicenseConfigurator() {
           {/* Resumen */}
           <Col span={8}>
             <Card size="small" title="Resumen">
-              <Statistic
-                title="Total Licencias"
-                value={totalLicencias}
-                precision={2}
-                suffix="€"
-                valueStyle={{ fontSize: 16 }}
-              />
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}><Text>Total Licencias</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalLicencias.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}><Text>Total CSS</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalCSS.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}><Text>Total Servicios</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalServicios.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}><Text>Tech Partners</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalTechPartners.toFixed(2)} €</Text>
+                </Col>
+              </Row>
               <Divider style={{ margin: '12px 0' }} />
-              <Statistic
-                title="Total CSS"
-                value={totalCSS}
-                precision={2}
-                suffix="€"
-                valueStyle={{ fontSize: 16 }}
-              />
-              <Divider style={{ margin: '12px 0' }} />
-              <Statistic
-                title="Total Servicios"
-                value={totalServicios}
-                precision={2}
-                suffix="€"
-                valueStyle={{ fontSize: 16 }}
-              />
-              <Divider style={{ margin: '12px 0' }} />
-              <Statistic
-                title="Tech Partners"
-                value={totalTechPartners}
-                precision={2}
-                suffix="€"
-                valueStyle={{ fontSize: 16 }}
-              />
-              <Divider style={{ margin: '12px 0' }} />
-              <Statistic
-                title="TOTAL"
-                value={totalContractValue}
-                precision={2}
-                suffix="€"
-                valueStyle={{ fontSize: 20, color: '#52c41a', fontWeight: 'bold' }}
-              />
+              <Row>
+                <Col span={14}><Text strong style={{ fontSize: 16 }}>TOTAL</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong style={{ fontSize: 18, color: '#52c41a' }}>
+                    {totalContractValue.toFixed(2)} €
+                  </Text>
+                </Col>
+              </Row>
             </Card>
           </Col>
         </Row>
