@@ -53,6 +53,7 @@ const BedrrockPanel = lazy(() => import('./views/BedrrockPanel'))
 const Manual = lazy(() => import('./views/Manual'))
 const QuestionnaireManager = lazy(() => import('./views/QuestionnaireManager'))
 const EFormGeneratorAI = lazy(() => import('./views/EFormGeneratorAI'))
+const LicenseConfigurator = lazy(() => import('./views/LicenseConfigurator'))
 
 const { Content } = Layout
 
@@ -78,6 +79,7 @@ const getMenuItems = (isAdmin = false, t = (key) => key) => {
     { key: 'document-generator', icon: <ThunderboltOutlined />, label: t('nav.documentGenerator'), path: '/document-generator' },
     { key: 'questionnaires',     icon: <FileExcelOutlined />,    label: 'Cuestionarios IT',         path: '/questionnaires' },
     { key: 'reporter',           icon: <FileTextOutlined />,     label: t('nav.thereforeReporter'), path: '/reporter' },
+    { key: 'license-config',     icon: <KeyOutlined />,          label: 'Config. Licencias',        path: '/license-configurator' },
     { key: 'manual',             icon: <BookOutlined />,         label: 'Manual',                   path: '/manual' },
 
     // DESARROLLO TÉCNICO (todos)
@@ -409,6 +411,7 @@ function AppContent() {
               <Route path="/questionnaires" element={<QuestionnaireManager />} />
               <Route path="/document-generator" element={<DocumentGenerator />} />
               <Route path="/reporter" element={<ThereforeReporter />} />
+              <Route path="/license-configurator" element={<LicenseConfigurator />} />
               <Route path="/web-services" element={<WebServicesManager />} />
               <Route path="/manual" element={<Manual />} />
               <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" status="construction" />} />
