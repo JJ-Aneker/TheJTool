@@ -422,20 +422,10 @@ export default function LicenseConfigurator() {
       <div className="header-main">
         <div>
           <h1 className="header-title">💼 Configurador de Licencias Therefore™</h1>
-          <p className="header-subtitle">Genera cotizaciones OnPremise, Online y Suscripción · Layout tipo Excel · Export XLSX</p>
+          <p className="header-subtitle">Genera cotizaciones OnPremise, Online y Suscripción · Layout optimizado · Export XLSX</p>
         </div>
         <div className="header-actions">
           <HelpButton section="licenseConfigurator" />
-
-          <Select
-            value={edicion}
-            onChange={setEdicion}
-            style={{ width: 150 }}
-          >
-            <Option value="onpremise">OnPremise</Option>
-            <Option value="online">Online</Option>
-            <Option value="suscripcion">Suscripción</Option>
-          </Select>
 
           <Button
             icon={<HistoryOutlined />}
@@ -476,241 +466,154 @@ export default function LicenseConfigurator() {
         </div>
       </div>
 
-      {/* CONTENT - Estilo Excel */}
-      <div style={{ flex: 1, overflow: 'auto', padding: '16px', backgroundColor: '#fff' }}>
+      {/* CONTENT */}
+      <div style={{ flex: 1, overflow: 'auto', padding: '16px' }}>
 
-        {/* CABECERA - Datos del proyecto */}
-        <Card size="small" style={{ marginBottom: 16, backgroundColor: '#f5f5f5' }}>
-          <Row gutter={16}>
-            <Col span={8}>
-              <div style={{ marginBottom: 8 }}>
-                <Text strong>SFDC OPP</Text>
-                <Input
-                  value={sfdcOpp}
-                  onChange={(e) => setSfdcOpp(e.target.value)}
-                  placeholder="OPP-XXXXX"
-                  style={{ marginTop: 4 }}
-                />
-              </div>
-            </Col>
-            <Col span={8}>
-              <div style={{ marginBottom: 8 }}>
-                <Text strong>DEAL SUPPORT</Text>
-                <Input
-                  value={dealSupport}
-                  onChange={(e) => setDealSupport(e.target.value)}
-                  placeholder="Nombre"
-                  style={{ marginTop: 4 }}
-                />
-              </div>
-            </Col>
-            <Col span={8}>
-              <div style={{ marginBottom: 8 }}>
-                <Text strong>FECHA</Text>
-                <Input
-                  type="date"
-                  value={fecha}
-                  onChange={(e) => setFecha(e.target.value)}
-                  style={{ marginTop: 4 }}
-                />
-              </div>
-            </Col>
-          </Row>
-
-          <Row gutter={16} style={{ marginTop: 8 }}>
-            <Col span={12}>
-              <div>
-                <Text strong>A.M.</Text>
-                <Input
-                  value={accountManager}
-                  onChange={(e) => setAccountManager(e.target.value)}
-                  placeholder="Account Manager"
-                  style={{ marginTop: 4 }}
-                />
-              </div>
-            </Col>
-            <Col span={12}>
-              <div>
-                <Text strong>CLIENTE</Text>
-                <Input
-                  value={cliente}
-                  onChange={(e) => setCliente(e.target.value)}
-                  placeholder="Nombre del cliente"
-                  style={{ marginTop: 4 }}
-                />
-              </div>
-            </Col>
-          </Row>
-        </Card>
-
-        {/* DOS COLUMNAS: Tech Partners + Servicios */}
+        {/* FILA 1: DATOS GENERALES + RESUMEN */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
-
-          {/* COLUMNA IZQUIERDA: Tech Partners + Resumen */}
-          <Col span={12}>
-
-            {/* Tech Partners */}
-            <Card
-              title={<Text strong style={{ color: '#c00' }}>TECH PARTNERS</Text>}
-              size="small"
-              style={{ marginBottom: 16 }}
-              extra={
-                <Button size="small" icon={<PlusOutlined />} onClick={openTechPartnersModal}>
-                  Agregar partner
-                </Button>
-              }
-            >
-              {techPartners.map((tp, index) => (
-                <Row key={index} gutter={8} style={{ marginBottom: 8 }}>
-                  <Col span={12}>
-                    <Text>{tp.nombre}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <InputNumber
-                      value={tp.importe}
-                      onChange={(val) => updateTechPartner(index, val)}
-                      precision={2}
-                      style={{ width: '100%' }}
-                      prefix="€"
+          {/* Datos Generales */}
+          <Col span={16}>
+            <Card size="small" title="Datos Generales de la Oferta">
+              <Row gutter={[16, 16]}>
+                <Col span={8}>
+                  <div>
+                    <Text strong>SFDC OPP</Text>
+                    <Input
+                      value={sfdcOpp}
+                      onChange={(e) => setSfdcOpp(e.target.value)}
+                      placeholder="OPP-XXXXX"
+                      style={{ marginTop: 4 }}
                     />
-                  </Col>
-                </Row>
-              ))}
-              <Divider style={{ margin: '8px 0' }} />
-              <Row>
-                <Col span={12}>
-                  <Text strong>TOTAL TECH PARTNERS</Text>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div>
+                    <Text strong>Deal Support</Text>
+                    <Input
+                      value={dealSupport}
+                      onChange={(e) => setDealSupport(e.target.value)}
+                      placeholder="Nombre"
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div>
+                    <Text strong>Fecha</Text>
+                    <Input
+                      type="date"
+                      value={fecha}
+                      onChange={(e) => setFecha(e.target.value)}
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
                 </Col>
                 <Col span={12}>
-                  <Text strong style={{ color: '#c00' }}>{totalTechPartners.toFixed(2)} €</Text>
+                  <div>
+                    <Text strong>Account Manager</Text>
+                    <Input
+                      value={accountManager}
+                      onChange={(e) => setAccountManager(e.target.value)}
+                      placeholder="Nombre del AM"
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
                 </Col>
-              </Row>
-            </Card>
-
-            {/* Resumen */}
-            <Card
-              title={<Text strong style={{ color: '#c00' }}>RESUMEN</Text>}
-              size="small"
-            >
-              <Row style={{ marginBottom: 4 }}>
-                <Col span={16}><Text>Tech Partners</Text></Col>
-                <Col span={8} style={{ textAlign: 'right' }}><Text>{totalTechPartners.toFixed(2)} €</Text></Col>
-              </Row>
-              <Row style={{ marginBottom: 4 }}>
-                <Col span={16}><Text>Servicios</Text></Col>
-                <Col span={8} style={{ textAlign: 'right' }}><Text>{totalServicios.toFixed(2)} €</Text></Col>
-              </Row>
-              <Row style={{ marginBottom: 4 }}>
-                <Col span={16}><Text>Total Therefore {edicion}</Text></Col>
-                <Col span={8} style={{ textAlign: 'right' }}><Text>{totalTherefore.toFixed(2)} €</Text></Col>
-              </Row>
-              <Divider style={{ margin: '8px 0' }} />
-              <Row>
-                <Col span={16}><Text strong style={{ color: '#c00' }}>TOTAL CONTRACT VALUE</Text></Col>
-                <Col span={8} style={{ textAlign: 'right' }}><Text strong style={{ color: '#c00', fontSize: 16 }}>{totalContractValue.toFixed(2)} €</Text></Col>
+                <Col span={12}>
+                  <div>
+                    <Text strong>Cliente</Text>
+                    <Input
+                      value={cliente}
+                      onChange={(e) => setCliente(e.target.value)}
+                      placeholder="Nombre del cliente"
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
               </Row>
             </Card>
           </Col>
 
-          {/* COLUMNA DERECHA: Servicios */}
-          <Col span={12}>
-            <Card
-              title={<Text strong style={{ color: '#c00' }}>SERVICIOS</Text>}
-              size="small"
-              extra={
-                <Button size="small" icon={<PlusOutlined />} onClick={() => setServiciosModalOpen(true)}>
-                  Agregar servicio
-                </Button>
-              }
-            >
-              {servicios.length === 0 ? (
-                <Text type="secondary">No hay servicios agregados</Text>
-              ) : (
-                servicios.map(serv => (
-                  <Row key={serv.id} gutter={8} style={{ marginBottom: 8 }}>
-                    <Col span={1}>
-                      <Button
-                        danger
-                        size="small"
-                        icon={<DeleteOutlined />}
-                        onClick={() => removeServicio(serv.id)}
-                      />
-                    </Col>
-                    <Col span={5}>
-                      <Input
-                        placeholder="Código"
-                        value={serv.codigo}
-                        onChange={(e) => updateServicio(serv.id, 'codigo', e.target.value)}
-                        size="small"
-                      />
-                    </Col>
-                    <Col span={9}>
-                      <Select
-                        placeholder="Servicio"
-                        value={serv.descripcion}
-                        onChange={(val) => {
-                          const selected = serviciosDisponibles.find(s => s.descripcion === val)
-                          updateServicio(serv.id, 'descripcion', val)
-                          updateServicio(serv.id, 'codigo', selected?.codigo || '')
-                          updateServicio(serv.id, 'pvp_jornada', selected?.pvp_jornada || 0)
-                        }}
-                        size="small"
-                        style={{ width: '100%' }}
-                      >
-                        {serviciosDisponibles.map(s => (
-                          <Option key={s.codigo} value={s.descripcion}>{s.descripcion}</Option>
-                        ))}
-                      </Select>
-                    </Col>
-                    <Col span={4}>
-                      <InputNumber
-                        placeholder="Unid."
-                        value={serv.unidades}
-                        onChange={(val) => updateServicio(serv.id, 'unidades', val)}
-                        min={0}
-                        size="small"
-                        style={{ width: '100%' }}
-                      />
-                    </Col>
-                    <Col span={5}>
-                      <Text>{(serv.pvp_jornada * serv.unidades).toFixed(2)} €</Text>
-                    </Col>
-                  </Row>
-                ))
-              )}
-
-              {servicios.length > 0 && (
-                <>
-                  <Divider style={{ margin: '8px 0' }} />
-                  <Row>
-                    <Col span={19}><Text strong>TOTAL SERVICIOS</Text></Col>
-                    <Col span={5}><Text strong style={{ color: '#c00' }}>{totalServicios.toFixed(2)} €</Text></Col>
-                  </Row>
-                </>
-              )}
+          {/* Resumen */}
+          <Col span={8}>
+            <Card size="small" title="Resumen">
+              <Statistic
+                title="Total Licencias"
+                value={totalLicencias}
+                precision={2}
+                suffix="€"
+                valueStyle={{ fontSize: 16 }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <Statistic
+                title="Total CSS"
+                value={totalCSS}
+                precision={2}
+                suffix="€"
+                valueStyle={{ fontSize: 16 }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <Statistic
+                title="Total Servicios"
+                value={totalServicios}
+                precision={2}
+                suffix="€"
+                valueStyle={{ fontSize: 16 }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <Statistic
+                title="Tech Partners"
+                value={totalTechPartners}
+                precision={2}
+                suffix="€"
+                valueStyle={{ fontSize: 16 }}
+              />
+              <Divider style={{ margin: '12px 0' }} />
+              <Statistic
+                title="TOTAL"
+                value={totalContractValue}
+                precision={2}
+                suffix="€"
+                valueStyle={{ fontSize: 20, color: '#52c41a', fontWeight: 'bold' }}
+              />
             </Card>
           </Col>
         </Row>
 
-        {/* TABLA DETALLE SOLUCIONES */}
+        {/* FILA 2: TABLA LICENCIAS */}
         <Card
-          title={<Text strong style={{ color: '#c00' }}>DETALLE SOLUCIONES | PRODUCTO</Text>}
           size="small"
+          title="Licencias"
           extra={
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setCatalogDrawerOpen(true)}
-            >
-              Agregar productos
-            </Button>
+            <Space>
+              <Select
+                value={edicion}
+                onChange={setEdicion}
+                style={{ width: 140 }}
+                size="small"
+              >
+                <Option value="onpremise">OnPremise</Option>
+                <Option value="online">Online</Option>
+                <Option value="suscripcion">Suscripción</Option>
+              </Select>
+              <Button
+                type="text"
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={() => setCatalogDrawerOpen(true)}
+              >
+                Agregar productos
+              </Button>
+            </Space>
           }
+          style={{ marginBottom: 16 }}
         >
           <Table
             dataSource={selectedItems}
             rowKey="codigo"
             size="small"
             pagination={false}
+            scroll={{ y: 250 }}
             columns={[
               {
                 title: 'Clase',
@@ -731,7 +634,7 @@ export default function LicenseConfigurator() {
               {
                 title: 'Unidad',
                 dataIndex: 'cantidad',
-                width: 80,
+                width: 90,
                 align: 'center',
                 render: (val, record) => (
                   <InputNumber
@@ -739,7 +642,7 @@ export default function LicenseConfigurator() {
                     value={val}
                     onChange={(v) => updateQuantity(record.codigo, v)}
                     size="small"
-                    style={{ width: 60 }}
+                    style={{ width: 70 }}
                   />
                 )
               },
@@ -753,7 +656,7 @@ export default function LicenseConfigurator() {
               {
                 title: 'PVP Total',
                 key: 'pvp_total',
-                width: 100,
+                width: 110,
                 align: 'right',
                 render: (_, record) => `${(record.pvp * record.cantidad).toFixed(2)} €`
               },
@@ -767,17 +670,18 @@ export default function LicenseConfigurator() {
               {
                 title: 'CSS Total',
                 key: 'css_total',
-                width: 100,
+                width: 110,
                 align: 'right',
                 render: (_, record) => `${((record.css_pvp || 0) * record.cantidad).toFixed(2)} €`
               },
               {
                 title: '',
                 key: 'action',
-                width: 60,
+                width: 50,
                 render: (_, record) => (
                   <Button
                     danger
+                    type="text"
                     size="small"
                     icon={<DeleteOutlined />}
                     onClick={() => removeItem(record.codigo)}
@@ -786,13 +690,168 @@ export default function LicenseConfigurator() {
               }
             ]}
           />
-
           {selectedItems.length === 0 && (
             <div style={{ textAlign: 'center', padding: '20px' }}>
-              <Text type="secondary">No hay productos seleccionados. Abrir catálogo para agregar.</Text>
+              <Text type="secondary">No hay productos. Click en "Agregar productos" para añadir.</Text>
             </div>
           )}
         </Card>
+
+        {/* FILA 3: SERVICIOS + TECH PARTNERS */}
+        <Row gutter={16}>
+          {/* Servicios */}
+          <Col span={12}>
+            <Card
+              size="small"
+              title="Servicios"
+              extra={
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => setServiciosModalOpen(true)}
+                >
+                  Agregar servicios
+                </Button>
+              }
+            >
+              <Table
+                dataSource={servicios}
+                rowKey="id"
+                size="small"
+                pagination={false}
+                scroll={{ y: 200 }}
+                columns={[
+                  {
+                    title: 'Código',
+                    dataIndex: 'codigo',
+                    width: 90,
+                    render: (text) => <Text style={{ fontFamily: 'monospace', fontSize: 11 }}>{text}</Text>
+                  },
+                  {
+                    title: 'Descripción',
+                    dataIndex: 'descripcion'
+                  },
+                  {
+                    title: 'Unidades',
+                    dataIndex: 'unidades',
+                    width: 80,
+                    align: 'center',
+                    render: (val, record) => (
+                      <InputNumber
+                        min={0}
+                        value={val}
+                        onChange={(v) => updateServicio(record.id, 'unidades', v)}
+                        size="small"
+                        style={{ width: 60 }}
+                      />
+                    )
+                  },
+                  {
+                    title: 'Total',
+                    key: 'total',
+                    width: 100,
+                    align: 'right',
+                    render: (_, record) => `${(record.pvp_jornada * record.unidades).toFixed(2)} €`
+                  },
+                  {
+                    title: '',
+                    key: 'action',
+                    width: 50,
+                    render: (_, record) => (
+                      <Button
+                        danger
+                        type="text"
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        onClick={() => removeServicio(record.id)}
+                      />
+                    )
+                  }
+                ]}
+              />
+              {servicios.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <Text type="secondary">Sin servicios</Text>
+                </div>
+              )}
+            </Card>
+          </Col>
+
+          {/* Tech Partners */}
+          <Col span={12}>
+            <Card
+              size="small"
+              title="Tech Partners"
+              extra={
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={openTechPartnersModal}
+                >
+                  Agregar partner
+                </Button>
+              }
+            >
+              <Table
+                dataSource={techPartners.filter(tp => tp.importe > 0)}
+                rowKey="nombre"
+                size="small"
+                pagination={false}
+                scroll={{ y: 200 }}
+                columns={[
+                  {
+                    title: 'Partner',
+                    dataIndex: 'nombre'
+                  },
+                  {
+                    title: 'Importe',
+                    dataIndex: 'importe',
+                    width: 150,
+                    align: 'right',
+                    render: (val, record, index) => (
+                      <InputNumber
+                        value={val}
+                        onChange={(v) => {
+                          const idx = techPartners.findIndex(tp => tp.nombre === record.nombre)
+                          updateTechPartner(idx, v)
+                        }}
+                        precision={2}
+                        size="small"
+                        style={{ width: 130 }}
+                        suffix="€"
+                        min={0}
+                      />
+                    )
+                  },
+                  {
+                    title: '',
+                    key: 'action',
+                    width: 50,
+                    render: (_, record) => (
+                      <Button
+                        danger
+                        type="text"
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        onClick={() => {
+                          const idx = techPartners.findIndex(tp => tp.nombre === record.nombre)
+                          updateTechPartner(idx, 0)
+                        }}
+                      />
+                    )
+                  }
+                ]}
+              />
+              {techPartners.filter(tp => tp.importe > 0).length === 0 && (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <Text type="secondary">Sin tech partners</Text>
+                </div>
+              )}
+            </Card>
+          </Col>
+        </Row>
       </div>
 
       {/* DRAWER CATÁLOGO */}
@@ -972,7 +1031,7 @@ export default function LicenseConfigurator() {
                     onChange={(val) => updateTempPartnerImporte(tp.nombre, val)}
                     precision={2}
                     style={{ width: '100%' }}
-                    prefix="€"
+                    suffix="€"
                     min={0}
                   />
                 </Col>
