@@ -13,7 +13,7 @@
       "codigo": "2212V463",
       "descripcion": "THE.EA CONNECTOR CONTENT",
       "clase": "THE.EA",
-      "pvp": 3425.0,
+      "pvp": 3425,
       "css_pvp": 521.42,
       "edicion": "onpremise",
       "puntos": 29
@@ -22,7 +22,7 @@
       "codigo": "4757V468",
       "descripcion": "THE.EA CONNECTOR COPILOT",
       "clase": "THE.EA",
-      "pvp": 3360.0,
+      "pvp": 3360,
       "css_pvp": 521.42,
       "edicion": "onpremise",
       "puntos": 29
@@ -31,7 +31,7 @@
       "codigo": "4691V862",
       "descripcion": "THE.EA CONNECTOR eINVOICE",
       "clase": "THE.EA",
-      "pvp": 3360.0,
+      "pvp": 3360,
       "css_pvp": 521.42,
       "edicion": "onpremise",
       "puntos": 29
@@ -40,7 +40,7 @@
       "codigo": "1505V128",
       "descripcion": "THE.EA CONNECTOR KOFAX CAPTURE",
       "clase": "THE.EA",
-      "pvp": 1835.0,
+      "pvp": 1835,
       "css_pvp": 287.68,
       "edicion": "onpremise",
       "puntos": 16
@@ -49,7 +49,7 @@
       "codigo": "1505V132",
       "descripcion": "THE.EA CONNECTOR MS DYN 365",
       "clase": "THE.EA",
-      "pvp": 6740.0,
+      "pvp": 6740,
       "css_pvp": 1024.8600000000001,
       "edicion": "onpremise",
       "puntos": 57
@@ -58,7 +58,7 @@
       "codigo": "1505V134",
       "descripcion": "THE.EA CONNECTOR SAP CONN",
       "clase": "THE.EA",
-      "pvp": 16840.0,
+      "pvp": 16840,
       "css_pvp": 2607.1,
       "edicion": "onpremise",
       "puntos": 145
@@ -67,7 +67,7 @@
       "codigo": "1505V131",
       "descripcion": "THE.EA CONNECTOR SHAREPOINT",
       "clase": "THE.EA",
-      "pvp": 6740.0,
+      "pvp": 6740,
       "css_pvp": 1024.8600000000001,
       "edicion": "onpremise",
       "puntos": 57
@@ -76,7 +76,7 @@
       "codigo": "1972V045",
       "descripcion": "THE.EA CONNECTOR UNIVERSAL",
       "clase": "THE.EA",
-      "pvp": 3425.0,
+      "pvp": 3425,
       "css_pvp": 521.42,
       "edicion": "onpremise",
       "puntos": 29
@@ -85,7 +85,7 @@
       "codigo": "4717V098",
       "descripcion": "THE.EA DOCUMENT CLASSIFICATION 100",
       "clase": "THE.EA",
-      "pvp": 4.0,
+      "pvp": 4,
       "css_pvp": 0,
       "edicion": "onpremise",
       "puntos": null
@@ -139,7 +139,7 @@
       "codigo": "2111V394",
       "descripcion": "THE.EA EDITION TEST LICENSE",
       "clase": "THE.EA",
-      "pvp": 1565.0,
+      "pvp": 1565,
       "css_pvp": 215.76,
       "edicion": "onpremise",
       "puntos": 12
@@ -166,7 +166,7 @@
       "codigo": "1505V107",
       "descripcion": "THE.EA SERVER LICENSE",
       "clase": "THE.EA",
-      "pvp": 1565.0,
+      "pvp": 1565,
       "css_pvp": 251.72,
       "edicion": "onpremise",
       "puntos": 14
@@ -175,7 +175,7 @@
       "codigo": "3604V399",
       "descripcion": "THE.EA SERVER LICENSE ADDITIONAL",
       "clase": "THE.EA",
-      "pvp": 1565.0,
+      "pvp": 1565,
       "css_pvp": 251.72,
       "edicion": "onpremise",
       "puntos": 14
@@ -220,7 +220,7 @@
       "codigo": "4358V668",
       "descripcion": "THE.EA USER CONCURRENT +500",
       "clase": "THE.EA",
-      "pvp": 1100.0,
+      "pvp": 1100,
       "css_pvp": 179.8,
       "edicion": "onpremise",
       "puntos": 10
@@ -229,7 +229,7 @@
       "codigo": "1972V058",
       "descripcion": "THE.EA USER CONCURRENT 100-249",
       "clase": "THE.EA",
-      "pvp": 2080.0,
+      "pvp": 2080,
       "css_pvp": 323.64,
       "edicion": "onpremise",
       "puntos": 18
@@ -238,7 +238,7 @@
       "codigo": "1505V118",
       "descripcion": "THE.EA USER CONCURRENT 10-24",
       "clase": "THE.EA",
-      "pvp": 3380.0,
+      "pvp": 3380,
       "css_pvp": 521.42,
       "edicion": "onpremise",
       "puntos": 29
@@ -247,7 +247,7 @@
       "codigo": "1505V117",
       "descripcion": "THE.EA USER CONCURRENT 1-9",
       "clase": "THE.EA",
-      "pvp": 3970.0,
+      "pvp": 3970,
       "css_pvp": 593.34,
       "edicion": "onpremise",
       "puntos": 33
@@ -256,7 +256,7 @@
       "codigo": "1972V059",
       "descripcion": "THE.EA USER CONCURRENT 250-499",
       "clase": "THE.EA",
-      "pvp": 1500.0,
+      "pvp": 1500,
       "css_pvp": 233.74,
       "edicion": "onpremise",
       "puntos": 13
@@ -265,7 +265,7 @@
       "codigo": "1505V119",
       "descripcion": "THE.EA USER CONCURRENT 25-49",
       "clase": "THE.EA",
-      "pvp": 2870.0,
+      "pvp": 2870,
       "css_pvp": 431.52,
       "edicion": "onpremise",
       "puntos": 24
@@ -274,7 +274,7 @@
       "codigo": "1505V120",
       "descripcion": "THE.EA USER CONCURRENT 50-99",
       "clase": "THE.EA",
-      "pvp": 2430.0,
+      "pvp": 2430,
       "css_pvp": 377.58,
       "edicion": "onpremise",
       "puntos": 21
@@ -283,7 +283,7 @@
       "codigo": "4358V667",
       "descripcion": "THE.EA USER NAME +500",
       "clase": "THE.EA",
-      "pvp": 550.0,
+      "pvp": 550,
       "css_pvp": 89.9,
       "edicion": "onpremise",
       "puntos": 5
@@ -292,7 +292,7 @@
       "codigo": "1972V049",
       "descripcion": "THE.EA USER NAME 100-249",
       "clase": "THE.EA",
-      "pvp": 1040.0,
+      "pvp": 1040,
       "css_pvp": 161.82,
       "edicion": "onpremise",
       "puntos": 9
@@ -301,7 +301,7 @@
       "codigo": "1505V110",
       "descripcion": "THE.EA USER NAME 10-24",
       "clase": "THE.EA",
-      "pvp": 1690.0,
+      "pvp": 1690,
       "css_pvp": 269.7,
       "edicion": "onpremise",
       "puntos": 15
@@ -310,7 +310,7 @@
       "codigo": "1505V109",
       "descripcion": "THE.EA USER NAME 1-9",
       "clase": "THE.EA",
-      "pvp": 1985.0,
+      "pvp": 1985,
       "css_pvp": 305.66,
       "edicion": "onpremise",
       "puntos": 17
@@ -319,7 +319,7 @@
       "codigo": "1972V050",
       "descripcion": "THE.EA USER NAME 250-499",
       "clase": "THE.EA",
-      "pvp": 750.0,
+      "pvp": 750,
       "css_pvp": 125.86,
       "edicion": "onpremise",
       "puntos": 7
@@ -328,7 +328,7 @@
       "codigo": "1505V111",
       "descripcion": "THE.EA USER NAME 25-49",
       "clase": "THE.EA",
-      "pvp": 1435.0,
+      "pvp": 1435,
       "css_pvp": 215.76,
       "edicion": "onpremise",
       "puntos": 12
@@ -337,7 +337,7 @@
       "codigo": "1505V112",
       "descripcion": "THE.EA USER NAME 50-99",
       "clase": "THE.EA",
-      "pvp": 1215.0,
+      "pvp": 1215,
       "css_pvp": 197.78,
       "edicion": "onpremise",
       "puntos": 11
@@ -346,7 +346,7 @@
       "codigo": "4358V666",
       "descripcion": "THE.EA USER READ +500",
       "clase": "THE.EA",
-      "pvp": 275.0,
+      "pvp": 275,
       "css_pvp": 53.94,
       "edicion": "onpremise",
       "puntos": 3
@@ -355,7 +355,7 @@
       "codigo": "1972V067",
       "descripcion": "THE.EA USER READ 100-249",
       "clase": "THE.EA",
-      "pvp": 520.0,
+      "pvp": 520,
       "css_pvp": 71.92,
       "edicion": "onpremise",
       "puntos": 4
@@ -364,7 +364,7 @@
       "codigo": "1972V068",
       "descripcion": "THE.EA USER READ 250-499",
       "clase": "THE.EA",
-      "pvp": 375.0,
+      "pvp": 375,
       "css_pvp": 53.94,
       "edicion": "onpremise",
       "puntos": 3
@@ -373,7 +373,7 @@
       "codigo": "1738V413",
       "descripcion": "THE.EA USER READ ONLY 10-24",
       "clase": "THE.EA",
-      "pvp": 845.0,
+      "pvp": 845,
       "css_pvp": 143.84,
       "edicion": "onpremise",
       "puntos": 8
@@ -445,7 +445,7 @@
       "codigo": "661ZZ458",
       "descripcion": "THE.ON CONNECTOR CONTENT",
       "clase": "THE.ON",
-      "pvp": 74.0,
+      "pvp": 74,
       "css_pvp": 3.33,
       "edicion": "online",
       "puntos": null
@@ -499,7 +499,7 @@
       "codigo": "661ZZ459",
       "descripcion": "THE.ON CONNECTOR UNIVERSAL",
       "clase": "THE.ON",
-      "pvp": 74.0,
+      "pvp": 74,
       "css_pvp": 3.33,
       "edicion": "online",
       "puntos": null
@@ -508,7 +508,7 @@
       "codigo": "909ZZ934",
       "descripcion": "THE.ON DOCUMENT CLASSIFICATION 100",
       "clase": "THE.ON",
-      "pvp": 4.0,
+      "pvp": 4,
       "css_pvp": 0.18,
       "edicion": "online",
       "puntos": null
@@ -571,7 +571,7 @@
       "codigo": "1505V135",
       "descripcion": "THE.ON SERVICE RIAS 0.5 DAY",
       "clase": "THE.ON",
-      "pvp": 1100.0,
+      "pvp": 1100,
       "css_pvp": 49.5,
       "edicion": "online",
       "puntos": null
@@ -580,8 +580,8 @@
       "codigo": "1505V136",
       "descripcion": "THE.ON SERVICE RIAS 1 DAY",
       "clase": "THE.ON",
-      "pvp": 2200.0,
-      "css_pvp": 99.0,
+      "pvp": 2200,
+      "css_pvp": 99,
       "edicion": "online",
       "puntos": null
     },
@@ -658,24 +658,6 @@
       "puntos": null
     },
     {
-      "codigo": "661ZZ456",
-      "descripcion": "THE.ON USER CONCURRENT",
-      "clase": "THE.ON",
-      "pvp": 53.9,
-      "css_pvp": 2.4255,
-      "edicion": "online",
-      "puntos": null
-    },
-    {
-      "codigo": "661ZZ457",
-      "descripcion": "THE.ON USER CONCURRENT",
-      "clase": "THE.ON",
-      "pvp": 43.1,
-      "css_pvp": 1.9395,
-      "edicion": "online",
-      "puntos": null
-    },
-    {
       "codigo": "661ZZ454",
       "descripcion": "THE.ON USER NAMED",
       "clase": "THE.ON",
@@ -685,47 +667,11 @@
       "puntos": null
     },
     {
-      "codigo": "661ZZ455",
-      "descripcion": "THE.ON USER NAMED",
-      "clase": "THE.ON",
-      "pvp": 26.95,
-      "css_pvp": 1.21275,
-      "edicion": "online",
-      "puntos": null
-    },
-    {
-      "codigo": "661ZZ456",
-      "descripcion": "THE.ON USER NAMED",
-      "clase": "THE.ON",
-      "pvp": 21.55,
-      "css_pvp": 0.96975,
-      "edicion": "online",
-      "puntos": null
-    },
-    {
       "codigo": "661ZZ453",
       "descripcion": "THE.ON USER READ ONLY",
       "clase": "THE.ON",
       "pvp": 16.85,
       "css_pvp": 0.7582500000000001,
-      "edicion": "online",
-      "puntos": null
-    },
-    {
-      "codigo": "661ZZ454",
-      "descripcion": "THE.ON USER READ ONLY",
-      "clase": "THE.ON",
-      "pvp": 13.48,
-      "css_pvp": 0.6066,
-      "edicion": "online",
-      "puntos": null
-    },
-    {
-      "codigo": "661ZZ455",
-      "descripcion": "THE.ON USER READ ONLY",
-      "clase": "THE.ON",
-      "pvp": 10.78,
-      "css_pvp": 0.4851,
       "edicion": "online",
       "puntos": null
     },
@@ -751,7 +697,7 @@
       "codigo": "898ZZ132",
       "descripcion": "THE.SU CONNECTOR CONTENT",
       "clase": "THE.SU",
-      "pvp": 74.0,
+      "pvp": 74,
       "css_pvp": 3.33,
       "edicion": "suscripcion",
       "puntos": null
@@ -814,7 +760,7 @@
       "codigo": "898ZZ119",
       "descripcion": "THE.SU CONNECTOR UNIVERSAL",
       "clase": "THE.SU",
-      "pvp": 74.0,
+      "pvp": 74,
       "css_pvp": 3.33,
       "edicion": "suscripcion",
       "puntos": null
@@ -823,7 +769,7 @@
       "codigo": "909ZZ934",
       "descripcion": "THE.SU DOCUMENT CLASSIFICATION 100",
       "clase": "THE.SU",
-      "pvp": 4.0,
+      "pvp": 4,
       "css_pvp": 0.18,
       "edicion": "suscripcion",
       "puntos": null
@@ -919,119 +865,11 @@
       "puntos": null
     },
     {
-      "codigo": "898ZZ123",
-      "descripcion": "THE.SU USER CONCURRENT 100-249",
-      "clase": "THE.SU",
-      "pvp": 55.9,
-      "css_pvp": 2.5155,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ123",
-      "descripcion": "THE.SU USER CONCURRENT 10-24",
-      "clase": "THE.SU",
-      "pvp": 76.6,
-      "css_pvp": 3.4469999999999996,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ123",
-      "descripcion": "THE.SU USER CONCURRENT 1-9",
-      "clase": "THE.SU",
-      "pvp": 85.1,
-      "css_pvp": 3.8294999999999995,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ123",
-      "descripcion": "THE.SU USER CONCURRENT 250-499",
-      "clase": "THE.SU",
-      "pvp": 50.3,
-      "css_pvp": 2.2634999999999996,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ123",
-      "descripcion": "THE.SU USER CONCURRENT 25-49",
-      "clase": "THE.SU",
-      "pvp": 68.8,
-      "css_pvp": 3.0959999999999996,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ123",
-      "descripcion": "THE.SU USER CONCURRENT 50-99",
-      "clase": "THE.SU",
-      "pvp": 61.9,
-      "css_pvp": 2.7855,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
       "codigo": "898ZZ114",
       "descripcion": "THE.SU USER NAMED +500",
       "clase": "THE.SU",
       "pvp": 22.6,
       "css_pvp": 1.0170000000000001,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ114",
-      "descripcion": "THE.SU USER NAMED 100-249",
-      "clase": "THE.SU",
-      "pvp": 27.95,
-      "css_pvp": 1.25775,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ114",
-      "descripcion": "THE.SU USER NAMED 10-24",
-      "clase": "THE.SU",
-      "pvp": 38.3,
-      "css_pvp": 1.7234999999999998,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ114",
-      "descripcion": "THE.SU USER NAMED 1-9",
-      "clase": "THE.SU",
-      "pvp": 42.55,
-      "css_pvp": 1.9147499999999997,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ114",
-      "descripcion": "THE.SU USER NAMED 250-499",
-      "clase": "THE.SU",
-      "pvp": 25.15,
-      "css_pvp": 1.1317499999999998,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ114",
-      "descripcion": "THE.SU USER NAMED 25-49",
-      "clase": "THE.SU",
-      "pvp": 34.4,
-      "css_pvp": 1.5479999999999998,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ114",
-      "descripcion": "THE.SU USER NAMED 50-99",
-      "clase": "THE.SU",
-      "pvp": 30.95,
-      "css_pvp": 1.39275,
       "edicion": "suscripcion",
       "puntos": null
     },
@@ -1043,88 +881,34 @@
       "css_pvp": 0.5085000000000001,
       "edicion": "suscripcion",
       "puntos": null
-    },
-    {
-      "codigo": "898ZZ107",
-      "descripcion": "THE.SU USER READ 100-249",
-      "clase": "THE.SU",
-      "pvp": 13.98,
-      "css_pvp": 0.6291,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ107",
-      "descripcion": "THE.SU USER READ 10-24",
-      "clase": "THE.SU",
-      "pvp": 19.15,
-      "css_pvp": 0.8617499999999999,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ107",
-      "descripcion": "THE.SU USER READ 1-9",
-      "clase": "THE.SU",
-      "pvp": 21.28,
-      "css_pvp": 0.9576,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ107",
-      "descripcion": "THE.SU USER READ 250-499",
-      "clase": "THE.SU",
-      "pvp": 12.58,
-      "css_pvp": 0.5660999999999999,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ107",
-      "descripcion": "THE.SU USER READ 25-49",
-      "clase": "THE.SU",
-      "pvp": 17.2,
-      "css_pvp": 0.7739999999999999,
-      "edicion": "suscripcion",
-      "puntos": null
-    },
-    {
-      "codigo": "898ZZ107",
-      "descripcion": "THE.SU USER READ 50-99",
-      "clase": "THE.SU",
-      "pvp": 15.48,
-      "css_pvp": 0.6966,
-      "edicion": "suscripcion",
-      "puntos": null
     }
   ],
   "services": [
     {
       "descripcion": "Consultoría",
-      "pvp_jornada": 880.0
+      "pvp_jornada": 880
     },
     {
       "descripcion": "Implementación",
-      "pvp_jornada": 705.0
+      "pvp_jornada": 705
     },
     {
       "descripcion": "Formación",
-      "pvp_jornada": 705.0
+      "pvp_jornada": 705
     },
     {
       "descripcion": "Gestión Proyecto",
-      "pvp_jornada": 705.0
+      "pvp_jornada": 705
     },
     {
       "descripcion": "Valor Punto CSS",
       "pvp_jornada": 17.98
     }
   ],
-  "total_items": 122,
+  "total_items": 98,
   "by_edition": {
     "onpremise": 45,
-    "online": 36,
-    "suscripcion": 41
+    "online": 30,
+    "suscripcion": 23
   }
 }
