@@ -34,7 +34,10 @@
     "share": "Share",
     "settings": "Settings",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "examples": "Quick examples",
+    "help": "Open help manual",
+    "copied": "Copied to clipboard"
   },
 
   "nav": {
@@ -553,6 +556,84 @@
       "eformImported": "New eForm imported",
       "workflowsUpdated": "Workflow configuration updated",
       "backupGenerated": "Instance backup generated"
+    }
+  },
+
+  "eformGeneratorAI": {
+    "title": "AI eForm Generator",
+    "request": "Request",
+    "questions": "Questions",
+    "prompt": "Prompt",
+    "result": "Result",
+    "questionsDesc": "Clarifications (optional)",
+    "promptDesc": "Review and adjust",
+    "resultDesc": "Preview and download",
+    "historyDesc": "Previous generations",
+    "describeForm": "Describe your eForm",
+    "describeFormPlaceholder": "Example: Customer registration form with VAT, name, email and phone. VAT is required.",
+    "improvePrompt": "Improve Prompt",
+    "generateEform": "Generate eForm",
+    "formName": "Form name",
+    "formId": "FormID (no spaces)",
+    "formIdPattern": "Only [A-Za-z0-9_], starting with letter",
+    "targetEnvironment": "Target environment",
+    "online": "Therefore Online",
+    "onpremise": "On-Premise",
+    "tenant": "Tenant (optional)",
+    "tenantPlaceholder": "e.g.: buildingcenter",
+    "serverUrl": "Server URL (optional)",
+    "serverUrlPlaceholder": "e.g.: https://server.local.com",
+    "functionalBlocks": "Functional blocks (optional)",
+    "formatDesign": "Format and design (optional)",
+    "targetCategory": "Target category (optional)",
+    "uploadCategoryXml": "Upload category XML",
+    "fieldsDetected": "fields detected",
+    "aiWillUseExactColNames": "AI will use these exact ColNames as keys in the eForm",
+    "downloadXml": "Download XML",
+    "summary": "Summary",
+    "warnings": "Warnings",
+    "json": "JSON",
+    "history": "History",
+    "view": "View",
+    "date": "Date",
+    "environment": "Environment",
+    "status": "Status",
+    "generating": "Generating...",
+    "noHistory": "No generation history",
+    "required": "Required",
+    "copyJson": "Copy JSON",
+    "validationErrors": "Validation errors (block download)",
+    "successGenerated": "✅ eForm generated successfully",
+    "newEform": "New eForm",
+    "viewHistory": "View history",
+    "blocks": {
+      "qr": "📷 QR / Barcode reader",
+      "autofill": "👤 Autofill with connected user",
+      "lookup": "🔍 Lookup from master category",
+      "modal": "✏️ Data update modal",
+      "signature": "✍️ Signature (canvas)",
+      "header": "🖼️ Corporate header",
+      "columns2": "📊 2-column layout",
+      "columns3": "📊 3-column layout"
+    },
+    "examples": {
+      "customerRegistration": "Customer registration",
+      "booksWithQr": "Book registration with QR"
+    },
+    "help": {
+      "howItWorks": "How it works",
+      "step1": "Describe the form you need",
+      "step2": "Click 'Improve Prompt' to get a detailed prompt (editable)",
+      "step3": "Click 'Generate eForm' to create the XML",
+      "step4": "Download the XML ready to import into Therefore"
+    },
+    "categoryDetection": {
+      "fieldsDetectedInCategory": "fields detected from category",
+      "colName": "ColName",
+      "caption": "Caption",
+      "type": "Type",
+      "length": "Len.",
+      "required": "Req."
     }
   }
 }

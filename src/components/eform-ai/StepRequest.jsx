@@ -3,36 +3,39 @@ import { Form, Input, Select, Button, Upload, Tag, Alert, Space, Card, Row, Col 
 import { CloudUploadOutlined, BulbOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import { supabase } from '../../config/supabaseClient'
+import { useTranslation } from 'react-i18next'
 
 const { TextArea } = Input
 const { Option } = Select
 
-const FUNCTIONAL_BLOCKS = [
-  { key: 'qr', label: '📷 Lector QR / códigos de barras' },
-  { key: 'autofill', label: '👤 Autorrelleno con usuario conectado' },
-  { key: 'lookup', label: '🔍 Buscar en categoría maestra' },
-  { key: 'modal', label: '✏️ Modal de actualización de datos' },
-  { key: 'signature', label: '✍️ Firma (canvas)' }
-]
-
-const FORMAT_BLOCKS = [
-  { key: 'header', label: '🖼️ Cabecera corporativa' },
-  { key: 'columns2', label: '📊 Diseño 2 columnas' },
-  { key: 'columns3', label: '📊 Diseño 3 columnas' }
-]
-
-const EXAMPLES = [
-  {
-    title: 'Alta de cliente',
-    text: 'Crear un eForm para dar de alta clientes con nombre, NIF, email, teléfono y dirección. El NIF es obligatorio.'
-  },
-  {
-    title: 'Registro de libros con QR',
-    text: 'Formulario para registrar libros en biblioteca con lector de códigos QR. Campos: código (leído por QR), título, autor, ISBN, fecha de alta.'
-  }
-]
-
 export default function StepRequest({ formData, updateFormData, goToStep, setLoading }) {
+  const { t } = useTranslation()
+
+  const FUNCTIONAL_BLOCKS = [
+    { key: 'qr', label: t('eformGeneratorAI.blocks.qr') },
+    { key: 'autofill', label: t('eformGeneratorAI.blocks.autofill') },
+    { key: 'lookup', label: t('eformGeneratorAI.blocks.lookup') },
+    { key: 'modal', label: t('eformGeneratorAI.blocks.modal') },
+    { key: 'signature', label: t('eformGeneratorAI.blocks.signature') }
+  ]
+
+  const FORMAT_BLOCKS = [
+    { key: 'header', label: t('eformGeneratorAI.blocks.header') },
+    { key: 'columns2', label: t('eformGeneratorAI.blocks.columns2') },
+    { key: 'columns3', label: t('eformGeneratorAI.blocks.columns3') }
+  ]
+
+  const EXAMPLES = [
+    {
+      title: t('eformGeneratorAI.examples.customerRegistration'),
+      text: 'Crear un eForm para dar de alta clientes con nombre, NIF, email, teléfono y dirección. El NIF es obligatorio.'
+    },
+    {
+      title: t('eformGeneratorAI.examples.booksWithQr'),
+      text: 'Formulario para registrar libros en biblioteca con lector de códigos QR. Campos: código (leído por QR), título, autor, ISBN, fecha de alta.'
+    }
+  ]
+
   const [form] = Form.useForm()
   const [categoryFileName, setCategoryFileName] = useState(null)
   const [promptImproved, setPromptImproved] = useState(false)
@@ -192,20 +195,20 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <Alert
-        message="Cómo funciona"
+        message={t('eformGeneratorAI.help.howItWorks')}
         description={
           <ol style={{ marginBottom: 0, paddingLeft: 20 }}>
-            <li>Describe el formulario en lenguaje natural</li>
-            <li>Haz clic en "Mejorar Prompt" para obtener un prompt detallado (editable)</li>
-            <li>Haz clic en "Generar eForm" para crear el XML</li>
-            <li>Descarga el XML listo para importar en Therefore</li>
+            <li>{t('eformGeneratorAI.help.step1')}</li>
+            <li>{t('eformGeneratorAI.help.step2')}</li>
+            <li>{t('eformGeneratorAI.help.step3')}</li>
+            <li>{t('eformGeneratorAI.help.step4')}</li>
           </ol>
         }
         type="info"
         showIcon
       />
 
-      <Card title="Ejemplos rápidos" size="small">
+      <Card title={t('common.examples')} size="small">
         <Space wrap>
           {EXAMPLES.map((ex, i) => (
             <Button key={i} size="small" onClick={() => loadExample(ex)}>
@@ -228,13 +231,13 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         }}
       >
         <Form.Item
-          label="Describe tu eForm (editable)"
+          label={t('eformGeneratorAI.describeForm')}
           name="request"
-          rules={[{ required: true, message: 'Describe el formulario' }]}
+          rules={[{ required: true, message: t('eformGeneratorAI.describeForm') }]}
         >
           <TextArea
             rows={promptImproved ? 12 : 6}
-            placeholder="Ejemplo: Crea un eForm para el registro de libros que además lea QRs. Campos: código QR, título, autor, ISBN, fecha de alta. El código QR es obligatorio."
+            placeholder={t('eformGeneratorAI.describeFormPlaceholder')}
             showCount
             maxLength={5000}
           />
@@ -246,7 +249,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
               icon={<BulbOutlined />}
               onClick={handleImprovePrompt}
             >
-              Mejorar Prompt
+              {t('eformGeneratorAI.improvePrompt')}
             </Button>
           </Col>
           {promptImproved && (
@@ -256,7 +259,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
                 icon={<ThunderboltOutlined />}
                 onClick={handleGenerate}
               >
-                Generar eForm
+                {t('eformGeneratorAI.generateEform')}
               </Button>
             </Col>
           )}
@@ -264,16 +267,16 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
 
         {promptImproved && (
           <>
-            <Form.Item label="Nombre del formulario" name="formName" rules={[{ required: true }]}>
+            <Form.Item label={t('eformGeneratorAI.formName')} name="formName" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
 
             <Form.Item
-              label="FormID (sin espacios)"
+              label={t('eformGeneratorAI.formId')}
               name="formId"
               rules={[
                 { required: true },
-                { pattern: /^[A-Za-z][A-Za-z0-9_]*$/, message: 'Solo [A-Za-z0-9_], empezando con letra' }
+                { pattern: /^[A-Za-z][A-Za-z0-9_]*$/, message: t('eformGeneratorAI.formIdPattern') }
               ]}
             >
               <Input />
@@ -281,10 +284,10 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           </>
         )}
 
-        <Form.Item label="Entorno destino" name="environment" rules={[{ required: true }]}>
+        <Form.Item label={t('eformGeneratorAI.targetEnvironment')} name="environment" rules={[{ required: true }]}>
           <Select>
-            <Option value="online">Therefore Online</Option>
-            <Option value="onpremise">On-Premise</Option>
+            <Option value="online">{t('eformGeneratorAI.online')}</Option>
+            <Option value="onpremise">{t('eformGeneratorAI.onpremise')}</Option>
           </Select>
         </Form.Item>
 
@@ -294,18 +297,18 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
         >
           {({ getFieldValue }) =>
             getFieldValue('environment') === 'online' ? (
-              <Form.Item label="Tenant (opcional)" name="tenant">
-                <Input placeholder="ej: buildingcenter" />
+              <Form.Item label={t('eformGeneratorAI.tenant')} name="tenant">
+                <Input placeholder={t('eformGeneratorAI.tenantPlaceholder')} />
               </Form.Item>
             ) : (
-              <Form.Item label="URL del servidor (opcional)" name="serverUrl">
-                <Input placeholder="ej: https://servidor.local.com" />
+              <Form.Item label={t('eformGeneratorAI.serverUrl')} name="serverUrl">
+                <Input placeholder={t('eformGeneratorAI.serverUrlPlaceholder')} />
               </Form.Item>
             )
           }
         </Form.Item>
 
-        <Form.Item label="Bloques funcionales (opcional)">
+        <Form.Item label={t('eformGeneratorAI.functionalBlocks')}>
           <Space wrap>
             {FUNCTIONAL_BLOCKS.map(block => (
               <Tag.CheckableTag
@@ -319,7 +322,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           </Space>
         </Form.Item>
 
-        <Form.Item label="Formato y diseño (opcional)">
+        <Form.Item label={t('eformGeneratorAI.formatDesign')}>
           <Space wrap>
             {FORMAT_BLOCKS.map(block => (
               <Tag.CheckableTag
@@ -333,31 +336,31 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
           </Space>
         </Form.Item>
 
-        <Form.Item label="Categoría destino (opcional)">
+        <Form.Item label={t('eformGeneratorAI.targetCategory')}>
           <Upload
             accept=".xml"
             beforeUpload={handleCategoryUpload}
             showUploadList={false}
           >
             <Button icon={<CloudUploadOutlined />}>
-              {categoryFileName || 'Subir XML de categoría'}
+              {categoryFileName || t('eformGeneratorAI.uploadCategoryXml')}
             </Button>
           </Upload>
           {formData.categoryFields && formData.categoryFields.length > 0 && (
             <Card
               size="small"
-              title={`${formData.categoryFields.length} campos detectados de la categoría`}
+              title={`${formData.categoryFields.length} ${t('eformGeneratorAI.categoryDetection.fieldsDetectedInCategory')}`}
               style={{ marginTop: 8 }}
             >
               <div style={{ maxHeight: 200, overflowY: 'auto' }}>
                 <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #d9d9d9' }}>
-                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>ColName</th>
-                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>Caption</th>
-                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>Tipo</th>
-                      <th style={{ padding: '4px 8px', textAlign: 'center' }}>Long.</th>
-                      <th style={{ padding: '4px 8px', textAlign: 'center' }}>Oblig.</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>{t('eformGeneratorAI.categoryDetection.colName')}</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>{t('eformGeneratorAI.categoryDetection.caption')}</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'left' }}>{t('eformGeneratorAI.categoryDetection.type')}</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'center' }}>{t('eformGeneratorAI.categoryDetection.length')}</th>
+                      <th style={{ padding: '4px 8px', textAlign: 'center' }}>{t('eformGeneratorAI.categoryDetection.required')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -377,7 +380,7 @@ export default function StepRequest({ formData, updateFormData, goToStep, setLoa
               </div>
               <Alert
                 type="info"
-                message="La IA usará estos ColName exactos como keys en el eForm"
+                message={t('eformGeneratorAI.aiWillUseExactColNames')}
                 style={{ marginTop: 8 }}
                 showIcon={false}
               />

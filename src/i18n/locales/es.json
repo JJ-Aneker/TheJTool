@@ -34,7 +34,10 @@
     "share": "Compartir",
     "settings": "Configuración",
     "lightMode": "Modo Claro",
-    "darkMode": "Modo Oscuro"
+    "darkMode": "Modo Oscuro",
+    "examples": "Ejemplos rápidos",
+    "help": "Abrir manual de ayuda",
+    "copied": "Copiado al portapapeles"
   },
 
   "nav": {
@@ -553,6 +556,84 @@
       "eformImported": "Nuevo formulario eForms importado",
       "workflowsUpdated": "Configuración de workflows actualizada",
       "backupGenerated": "Backup de instancias generado"
+    }
+  },
+
+  "eformGeneratorAI": {
+    "title": "Generador de eForms IA",
+    "request": "Petición",
+    "questions": "Preguntas",
+    "prompt": "Prompt",
+    "result": "Resultado",
+    "questionsDesc": "Aclaraciones (opcional)",
+    "promptDesc": "Revisa y ajusta",
+    "resultDesc": "Vista previa y descarga",
+    "historyDesc": "Generaciones anteriores",
+    "describeForm": "Describe tu eForm",
+    "describeFormPlaceholder": "Ejemplo: Formulario de alta de cliente con NIF, nombre, email y teléfono. El NIF es obligatorio.",
+    "improvePrompt": "Mejorar Prompt",
+    "generateEform": "Generar eForm",
+    "formName": "Nombre del formulario",
+    "formId": "FormID (sin espacios)",
+    "formIdPattern": "Solo [A-Za-z0-9_], empezando con letra",
+    "targetEnvironment": "Entorno destino",
+    "online": "Therefore Online",
+    "onpremise": "On-Premise",
+    "tenant": "Tenant (opcional)",
+    "tenantPlaceholder": "ej: buildingcenter",
+    "serverUrl": "URL del servidor (opcional)",
+    "serverUrlPlaceholder": "ej: https://servidor.local.com",
+    "functionalBlocks": "Bloques funcionales (opcional)",
+    "formatDesign": "Formato y diseño (opcional)",
+    "targetCategory": "Categoría destino (opcional)",
+    "uploadCategoryXml": "Subir XML de categoría",
+    "fieldsDetected": "campos detectados",
+    "aiWillUseExactColNames": "La IA usará estos ColName exactos como keys en el eForm",
+    "downloadXml": "Descargar XML",
+    "summary": "Resumen",
+    "warnings": "Avisos",
+    "json": "JSON",
+    "history": "Historial",
+    "view": "Ver",
+    "date": "Fecha",
+    "environment": "Entorno",
+    "status": "Estado",
+    "generating": "Generando...",
+    "noHistory": "No hay historial de generaciones",
+    "required": "Obligatorio",
+    "copyJson": "Copiar JSON",
+    "validationErrors": "Errores de validación (bloquean descarga)",
+    "successGenerated": "✅ eForm generado correctamente",
+    "newEform": "Nuevo eForm",
+    "viewHistory": "Ver historial",
+    "blocks": {
+      "qr": "📷 Lector QR / códigos de barras",
+      "autofill": "👤 Autorrelleno con usuario conectado",
+      "lookup": "🔍 Buscar en categoría maestra",
+      "modal": "✏️ Modal de actualización de datos",
+      "signature": "✍️ Firma (canvas)",
+      "header": "🖼️ Cabecera corporativa",
+      "columns2": "📊 Diseño 2 columnas",
+      "columns3": "📊 Diseño 3 columnas"
+    },
+    "examples": {
+      "customerRegistration": "Alta de cliente",
+      "booksWithQr": "Registro de libros con QR"
+    },
+    "help": {
+      "howItWorks": "Cómo funciona",
+      "step1": "Describe el formulario que necesitas",
+      "step2": "Haz clic en 'Mejorar Prompt' para obtener un prompt detallado (editable)",
+      "step3": "Haz clic en 'Generar eForm' para crear el XML",
+      "step4": "Descarga el XML listo para importar en Therefore"
+    },
+    "categoryDetection": {
+      "fieldsDetectedInCategory": "campos detectados de la categoría",
+      "colName": "ColName",
+      "caption": "Caption",
+      "type": "Tipo",
+      "length": "Long.",
+      "required": "Oblig."
     }
   }
 }

@@ -3,6 +3,7 @@ import { Card, Steps, Button, message, Spin, Tooltip } from 'antd'
 import { ArrowLeftOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useTranslation } from 'react-i18next'
 import StepRequest from '../components/eform-ai/StepRequest'
 import StepQuestions from '../components/eform-ai/StepQuestions'
 import StepPrompt from '../components/eform-ai/StepPrompt'
@@ -10,6 +11,7 @@ import StepResult from '../components/eform-ai/StepResult'
 import StepHistory from '../components/eform-ai/StepHistory'
 
 export default function EFormGeneratorAI() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -44,11 +46,11 @@ export default function EFormGeneratorAI() {
   })
 
   const steps = [
-    { title: 'Petición', description: 'Describe tu eForm' },
-    { title: 'Preguntas', description: 'Aclaraciones (opcional)' },
-    { title: 'Prompt', description: 'Revisa y ajusta' },
-    { title: 'Resultado', description: 'Vista previa y descarga' },
-    { title: 'Historial', description: 'Generaciones anteriores' }
+    { title: t('eformGeneratorAI.request'), description: t('eformGeneratorAI.describeForm') },
+    { title: t('eformGeneratorAI.questions'), description: t('eformGeneratorAI.questionsDesc') },
+    { title: t('eformGeneratorAI.prompt'), description: t('eformGeneratorAI.promptDesc') },
+    { title: t('eformGeneratorAI.result'), description: t('eformGeneratorAI.resultDesc') },
+    { title: t('eformGeneratorAI.history'), description: t('eformGeneratorAI.historyDesc') }
   ]
 
   const updateFormData = (updates) => {
@@ -83,9 +85,9 @@ export default function EFormGeneratorAI() {
                 icon={<ArrowLeftOutlined />}
                 onClick={handleBack}
               />
-              <span>Generador de eForms IA</span>
+              <span>{t('eformGeneratorAI.title')}</span>
             </div>
-            <Tooltip title="Abrir manual de ayuda">
+            <Tooltip title={t('common.help')}>
               <Button
                 type="text"
                 icon={<QuestionCircleOutlined />}

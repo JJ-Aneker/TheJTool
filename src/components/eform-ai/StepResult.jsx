@@ -1,7 +1,9 @@
 import { Button, Space, Alert, Tabs, Table, theme } from 'antd'
 import { DownloadOutlined, CopyOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 
 export default function StepResult({ formData, updateFormData, goToStep, setLoading }) {
+  const { t } = useTranslation()
   const { token } = theme.useToken()
   const { validation, xml, components } = formData
 
@@ -17,7 +19,7 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
 
   const handleCopyJSON = () => {
     navigator.clipboard.writeText(JSON.stringify(components, null, 2))
-    alert('JSON copiado al portapapeles')
+    alert(t('common.copied'))
   }
 
   const handleNewEForm = () => {
@@ -68,15 +70,15 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
   const tabItems = [
     {
       key: 'fields',
-      label: 'Resumen',
+      label: t('eformGeneratorAI.summary'),
       children: (
         <Table
           dataSource={fieldsTableData}
           columns={[
             { title: 'Key', dataIndex: 'field', key: 'field' },
             { title: 'Label', dataIndex: 'label', key: 'label' },
-            { title: 'Tipo', dataIndex: 'type', key: 'type' },
-            { title: 'Obligatorio', dataIndex: 'required', key: 'required' }
+            { title: t('common.type'), dataIndex: 'type', key: 'type' },
+            { title: t('eformGeneratorAI.required'), dataIndex: 'required', key: 'required' }
           ]}
           pagination={false}
           size="small"
@@ -85,11 +87,11 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
     },
     {
       key: 'json',
-      label: 'JSON',
+      label: t('eformGeneratorAI.json'),
       children: (
         <div>
           <Button icon={<CopyOutlined />} onClick={handleCopyJSON} style={{ marginBottom: 8 }}>
-            Copiar JSON
+            {t('eformGeneratorAI.copyJson')}
           </Button>
           <pre style={{
             background: token.colorBgLayout,
@@ -111,7 +113,7 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       {validation?.errors?.length > 0 && (
         <Alert
-          message="Errores de validación (bloquean descarga)"
+          message={t('eformGeneratorAI.validationErrors')}
           description={
             <ul>
               {validation.errors.map((err, i) => <li key={i}>{err}</li>)}
@@ -124,7 +126,7 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
 
       {validation?.warnings?.length > 0 && (
         <Alert
-          message="Avisos (no bloquean descarga)"
+          message={t('eformGeneratorAI.warnings')}
           description={
             <ul>
               {validation.warnings.map((warn, i) => <li key={i}>{warn}</li>)}
@@ -137,7 +139,7 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
 
       {validation?.errors?.length === 0 && (
         <Alert
-          message="✅ eForm generado correctamente"
+          message={t('eformGeneratorAI.successGenerated')}
           type="success"
           showIcon
         />
@@ -152,13 +154,13 @@ export default function StepResult({ formData, updateFormData, goToStep, setLoad
           onClick={handleDownload}
           disabled={validation?.errors?.length > 0}
         >
-          Descargar XML
+          {t('eformGeneratorAI.downloadXml')}
         </Button>
         <Button onClick={handleNewEForm}>
-          Nuevo eForm
+          {t('eformGeneratorAI.newEform')}
         </Button>
         <Button onClick={() => goToStep(4)}>
-          Ver historial
+          {t('eformGeneratorAI.viewHistory')}
         </Button>
       </Space>
     </Space>
