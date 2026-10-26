@@ -819,7 +819,12 @@ export default function LicenseConfigurator() {
                           updateTechPartner(idx, e.target.value)
                         }}
                         size="small"
-                        style={{ width: 130, textAlign: 'right' }}
+                        style={{
+                          width: 130,
+                          textAlign: 'right',
+                          MozAppearance: 'textfield'
+                        }}
+                        className="no-spinner"
                         min={0}
                         step="0.01"
                       />
@@ -1030,7 +1035,8 @@ export default function LicenseConfigurator() {
                     placeholder="Importe"
                     value={tp.importe}
                     onChange={(e) => updateTempPartnerImporte(tp.nombre, e.target.value)}
-                    style={{ width: '100%', textAlign: 'right' }}
+                    style={{ width: '100%', textAlign: 'right', MozAppearance: 'textfield' }}
+                    className="no-spinner"
                     min={0}
                     step="0.01"
                   />
