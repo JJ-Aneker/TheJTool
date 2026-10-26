@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Card, Steps, Button, message, Spin, Tooltip } from 'antd'
-import { ArrowLeftOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTranslation } from 'react-i18next'
+import HelpButton from '../components/HelpButton'
 import StepRequest from '../components/eform-ai/StepRequest'
 import StepQuestions from '../components/eform-ai/StepQuestions'
 import StepPrompt from '../components/eform-ai/StepPrompt'
@@ -87,13 +88,7 @@ export default function EFormGeneratorAI() {
               />
               <span>{t('eformGeneratorAI.title')}</span>
             </div>
-            <Tooltip title={t('common.help')}>
-              <Button
-                type="text"
-                icon={<QuestionCircleOutlined />}
-                onClick={() => navigate('/manual#eformGeneratorAI')}
-              />
-            </Tooltip>
+            <HelpButton section="eformGeneratorAI" />
           </div>
         }
         style={{ maxWidth: 1200, margin: '0 auto' }}
