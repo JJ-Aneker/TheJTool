@@ -53,6 +53,7 @@ export default function LicenseConfigurator() {
 
   const [searchText, setSearchText] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedCatalogItems, setSelectedCatalogItems] = useState([])
 
   // Servicios predefinidos
   const serviciosDisponibles = [
@@ -115,6 +116,31 @@ export default function LicenseConfigurator() {
       setSelectedItems([...selectedItems, { ...item, cantidad: 1 }])
     }
     antMessage.success('Artículo agregado')
+  }
+
+  const addMultipleItems = () => {
+    if (selectedCatalogItems.length === 0) {
+      antMessage.warning('Selecciona al menos un artículo')
+      return
+    }
+
+    let added = 0
+    const newItems = [...selectedItems]
+
+    selectedCatalogItems.forEach(codigo => {
+      const item = items.find(i => i.codigo === codigo)
+      if (item) {
+        const exists = newItems.find(i => i.codigo === item.codigo)
+        if (!exists) {
+          newItems.push({ ...item, cantidad: 1 })
+          added++
+        }
+      }
+    })
+
+    setSelectedItems(newItems)
+    setSelectedCatalogItems([])
+    antMessage.success(`${added} artículos agregados`)
   }
 
   const updateQuantity = (codigo, cantidad) => {
@@ -691,11 +717,26 @@ export default function LicenseConfigurator() {
 
       {/* DRAWER CATÁLOGO */}
       <Drawer
-        title="Catálogo de Artículos"
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginRight: 24 }}>
+            <span>Catálogo de Artículos</span>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={addMultipleItems}
+              disabled={selectedCatalogItems.length === 0}
+            >
+              Agregar seleccionados ({selectedCatalogItems.length})
+            </Button>
+          </div>
+        }
         placement="right"
-        width={800}
+        width={900}
         open={catalogDrawerOpen}
-        onClose={() => setCatalogDrawerOpen(false)}
+        onClose={() => {
+          setCatalogDrawerOpen(false)
+          setSelectedCatalogItems([])
+        }}
       >
         <Space style={{ marginBottom: 16, width: '100%' }} direction="vertical">
           <Input.Search
@@ -718,6 +759,10 @@ export default function LicenseConfigurator() {
         </Space>
 
         <Table
+          rowSelection={{
+            selectedRowKeys: selectedCatalogItems,
+            onChange: (selectedRowKeys) => setSelectedCatalogItems(selectedRowKeys)
+          }}
           dataSource={filteredItems}
           rowKey="codigo"
           size="small"
