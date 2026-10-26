@@ -805,17 +805,17 @@ export default function LicenseConfigurator() {
                     width: 150,
                     align: 'right',
                     render: (val, record, index) => (
-                      <InputNumber
+                      <Input
+                        type="number"
                         value={val}
-                        onChange={(v) => {
+                        onChange={(e) => {
                           const idx = techPartners.findIndex(tp => tp.nombre === record.nombre)
-                          updateTechPartner(idx, v)
+                          updateTechPartner(idx, e.target.value)
                         }}
-                        precision={2}
                         size="small"
-                        style={{ width: 130 }}
-                        suffix="€"
+                        style={{ width: 130, textAlign: 'right' }}
                         min={0}
+                        step="0.01"
                       />
                     )
                   },
