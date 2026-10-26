@@ -58,7 +58,7 @@ export default function EFormGeneratorAI() {
   }
 
   return (
-    <div className="container-main">
+    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* HEADER */}
       <div className="header-main">
         <div>
@@ -67,55 +67,73 @@ export default function EFormGeneratorAI() {
         </div>
         <div className="header-actions">
           <HelpButton section="eformGeneratorAI" />
+          <button
+            onClick={() => goToStep(0)}
+            className={currentStep === 0 ? 'btn-primary' : 'btn-default'}
+          >
+            📝 Nueva Generación
+          </button>
+          <button
+            onClick={() => goToStep(3)}
+            className={currentStep === 3 ? 'btn-primary' : 'btn-default'}
+          >
+            📚 Historial
+          </button>
         </div>
       </div>
 
       {/* CONTENT */}
-      <div className="content-main" style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <Steps
-          current={currentStep}
-          items={steps}
-          style={{ marginBottom: 32 }}
-          size="small"
-        />
+      <div style={{
+        flex: 1,
+        overflow: 'auto',
+        paddingRight: '4px'
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <Steps
+            current={currentStep}
+            items={steps}
+            style={{ marginBottom: 32 }}
+            size="small"
+          />
 
-        <Spin spinning={loading}>
-          {currentStep === 0 && (
-            <StepRequest
-              formData={formData}
-              updateFormData={updateFormData}
-              goToStep={goToStep}
-              setLoading={setLoading}
-            />
-          )}
+          <Spin spinning={loading}>
+            {currentStep === 0 && (
+              <StepRequest
+                formData={formData}
+                updateFormData={updateFormData}
+                goToStep={goToStep}
+                setLoading={setLoading}
+              />
+            )}
 
-          {currentStep === 1 && (
-            <StepPrompt
-              formData={formData}
-              updateFormData={updateFormData}
-              goToStep={goToStep}
-              setLoading={setLoading}
-            />
-          )}
+            {currentStep === 1 && (
+              <StepPrompt
+                formData={formData}
+                updateFormData={updateFormData}
+                goToStep={goToStep}
+                setLoading={setLoading}
+              />
+            )}
 
-          {currentStep === 2 && (
-            <StepResult
-              formData={formData}
-              updateFormData={updateFormData}
-              goToStep={goToStep}
-              setLoading={setLoading}
-            />
-          )}
+            {currentStep === 2 && (
+              <StepResult
+                formData={formData}
+                updateFormData={updateFormData}
+                goToStep={goToStep}
+                setLoading={setLoading}
+              />
+            )}
 
-          {currentStep === 3 && (
-            <StepHistory
-              formData={formData}
-              updateFormData={updateFormData}
-              goToStep={goToStep}
-              setLoading={setLoading}
-            />
-          )}
-        </Spin>
+            {currentStep === 3 && (
+              <StepHistory
+                formData={formData}
+                updateFormData={updateFormData}
+                goToStep={goToStep}
+                setLoading={setLoading}
+              />
+            )}
+          </Spin>
+        </div>
       </div>
     </div>
   )
