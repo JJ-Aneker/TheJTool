@@ -335,52 +335,59 @@ export default function LicenseConfigurator() {
     antMessage.success('Cotización cargada')
   }
 
-  // Exportar a Excel
-  const exportToExcel = () => {
-    const wb = XLSX.utils.book_new()
+  // Exportar a Word
+  const exportToExcel = async () => {
+    try {
+      antMessage.loading({ content: 'Generando documento...', key: 'docx', duration: 0 })
 
-    // Hoja principal con formato similar al Excel
-    const wsData = [
-      ['', `Configurador Therefore™ ${edicion === 'onpremise' ? 'On Premise' : edicion === 'online' ? 'Online' : 'Suscripción'}`],
-      [],
-      ['', 'SFDC OPP', sfdcOpp, 'DEAL SUPPORT', dealSupport, 'FECHA', fecha],
-      ['', 'A.M.', accountManager],
-      ['', 'CLIENTE', cliente],
-      [],
-      ['', 'TECH PARTNERS', '', 'Importe Total'],
-      ...techPartners.map(tp => ['', tp.nombre, '', tp.importe.toFixed(2)]),
-      ['', 'TOTAL TECH PARTNERS', '', totalTechPartners.toFixed(2)],
-      [],
-      ['', 'SERVICIOS', '', 'Unidades', 'Importe Total'],
-      ...servicios.map(s => ['', s.descripcion, '', s.unidades, (s.pvp_jornada * s.unidades).toFixed(2)]),
-      ['', 'TOTAL SERVICIOS', '', '', totalServicios.toFixed(2)],
-      [],
-      ['', 'RESUMEN', '', 'Importe Total'],
-      ['', 'Tech Partners', '', totalTechPartners.toFixed(2)],
-      ['', 'Servicios', '', totalServicios.toFixed(2)],
-      ['', 'Total Therefore', '', totalTherefore.toFixed(2)],
-      ['', 'TOTAL CONTRACT VALUE', '', totalContractValue.toFixed(2)],
-      [],
-      ['', 'DETALLE SOLUCIONES | PRODUCTO'],
-      ['', 'Clase', 'Código', 'Concepto', 'Unidad', 'PVP', 'PVP Total', 'CSS', 'CSS Total'],
-      ...selectedItems.map(item => [
-        '',
-        item.clase,
-        item.codigo,
-        item.descripcion,
-        item.cantidad,
-        item.pvp.toFixed(2),
-        (item.pvp * item.cantidad).toFixed(2),
-        (item.css_pvp || 0).toFixed(2),
-        ((item.css_pvp || 0) * item.cantidad).toFixed(2)
-      ])
-    ]
+      // Preparar datos para el endpoint
+      const quotationData = {
+        cliente: cliente || 'Cliente',
+        sfdcOpp: sfdcOpp || '',
+        dealSupport: dealSupport || '',
+        accountManager: accountManager || '',
+        fecha: fecha || new Date().toISOString().split('T')[0],
+        edicion,
+        items: selectedItems,
+        servicios,
+        techPartners: techPartners.filter(tp => tp.importe > 0),
+        totalLicencias,
+        totalCSS,
+        totalServicios,
+        totalTechPartners,
+        totalGeneral: totalContractValue,
+        cuotaAnual,
+        anosContrato,
+        soporteLocal
+      }
 
-    const ws = XLSX.utils.aoa_to_sheet(wsData)
-    XLSX.utils.book_append_sheet(wb, ws, 'Cotización')
+      const response = await fetch('/api/build-docx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectData: quotationData,
+          tipoDoc: 'quotation'
+        })
+      })
 
-    XLSX.writeFile(wb, `Therefore_${edicion}_${sfdcOpp || 'Cotizacion'}_${fecha}.xlsx`)
-    antMessage.success('Excel exportado')
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error generando documento')
+      }
+
+      const { docxBase64, filename } = await response.json()
+
+      // Descargar archivo
+      const link = document.createElement('a')
+      link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${docxBase64}`
+      link.download = filename
+      link.click()
+
+      antMessage.success({ content: 'Documento generado correctamente', key: 'docx' })
+    } catch (error) {
+      console.error('Error exportando:', error)
+      antMessage.error({ content: error.message || 'Error generando documento', key: 'docx' })
+    }
   }
 
   // Limpiar
@@ -459,7 +466,7 @@ export default function LicenseConfigurator() {
             disabled={selectedItems.length === 0}
             className="btn-default"
           >
-            Excel
+            Word
           </Button>
 
           <Button

@@ -934,6 +934,263 @@ async function buildDocument(projectData) {
   return Packer.toBuffer(doc);
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
+// GENERADOR DE DOCUMENTOS DE COTIZACIÓN DE LICENCIAS
+// ═════════════════════════════════════════════════════════════════════════════
+
+async function buildQuotationDocument(quotationData) {
+  const {
+    cliente = 'Cliente',
+    sfdcOpp = '',
+    dealSupport = '',
+    accountManager = '',
+    fecha = new Date().toISOString().split('T')[0],
+    edicion = 'onpremise',
+    items = [],
+    servicios = [],
+    techPartners = [],
+    totalLicencias = 0,
+    totalCSS = 0,
+    totalServicios = 0,
+    totalTechPartners = 0,
+    totalGeneral = 0,
+    cuotaAnual = 0,
+    anosContrato = 1,
+    soporteLocal = 0
+  } = quotationData;
+
+  const edicionLabel = edicion === 'onpremise' ? 'On-Premise' :
+                       edicion === 'online' ? 'Online' : 'Suscripción';
+
+  const sections = [];
+
+  // Portada
+  sections.push(
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 3000, after: 400 },
+      children: [new TextRun({
+        text: 'COTIZACIÓN DE LICENCIAS',
+        font: F.H1,
+        size: 64,
+        color: C.RED,
+        bold: true
+      })]
+    }),
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 200 },
+      children: [new TextRun({
+        text: `Therefore™ ${edicionLabel}`,
+        font: F.BODY,
+        size: 32,
+        color: C.DARK
+      })]
+    }),
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 2000 },
+      children: [new TextRun({
+        text: cliente,
+        font: F.BODY,
+        size: 28,
+        color: C.DARK,
+        bold: true
+      })]
+    }),
+    new Paragraph({ children: [new PageBreak()] })
+  );
+
+  // Datos Generales
+  sections.push(
+    h1('Datos Generales'),
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: BDRS(),
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('SFDC OPP', { bold: true })], ...CM }),
+            new TableCell({ children: [p(sfdcOpp)], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Deal Support', { bold: true })], ...CM }),
+            new TableCell({ children: [p(dealSupport)], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Account Manager', { bold: true })], ...CM }),
+            new TableCell({ children: [p(accountManager)], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Fecha', { bold: true })], ...CM }),
+            new TableCell({ children: [p(fecha)], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Edición', { bold: true })], ...CM }),
+            new TableCell({ children: [p(edicionLabel)], ...CM })
+          ]
+        })
+      ]
+    })
+  );
+
+  // Licencias
+  if (items.length > 0) {
+    sections.push(
+      h1('Licencias y Productos'),
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: BDRS(),
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({ children: [p('Código', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('Descripción', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('Cantidad', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('PVP', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('Total', { bold: true })], shading: { fill: C.LGREY }, ...CM })
+            ]
+          }),
+          ...items.map(item => new TableRow({
+            children: [
+              new TableCell({ children: [p(item.codigo || '', { size: 16 })], ...CM }),
+              new TableCell({ children: [p(item.descripcion || '', { size: 16 })], ...CM }),
+              new TableCell({ children: [p(String(item.cantidad || 1), { size: 16 })], ...CM }),
+              new TableCell({ children: [p(`${(item.pvp || 0).toFixed(2)} €`, { size: 16 })], ...CM }),
+              new TableCell({ children: [p(`${((item.pvp || 0) * (item.cantidad || 1)).toFixed(2)} €`, { size: 16, bold: true })], ...CM })
+            ]
+          }))
+        ]
+      })
+    );
+  }
+
+  // Servicios
+  if (servicios.length > 0) {
+    sections.push(
+      h1('Servicios Profesionales'),
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: BDRS(),
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({ children: [p('Servicio', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('Unidades', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('PVP/Unidad', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('Total', { bold: true })], shading: { fill: C.LGREY }, ...CM })
+            ]
+          }),
+          ...servicios.map(serv => new TableRow({
+            children: [
+              new TableCell({ children: [p(serv.descripcion || '', { size: 16 })], ...CM }),
+              new TableCell({ children: [p(String(serv.unidades || 1), { size: 16 })], ...CM }),
+              new TableCell({ children: [p(`${(serv.pvp_jornada || 0).toFixed(2)} €`, { size: 16 })], ...CM }),
+              new TableCell({ children: [p(`${((serv.pvp_jornada || 0) * (serv.unidades || 1)).toFixed(2)} €`, { size: 16, bold: true })], ...CM })
+            ]
+          }))
+        ]
+      })
+    );
+  }
+
+  // Tech Partners
+  const activeTechPartners = techPartners.filter(tp => tp.importe > 0);
+  if (activeTechPartners.length > 0) {
+    sections.push(
+      h1('Tech Partners'),
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: BDRS(),
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({ children: [p('Partner', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('Importe', { bold: true })], shading: { fill: C.LGREY }, ...CM })
+            ]
+          }),
+          ...activeTechPartners.map(tp => new TableRow({
+            children: [
+              new TableCell({ children: [p(tp.nombre || '', { size: 16 })], ...CM }),
+              new TableCell({ children: [p(`${(tp.importe || 0).toFixed(2)} €`, { size: 16, bold: true })], ...CM })
+            ]
+          }))
+        ]
+      })
+    );
+  }
+
+  // Resumen
+  sections.push(
+    h1('Resumen Económico'),
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: BDRS(),
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Total Licencias', { bold: true })], ...CM }),
+            new TableCell({ children: [p(`${totalLicencias.toFixed(2)} €`, { size: 18, bold: true })], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Total CSS', { bold: true })], ...CM }),
+            new TableCell({ children: [p(`${totalCSS.toFixed(2)} €`, { size: 18, bold: true })], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Total Servicios', { bold: true })], ...CM }),
+            new TableCell({ children: [p(`${totalServicios.toFixed(2)} €`, { size: 18, bold: true })], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ children: [p('Tech Partners', { bold: true })], ...CM }),
+            new TableCell({ children: [p(`${totalTechPartners.toFixed(2)} €`, { size: 18, bold: true })], ...CM })
+          ]
+        }),
+        new TableRow({
+          children: [
+            new TableCell({
+              children: [p('TOTAL GENERAL', { bold: true, size: 22, color: C.RED })],
+              shading: { fill: C.YELLOW },
+              ...CM
+            }),
+            new TableCell({
+              children: [p(`${totalGeneral.toFixed(2)} €`, { size: 22, bold: true, color: C.RED })],
+              shading: { fill: C.YELLOW },
+              ...CM
+            })
+          ]
+        })
+      ]
+    })
+  );
+
+  const doc = new Document({
+    sections: [{
+      properties: {
+        page: {
+          margin: { top: MAR_TOP, right: MAR_LAT, bottom: MAR_BOT, left: MAR_LAT }
+        }
+      },
+      children: sections
+    }]
+  });
+
+  return await Packer.toBuffer(doc);
+}
+
 // ── HANDLER ───────────────────────────────────────────────────────────────────
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -995,16 +1252,28 @@ export default async function handler(req, res) {
       projectData.tipoDoc = tipoDoc;
     }
 
-    console.log('[BUILD-DOCX] Llamando a buildDocument()...')
+    console.log('[BUILD-DOCX] Llamando a build función...')
+    console.log('[BUILD-DOCX] tipoDoc:', tipoDoc)
     console.log('[BUILD-DOCX] ═══════════════════════════════════════════════════')
 
-    const buffer = await buildDocument(projectData);
-    const base64 = buffer.toString('base64');
+    let buffer, filename;
 
-    const cliente = projectData.cliente?.nombre || 'Cliente';
-    const fecha = (projectData.proyecto?.fecha || '').replace(/\./g, '');
-    const version = (projectData.proyecto?.version || 'v1_0').replace(/\./g, '_');
-    const filename = `${cliente.replace(/\s+/g, '_')}_EFDT_${version}.docx`;
+    if (tipoDoc === 'quotation') {
+      // Generar documento de cotización
+      buffer = await buildQuotationDocument(projectData);
+      const cliente = projectData.cliente || 'Cliente';
+      const fecha = projectData.fecha || new Date().toISOString().split('T')[0];
+      filename = `Cotización_Therefore_${cliente.replace(/\s+/g, '_')}_${fecha.replace(/-/g, '')}.docx`;
+    } else {
+      // Generar documento estándar (EFDT, requirements, etc.)
+      buffer = await buildDocument(projectData);
+      const cliente = projectData.cliente?.nombre || 'Cliente';
+      const fecha = (projectData.proyecto?.fecha || '').replace(/\./g, '');
+      const version = (projectData.proyecto?.version || 'v1_0').replace(/\./g, '_');
+      filename = `${cliente.replace(/\s+/g, '_')}_EFDT_${version}.docx`;
+    }
+
+    const base64 = buffer.toString('base64');
 
     Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
     return res.status(200).json({ success: true, docxBase64: base64, filename });
