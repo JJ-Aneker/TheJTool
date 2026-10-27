@@ -580,6 +580,52 @@ export default function LicenseConfigurator() {
           </Col>
         </Row>
 
+        {/* FILA 1.5: SUSCRIPCIÓN (solo para Online y Suscripción) */}
+        {(edicion === 'online' || edicion === 'suscripcion') && (
+          <Card size="small" title="Suscripción" style={{ marginBottom: 16 }}>
+            <Row gutter={[16, 16]}>
+              <Col span={8}>
+                <div>
+                  <Text strong>Cuota Anual</Text>
+                  <InputNumber
+                    value={cuotaAnual}
+                    onChange={(val) => setCuotaAnual(val || 0)}
+                    precision={2}
+                    style={{ width: '100%', marginTop: 4 }}
+                    min={0}
+                    placeholder="0.00"
+                  />
+                </div>
+              </Col>
+              <Col span={8}>
+                <div>
+                  <Text strong>Años Contrato</Text>
+                  <InputNumber
+                    value={anosContrato}
+                    onChange={(val) => setAnosContrato(val || 1)}
+                    style={{ width: '100%', marginTop: 4 }}
+                    min={1}
+                    placeholder="1"
+                  />
+                </div>
+              </Col>
+              <Col span={8}>
+                <div>
+                  <Text strong>Soporte Local (€/año)</Text>
+                  <InputNumber
+                    value={soporteLocal}
+                    onChange={(val) => setSoporteLocal(val || 0)}
+                    precision={2}
+                    style={{ width: '100%', marginTop: 4 }}
+                    min={0}
+                    placeholder="0.00"
+                  />
+                </div>
+              </Col>
+            </Row>
+          </Card>
+        )}
+
         {/* FILA 2: TABLA LICENCIAS */}
         <Card
           size="small"
