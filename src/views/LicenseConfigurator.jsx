@@ -916,26 +916,28 @@ export default function LicenseConfigurator() {
           setCatalogDrawerOpen(false)
           setSelectedCatalogItems([])
         }}
+        bodyStyle={{ padding: '16px 0' }}
       >
         <Input.Search
           placeholder="Buscar por código o descripción..."
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           allowClear
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, paddingLeft: 24, paddingRight: 24 }}
         />
 
-        <Table
-          rowSelection={{
-            selectedRowKeys: selectedCatalogItems,
-            onChange: (selectedRowKeys) => setSelectedCatalogItems(selectedRowKeys)
-          }}
-          dataSource={filteredItems}
-          rowKey="codigo"
-          size="small"
-          pagination={{ pageSize: 20 }}
-          loading={loading}
-          scroll={{ y: 600 }}
+        <div style={{ paddingLeft: 24, paddingRight: 24 }}>
+          <Table
+            rowSelection={{
+              selectedRowKeys: selectedCatalogItems,
+              onChange: (selectedRowKeys) => setSelectedCatalogItems(selectedRowKeys)
+            }}
+            dataSource={filteredItems}
+            rowKey="codigo"
+            size="small"
+            pagination={{ pageSize: 20 }}
+            loading={loading}
+            scroll={{ y: 600 }}
           columns={[
             {
               title: 'Código',
@@ -971,7 +973,8 @@ export default function LicenseConfigurator() {
               )
             }
           ]}
-        />
+          />
+        </div>
       </Drawer>
 
       {/* Modal Servicios */}
