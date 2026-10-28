@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Table, Button, Input, InputNumber, Select, Card, Drawer, Space, Modal, Form, message as antMessage, Divider, Typography, Statistic, Row, Col, Tag } from 'antd'
-import { PlusOutlined, SaveOutlined, DownloadOutlined, DeleteOutlined, HistoryOutlined, ShoppingCartOutlined, AppstoreOutlined } from '@ant-design/icons'
+import { Table, Button, Input, InputNumber, Select, Card, Drawer, Space, Modal, Form, message as antMessage, Divider, Typography, Statistic, Row, Col, Tag, Upload } from 'antd'
+import { PlusOutlined, SaveOutlined, DownloadOutlined, DeleteOutlined, HistoryOutlined, ShoppingCartOutlined, AppstoreOutlined, FileImageOutlined } from '@ant-design/icons'
 import { message } from '../utils/message'
 import HelpButton from '../components/HelpButton'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../config/supabaseClient'
+import { storageService } from '../services/storageService'
 import * as XLSX from 'xlsx'
 
 const { TextArea } = Input
@@ -59,6 +60,13 @@ export default function LicenseConfigurator() {
   const [selectedServicios, setSelectedServicios] = useState([])
   const [tempTechPartners, setTempTechPartners] = useState([])
 
+  // Estados para portada
+  const [portada, setPortada] = useState(null)
+  const [portadaPreview, setPortadaPreview] = useState(null)
+  const [portadaModalOpen, setPortadaModalOpen] = useState(false)
+  const [savedCovers, setSavedCovers] = useState([])
+  const [useDefaultPortada, setUseDefaultPortada] = useState(false)
+
   // Servicios predefinidos
   const serviciosDisponibles = [
     { codigo: '739ZZ051', descripcion: 'Consultoría', pvp_jornada: 880 },
@@ -85,6 +93,28 @@ export default function LicenseConfigurator() {
   useEffect(() => {
     loadItems()
   }, [edicion])
+
+  // Cargar portadas guardadas
+  useEffect(() => {
+    if (user?.id) {
+      loadSavedCovers()
+    }
+  }, [user])
+
+  const loadSavedCovers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('portadas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setSavedCovers(data || [])
+    } catch (err) {
+      console.error('Error cargando portadas:', err)
+    }
+  }
 
   const loadItems = async () => {
     setLoading(true)
@@ -918,12 +948,14 @@ export default function LicenseConfigurator() {
         }}
         bodyStyle={{ padding: '16px 0' }}
       >
-        <div style={{ padding: '0 24px', marginBottom: 16 }}>
+        <div style={{ padding: '0 24px', marginBottom: 16, background: '#f5f5f5', borderRadius: 4 }}>
           <Input.Search
             placeholder="Buscar por código o descripción..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             allowClear
+            bordered={false}
+            style={{ background: 'transparent' }}
           />
         </div>
 
