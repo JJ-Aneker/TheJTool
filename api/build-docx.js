@@ -1096,7 +1096,9 @@ async function buildQuotationDocument(quotationData) {
     totalGeneral = 0,
     cuotaAnual = 0,
     anosContrato = 1,
-    soporteLocal = 0
+    soporteLocal = 0,
+    portada = null,
+    useDefaultPortada = false
   } = quotationData;
 
   const edicionLabel = edicion === 'onpremise' ? 'On-Premise' :
@@ -1104,42 +1106,65 @@ async function buildQuotationDocument(quotationData) {
 
   const sections = [];
 
-  // Portada
-  sections.push(
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { before: 3000, after: 400 },
-      children: [new TextRun({
-        text: 'COTIZACIÓN DE LICENCIAS',
-        font: F.H1,
-        size: 64,
-        color: C.RED,
-        bold: true
-      })]
-    }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 200 },
-      children: [new TextRun({
-        text: `Therefore™ ${edicionLabel}`,
-        font: F.BODY,
-        size: 32,
-        color: C.DARK
-      })]
-    }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 2000 },
-      children: [new TextRun({
-        text: cliente,
-        font: F.BODY,
-        size: 28,
-        color: C.DARK,
-        bold: true
-      })]
-    }),
-    new Paragraph({ children: [new PageBreak()] })
-  );
+  // Portada con imagen si existe
+  if (portada?.imgBase64 || portada?.base64) {
+    const imgData = portada.imgBase64 || portada.base64;
+    const base64Clean = imgData.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+
+    sections.push(
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 1000 },
+        children: [
+          new ImageRun({
+            data: Buffer.from(base64Clean, 'base64'),
+            transformation: {
+              width: 600,
+              height: Math.round(600 * (portada.height / portada.width))
+            }
+          })
+        ]
+      }),
+      new Paragraph({ children: [new PageBreak()] })
+    );
+  } else {
+    // Portada sin imagen
+    sections.push(
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 3000, after: 400 },
+        children: [new TextRun({
+          text: 'COTIZACIÓN DE LICENCIAS',
+          font: F.H1,
+          size: 64,
+          color: C.RED,
+          bold: true
+        })]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 },
+        children: [new TextRun({
+          text: `Therefore™ ${edicionLabel}`,
+          font: F.BODY,
+          size: 32,
+          color: C.DARK
+        })]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 2000 },
+        children: [new TextRun({
+          text: cliente,
+          font: F.BODY,
+          size: 28,
+          color: C.DARK,
+          bold: true
+        })]
+      }),
+      new Paragraph({ children: [new PageBreak()] })
+    );
+  }
 
   // Datos Generales
   sections.push(
@@ -1182,7 +1207,18 @@ async function buildQuotationDocument(quotationData) {
     })
   );
 
-  // Secciones Educativas
+  // Índice (Table of Contents)
+  sections.push(
+    new Paragraph({ children: [new PageBreak()] }),
+    h1('Índice'),
+    new TableOfContents('Índice', {
+      hyperlink: true,
+      headingStyleRange: '1-3'
+    }),
+    new Paragraph({ children: [new PageBreak()] })
+  );
+
+  // Secciones Educativas (Modelo + Módulos Incluidos)
   const seccionesEducativas = generarSeccionesEducativas(edicion, items);
   sections.push(...seccionesEducativas);
 
