@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import { TEXTOS } from './_lib/knowledge/textos_estandar.js';
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js';
 import { formatImporte } from './_lib/knowledge/ratios.js';
+import LICENSE_DESCRIPTIONS from './license_descriptions.json' assert { type: 'json' };
 
 // Helper para acceso a datos de vertical (con fallback a hardcoded)
 function getVerticalData(verticalKey) {
@@ -938,6 +939,141 @@ async function buildDocument(projectData) {
 // GENERADOR DE DOCUMENTOS DE COTIZACIÓN DE LICENCIAS
 // ═════════════════════════════════════════════════════════════════════════════
 
+// Funciones auxiliares para detectar módulos
+function detectModulosIncluidos(items) {
+  const codigos = items.map(i => i.codigo || '').map(c => c.toUpperCase());
+  const incluidos = [];
+  const conectores = LICENSE_DESCRIPTIONS.conectores;
+  const iaModules = LICENSE_DESCRIPTIONS.ia_modules;
+
+  // Detectar conectores
+  Object.entries(conectores).forEach(([key, conector]) => {
+    if (conector.codigo && codigos.some(c => c.includes(conector.codigo.toUpperCase()))) {
+      incluidos.push({ ...conector, tipo: 'conector', key });
+    }
+  });
+
+  // Detectar módulos de IA
+  Object.entries(iaModules).forEach(([key, modulo]) => {
+    if (modulo.codigo && codigos.some(c => c.includes(modulo.codigo.toUpperCase()))) {
+      incluidos.push({ ...modulo, tipo: 'ia', key });
+    }
+  });
+
+  return incluidos;
+}
+
+function detectModulosOpcionales(items) {
+  const incluidos = detectModulosIncluidos(items);
+  const keysIncluidos = incluidos.map(m => m.key);
+  const opcionales = [];
+
+  const conectores = LICENSE_DESCRIPTIONS.conectores;
+  const iaModules = LICENSE_DESCRIPTIONS.ia_modules;
+
+  // Conectores no incluidos
+  Object.entries(conectores).forEach(([key, conector]) => {
+    if (!keysIncluidos.includes(key)) {
+      opcionales.push({ ...conector, tipo: 'conector', key });
+    }
+  });
+
+  // Módulos IA no incluidos
+  Object.entries(iaModules).forEach(([key, modulo]) => {
+    if (!keysIncluidos.includes(key)) {
+      opcionales.push({ ...modulo, tipo: 'ia', key });
+    }
+  });
+
+  return opcionales;
+}
+
+function generarSeccionesEducativas(edicion, items) {
+  const sections = [];
+  const modeloInfo = LICENSE_DESCRIPTIONS.modelos[edicion];
+
+  // Sección 1: Modelo de Licenciamiento
+  sections.push(
+    h1('Su Modelo de Licenciamiento'),
+    h2(modeloInfo.titulo),
+    p(modeloInfo.descripcion, { size: 18 })
+  );
+
+  // Sección 2: Módulos Incluidos en su Propuesta
+  const modulosIncluidos = detectModulosIncluidos(items);
+
+  if (modulosIncluidos.length > 0) {
+    sections.push(
+      new Paragraph({ children: [new PageBreak()] }),
+      h1('Módulos Incluidos en su Propuesta')
+    );
+
+    modulosIncluidos.forEach(modulo => {
+      sections.push(
+        h2(modulo.titulo),
+        modulo.subtitulo ? p(modulo.subtitulo, { italic: true, size: 16, color: C.GREY }) : null,
+        p(modulo.descripcion, { size: 18 })
+      ).filter(Boolean);
+
+      if (modulo.caracteristicas && modulo.caracteristicas.length > 0) {
+        modulo.caracteristicas.forEach(caract => {
+          sections.push(
+            new Paragraph({
+              bullet: { level: 0 },
+              children: [new TextRun({
+                text: caract,
+                font: F.BODY,
+                size: 18,
+                color: C.DARK
+              })]
+            })
+          );
+        });
+      }
+
+      if (modulo.valor) {
+        sections.push(
+          p(`💡 Valor: ${modulo.valor}`, { size: 18, bold: true, color: C.RED })
+        );
+      }
+
+      if (modulo.ejemplo) {
+        sections.push(
+          p(`Ejemplo: ${modulo.ejemplo}`, { size: 16, italic: true })
+        );
+      }
+    });
+  }
+
+  // Sección 3: Módulos Opcionales Disponibles
+  const modulosOpcionales = detectModulosOpcionales(items);
+
+  if (modulosOpcionales.length > 0) {
+    sections.push(
+      new Paragraph({ children: [new PageBreak()] }),
+      h1('Módulos Opcionales Disponibles'),
+      p('Los siguientes módulos no están incluidos en esta propuesta, pero están disponibles para ampliar las capacidades de Therefore™:', { size: 18, italic: true })
+    );
+
+    modulosOpcionales.forEach(modulo => {
+      sections.push(
+        h3(modulo.titulo),
+        p(modulo.descripcion, { size: 16 })
+      );
+
+      if (modulo.valor) {
+        sections.push(
+          p(`💡 ${modulo.valor}`, { size: 16, color: C.GREY })
+        );
+      }
+    });
+  }
+
+  sections.push(new Paragraph({ children: [new PageBreak()] }));
+
+  return sections.filter(Boolean);
+}
+
 async function buildQuotationDocument(quotationData) {
   const {
     cliente = 'Cliente',
@@ -1041,6 +1177,10 @@ async function buildQuotationDocument(quotationData) {
       ]
     })
   );
+
+  // Secciones Educativas
+  const seccionesEducativas = generarSeccionesEducativas(edicion, items);
+  sections.push(...seccionesEducativas);
 
   // Licencias
   if (items.length > 0) {
