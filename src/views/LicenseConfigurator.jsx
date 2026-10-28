@@ -258,12 +258,16 @@ export default function LicenseConfigurator() {
   }
 
   // Cálculos
+  // Para Online y Suscripción: PVP es mensual, multiplicar por 12 meses y años de contrato
+  const isRecurring = edicion === 'online' || edicion === 'suscripcion'
+  const multiplicadorTiempo = isRecurring ? (12 * anosContrato) : 1
+
   const totalLicencias = selectedItems.reduce((sum, item) =>
-    sum + (item.pvp * item.cantidad), 0
+    sum + (item.pvp * item.cantidad * multiplicadorTiempo), 0
   )
 
   const totalCSS = selectedItems.reduce((sum, item) =>
-    sum + ((item.css_pvp || 0) * item.cantidad), 0
+    sum + ((item.css_pvp || 0) * item.cantidad * (isRecurring ? anosContrato : 1)), 0
   )
 
   const totalServicios = servicios.reduce((sum, serv) =>
@@ -551,13 +555,27 @@ export default function LicenseConfigurator() {
           <Col span={8}>
             <Card size="small" title="Resumen">
               <Row style={{ marginBottom: 8 }}>
-                <Col span={14}><Text>Total Licencias</Text></Col>
+                <Col span={14}>
+                  <Text>
+                    Total Licencias
+                    {isRecurring && <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>
+                      ({anosContrato} año{anosContrato > 1 ? 's' : ''} × 12 meses)
+                    </Text>}
+                  </Text>
+                </Col>
                 <Col span={10} style={{ textAlign: 'right' }}>
                   <Text strong>{totalLicencias.toFixed(2)} €</Text>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 8 }}>
-                <Col span={14}><Text>Total CSS</Text></Col>
+                <Col span={14}>
+                  <Text>
+                    Total CSS
+                    {isRecurring && <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>
+                      ({anosContrato} año{anosContrato > 1 ? 's' : ''})
+                    </Text>}
+                  </Text>
+                </Col>
                 <Col span={10} style={{ textAlign: 'right' }}>
                   <Text strong>{totalCSS.toFixed(2)} €</Text>
                 </Col>
@@ -700,32 +718,38 @@ export default function LicenseConfigurator() {
                 )
               },
               {
-                title: 'PVP',
+                title: isRecurring ? 'PVP/mes' : 'PVP',
                 dataIndex: 'pvp',
                 width: 100,
                 align: 'right',
                 render: (val) => `${val?.toFixed(2)} €`
               },
               {
-                title: 'PVP Total',
+                title: isRecurring ? `Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'PVP Total',
                 key: 'pvp_total',
-                width: 110,
+                width: 140,
                 align: 'right',
-                render: (_, record) => `${(record.pvp * record.cantidad).toFixed(2)} €`
+                render: (_, record) => {
+                  const total = record.pvp * record.cantidad * multiplicadorTiempo
+                  return `${total.toFixed(2)} €`
+                }
               },
               {
-                title: 'CSS',
+                title: 'CSS/año',
                 dataIndex: 'css_pvp',
                 width: 100,
                 align: 'right',
                 render: (val) => `${(val || 0).toFixed(2)} €`
               },
               {
-                title: 'CSS Total',
+                title: isRecurring ? `CSS Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'CSS Total',
                 key: 'css_total',
-                width: 110,
+                width: 140,
                 align: 'right',
-                render: (_, record) => `${((record.css_pvp || 0) * record.cantidad).toFixed(2)} €`
+                render: (_, record) => {
+                  const total = (record.css_pvp || 0) * record.cantidad * (isRecurring ? anosContrato : 1)
+                  return `${total.toFixed(2)} €`
+                }
               },
               {
                 title: '',

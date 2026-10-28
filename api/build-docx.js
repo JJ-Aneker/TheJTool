@@ -1188,6 +1188,17 @@ async function buildQuotationDocument(quotationData) {
 
   // Licencias
   if (items.length > 0) {
+    const isRecurring = edicion === 'online' || edicion === 'suscripcion'
+    const multiplicadorTiempo = isRecurring ? (12 * anosContrato) : 1
+
+    // Nota sobre precios recurrentes
+    if (isRecurring) {
+      sections.push(
+        p(`Nota: Los precios mostrados son mensuales. El total refleja ${anosContrato} año${anosContrato > 1 ? 's' : ''} de contrato (12 meses × ${anosContrato}).`,
+          { size: 16, italic: true, color: C.GREY })
+      );
+    }
+
     sections.push(
       h1('Licencias y Productos'),
       new Table({
@@ -1199,19 +1210,29 @@ async function buildQuotationDocument(quotationData) {
               new TableCell({ children: [p('Código', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
               new TableCell({ children: [p('Descripción', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
               new TableCell({ children: [p('Cantidad', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
-              new TableCell({ children: [p('PVP', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
-              new TableCell({ children: [p('Total', { bold: true })], shading: { fill: C.LGREY }, ...CM })
+              new TableCell({ children: [p(isRecurring ? 'PVP/mes' : 'PVP', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p(isRecurring ? `Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'Total', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p('CSS/año', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p(isRecurring ? `CSS Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'CSS Total', { bold: true })], shading: { fill: C.LGREY }, ...CM })
             ]
           }),
-          ...items.map(item => new TableRow({
-            children: [
-              new TableCell({ children: [p(item.codigo || '', { size: 16 })], ...CM }),
-              new TableCell({ children: [p(item.descripcion || '', { size: 16 })], ...CM }),
-              new TableCell({ children: [p(String(item.cantidad || 1), { size: 16 })], ...CM }),
-              new TableCell({ children: [p(`${(item.pvp || 0).toFixed(2)} €`, { size: 16 })], ...CM }),
-              new TableCell({ children: [p(`${((item.pvp || 0) * (item.cantidad || 1)).toFixed(2)} €`, { size: 16, bold: true })], ...CM })
-            ]
-          }))
+          ...items.map(item => {
+            const totalLicencia = (item.pvp || 0) * (item.cantidad || 1) * multiplicadorTiempo
+            const cssAnual = (item.css_pvp || 0)
+            const totalCSS = cssAnual * (item.cantidad || 1) * (isRecurring ? anosContrato : 1)
+
+            return new TableRow({
+              children: [
+                new TableCell({ children: [p(item.codigo || '', { size: 16 })], ...CM }),
+                new TableCell({ children: [p(item.descripcion || '', { size: 16 })], ...CM }),
+                new TableCell({ children: [p(String(item.cantidad || 1), { size: 16 })], ...CM }),
+                new TableCell({ children: [p(`${(item.pvp || 0).toFixed(2)} €`, { size: 16 })], ...CM }),
+                new TableCell({ children: [p(`${totalLicencia.toFixed(2)} €`, { size: 16, bold: true })], ...CM }),
+                new TableCell({ children: [p(`${cssAnual.toFixed(2)} €`, { size: 16 })], ...CM }),
+                new TableCell({ children: [p(`${totalCSS.toFixed(2)} €`, { size: 16, bold: true })], ...CM })
+              ]
+            })
+          })
         ]
       })
     );
