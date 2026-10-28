@@ -636,7 +636,6 @@ export default function LicenseConfigurator() {
                 <Option value="suscripcion">Suscripción</Option>
               </Select>
               <Button
-                type="text"
                 size="small"
                 icon={<PlusOutlined />}
                 onClick={() => setCatalogDrawerOpen(true)}
@@ -751,7 +750,6 @@ export default function LicenseConfigurator() {
               title="Servicios"
               extra={
                 <Button
-                  type="text"
                   size="small"
                   icon={<PlusOutlined />}
                   onClick={() => setServiciosModalOpen(true)}
@@ -830,7 +828,6 @@ export default function LicenseConfigurator() {
               title="Tech Partners"
               extra={
                 <Button
-                  type="text"
                   size="small"
                   icon={<PlusOutlined />}
                   onClick={openTechPartnersModal}
@@ -927,25 +924,24 @@ export default function LicenseConfigurator() {
           setSelectedCatalogItems([])
         }}
       >
-        <Space style={{ marginBottom: 16, width: '100%' }} direction="vertical">
-          <Input.Search
-            placeholder="Buscar por código o descripción..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-          />
-          <Select
-            value={selectedCategory}
-            onChange={setSelectedCategory}
-            style={{ width: '100%' }}
-          >
-            {categories.map(cat => (
-              <Option key={cat} value={cat}>
-                {cat === 'all' ? 'Todas las categorías' : cat}
-              </Option>
-            ))}
-          </Select>
-        </Space>
+        <Input.Search
+          placeholder="Buscar por código o descripción..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          allowClear
+          style={{ marginBottom: 16 }}
+        />
+        <Select
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+          style={{ width: '100%', marginBottom: 16 }}
+        >
+          {categories.map(cat => (
+            <Option key={cat} value={cat}>
+              {cat === 'all' ? 'Todas las categorías' : cat}
+            </Option>
+          ))}
+        </Select>
 
         <Table
           rowSelection={{
