@@ -918,13 +918,14 @@ export default function LicenseConfigurator() {
         }}
         bodyStyle={{ padding: '16px 0' }}
       >
-        <Input.Search
-          placeholder="Buscar por código o descripción..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          allowClear
-          style={{ marginBottom: 16, paddingLeft: 24, paddingRight: 24 }}
-        />
+        <div style={{ padding: '0 24px', marginBottom: 16 }}>
+          <Input.Search
+            placeholder="Buscar por código o descripción..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            allowClear
+          />
+        </div>
 
         <div style={{ paddingLeft: 24, paddingRight: 24 }}>
           <Table
