@@ -13,7 +13,6 @@ import { fileURLToPath } from 'url';
 import { TEXTOS } from './_lib/knowledge/textos_estandar.js';
 import { VERTICALES, PREMISAS_COMUNES } from './_lib/knowledge/verticales.js';
 import { formatImporte } from './_lib/knowledge/ratios.js';
-import LICENSE_DESCRIPTIONS from './license_descriptions.json' assert { type: 'json' };
 
 // Helper para acceso a datos de vertical (con fallback a hardcoded)
 function getVerticalData(verticalKey) {
@@ -21,6 +20,11 @@ function getVerticalData(verticalKey) {
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Cargar descripciones de licencias
+const LICENSE_DESCRIPTIONS = JSON.parse(
+  readFileSync(join(__dirname, 'license_descriptions.json'), 'utf-8')
+);
 
 export const config = { maxDuration: 120 };
 
