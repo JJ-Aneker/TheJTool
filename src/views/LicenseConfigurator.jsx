@@ -369,8 +369,97 @@ export default function LicenseConfigurator() {
     antMessage.success('Cotización cargada')
   }
 
-  // Exportar a Word
-  const exportToExcel = async () => {
+  // Funciones de portada
+  const selectSavedCover = async (cover) => {
+    try {
+      antMessage.loading({ content: 'Cargando portada...', key: 'cover' })
+
+      const publicUrl = storageService.getPublicUrl(cover.storage_path)
+
+      const img = new Image()
+      img.onload = () => {
+        setPortada({
+          name: cover.name,
+          storageUrl: publicUrl,
+          storagePath: cover.storage_path,
+          width: img.width,
+          height: img.height,
+          base64: null
+        })
+        setPortadaPreview(publicUrl)
+        setPortadaModalOpen(false)
+        antMessage.success({ content: 'Portada cargada', key: 'cover' })
+      }
+      img.src = publicUrl
+    } catch (err) {
+      console.error('Error cargando portada:', err)
+      antMessage.error({ content: 'Error cargando portada', key: 'cover' })
+    }
+  }
+
+  const handleCoverUpload = async (file) => {
+    if (file.type !== 'image/png') {
+      antMessage.error('Solo se aceptan archivos PNG para la portada')
+      return false
+    }
+
+    try {
+      antMessage.loading({ content: 'Subiendo portada...', key: 'portada' })
+
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const base64 = e.target.result
+        const img = new Image()
+
+        img.onload = async () => {
+          try {
+            const uploadResult = await storageService.uploadCover(file, user.id)
+
+            setPortada({
+              name: file.name,
+              storageUrl: uploadResult.publicUrl,
+              storagePath: uploadResult.path,
+              width: img.width,
+              height: img.height,
+              base64
+            })
+            setPortadaPreview(base64)
+
+            await loadSavedCovers()
+            setPortadaModalOpen(false)
+            antMessage.success({ content: 'Portada subida', key: 'portada' })
+          } catch (err) {
+            console.error('Error subiendo portada:', err)
+            antMessage.error({ content: 'Error al subir portada', key: 'portada' })
+          }
+        }
+        img.src = base64
+      }
+      reader.readAsDataURL(file)
+    } catch (err) {
+      console.error('Error subiendo portada:', err)
+      antMessage.error({ content: 'Error al subir portada', key: 'portada' })
+    }
+
+    return false
+  }
+
+  const removeCoverImage = async () => {
+    if (portada?.storagePath) {
+      await storageService.deleteDocuments([portada.storagePath])
+    }
+    setPortada(null)
+    setPortadaPreview(null)
+    setUseDefaultPortada(false)
+  }
+
+  // Exportar a Word - Abrir modal de portada primero
+  const exportToExcel = () => {
+    setPortadaModalOpen(true)
+  }
+
+  // Generar documento Word con portada
+  const generateDocument = async () => {
     try {
       antMessage.loading({ content: 'Generando documento...', key: 'docx', duration: 0 })
 
@@ -400,7 +489,14 @@ export default function LicenseConfigurator() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           projectData: quotationData,
-          tipoDoc: 'quotation'
+          tipoDoc: 'quotation',
+          portada: portada ? {
+            storageUrl: portada.storageUrl || null,
+            base64: portada.base64,
+            width: portada.width,
+            height: portada.height
+          } : null,
+          useDefaultPortada
         })
       })
 
@@ -418,6 +514,7 @@ export default function LicenseConfigurator() {
       link.click()
 
       antMessage.success({ content: 'Documento generado correctamente', key: 'docx' })
+      setPortadaModalOpen(false)
     } catch (error) {
       console.error('Error exportando:', error)
       antMessage.error({ content: error.message || 'Error generando documento', key: 'docx' })
@@ -1184,6 +1281,115 @@ export default function LicenseConfigurator() {
             }
           ]}
         />
+      </Modal>
+
+      {/* Modal de Portada */}
+      <Modal
+        open={portadaModalOpen}
+        onCancel={() => setPortadaModalOpen(false)}
+        title="Seleccionar portada"
+        width={900}
+        footer={[
+          <Button key="cancel" onClick={() => setPortadaModalOpen(false)}>
+            Cancelar
+          </Button>,
+          <Button key="generate" type="primary" onClick={generateDocument}>
+            Generar Documento
+          </Button>
+        ]}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
+          {/* Cuadro para subir nueva portada */}
+          <Upload.Dragger
+            beforeUpload={handleCoverUpload}
+            showUploadList={false}
+            style={{ height: 250 }}
+          >
+            <div style={{ padding: 20, textAlign: 'center' }}>
+              <FileImageOutlined style={{ fontSize: 48, color: '#1890ff', marginBottom: 8 }} />
+              <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>
+                Nueva portada
+              </div>
+              <div style={{ fontSize: 12, color: '#999' }}>
+                Click o arrastra PNG aquí
+              </div>
+            </div>
+          </Upload.Dragger>
+
+          {/* Portadas guardadas */}
+          {savedCovers.length === 0 && (
+            <div style={{
+              gridColumn: '2 / -1',
+              padding: 40,
+              textAlign: 'center',
+              color: '#999',
+              border: '1px dashed #d9d9d9',
+              borderRadius: 4
+            }}>
+              No hay portadas guardadas aún
+            </div>
+          )}
+
+          {savedCovers.map(cover => (
+            <div
+              key={cover.id}
+              onClick={() => selectSavedCover(cover)}
+              style={{
+                cursor: 'pointer',
+                border: portada?.storagePath === cover.storage_path ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                borderRadius: 4,
+                padding: 8,
+                transition: 'all 0.3s',
+                height: 250
+              }}
+            >
+              <img
+                src={storageService.getPublicUrl(cover.storage_path)}
+                alt={cover.name}
+                style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 4 }}
+              />
+              <div style={{ marginTop: 8, fontSize: 12, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {cover.name}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Preview de portada seleccionada */}
+        {portadaPreview && (
+          <div style={{ marginTop: 16, padding: 16, background: '#f5f5f5', borderRadius: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text strong>Portada seleccionada</Text>
+              <Button size="small" danger onClick={removeCoverImage}>
+                Quitar portada
+              </Button>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <img src={portadaPreview} alt="Preview" style={{ width: 100, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12 }}>{portada?.name}</div>
+                <div style={{ marginTop: 8 }}>
+                  <input
+                    type="checkbox"
+                    id="use-default-cover"
+                    checked={useDefaultPortada}
+                    onChange={(e) => setUseDefaultPortada(e.target.checked)}
+                  />
+                  <label htmlFor="use-default-cover" style={{ marginLeft: 8, fontSize: 12, cursor: 'pointer' }}>
+                    Usar portada por defecto de Therefore
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Opción de generar sin portada */}
+        {!portadaPreview && (
+          <div style={{ marginTop: 16, textAlign: 'center' }}>
+            <Text type="secondary">O continuar sin portada personalizada</Text>
+          </div>
+        )}
       </Modal>
     </div>
   )
