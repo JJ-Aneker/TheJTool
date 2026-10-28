@@ -52,7 +52,6 @@ export default function LicenseConfigurator() {
   const [quotations, setQuotations] = useState([])
 
   const [searchText, setSearchText] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedCatalogItems, setSelectedCatalogItems] = useState([])
 
   const [serviciosModalOpen, setServiciosModalOpen] = useState(false)
@@ -419,19 +418,13 @@ export default function LicenseConfigurator() {
     })
   }
 
-  // Categorías
-  const categories = ['all', ...new Set(items.map(i => i.categoria || 'Sin categoría').filter(Boolean))]
-
   // Filtrar items del catálogo
   const filteredItems = items.filter(item => {
     const matchSearch = !searchText ||
       item.descripcion?.toLowerCase().includes(searchText.toLowerCase()) ||
       item.codigo?.toLowerCase().includes(searchText.toLowerCase())
 
-    const matchCategory = selectedCategory === 'all' ||
-      (item.categoria || 'Sin categoría') === selectedCategory
-
-    return matchSearch && matchCategory
+    return matchSearch
   })
 
   return (
@@ -931,17 +924,6 @@ export default function LicenseConfigurator() {
           allowClear
           style={{ marginBottom: 16 }}
         />
-        <Select
-          value={selectedCategory}
-          onChange={setSelectedCategory}
-          style={{ width: '100%', marginBottom: 16 }}
-        >
-          {categories.map(cat => (
-            <Option key={cat} value={cat}>
-              {cat === 'all' ? 'Todas las categorías' : cat}
-            </Option>
-          ))}
-        </Select>
 
         <Table
           rowSelection={{
