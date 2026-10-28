@@ -266,8 +266,9 @@ export default function LicenseConfigurator() {
     sum + (item.pvp * item.cantidad * multiplicadorTiempo), 0
   )
 
+  // CSS también es mensual en Online/Suscripción
   const totalCSS = selectedItems.reduce((sum, item) =>
-    sum + ((item.css_pvp || 0) * item.cantidad * (isRecurring ? anosContrato : 1)), 0
+    sum + ((item.css_pvp || 0) * item.cantidad * multiplicadorTiempo), 0
   )
 
   const totalServicios = servicios.reduce((sum, serv) =>
@@ -492,7 +493,7 @@ export default function LicenseConfigurator() {
           <Col span={16}>
             <Card size="small" title="Datos Generales de la Oferta">
               <Row gutter={[16, 16]}>
-                <Col span={8}>
+                <Col span={6}>
                   <div>
                     <Text strong>SFDC OPP</Text>
                     <Input
@@ -503,7 +504,7 @@ export default function LicenseConfigurator() {
                     />
                   </div>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <div>
                     <Text strong>Deal Support</Text>
                     <Input
@@ -514,7 +515,7 @@ export default function LicenseConfigurator() {
                     />
                   </div>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <div>
                     <Text strong>Fecha</Text>
                     <Input
@@ -522,6 +523,18 @@ export default function LicenseConfigurator() {
                       value={fecha}
                       onChange={(e) => setFecha(e.target.value)}
                       style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Años Contrato</Text>
+                    <InputNumber
+                      value={anosContrato}
+                      onChange={(val) => setAnosContrato(val || 1)}
+                      style={{ width: '100%', marginTop: 4 }}
+                      min={1}
+                      placeholder="1"
                     />
                   </div>
                 </Col>
@@ -572,7 +585,7 @@ export default function LicenseConfigurator() {
                   <Text>
                     Total CSS
                     {isRecurring && <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>
-                      ({anosContrato} año{anosContrato > 1 ? 's' : ''})
+                      ({anosContrato} año{anosContrato > 1 ? 's' : ''} × 12 meses)
                     </Text>}
                   </Text>
                 </Col>
@@ -606,51 +619,6 @@ export default function LicenseConfigurator() {
         </Row>
 
         {/* FILA 1.5: SUSCRIPCIÓN (solo para Online y Suscripción) */}
-        {(edicion === 'online' || edicion === 'suscripcion') && (
-          <Card size="small" title="Suscripción" style={{ marginBottom: 16 }}>
-            <Row gutter={[16, 16]}>
-              <Col span={8}>
-                <div>
-                  <Text strong>Cuota Anual</Text>
-                  <InputNumber
-                    value={cuotaAnual}
-                    onChange={(val) => setCuotaAnual(val || 0)}
-                    precision={2}
-                    style={{ width: '100%', marginTop: 4 }}
-                    min={0}
-                    placeholder="0.00"
-                  />
-                </div>
-              </Col>
-              <Col span={8}>
-                <div>
-                  <Text strong>Años Contrato</Text>
-                  <InputNumber
-                    value={anosContrato}
-                    onChange={(val) => setAnosContrato(val || 1)}
-                    style={{ width: '100%', marginTop: 4 }}
-                    min={1}
-                    placeholder="1"
-                  />
-                </div>
-              </Col>
-              <Col span={8}>
-                <div>
-                  <Text strong>Soporte Local (€/año)</Text>
-                  <InputNumber
-                    value={soporteLocal}
-                    onChange={(val) => setSoporteLocal(val || 0)}
-                    precision={2}
-                    style={{ width: '100%', marginTop: 4 }}
-                    min={0}
-                    placeholder="0.00"
-                  />
-                </div>
-              </Col>
-            </Row>
-          </Card>
-        )}
-
         {/* FILA 2: TABLA LICENCIAS */}
         <Card
           size="small"
@@ -735,7 +703,7 @@ export default function LicenseConfigurator() {
                 }
               },
               {
-                title: 'CSS/año',
+                title: isRecurring ? 'CSS/mes' : 'CSS/año',
                 dataIndex: 'css_pvp',
                 width: 100,
                 align: 'right',
@@ -747,7 +715,7 @@ export default function LicenseConfigurator() {
                 width: 140,
                 align: 'right',
                 render: (_, record) => {
-                  const total = (record.css_pvp || 0) * record.cantidad * (isRecurring ? anosContrato : 1)
+                  const total = (record.css_pvp || 0) * record.cantidad * multiplicadorTiempo
                   return `${total.toFixed(2)} €`
                 }
               },

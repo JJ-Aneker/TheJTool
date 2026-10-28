@@ -1212,14 +1212,14 @@ async function buildQuotationDocument(quotationData) {
               new TableCell({ children: [p('Cantidad', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
               new TableCell({ children: [p(isRecurring ? 'PVP/mes' : 'PVP', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
               new TableCell({ children: [p(isRecurring ? `Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'Total', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
-              new TableCell({ children: [p('CSS/año', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
+              new TableCell({ children: [p(isRecurring ? 'CSS/mes' : 'CSS/año', { bold: true })], shading: { fill: C.LGREY }, ...CM }),
               new TableCell({ children: [p(isRecurring ? `CSS Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'CSS Total', { bold: true })], shading: { fill: C.LGREY }, ...CM })
             ]
           }),
           ...items.map(item => {
             const totalLicencia = (item.pvp || 0) * (item.cantidad || 1) * multiplicadorTiempo
-            const cssAnual = (item.css_pvp || 0)
-            const totalCSS = cssAnual * (item.cantidad || 1) * (isRecurring ? anosContrato : 1)
+            const cssPrecio = (item.css_pvp || 0)
+            const totalCSS = cssPrecio * (item.cantidad || 1) * multiplicadorTiempo
 
             return new TableRow({
               children: [
@@ -1228,7 +1228,7 @@ async function buildQuotationDocument(quotationData) {
                 new TableCell({ children: [p(String(item.cantidad || 1), { size: 16 })], ...CM }),
                 new TableCell({ children: [p(`${(item.pvp || 0).toFixed(2)} €`, { size: 16 })], ...CM }),
                 new TableCell({ children: [p(`${totalLicencia.toFixed(2)} €`, { size: 16, bold: true })], ...CM }),
-                new TableCell({ children: [p(`${cssAnual.toFixed(2)} €`, { size: 16 })], ...CM }),
+                new TableCell({ children: [p(`${cssPrecio.toFixed(2)} €`, { size: 16 })], ...CM }),
                 new TableCell({ children: [p(`${totalCSS.toFixed(2)} €`, { size: 16, bold: true })], ...CM })
               ]
             })
