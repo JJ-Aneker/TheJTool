@@ -18,6 +18,8 @@ import exportGanttHandler from './api/export-gantt.js';
 import exportVerticalHandler from './api/export-vertical.js';
 import bedrockHandler from './api/bedrock.js';
 import * as verticalesHandlers from './api/verticales.js';
+import parseLicensingRequestHandler from './api/parse-licensing-request.js';
+import analyzeLicensingHandler from './api/analyze-licensing.js';
 import dashboardRouter from './routes/dashboard.js';
 import adminRouter from './routes/admin.js';
 import eformAiRouter from './routes/eformAi.js';
@@ -96,6 +98,10 @@ app.get('/api/health', (req, res) => {
 app.post('/api/analyze', analyzeHandler);
 app.post('/api/build-docx', buildDocxHandler);
 app.post('/api/export-gantt', exportGanttHandler);
+
+// Licensing configurator API routes
+app.post('/api/parse-licensing-request', parseLicensingRequestHandler);
+app.post('/api/analyze-licensing', analyzeLicensingHandler);
 app.post('/api/export-vertical', exportVerticalHandler);
 
 // AWS Bedrock API management routes (admin only)
