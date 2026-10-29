@@ -49,15 +49,59 @@ export const storageService = {
 
   /**
    * Lista TODAS las portadas disponibles (públicas para todos los usuarios)
+   * Lee directamente del bucket público de Supabase Storage
    * @returns {Promise<Array>} Lista de portadas
    */
   async listAllCovers() {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
-      const res = await fetch(`${API_URL}/api/admin/storage/covers`)
-      const json = await res.json()
-      if (!json.success) throw new Error(json.error || 'Error listando portadas')
-      return json.covers
+      // Leer directamente del Storage público
+      const { data: folders, error: foldersError } = await supabase.storage
+        .from('document-uploads')
+        .list('', { limit: 1000 })
+
+      if (foldersError) {
+        console.error('[StorageService] Error listing folders:', foldersError)
+        return []
+      }
+
+      const allCovers = []
+
+      for (const folder of folders || []) {
+        if (!folder.id) continue // Skip files, only process folders
+
+        const { data: files, error: filesError } = await supabase.storage
+          .from('document-uploads')
+          .list(folder.name, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } })
+
+        if (filesError) {
+          console.error(`[StorageService] Error listing files in ${folder.name}:`, filesError)
+          continue
+        }
+
+        const covers = (files || [])
+          .filter(f => f.name.toLowerCase().endsWith('.png'))
+          .map(f => {
+            const path = `${folder.name}/${f.name}`
+            const { data: { publicUrl } } = supabase.storage
+              .from('document-uploads')
+              .getPublicUrl(path)
+            return {
+              name: f.name,
+              path,
+              url: publicUrl,
+              created_at: f.created_at,
+              size: f.metadata?.size || 0,
+              owner: folder.name
+            }
+          })
+
+        allCovers.push(...covers)
+      }
+
+      // Sort by created_at desc
+      allCovers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+
+      return allCovers
     } catch (error) {
       logger.error('Error listing covers:', error)
       return []

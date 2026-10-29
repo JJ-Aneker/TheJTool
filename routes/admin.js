@@ -223,6 +223,9 @@ router.post('/storage/signed-upload-url', async (req, res) => {
  */
 router.get('/storage/covers', async (req, res) => {
   try {
+    console.log('[Admin] SUPABASE_URL:', process.env.VITE_SUPABASE_URL)
+    console.log('[Admin] SERVICE_KEY defined:', !!process.env.SUPABASE_SERVICE_KEY)
+
     const supabaseAdmin = getSupabaseAdmin()
 
     // List all folders (user directories) in the bucket
