@@ -652,16 +652,19 @@ export default function LicenseConfigurator() {
   // Generar documento Word con portada
   const generateDocument = async () => {
     try {
-      antMessage.loading({ content: 'Generando documento...', key: 'docx', duration: 0 })
+      // PASO 1: Generar contenido narrativo con Claude
+      antMessage.loading({ content: 'Analizando propuesta con IA...', key: 'docx', duration: 0 })
 
-      // Preparar datos para el endpoint
       const quotationData = {
         cliente: cliente || 'Cliente',
+        sector: 'General', // TODO: podríamos extraer del contexto
+        contexto: solicitudNatural || 'Propuesta de licenciamiento Therefore™',
         sfdcOpp: sfdcOpp || '',
         dealSupport: dealSupport || '',
         accountManager: accountManager || '',
         fecha: fecha || new Date().toISOString().split('T')[0],
         edicion,
+        selectedItems,
         items: selectedItems,
         servicios,
         techPartners: techPartners.filter(tp => tp.importe > 0),
@@ -675,12 +678,37 @@ export default function LicenseConfigurator() {
         soporteLocal
       }
 
-      const response = await fetch('/api/build-docx', {
+      console.log('[LicenseConfigurator] Llamando a analyze-licensing...')
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+      const analyzeResponse = await fetch(`${API_URL}/api/analyze-licensing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(quotationData)
+      })
+
+      if (!analyzeResponse.ok) {
+        const error = await analyzeResponse.json()
+        throw new Error(error.error || 'Error en análisis de la propuesta')
+      }
+
+      const analyzeResult = await analyzeResponse.json()
+
+      if (!analyzeResult.success) {
+        throw new Error('Error en análisis de la propuesta')
+      }
+
+      console.log('[LicenseConfigurator] Contenido generado:', analyzeResult.data.generatedContent)
+
+      // PASO 2: Generar documento Word con contenido narrativo
+      antMessage.loading({ content: 'Generando documento Word...', key: 'docx', duration: 0 })
+
+      const response = await fetch(`${API_URL}/api/build-docx`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          projectData: quotationData,
-          tipoDoc: 'quotation',
+          projectData: analyzeResult.data, // Incluye generatedContent
+          tipoDoc: 'licensing', // Nuevo tipo para documentos de licenciamiento
           portada: portada ? {
             storageUrl: portada.storageUrl || null,
             base64: portada.base64,
