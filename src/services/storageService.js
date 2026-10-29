@@ -54,10 +54,14 @@ export const storageService = {
    */
   async listAllCovers() {
     try {
+      console.log('[StorageService] Iniciando listado de portadas...')
+
       // Leer directamente del Storage público
       const { data: folders, error: foldersError } = await supabase.storage
         .from('document-uploads')
         .list('', { limit: 1000 })
+
+      console.log('[StorageService] Folders encontrados:', folders?.length || 0, folders)
 
       if (foldersError) {
         console.error('[StorageService] Error listing folders:', foldersError)
@@ -67,11 +71,19 @@ export const storageService = {
       const allCovers = []
 
       for (const folder of folders || []) {
-        if (!folder.id) continue // Skip files, only process folders
+        console.log('[StorageService] Procesando item:', folder.name, 'metadata:', folder.metadata)
+
+        // Skip files: files have metadata property, folders don't
+        if (folder.metadata !== null) {
+          console.log('[StorageService] Skipping file (has metadata):', folder.name)
+          continue
+        }
 
         const { data: files, error: filesError } = await supabase.storage
           .from('document-uploads')
           .list(folder.name, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } })
+
+        console.log(`[StorageService] Files en ${folder.name}:`, files?.length || 0, files)
 
         if (filesError) {
           console.error(`[StorageService] Error listing files in ${folder.name}:`, filesError)
@@ -95,12 +107,14 @@ export const storageService = {
             }
           })
 
+        console.log(`[StorageService] Portadas PNG en ${folder.name}:`, covers.length, covers)
         allCovers.push(...covers)
       }
 
       // Sort by created_at desc
       allCovers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
+      console.log('[StorageService] Total portadas encontradas:', allCovers.length)
       return allCovers
     } catch (error) {
       logger.error('Error listing covers:', error)
