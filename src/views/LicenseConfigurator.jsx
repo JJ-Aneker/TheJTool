@@ -103,12 +103,12 @@ export default function LicenseConfigurator() {
 
   const loadSavedCovers = async () => {
     try {
-      console.log('[LicenseConfigurator] Cargando portadas para user:', user?.id)
+      console.log('[LicenseConfigurator] Cargando portadas disponibles (públicas)...')
 
+      // Cargar TODAS las portadas (públicas para todos los usuarios)
       const { data, error } = await supabase
         .from('portadas')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
       if (error) {

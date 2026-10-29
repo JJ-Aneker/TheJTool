@@ -48,14 +48,13 @@ export const storageService = {
   },
 
   /**
-   * Lista portadas guardadas del usuario
-   * @param {string} userId - ID del usuario
+   * Lista TODAS las portadas disponibles (públicas para todos los usuarios)
    * @returns {Promise<Array>} Lista de portadas
    */
-  async listUserCovers(userId) {
+  async listAllCovers() {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
-      const res = await fetch(`${API_URL}/api/admin/storage/covers/${userId}`)
+      const res = await fetch(`${API_URL}/api/admin/storage/covers`)
       const json = await res.json()
       if (!json.success) throw new Error(json.error || 'Error listando portadas')
       return json.covers

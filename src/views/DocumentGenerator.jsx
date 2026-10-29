@@ -138,14 +138,10 @@ export default function DocumentGenerator() {
   const loadSavedCovers = async () => {
     setLoadingCovers(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      console.log('[DocumentGenerator] 🔍 Cargando portadas guardadas para user:', user?.id)
-      if (!user) {
-        console.log('[DocumentGenerator] ⚠️ No hay usuario autenticado')
-        return
-      }
+      console.log('[DocumentGenerator] 🔍 Cargando portadas disponibles (públicas)...')
 
-      const covers = await storageService.listUserCovers(user.id)
+      // Cargar TODAS las portadas (públicas para todos los usuarios)
+      const covers = await storageService.listAllCovers()
       console.log('[DocumentGenerator] ✅ Portadas encontradas:', covers.length)
       console.log('[DocumentGenerator] Portadas:', covers)
       setSavedCovers(covers)

@@ -218,6 +218,68 @@ router.post('/storage/signed-upload-url', async (req, res) => {
 })
 
 /**
+ * GET /api/admin/storage/covers
+ * List ALL saved cover images (public to all users) — uses service key to bypass RLS
+ */
+router.get('/storage/covers', async (req, res) => {
+  try {
+    const supabaseAdmin = getSupabaseAdmin()
+
+    // List all folders (user directories) in the bucket
+    const { data: folders, error: foldersError } = await supabaseAdmin.storage
+      .from('document-uploads')
+      .list('', { limit: 1000 })
+
+    if (foldersError) {
+      console.error('[Admin] Error listing folders:', foldersError)
+      return res.status(500).json({ success: false, error: foldersError.message })
+    }
+
+    // For each folder, list PNG files
+    const allCovers = []
+    for (const folder of folders || []) {
+      if (!folder.id) continue // Skip files, only process folders
+
+      const { data: files, error: filesError } = await supabaseAdmin.storage
+        .from('document-uploads')
+        .list(folder.name, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } })
+
+      if (filesError) {
+        console.error(`[Admin] Error listing files in ${folder.name}:`, filesError)
+        continue
+      }
+
+      const covers = (files || [])
+        .filter(f => f.name.toLowerCase().endsWith('.png'))
+        .map(f => {
+          const path = `${folder.name}/${f.name}`
+          const { data: { publicUrl } } = supabaseAdmin.storage
+            .from('document-uploads')
+            .getPublicUrl(path)
+          return {
+            name: f.name,
+            path,
+            url: publicUrl,
+            created_at: f.created_at,
+            size: f.metadata?.size || 0,
+            owner: folder.name // user ID que subió la portada
+          }
+        })
+
+      allCovers.push(...covers)
+    }
+
+    // Sort all covers by created_at desc
+    allCovers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+
+    res.json({ success: true, covers: allCovers })
+  } catch (error) {
+    console.error('[Admin] List all covers error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+/**
  * GET /api/admin/storage/covers/:userId
  * List user's saved cover images — uses service key to bypass RLS on storage.list()
  */
