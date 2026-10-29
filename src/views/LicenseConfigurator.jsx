@@ -103,13 +103,20 @@ export default function LicenseConfigurator() {
 
   const loadSavedCovers = async () => {
     try {
+      console.log('[LicenseConfigurator] Cargando portadas para user:', user?.id)
+
       const { data, error } = await supabase
         .from('portadas')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('[LicenseConfigurator] Error Supabase:', error)
+        throw error
+      }
+
+      console.log('[LicenseConfigurator] Portadas encontradas:', data?.length || 0, data)
       setSavedCovers(data || [])
     } catch (err) {
       console.error('Error cargando portadas:', err)
