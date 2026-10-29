@@ -67,6 +67,10 @@ export default function LicenseConfigurator() {
   const [savedCovers, setSavedCovers] = useState([])
   const [useDefaultPortada, setUseDefaultPortada] = useState(false)
 
+  // Estados para lenguaje natural
+  const [solicitudNatural, setSolicitudNatural] = useState('')
+  const [procesandoSolicitud, setProcesandoSolicitud] = useState(false)
+
   // Servicios predefinidos
   const serviciosDisponibles = [
     { codigo: '739ZZ051', descripcion: 'Consultoría', pvp_jornada: 880 },
@@ -453,6 +457,193 @@ export default function LicenseConfigurator() {
     setUseDefaultPortada(false)
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PROCESAMIENTO DE LENGUAJE NATURAL
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const procesarSolicitudNatural = async () => {
+    if (!solicitudNatural || solicitudNatural.trim().length < 10) {
+      antMessage.warning('Por favor, escribe una solicitud con al menos 10 caracteres')
+      return
+    }
+
+    try {
+      setProcesandoSolicitud(true)
+      antMessage.loading({ content: 'Interpretando solicitud...', key: 'parse', duration: 0 })
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+      const response = await fetch(`${API_URL}/api/parse-licensing-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ solicitud: solicitudNatural })
+      })
+
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Error al parsear solicitud')
+      }
+
+      console.log('[LicenseConfigurator] Solicitud parseada:', result.data)
+
+      // Aplicar resultados
+      aplicarDatosParsedos(result.data)
+
+      antMessage.success({ content: 'Solicitud interpretada correctamente', key: 'parse' })
+
+    } catch (error) {
+      console.error('Error procesando solicitud:', error)
+      antMessage.error({
+        content: `Error: ${error.message}`,
+        key: 'parse'
+      })
+    } finally {
+      setProcesandoSolicitud(false)
+    }
+  }
+
+  const aplicarDatosParsedos = (parsedData) => {
+    // Aplicar edición
+    if (parsedData.edicion) {
+      setEdicion(parsedData.edicion)
+      console.log('[LicenseConfigurator] Edición aplicada:', parsedData.edicion)
+    }
+
+    // Aplicar años de contrato
+    if (parsedData.anos_contrato) {
+      setAnosContrato(parsedData.anos_contrato)
+    }
+
+    // Aplicar información del cliente
+    if (parsedData.cliente?.contexto) {
+      // Podríamos usar esto para pre-rellenar el campo cliente
+      if (parsedData.cliente.contexto && !cliente) {
+        setCliente(parsedData.cliente.contexto.substring(0, 100))
+      }
+    }
+
+    // Aplicar licencias
+    if (parsedData.licencias && parsedData.licencias.length > 0) {
+      parsedData.licencias.forEach(lic => {
+        buscarYAgregarLicencia(lic.tipo, lic.cantidad)
+      })
+    }
+
+    // Aplicar productos
+    if (parsedData.productos && parsedData.productos.length > 0) {
+      parsedData.productos.forEach(prod => {
+        buscarYAgregarProducto(prod.descripcion, prod.cantidad, prod.codigo_sugerido)
+      })
+    }
+
+    // Aplicar servicios personalizados
+    if (parsedData.servicios_personalizados && parsedData.servicios_personalizados.length > 0) {
+      const nuevosServicios = parsedData.servicios_personalizados.map((serv, idx) => ({
+        id: `custom-${Date.now()}-${idx}`,
+        descripcion: serv.descripcion,
+        importe: serv.importe || 0,
+        notas: serv.notas || ''
+      }))
+      setServicios(prev => [...prev, ...nuevosServicios])
+    }
+
+    // Mostrar notas adicionales si hay
+    if (parsedData.notas_adicionales) {
+      console.log('[LicenseConfigurator] Notas:', parsedData.notas_adicionales)
+      antMessage.info({
+        content: `Nota: ${parsedData.notas_adicionales}`,
+        duration: 5
+      })
+    }
+  }
+
+  const buscarYAgregarLicencia = (tipo, cantidad) => {
+    // Buscar en el catálogo la licencia del tipo especificado
+    const palabrasClave = {
+      'nominal': ['nominal', 'dedicada'],
+      'concurrente': ['concurrente', 'flotante'],
+      'readonly': ['readonly', 'solo lectura', 'read-only']
+    }
+
+    const keywords = palabrasClave[tipo] || []
+
+    const licenciaEncontrada = items.find(item => {
+      const desc = item.descripcion?.toLowerCase() || ''
+      return keywords.some(kw => desc.includes(kw))
+    })
+
+    if (licenciaEncontrada) {
+      // Verificar si ya está en selectedItems
+      const yaExiste = selectedItems.find(i => i.codigo === licenciaEncontrada.codigo)
+
+      if (yaExiste) {
+        // Actualizar cantidad
+        setSelectedItems(prev => prev.map(item =>
+          item.codigo === licenciaEncontrada.codigo
+            ? { ...item, cantidad: item.cantidad + cantidad }
+            : item
+        ))
+      } else {
+        // Agregar nuevo
+        setSelectedItems(prev => [...prev, {
+          ...licenciaEncontrada,
+          cantidad
+        }])
+      }
+
+      console.log(`[LicenseConfigurator] Licencia ${tipo} agregada: ${cantidad} unidades`)
+    } else {
+      console.warn(`[LicenseConfigurator] No se encontró licencia tipo: ${tipo}`)
+    }
+  }
+
+  const buscarYAgregarProducto = (descripcion, cantidad, codigoSugerido = null) => {
+    // Buscar producto por código sugerido o por descripción
+    let productoEncontrado = null
+
+    if (codigoSugerido) {
+      productoEncontrado = items.find(item => item.codigo === codigoSugerido)
+    }
+
+    if (!productoEncontrado) {
+      // Buscar por palabras clave en la descripción
+      const palabrasClave = descripcion.toLowerCase().split(' ')
+      productoEncontrado = items.find(item => {
+        const desc = item.descripcion?.toLowerCase() || ''
+        return palabrasClave.some(palabra =>
+          palabra.length > 3 && desc.includes(palabra)
+        )
+      })
+    }
+
+    if (productoEncontrado) {
+      const yaExiste = selectedItems.find(i => i.codigo === productoEncontrado.codigo)
+
+      if (yaExiste) {
+        setSelectedItems(prev => prev.map(item =>
+          item.codigo === productoEncontrado.codigo
+            ? { ...item, cantidad: item.cantidad + cantidad }
+            : item
+        ))
+      } else {
+        setSelectedItems(prev => [...prev, {
+          ...productoEncontrado,
+          cantidad
+        }])
+      }
+
+      console.log(`[LicenseConfigurator] Producto agregado: ${productoEncontrado.descripcion} x${cantidad}`)
+    } else {
+      console.warn(`[LicenseConfigurator] No se encontró producto: ${descripcion}`)
+      antMessage.warning({
+        content: `No se encontró en el catálogo: "${descripcion}"`,
+        duration: 3
+      })
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+
   // Exportar a Word - Abrir modal de portada primero
   const exportToExcel = () => {
     setPortadaModalOpen(true)
@@ -606,6 +797,54 @@ export default function LicenseConfigurator() {
 
       {/* CONTENT */}
       <div style={{ flex: 1, overflow: 'auto', padding: '16px' }}>
+
+        {/* CAMPO DE LENGUAJE NATURAL */}
+        <Card
+          size="small"
+          title="🤖 Crear Propuesta con Lenguaje Natural"
+          style={{ marginBottom: 16, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none' }}
+          headStyle={{ color: 'white', fontWeight: 'bold' }}
+          bodyStyle={{ background: 'white' }}
+        >
+          <div style={{ marginBottom: 12 }}>
+            <Text>
+              Describe la propuesta en lenguaje natural y el sistema auto-completará los campos.
+              <br />
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                Ejemplo: "Necesito OnPremise con 5 nominales, 10 concurrentes y 15 readonly. Incluir Content Connector, 8 jornadas de implementación y 2 de formación. Cliente del sector retail."
+              </Text>
+            </Text>
+          </div>
+          <Space.Compact style={{ width: '100%' }}>
+            <TextArea
+              value={solicitudNatural}
+              onChange={(e) => setSolicitudNatural(e.target.value)}
+              placeholder="Escribe aquí tu solicitud en lenguaje natural..."
+              autoSize={{ minRows: 3, maxRows: 6 }}
+              style={{ flex: 1 }}
+              disabled={procesandoSolicitud}
+            />
+          </Space.Compact>
+          <div style={{ marginTop: 12, textAlign: 'right' }}>
+            <Space>
+              <Button
+                onClick={() => setSolicitudNatural('')}
+                disabled={!solicitudNatural || procesandoSolicitud}
+              >
+                Limpiar
+              </Button>
+              <Button
+                type="primary"
+                onClick={procesarSolicitudNatural}
+                loading={procesandoSolicitud}
+                disabled={!solicitudNatural || solicitudNatural.trim().length < 10}
+                icon={<PlusOutlined />}
+              >
+                {procesandoSolicitud ? 'Interpretando...' : 'Interpretar y Rellenar'}
+              </Button>
+            </Space>
+          </div>
+        </Card>
 
         {/* FILA 1: DATOS GENERALES + RESUMEN */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
