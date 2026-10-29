@@ -105,19 +105,11 @@ export default function LicenseConfigurator() {
     try {
       console.log('[LicenseConfigurator] Cargando portadas disponibles (públicas)...')
 
-      // Cargar TODAS las portadas (públicas para todos los usuarios)
-      const { data, error } = await supabase
-        .from('portadas')
-        .select('*')
-        .order('created_at', { ascending: false })
+      // Cargar TODAS las portadas desde el endpoint del backend
+      const covers = await storageService.listAllCovers()
 
-      if (error) {
-        console.error('[LicenseConfigurator] Error Supabase:', error)
-        throw error
-      }
-
-      console.log('[LicenseConfigurator] Portadas encontradas:', data?.length || 0, data)
-      setSavedCovers(data || [])
+      console.log('[LicenseConfigurator] Portadas encontradas:', covers?.length || 0, covers)
+      setSavedCovers(covers || [])
     } catch (err) {
       console.error('Error cargando portadas:', err)
     }
@@ -381,14 +373,15 @@ export default function LicenseConfigurator() {
     try {
       antMessage.loading({ content: 'Cargando portada...', key: 'cover' })
 
-      const publicUrl = storageService.getPublicUrl(cover.storage_path)
+      // El endpoint ya devuelve la URL pública completa
+      const publicUrl = cover.url
 
       const img = new Image()
       img.onload = () => {
         setPortada({
           name: cover.name,
           storageUrl: publicUrl,
-          storagePath: cover.storage_path,
+          storagePath: cover.path, // Usar cover.path en lugar de cover.storage_path
           width: img.width,
           height: img.height,
           base64: null
@@ -1339,11 +1332,11 @@ export default function LicenseConfigurator() {
 
           {savedCovers.map(cover => (
             <div
-              key={cover.id}
+              key={cover.path}
               onClick={() => selectSavedCover(cover)}
               style={{
                 cursor: 'pointer',
-                border: portada?.storagePath === cover.storage_path ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                border: portada?.storagePath === cover.path ? '2px solid #1890ff' : '1px solid #d9d9d9',
                 borderRadius: 4,
                 padding: 8,
                 transition: 'all 0.3s',
@@ -1351,7 +1344,7 @@ export default function LicenseConfigurator() {
               }}
             >
               <img
-                src={storageService.getPublicUrl(cover.storage_path)}
+                src={cover.url}
                 alt={cover.name}
                 style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 4 }}
               />
