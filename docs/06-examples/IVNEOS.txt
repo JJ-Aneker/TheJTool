@@ -1,0 +1,960 @@
+
+
+
+
+
+
+MEMORIA TÉCNICA Y PRESUPUESTO
+
+	DESCARGA Y GESTIÓN DE LAS NOTIFICACIONES CON LAS AAPP	
+IVNEOS
+
+
+CONTENIDOS
+1 OBJETO Y ALCANCE DEL SERVICIO	3
+2 IVNEOS	3
+2.1 APLICACIÓN PARA LA GESTIÓN DE NOTIFICACIONES	3
+2.1.1 CAPACIDADES	4
+2.1.2 CARACTERÍSTICAS FUNCIONALES	5
+2.1.3 GESTIÓN DE USUARIOS Y PERMISOS	10
+2.1.4 POSIBILIDAD DE CONFIGURAR MÚLTIPLES CERTIFICADOS PARA UN MISMO CIF	11
+2.1.5 SEGURIDAD EN LA VERIFICACIÓN DE NOTIFICACIONES DISPONIBLES	11
+2.1.6 AUDITORÍA DE USO	11
+2.2 BUZONES DE NOTIFICACIONES	11
+2.2.1 DESCARGA DE METADATOS DE NOTIFICACIONES	12
+2.3 TABLÓN EDICTAL ÚNICO (TEU-BOE)	13
+2.4 AUTOMATISMOS DE DISTRIBUCIÓN	13
+2.5 ENTREGA DE ESCRITOS: REGISTRO ELECTRÓNICO DE LA ADMINISTRACIÓN GENERAL DEL ESTADO O REGISTRO ELECTRÓNICO COMÚN (REC) – MÓDULO OPCIONAL	13
+2.5.1 PRESENTACIÓN MANUAL MEDIANTE FORMULARIO	14
+2.5.2 PRESENTACIÓN MASIVA	18
+2.6 RESUMEN DE PRINCIPALES VENTAJAS	19
+2.6.1 BUZONES Y CONECTORES DISPONIBLES	19
+2.6.2 CARACTERÍSTICAS DE SEGURIDAD INCLUIDAS	20
+2.6.3 AUTOMATISMOS DE DISTRIBUCIÓN E INTEGRACIONES	20
+2.6.4 ARQUITECTURA Y OPCIONES POSIBLES PARA LA IMPLANTACIÓN	20
+3 PRESUPUESTO	22
+1 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+96 003 12 03
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+info@signaturit.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Paris · Barcelona · Valencia
+
+1 OBJETO Y ALCANCE DEL SERVICIO
+El objeto de la presente propuesta es ofrecer a Canon, como partner, el servicio IvNeos (para su puesta a disposición del cliente final Michelin), un servicio automatizado para la recogida y entrega de documentación a las AAPP, de acuerdo con la Ley 39/2015 LPAC, que obliga a las sociedades españolas a relacionarse con la administración por medios electrónicos o telemáticos.
+El alcance incluye el acceso a la solución, la configuración inicial, el soporte funcional y el acompañamiento necesario para su implantación y adopción, así como las funcionalidades propias del servicio orientadas a mejorar la gestión, control y trazabilidad de los procesos asociados. Quedan excluidos los desarrollos, integraciones o servicios adicionales no contemplados expresamente en este documento.
+* Gestor de notificaciones IvNEOS:
+? Monitorización de notificaciones dirigidas a MICHELIN disponibles en diferentes sedes de AAPP y su descarga automatizada.
+? Gestión y distribución interna de las notificaciones mediante perfiles de usuario, permisos y reglas de distribución.
+? Configuración y soporte extendido o asistencia tanto en la fase de puesta en marcha como después de su paso a producción
+? Formación sobre el funcionamiento del aplicativo y manuales de uso
+? Mantenimiento y soporte
+? Actualizaciones a nuevas versiones
+? Evolución de la aplicación dentro de la filosofía inicial y en la medida de las posibilidades técnicas que ofrezca la Administración Pública para incluir nuevos servicios de recogida de notificaciones o envío de documentos
+Ivnosys Soluciones propone una solución basada en sus productos y con tecnología propia, mediante la utilización de su gestor de notificaciones Electrónicas IvNEOS.
+
+2 IVNEOS
+2.1 APLICACIÓN PARA LA GESTIÓN DE NOTIFICACIONES
+
+
+
+
+El servicio persigue dar una solución a las organizaciones radicadas en España al problema ocasionado con la aparición de las notificaciones electrónicas obligatorias por parte de las administraciones públicas y la proliferación de diferentes buzones y tablones electrónicos y la necesidad de utilizar un certificado digital para su consulta.
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+Los servicios de gestión centralizada de Notificaciones IvNEOS tienen como objetivos los siguientes:
+- Ofrecer un sistema que les ayude a adaptarse a la obligatoriedad de la recepción electrónica de notificaciones desde las diferentes administraciones públicas.
+- Unificar en un único punto de acceso los diferentes buzones de notificaciones electrónicas de los organismos públicos.
+- Facilitar la gestión del ciclo de vida de las notificaciones electrónicas, desde el momento de su recepción, descarga, y hasta el momento de su resolución ante el organismo emisor.
+- Facilitar el reparto de notificaciones electrónicas atendiendo a su origen y/o naturaleza, dentro de la corporación. Incluyendo capacidades de multiempresa en la recepción y reparto.
+- Aumentar los niveles de seguridad técnica en la recepción de notificaciones electrónicas atendiendo a:
+o Seguridad técnica para la recepción de notificaciones electrónicas mediante accesos directos a buzones mediante certificados digitales.
+o Gestión segura centralizada de certificados para el acceso a buzones.
+o Seguridad en reparto de notificaciones para que cada usuario reciba solo las notificaciones de su competencia.
+
+2.1.1 Capacidades.
+Para cada uno de estos usuarios pueden definirse perfiles (sincronizador, descargador, etc.) así como limitarse el acceso a las notificaciones de determinados CIFs y organismos.
+De una manera fácil y ágil el sistema permite:
+- Gestionar los buzones de notificaciones electrónicas pendientes, para un control periódico de las notificaciones que no han sido leídas. Con capacidad multiempresa.
+- Gestionar y controlar las notificaciones leídas y no descargadas, facilitando el control de plazos.
+- Gestionar las notificaciones descargadas, controlando entre otras cosas el estado de resolución de cada una.
+- Descargar los metadatos asociados que proporcionen las diferentes sedes en las notificaciones recibidas.
+- Gestionar documentos y acciones realizadas sobre las notificaciones.
+- Realizar seguimiento del tablón edictal único, para la detección de notificaciones publicadas en los mismos tras no haber podido ser entregadas al destinatario.
+- Solicitar certificados tributarios a la AEAT.
+- Solicitar certificados a la Seguridad Social.
+- Presentar escritos a la Agencia Tributaria en contestación a sus notificaciones.
+- Utilizar el Registro Electrónico General de la Administración General del Estado para la presentación de documentos para su tramitación con destino a cualquier órgano administrativo de la Administración General del Estado, Organismo público o
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+Entidad vinculado o dependiente a éstos (Ley 39/2015) (Módulo opcional no ofrecido en esta propuesta)
+- Distribuir las notificaciones mediante reglas automáticas de filtrado y reenvío según diferentes criterios:
+o Diferentes eventos: al sincronizar, al descargar, fechas de vencimiento
+o Diferentes criterios para distribuir: por organismo, por plataforma, por fechas, por CIF, por asunto, por tipo, por metadatos
+o Diferentes acciones: cambio de estado, descarga automática, asignación de gestor, envío de avisos por mail, envío de notificación por mail, acciones personalizadas
+
+- Realizar integración con sistemas corporativos (Gestores documentales, de expedientes, etc.) para guardar las notificaciones en estos sistemas.
+- Disponer de API o similar, para consumir los servicios de IvNEOS desde aplicaciones externas
+- Desarrollar a medida la integración con sedes electrónicas adicionales a las existentes en los catálogos de IVNOSYS. Siempre que la Sede lo permita.
+
+2.1.2 Características funcionales
+Las principales características son:
+	Permite la incorporación de múltiples plataformas emisoras de notificaciones electrónicas.
+
+
+
+Sincronización de todos los buzones de todas las plataformas con un solo clic.
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
+
+& Busca directamente en las plataformas de recepción de notificaciones, evitando así los problemas del aviso (no vinculante) que se pudiera recibir por correo electrónico.
+
+
+
+& Múltiples puestos y múltiples usuarios (con perfiles de acceso configurables)
+
+& Permite la gestión de las notificaciones electrónicas recibidas, incluyendo:
+? Descarga de la notificación en el momento deseado por el gestor.
+? Gestión de estados
+? Gestión de documentos
+? Gestión de notas
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+2.1.2.1 Sincronización de las distintas plataformas definidas:
+Se dispone de diferentes formas para poder ejecutar la monitorización de los diferentes buzones:
+* Manualmente	desde	la	aplicación	cliente.	Se	ejecuta	de	manera	instantánea.
+
+* De forma programada al arrancar la aplicación cliente y de forma periódica mientras se mantenga iniciada. Es posible configurar el arranque automático de la aplicación al iniciar el sistema operativo.
+
+   Finalizada la monitorización se mostrará o enviará al usuario el resumen de las notificaciones disponibles por los canales seleccionados por el propio usuario.
+      Este proceso de monitorización consiste en el acceso automático con certificado digital a todas las sedes electrónicas configuradas por el usuario, aportando de esta forma una total seguridad técnica en el acceso de acuerdo con las recomendaciones realizadas por los diferentes organismos que no garantizan la notificación mediante correo electrónico de las nuevas notificaciones.
+        En estos procesos se detectarán tanto los avisos de actuaciones consideradas como notificación administrativa como las comunicaciones electrónicas que pudieran enviar los diferentes organismos por este canal.
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+2.1.2.1.1 Consulta de buzones de forma desasistida
+Conforme se ha indicado en el punto anterior, la sincronización de buzones podrá llevarse a cabo de forma manual o bien con una programación según un intervalo de horas que revisará los buzones configurados para informar si existen notificaciones pendientes de leer.
+2.1.2.2 Descarga y gestión de notificaciones
+El gestor de notificaciones permite la descarga y gestión de las notificaciones electrónicas recibidas, así como una gestión de estados, documentación relacionada y acciones realizadas.
+2.1.2.2.1 Gestión de notificaciones electrónicas por estado (lectura) y usuario destinatario
+Desde el menú lateral se podrá seleccionar la vista de notificaciones según su estado: Pendientes, en trámite o listar el historial de sincronizaciones.
+2.1.2.2.2 Filtrado de notificaciones por diferentes campos
+Se podrán realizar búsquedas filtrando por cualquiera de las cabeceras (plataforma, cliente, emisor, etc.) en las diferentes vistas del listado de notificaciones. Bastará con escribir el valor deseado en la casilla en blanco debajo del título de cada cabecera.
+La función Panel de Control sirve para informar sobre la recepción de las notificaciones emitidas por cada organismo, indicando el número de notificaciones de cada organismo y la fecha de emisión.
+Y también permitirá realizar filtrados desde el panel de control de la misma manera que la expuesta anteriormente.
+2.1.2.2.3 Opciones de descarga
+Se puede descargar la notificación en el momento deseado (individualmente haciendo un
+doble click sobre el aviso o seleccionando varios y utilizando la opción “descarga múltiple”).
+Una vez seleccionada una notificación para descarga se abrirá una nueva ventana que permitirá:
+? Firmar y descargar la notificación
+? Gestionar los estados
+2.1.2.2.4 Documentación relacionada y expedientes
+Pulsando sobre una notificación se puede ver su detalle desde donde se puede gestionar la notificación a través de diferentes secciones:
+* Datos básicos, desde donde se podrá modificar el estado de tramitación y la fecha máxima de tramitación. Así se puede contralar el ciclo de vida.
+* Documentos asociados y acciones realizadas
+
+Al descargar una notificación, el documento descargado será archivado de forma automática en la carpeta configurada por el usuario para cada organismo, siguiendo una estructura estándar basada en la fecha de la notificación. En cualquier caso, la notificación siempre podrá ser localizada desde la aplicación.
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+A las Notificaciones Electrónicas, se les puede añadir Documentos, Acciones y Expedientes, permitiendo una gestión colaborativa de las notificaciones. Posteriormente los expedientes pueden gestionarse desde una sección específica.
+Un expediente agrupará todas las notificaciones relacionadas, así como otros documentos como, por ejemplo, escritos presentados como contestación
+En la misma ventana anterior se podrá:
+? Gestionar otros documentos, que pueden subirse al gestor y quedar ligados a la notificación para referencia posterior.
+? Gestión de notas que el usuario quiera tomar en referencia a esa notificación.
+2.1.2.2.5 Gestión de acciones para cada notificación
+En la última pestaña de la ventana de descarga de notificaciones se puede acceder al registro de acciones realizadas con la notificación, bien para revisión, bien para anotación de nuevas acciones.
+
+
+
+
+2.1.2.3 Seguimiento del tablón edictal único.
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+2.1.2.5	Asistente para la presentación de escritos a la Agencia Tributaria
+
+
+2.1.3 Gestión de usuarios y permisos
+2.1.3.1 Perfiles de usuario diferentes con funciones limitadas según su rol:
+Se podrán crear múltiples usuarios a los cuales se les podrán asignar diferentes roles:
+? Lector
+Ver avisos de notificación
+? Editor
+Ver notificaciones y rellenar escritos
+? Sincronizador
+Ver notificaciones y sincronizar con los organismos que tenga permisos.
+? Descargador
+Gestionar, descargar y firmar notificaciones con los organismos que tenga permisos.
+? Administrador
+Gestión y configuración de usuarios, grupos y sus respectivos permisos.
+? Superadministrador
+Gestión y configuración de usuarios, grupos, junto con sus respectivos permisos y certificados gestionados por la aplicación.
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+2.1.3.2 Gestión de permisos
+& Se podrán crear grupos que servirán para relacionar CIFs (“clientes”/empresas) con los usuarios que podrán gestionar sus notificaciones: Los usuarios incluidos en un grupo tendrán acceso a la gestión de los CIFs incluidos en el grupo – con funciones limitadas por su perfil de usuario.
+& Mediante la gestión de los “servicios activos”, para cada usuario, se podrán seleccionar los buzones emisores (organismos) que podrá gestionar y esta selección tendrá validez para todos los CIFs a los que tenga acceso el usuario.
+2.1.3.3 Definición de permisos a nivel de organismo
+Como característica de seguridad muy importante cabe resaltar que IvNeos permite definir permisos concretos a los usuarios por sede de organismo – no solamente por conector. Esto es especialmente relevante en el caso de buzones como el 060 que emiten notificaciones agrupadas de múltiples organismos. De esta forma, por ejemplo, se puede evitar que determinados usuarios tengan acceso a notificaciones de AEAT o Justicia, que emiten por el 060, pero no a otros organismos que emiten por este buzón. Este comportamiento se mantiene para cualquier buzón que sea de este tipo (autonómicos, etc.) y se podrán otorgar permisos individualmente para cada uno de los organismos que emitan por el buzón.
+
+2.1.4 Posibilidad de configurar múltiples certificados para un mismo CIF
+Dentro de una misma organización pueden existir varios representantes de la compañía, cada uno con su propio certificado. Con IvNeos cada representante podría utilizar su propio certificado sin tener que compartir uno común.
+IvNeos permite que cada uno de estos usuarios tenga configurados sus certificados sin interferir en la configuración de otros, de esta manera, cada uno de ellos accede a las notificaciones con su propio certificado.
+
+2.1.5 Seguridad en la verificación de notificaciones disponibles
+Gestión inteligente de la sincronización. Reintentos automáticos, evolución de la sincronización o tiempos medios que permiten detectar problemas y alertar al usuario en caso de que algún buzón presente un comportamiento anómalo.
+
+2.1.6 Auditoría de uso
+Para cada notificación la aplicación registrará las principales acciones realizadas por cada usuario, como por ejemplo quien ejecutó la sincronización para obtener el aviso de notificación disponible o quién la firmó y descargó.
+2.2 BUZONES DE NOTIFICACIONES
+	Todos los organismos que emiten notificaciones a través del sistema 060.
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+& Todos los organismos que emiten a través del Punto de Acceso General del Estado-carpeta ciudadana (PAG)
+& DEHU
+& DEJU
+& ENOTUM
+& Tesorería General de la Seguridad Social.
+& DEV - Dirección Electrónica Vial de la Dirección General de Tráfico.
+& Lexnet – Ministerio de Justicia.
+& Diputación de Bizkaia, Oficina Virtual de Hacienda y Finanzas.
+& Diputación Foral de Gipuzkoa.
+& Administración de Justicia de Euskadi.
+& Generalitat Valenciana
+& Comunidad de Madrid
+& Xunta de Galicia
+& Junta de Comunidades de Castilla y León
+& Comunidad Autónoma de Aragón (PAG
+& Lexnet-Ministerio de Justicia
+
+2.2.1 Descarga de metadatos de notificaciones
+La aplicación recogerá todos los metadatos que las diferentes sedes de notificaciones ofrezcan asociados a cada notificación.
+Cuando se descargue desde la aplicación una notificación se generará un fichero con los metadatos de la notificación, bien sea una descarga múltiple o individual.
+Este fichero se almacenará en la misma carpeta que se almacena los documentos propios de la notificación. Se guardarán en subcarpetas para evitar duplicidades de nombres ya que se respeta el nombre original según recibe del organismo emisor. Se verá disponible, para su descarga, desde la pestaña "Documentos" de la ventana de la notificación en cuestión.
+El fichero de metadatos tendrá formato JSON.
+El fichero contendrá 3 tipos diferentes de metadatos. Primero los metadatos propios de la aplicación de gestión de notificaciones, luego los metadatos de la plataforma o sede electrónica desde donde se han sincronizado las notificaciones, y finalmente los propios del organismo emisor.
+Para todas las notificaciones, los metadatos de la aplicación serán siempre los mismos, pero el resto dependerán de la plataforma y del organismo emisor, ya que diferentes organismos emisores pueden enviar diferentes metadatos dentro de una misma plataforma.
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+2.3 TABLÓN EDICTAL ÚNICO (TEU-BOE)
+El TEU del BOE agrupa además los tablones de la AEAT, DGT-TESTRA y SS.
+IvNeos rastrea anuncios publicados para los CIFs configurados, permitiendo acceder directamente a la publicación.
+2.4 AUTOMATISMOS DE DISTRIBUCIÓN
+El módulo de automatismos permite definir acciones que se ejecutan automáticamente y ayuden a gestionar las notificaciones en la organización:
+* Mediante la creación de reglas automáticas de filtrado y reenvío de notificaciones según diferentes criterios. Ejemplos:
+o Diferentes eventos: al sincronizar, al descargar, fechas de vencimiento
+o Diferentes criterios para distribuir: por organismo, por plataforma, por fechas, por CIF, por asunto, por tipo, por código postal.
+o Diferentes acciones: cambio de estado, asignación de gestor, envío de avisos por mail, envío de notificación por mail, acciones personalizadas
+Asimismo, IvNeos está preparado para realizar integraciones con sistemas corporativos (Gestores documentales, de expedientes, etc.) para guardar las notificaciones en estos sistemas.
+2.5 ENTREGA DE ESCRITOS: REGISTRO ELECTRÓNICO DE LA ADMINISTRACIÓN GENERAL DEL ESTADO O REGISTRO ELECTRÓNICO COMÚN (REC) – MÓDULO OPCIONAL.
+El Registro Electrónico General de la Administración General del Estado es un registro para la presentación de documentos para su tramitación con destino a cualquier órgano administrativo de la Administración General del Estado, Organismo público o Entidad vinculado o dependiente a éstos, de acuerdo a lo dispuesto en la Ley 39/2015.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
+Además, a través del Registro Electrónico, se podrán presentar documentos para su remisión telemática a otras Administraciones Públicas (Comunidades Autónomas, Entidades Locales, etc.) que estén integradas en el Sistema de Interconexión de Registros (SIR).
+El gestor de notificaciones puede integrarse con el Registro Electrónico. Permite la presentación directa de requerimientos a notificaciones recibidas de los organismos adheridos a SIR. El Gestor de Notificaciones mostrará el resguardo de presentación generado por el Registro Electrónico.
+Existen dos modalidades, mediante el asistente de la aplicación por envío manual, organismo por organismo; o por automatización para envío masivo mediante archivo de proceso por lotes.
+
+
+2.5.1 Presentación manual mediante formulario
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
+
+A través de la opción “Escritos a REC” se podrá acceder al asistente:
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
+
+Esta presentación se realizará mediante formulario con introducción manual de todos los datos y selección de los documentos que se desee adjuntar:
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+? Se podrán adjuntar hasta 5 documentos en cada envío,
+? El envío se firmará con uno de los certificados digitales instalados en IvNEOS
+? Una vez finalizado el proceso se obtendrá un justificante del envío que podrá guardarse
+? El histórico de escritos presentados podrá consultarse mediante una opción específica
+
+
+
+
+2.5.2 Presentación masiva
+La presentación masiva permite realizar las mismas acciones que la anterior por formulario, pero automatizadas mediante un fichero CSV, teniendo que introducir el CAPTCHA solo una vez por cada presentación masiva (en la medida de lo posible se intentará analizar y eliminar el CAPTCHA mediante un desarrollo para su auto-detección).
+Para la presentación masiva de documentación, hay disponible una plantilla a rellenar por el usuario, en la que debe indicar una serie de datos, códigos y rutas de descarga de fichero.
+En la plantilla, se debe especificar la ruta de acceso a los documentos que se desean presentar, para que el asistente los pueda cargar de forma automática.
+Ejemplo de los datos requeridos:
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
+
+2.6 RESUMEN DE PRINCIPALES VENTAJAS
+Las principales ventajas de IvNeos pueden resumirse en los siguientes apartados:
+
+2.6.1 Buzones y conectores disponibles
+2.6.1.1 Miles buzones incluidos
+Dispone de múltiples sedes con su licencia estándar, incluyendo los buzones del 060, y el Punto de Acceso General del Estado (PAG) a través de los cuales emiten miles de administraciones públicas.
+2.6.1.1.1 Seguimiento del Tablón Edictal Único (TEU)
+Para cada uno de los CIFs configurados se puede habilitar el rastreo de notificaciones publicadas en este tablón del BOE. La aplicación informará de aquellas publicaciones relacionadas que encuentre, incluyendo el enlace directo a la notificación.
+2.6.1.1.2 Presentación de escritos de respuesta ante la AEAT
+Permite responder directamente, sin salir de la aplicación, a las notificaciones de la AEAT.
+2.6.1.1.3 Obtención de certificados de corriente de pago con AEAT y TGSS
+Para cada uno de los CIFs configurados se puede obtener directamente el certificado de estar al corriente con las obligaciones con estos organismos.
+2.6.1.2 Posibilidad de desarrollo y activación de sedes de organismos adicionales
+Ivnosys dispone de una amplia experiencia en el desarrollo de conectores con las diferentes sedes electrónicas, lo cual posibilita que el CLIENTE pueda habilitar prácticamente cualquier sede en la que esté interesado. Para ello se proponen diferentes alternativas: desarrollos a medida, tarifa plana, etc.
+2.6.1.2.1 Integración con REC para envío de escritos a las diferentes Administraciones Públicas.
+A través del Registro Electrónico Común se pueden enviar escritos a multitud de AAPP, teniendo el mismo efecto que si se hubiesen presentado en su registro general específico. Esta opción es especialmente útil a través de la posibilidad de realizar envíos masivos, obteniendo automáticamente los justificantes correspondientes.
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+2.6.2 Características de seguridad incluidas
+Para cada uno de los usuarios pueden definirse perfiles (sincronizador, descargador, etc.) así como limitarse el acceso a las notificaciones de determinados CIFs y organismos.
+& Definición de permisos a nivel de organismo
+& Posibilidad de configurar múltiples certificados para un mismo CIF
+& Seguridad en la verificación de notificaciones disponibles
+
+2.6.3 Automatismos de distribución e integraciones
+Como se ha indicado en el punto anterior (2.4 Automatismos de distribución) IvNeos dispone de un módulo de automatismos que complementa el esquema de permisos de usuario mediante reglas automáticas que se desencadenan según determinados eventos, con diferentes filtros, que permiten asignar notificaciones o informar a los usuarios de nuevas notificaciones, cambios en su estado, plazos, etc.
+Además, para aquellos clientes que lo requieran Ivnosys pone a disposición la posibilidad de realizar integraciones o desarrollos a medida
+
+2.6.4 Arquitectura y opciones posibles para la implantación
+Se trata de un sistema Cloud híbrido puesto que la aplicación reside en servidor local pero los datos, licenciamiento, información de configuración, etc. reside en servidor Web seguro con autentificación.
+Se aprovecha la tecnología Windows Forms para interactuar con los certificados digitales del cliente y poder aprovechar la riqueza de los componentes que ofrece esta plataforma.
+Para facilitar la configuración, control de licencias y actualización de los conectores a las sedes electrónicas, así como para proteger el know how, la información debe residir en la nube y por eso la aplicación cuenta con una plataforma de servicios web que así lo permite.
+A continuación, se muestra la arquitectura de la aplicación y una descripción de cada componente.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
+
+& SERVICIO CLOUD IVNEOS: Servidor de IvNeos gestionado en CPD de Ivnosys Soluciones (ubicado en Valencia) multi-tenant con base de datos de gestión multi-usuario. No almacena ni las notificaciones electrónicas ni los certificados digitales.
+& EQUIPO CLIENTE: Estación de trabajo de los operadores donde se ejecutará la aplicación IvNeos (Windows 7 o superior).
+& IvNEOS (IvNeos.exe): Aplicación de escritorio que se instala en los EQUIPO CLIENTE y que conecta con el SERVICIO CLOUD IVNEOS mediante protocolo de servicios web SOAP a través de un canal seguro SSL/TLS. Se puede distribuir mediante .msi o mediante tecnología Click Once de Microsoft desde el SERVICIO CLOUD IVNEOS (con este método soporta actualización automática).
+& Directorio Activo (LDAP): La autenticación de usuarios puede realizarse de forma integrada utilizando el usuario Windows del EQUIPO CLIENTE. Esta opción requiere que el EQUIPO CLIENTE esté conectado a la RED LOCAL de la organización del cliente y configurar un usuario del Directorio Activo (LDAP) que compruebe la autenticidad de la sesión. Si no se desea integración LDAP la gestión de usuarios puede ser propia gestionada por el SERVICIO CLOUD IVNEOS.
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+& Repositorio centralizado de certificados: Ubicado en la RED LOCAL de la organización del cliente. Los certificados necesarios deben estar accesibles en EQUIPO CLIENTE por el operador del equipo. El acceso a los certificados se realizaría por IvNEOS (IvNeos.exe) utilizando el CSP - Cryptographic Service Provider correspondiente instalado en el EQUIPO CLIENTE.
+& Modulo Comunicaciones. Componente interno de IvNEOS (IvNeos.exe) encargado de las comunicaciones con las SEDES ELECTRÓNICAS. El EQUIPO CLIENTE debe tener conectividad y acceso a través de los Firewalls y Proxies del acceso a INTERNET de la red del EQUIPO CLIENTE. Usa el certificado digital para realizar la AUTENTICACIÓN CON EL CERTIFICADO DIGITAL (SSL) en las SEDES ELECTRÓNICAS y firmar los acuses de recibo de las notificaciones.
+& Repositorio Documental. Las notificaciones descargadas se almacenan por defecto en una unidad de red dentro de la RED LOCAL de la organización del cliente. El EQUIPO CLIENTE debe tener visibilidad a través de la ruta UNC de la unidad de red del Repositorio Documental. Los permisos de acceso a la unidad de red deben limitarse a un usuario específico gestionando por IvNEOS (IvNeos.exe), de forma que el usuario autenticado en el EQUIPO CLIENTE no tiene que tener acceso directo.
+
+3 PRESUPUESTO
+
+
+IvNeosUnidadesConceptoTipoPVD1Suscripción IvNeos EnterpriseAnual2.692,31 €1Licencia IvNeos Enterprise Desktop (hasta 5 CIF)Anual1.923,08 €1Suscripción conector eNotumAnual1.538,46 €1Suscripción IvNeos Premium + eNotumAnual10.769,23 €1Onboarding-0,00 €1Soporte EstándarAnual0,00 €Servicios opcionales IvNeosUnidadesConceptoTipoPVP1Módulo de descargas programadasAnual1.153,85 €1Módulo de acciones automáticasAnual1.923,08 €1Servicio de autenticación externa/LDAP/SAMLAnual1.538,46 €	PVD: Precio venta distribuidor
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+ORDEN DE COMPRA:
+Fecha: 15/05/2026
+
+* Datos del Cliente
+
+Razón SocialReferenciaCIFValidez OfertaDomicilio SocialFecha Inicio contrataciónContactoFecha Fin de contratación
+
+* Oferta comercial
+Precios con IVA no incluido. Se presentará una factura por importe del 100% de la propuesta, correspondiente al primer año de servicio, tras la aceptación.
+
+IvNeosUnidadesConceptoTipoPVD1Suscripción IvNeos EnterpriseAnual2.692,31 €1Licencia IvNeos Enterprise Desktop (hasta 5 CIF)Anual1.923,08 €1Suscripción conector eNotumAnual1.538,46 €1Suscripción IvNeos Premium + eNotumAnual10.769,23 €1Onboarding-0,00 €1Soporte EstándarAnual0,00 €Servicios opcionales IvneosUnidadesConceptoTipoPVP1Módulo de descargas programadasAnual1.153,85 €1Módulo de acciones automáticasAnual1.923,08 €1Servicio de autenticación externa/LDAP/SAMLAnual1.538,46 €
+
+* Información de Facturación
+
+Condiciones de pagoTRANSFERENCIA A 30 DÍAS DE FECHA DE FACTURA
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+De conformidad con lo anterior, el Cliente acepta las condiciones de contratación descritas mediante el uso de la firma electrónica, otorgándole pleno valor legal.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+Condiciones de contratación
+1. Partes
+PROVEEDOR: el proveedor de los Servicios contratados es la Entidad jurídica cuyos datos corporativos aparecen en la Orden de compra la cual mantendrá la relación contractual principal con el CLIENTE obligándose ante él conforme las presentes Condiciones Generales.
+CLIENTE: la persona física o jurídica identificada en la Orden de Compra que solicita los Servicios en las condiciones indicadas en la Orden de Compra.
+PRESTADOR DE SERVICIOS DE CONFIANZA: tratándose de Servicios de confianza conforme al Reglamento eIDAS, el Prestador de Servicios de Confianza es la entidad jurídica que figura en la Lista de Prestadores de Servicios de Confianza de la Unión Europea y que prestará dichos Servicios al CLIENTE y usuarios. Consultar el Prestador así como los Términos y Condiciones de uso de sus servicios respectivos en el Anexo I.
+2. Alcance. Las presentes Condiciones Generales de contratación se aplicarán a la relación contractual entre el Proveedor y el Cliente formalizada mediante la aceptación de la correspondiente Orden de compra, respecto de los Servicios contratados. La modificación posterior por adquisición de nuevos o diferentes productos, se considera una nueva contratación a todos los efectos aplicándose a la relación contractual las Condiciones Generales de contratación vigentes en dicho momento. En caso de modificación por adquisición de más volumen de Créditos, las Condiciones Generales de contratación iniciales seguirán siendo aplicables, y prevalecerán en caso de contradicción o duplicidades con las que se pudieran firmar con ocasión de la modificación.
+3. Objeto. Constituye el objeto del presente Contrato la prestación de “Servicios” descritos en la Orden de compra en base a los cuales el Proveedor concederá al Cliente una licencia de uso sobre los Servicios (bajo la modalidad Software as a Service) no exclusiva e intransferible y limitada al tiempo de duración del contrato.
+La contratación de Créditos (firmas, SMS, sellos, etc.) y/o unidades de Certificados estará necesariamente vinculada a la contratación de Servicios con licencia de uso (Plataforma, Software, etc.) bien a través del mismo pedido, bien a través de otro pedido anterior, y su consumo deberá efectuarse dentro del plazo de duración del Contrato inicial o de sus correspondientes renovaciones.
+Se incluye en el Anexo I una referencia a todos los Servicios ofrecidos por el Proveedor con referencia en su caso al Prestador de Servicios de Confianza que prestará el Servicio final (si diferente del Proveedor) y a la documentación legal aplicable a cada servicio de confianza. Dicho Anexo I es parte integrante del presente Contrato.
+4. Duración - Renovación. El presente Contrato tendrá como duración inicial el periodo comprendido entre la “Fecha inicio de contratación” (fecha de la puesta a disposición de la licencia) y la “Fecha fin de contratación” según figura en la Orden de Compra, ello, independientemente de la fecha de su firma, renovándose de forma tácita y automática a la fecha aniversario por periodos sucesivos e iguales salvo que cualquiera de las Partes decidiese no renovarlo previa comunicación escrita a la otra Parte y con un plazo mínimo de SESENTA (60) días de antelación a la fecha aniversario.
+La adquisición de Créditos adicionales durante la vigencia del Contrato, se considerará como una adenda a dicho Contrato sin que su duración y demás condiciones se vean modificadas.
+Para el supuesto de venta de ciertos Servicios que requieran trabajos de implantación específica (integración, personalización, instalación on premises, etc.), la fecha aniversario a efectos de renovación anual del Contrato o terminación anticipada, coincidirá con la fecha de inicio de la prestación de servicio que constará en el ‘Acta de fin de implantación’ emitido por el Proveedor. Los trabajos de simple configuración de herramientas (para plataformas Signaturit e IvSign) en cambio no implicarán modificación de la fecha aniversario, manteniéndose como fecha de inicio de la prestación de los servicios la Fecha inicio de contratación que figura en el Orden de compra.
+5. Efectos de la terminación. El período inicial del Contrato y los periodos de las renovaciones tacitas son de obligado cumplimiento. En caso de que el Cliente desease terminar el Contrato anticipadamente por voluntad propia perderá las cantidades abonadas hasta dicho momento en concepto de penalización.
+Asimismo, tanto en caso de terminación anticipada como o en caso de comunicar su voluntad de no renovarlo a la fecha aniversario, el Cliente no podrá reclamar la devolución de los importes abonados por unidades de Créditos
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+no agotadas, Certificados no expedidos o licencias no activadas durante la vigencia del contrato y tampoco liberará al mismo de cualquier otro pago debido.
+Los Certificados electrónicos almacenados en la solución de centralización del Proveedor y que siguieran vigentes en el momento de dicha terminación, no podrán ser recuperados, sin que proceda indemnización alguna a favor del Cliente.
+6. Facturación - Pago. Salvo acuerdo especifico entre las Partes, la primera factura se emitirá a la “Fecha inicio de contratación” (fecha de la puesta a disposición de la licencia) y las siguientes según la periodicidad acordada en la Orden de Compra tanto para la duración inicial como para las eventuales prorrogas tacitas.
+Salvo que la Orden de Compra estipule otro plazo, el pago del precio de los Servicios contratados como el IVA u otros impuestos (que pudieran proceder o ser de aplicación) deberá efectuarse por el Cliente a los TREINTA (30) días fecha recepción factura, mediante transferencia bancaria.
+El Cliente no podrá alegar la falta de consumo completo de Créditos o de Certificados contratados para retrasar el pago.
+Las Partes acuerdan que la facturación se hará por los medios electrónicos y en formato digital que marque el Proveedor.
+Para el supuesto de Servicios con trabajos de implantación específica (integración, personalización, on premises, etc.) o en caso de retraso en el inicio de la prestación de los Servicios por razones imputables exclusivamente al Proveedor, la licencia anual tomará como fecha de inicio la fecha del ‘Acta de fin de implantación’ de los Servicios contratados, y dicha fecha será considerada como fecha aniversario para la facturación de las renovaciones. Los trabajos de implantación mismos se facturarán a la Fecha inicio de contratación que figura en la orden de compra.
+En caso de demora en la implantación por causa del Cliente, la factura se emitirá a la fecha de entrega inicialmente prevista en el Acta de inicio, y dicha fecha será considerada como fecha aniversario para las renovaciones.
+7. Intereses de demora. En caso de retraso en el pago de las sumas adeudadas por el Cliente más allá del plazo estipulado tendrá por efecto su incursión en mora, sin necesidad de requerimiento escrito del Proveedor y obligará al Cliente (i) los intereses de demora desde el momento en que la cantidad debió ser pagada hasta la fecha efectiva de su pago, de acuerdo con la Ley 3/2004, de 29 de diciembre, por la que se establecen medidas de lucha contra la morosidad en las operaciones comerciales, (ii) al pago de una cantidad fija de 40 euros por factura debida y (iii) los gastos o comisiones por devolución de recibos que soporte el Proveedor, sin perjuicio de cualquier otra acción que el Proveedor pueda ejercer contra el Cliente a este respecto, como la suspensión de los Servicios hasta regularización de los pagos pendientes.
+8. Actualización de los precios. Los precios se actualizarán en la fecha aniversario del Contrato, conforme a la variación del Índice General Nacional de Precios al Consumo (el I.P.C. general). Para la primera actualización se tomará como mes de referencia el último índice publicado a la fecha de celebración del contrato. Las sucesivas actualizaciones se realizarán sobre el precio anteriormente actualizado. El precio actualizado se incluirá en la factura con expresión del porcentaje de alteración aplicado y será exigible al Cliente a partir de su notificación.
+Asimismo, durante la vigencia del Contrato, el Proveedor se reserva el derecho a modificar el precio de los Servicios suscritos como consecuencia de un incremento de las tarifas aplicadas por los operadores o subcontratistas, informando previamente al Cliente, con una antelación de SESENTA (60) días, antes de la fecha de entrada en vigor de las nuevas tarifas aplicables. El Cliente tendrá la opción de resolver el Contrato notificándolo al Proveedor mediante acuse de recibo dentro del plazo indicado. Transcurrido el plazo de preaviso de SESENTA (60) días, y sin notificación alguna por parte del Cliente, las nuevas tarifas entrarán automáticamente en vigor.
+9. Propiedad intelectual e industrial. El Cliente manifiesta conocer que la firma del Contrato no supondrá adquisición alguna de los derechos de propiedad intelectual o de cualquier otra clase que verse sobre la información, contenido, diseño, estructura, compilación, código fuente y en general todo aquello que tenga una relación directa o indirecta con el Proveedor y los servicios que oferta.
+10. Obligaciones del Proveedor. El Proveedor garantiza haber adoptado las medidas técnicas necesarias para el cumplimiento de lo establecido en este Contrato, así como con todo aquello relacionado con el mantenimiento de
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+los Servicios objeto de este Contrato y la seguridad, confidencialidad, protección de datos, el nivel adecuado de servicios y el seguro de responsabilidad civil que dé cobertura a todas las obligaciones contraídas.
+El incumplimiento o cumplimiento defectuoso de las obligaciones del Proveedor que no esté sujeto a controversia (reconocido por el Proveedor), dará derecho al Cliente a resolver el contrato con efecto inmediato, y a obtener la devolución de las cantidades abonadas por anticipado y por los servicios no prestados correctamente, sin perjuicio de las reclamaciones por daños y perjuicios que el Cliente tuviese derecho a iniciar en el marco de lo acordado en clausula 12.
+11. Obligaciones del Cliente. i) Hacer un buen uso de los Servicios, comprometiéndose a no contravenir el Contrato, la legislación vigente ni lesionar los derechos e intereses de terceros; ii) pagar los importes relativos a las facturas emitidas en tiempo y forma; y iii) hacer buen uso de su usuario y contraseña de acceso a los Servicios y no ponerlos a disposición de terceros.
+El incumplimiento de las obligaciones del Cliente, la reventa sin consentimiento de los productos del Proveedor por parte del Cliente, la falta de pago total o parcial tras haber sido requerido para ello, conllevará la resolución del contrato con efecto inmediato, finalizando la prestación de los Servicios (incluido la revocación de los certificados emitidos) sin posibilidad de reembolso, y sin perjuicio de las reclamaciones por daños y perjuicios que el Proveedor tuviese derecho a iniciar.
+El Cliente deberá realizar el proceso de puesta en marcha del Servicio con acceso por licencia SaaS (u “onboarding”) dentro del plazo de 3 meses desde la Fecha de inicio de contratación. Pasado este plazo, la asistencia personal para formación o configuración podrá ser facturada al Cliente.
+12. Responsabilidad. El Proveedor se compromete a poner toda la diligencia razonable en la ejecución de los Servicios de acuerdo con las mejores prácticas de su profesión y en colaboración con el Cliente, pero sólo estará vinculado por una obligación de medios. El Proveedor no podrá ser considerado responsable en ningún caso por daños distintos de los que resulten directa y exclusivamente de un fallo en la ejecución de los Servicios solicitados.
+El Proveedor no podrá ser considerado responsable en caso de utilización no conforme de los Servicios, en caso de aplicación descuidada o de no aplicación de los consejos de utilización proporcionados en el marco de la asistencia o de consejos que no emanen del Proveedor.
+El Proveedor quedará exonerado de toda responsabilidad en caso de imposibilidad de acceso a los Servicios debido a un acontecimiento ajeno a su voluntad.
+En caso de que la responsabilidad del Proveedor se mantuviera, por cualquier motivo y sea cual sea la base jurídica invocada o retenida, las Partes acuerdan expresamente que el importe de todos los daños y perjuicios combinados y acumulados se limitaría al importe sin impuestos pagado por el Cliente por los Servicios en cuestión durante los 12 (doce) meses anteriores al hecho generador del daño. Lo anterior se entiende sin perjuicio de los derechos de reclamación de terceros afectados contra el Proveedor en su condición de Prestador de Servicios de Confianza.
+13. Actualización de los Servicios. Teniendo en cuenta la evolución de la tecnología y la necesidad de adaptarla a las mejoras en materia de calidad y seguridad de la información o por razón de cumplimiento normativo, el Proveedor se reserva el derecho de desplegar versiones actualizadas de los Servicios contratados o, incluso a ofrecer su sustitución por otros de similares características y funcionalidades, pudiendo el Cliente en estos casos solicitar la resolución anticipada del Contrato si no está conforme con las nuevas condiciones ofrecidas, con devolución de parte del precio por el tiempo no disfrutado.
+14. Confidencialidad y protección de datos. Toda información surgida como consecuencia de la contratación de los Servicios, así como la que surja durante su relación comercial, será considerada confidencial, no pudiendo difundirla, utilizarla, copiarla o suministrarla a terceros, entre otros, salvo acuerdo previo y expreso de la otra Parte. Para los Servicios en los que el Proveedor y el Cliente, intervienen como Encargado y Responsable de Tratamiento de Datos Personales, respectivamente, se comprometen a cumplir con lo previsto en el Anexo II en materia de protección de datos, sin perjuicios de las obligaciones que puedan aplicar al Prestador de Servicios de Confianza como Responsable del tratamiento por la propia naturaleza del servicio prestado.
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+15. Acuerdo Nivel de Servicio. Salvo los casos de contratación de un ANS especifico, se aplicarán las condiciones de nivel de servicio publicadas en la página web del Proveedor (ver url en Anexo I)). El acceso al soporte se encuentra en la siguiente dirección: https://help.signaturit.com/hc/es/requests/new
+16. Jurisdicción y legislación La presente relación comercial se regirá por la legislación española, sometiéndose las Partes a la jurisdicción exclusiva de los Tribunales de Valencia para la resolución de cualquier disputa que aconteciera, con renuncia expresa a cualquier fuero propio pudiendo designar libremente la representación letrada que estimen oportuna.
+De conformidad con lo anterior, las Partes reconocen que este Contrato ha sido convenientemente aceptado por las Partes quienes han suscrito y prestado su consentimiento expresamente para la perfección del mismo mediante el uso de la firma electrónica,reconociéndole plena eficacia jurídica.
+17. Condiciones adicionales de contratación: Todo lo que no resulte expresamente regulado por la presente, se sujetará a lo dispuesto en la documentación legal aplicable a cada uno de los Servicios contratados según se indica en el Anexo I.
+
+
+ANEXO II. Contrato de Encargado de Tratamiento
+
+De acuerdo en el artículo 28 y relacionados del Reglamento General de Protección de Datos (“RGPD”) y la Ley Orgánica de Protección de Datos y Garantía de los Derechos Digitales (“LOPDGDD”) de España, el tratamiento de datos de carácter personal por cuenta de terceros requiere de la celebración de un contrato privado. Salvo que la naturaleza del Servicio implique que el Proveedor o Prestador final del Servicio tenga por ley la condición de RESPONSABLE (en cuyo caso, se informará oportunamente al Cliente y los usuarios), el Cliente actuará como responsable de los ficheros y datos personales y el Proveedor actuará, como encargado del tratamiento. Si el Servicio final fuera prestado por un Prestador de Servicios de Confianza diferente del Proveedor según indicado en el Anexo I, el Prestador intervendrá como ENCARGADO y el Proveedor como SUB-ENCARGADO.
+1. Objeto, finalidad y duración. El presente anexo fija los términos y condiciones del tratamiento por parte del ENCARGADO de los datos personales contenidos en los sistemas o ficheros del RESPONSABLE con la finalidad de prestar los Servicios del contrato principal y con la misma duración que éste.
+Tipo de datos personales: Datos identificativos y/o biométricos de la firma o del rostro (para VideoID u Onboarding) Categorías de interesados: Clientes y usuarios del Responsable.
+Tratamientos: Recogida, registro, comunicación por transmisión.
+2. Obligaciones del encargado. El tratamiento se realizará de conformidad con lo establecido en el RGPD y la LOPDGDD. El ENCARGADO se compromete a cumplir con las instrucciones del RESPONSABLE, cumpliendo con el artículo 32 del RGPD:
+* Medidas técnicas y organizativas para garantizar la seguridad, confidencialidad e integridad de los datos de carácter personal (encriptación, cifrado y seudonimización, entre otras).
+* No aplicar, comunicar ni utilizar los datos de carácter personal con finalidades diferentes a las establecidas.
+* Guardar bajo su control y custodia los datos personales facilitados y a no divulgarlos, transferirlos, ni siquiera para su conservación.
+* Llevar un registro de todas las categorías de actividades de tratamiento efectuadas.
+* No subcontratar ninguna de las prestaciones que formen parte del objeto de este Contrato que comporten un tratamiento de datos personales salvo los servicios auxiliares necesarios para el normal funcionamiento de los servicios se encuentran recogidos en el DPA.
+* Notificar sin dilación indebida de aquellas violaciones de la seguridad.
+* Colaborar en el ejercicio de los derechos de los interesados (acceso, rectificación, supresión, limitación, portabilidad y/o oposición).
+* Realizar formaciones periódicas en materia de protección de datos a sus empleados en general y a los empleados que tengan acceso a datos personales en particular, para asegurar un tratamiento acorde al RGPD.
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+* Poner a disposición la información necesaria relativa al cumplimiento en materia de protección de datos personales y permitir al RESPONSABLE la realización de auditorías en materia de protección de datos siempre y cuando: i) se otorgue un preaviso mínimo de 15 días; ii) el RESPONSABLE esté a cargo de soportar los costes y gastos asociados a dicha auditoría.
+3. Medidas de seguridad. El ENCARGADO de tratamiento dispone de las medidas de seguridad propias de la certificación ISO 27001, ISO 20000 o el ENS, entre otras, las evaluaciones de impacto y deberá asistir al RESPONSABLE en la respuesta al ejercicio de los derechos correspondientes a los interesados.
+4. Obligaciones del responsable. El RESPONSABLE manifiesta cumplir con todas las medidas técnicas y organizativas necesarias en cumplimiento de la normativa de Protección de Datos y defensa de los derechos de los interesados. El RESPONSABLE se obliga a colaborar y comunicar al ENCARGADO cualquier variación que se produzca de los datos personales facilitados, para que ésta proceda a su actualización.
+Para más información consultar la Política de privacidad del Proveedor disponible en la página web del Proveedor o escriba al correo electrónico dpo@signaturit.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+

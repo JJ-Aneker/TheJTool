@@ -1,0 +1,1700 @@
+import { useState, useEffect } from 'react'
+import { Table, Button, Input, InputNumber, Select, Card, Drawer, Space, Modal, Form, message as antMessage, Divider, Typography, Statistic, Row, Col, Tag, Upload } from 'antd'
+import { PlusOutlined, SaveOutlined, DownloadOutlined, DeleteOutlined, HistoryOutlined, ShoppingCartOutlined, AppstoreOutlined, FileImageOutlined } from '@ant-design/icons'
+import { message } from '../utils/message'
+import HelpButton from '../components/HelpButton'
+import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../config/supabaseClient'
+import { storageService } from '../services/storageService'
+import * as XLSX from 'xlsx'
+
+const { TextArea } = Input
+const { Option } = Select
+const { Title, Text } = Typography
+
+export default function LicenseConfigurator() {
+  const { user } = useAuth()
+  const [form] = Form.useForm()
+
+  const [loading, setLoading] = useState(false)
+  const [edicion, setEdicion] = useState('onpremise') // onpremise, online, suscripcion
+
+  // Datos de cabecera
+  const [sfdcOpp, setSfdcOpp] = useState('')
+  const [dealSupport, setDealSupport] = useState('')
+  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+  const [accountManager, setAccountManager] = useState('')
+  const [cliente, setCliente] = useState('')
+
+  // Catálogo y selección
+  const [items, setItems] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
+  const [catalogDrawerOpen, setCatalogDrawerOpen] = useState(false)
+
+  // Tech Partners
+  const [techPartners, setTechPartners] = useState([
+    { nombre: 'Docuten', importe: 0 },
+    { nombre: 'IO Digital X', importe: 0 },
+    { nombre: 'Ivnosys', importe: 0 },
+    { nombre: 'Doceo Software', importe: 0 },
+    { nombre: 'Otros', importe: 0 }
+  ])
+
+  // Servicios
+  const [servicios, setServicios] = useState([])
+
+  // Suscripción (solo para edicion=suscripcion)
+  const [cuotaAnual, setCuotaAnual] = useState(0)
+  const [anosContrato, setAnosContrato] = useState(1)
+  const [soporteLocal, setSoporteLocal] = useState(0)
+
+  const [saveModalOpen, setSaveModalOpen] = useState(false)
+  const [historyModalOpen, setHistoryModalOpen] = useState(false)
+  const [quotations, setQuotations] = useState([])
+
+  const [searchText, setSearchText] = useState('')
+  const [selectedCatalogItems, setSelectedCatalogItems] = useState([])
+
+  const [serviciosModalOpen, setServiciosModalOpen] = useState(false)
+  const [techPartnersModalOpen, setTechPartnersModalOpen] = useState(false)
+  const [selectedServicios, setSelectedServicios] = useState([])
+  const [tempTechPartners, setTempTechPartners] = useState([])
+
+  // Estados para portada
+  const [portada, setPortada] = useState(null)
+  const [portadaPreview, setPortadaPreview] = useState(null)
+  const [portadaModalOpen, setPortadaModalOpen] = useState(false)
+  const [savedCovers, setSavedCovers] = useState([])
+  const [useDefaultPortada, setUseDefaultPortada] = useState(false)
+
+  // Estados para lenguaje natural
+  const [solicitudNatural, setSolicitudNatural] = useState('')
+  const [procesandoSolicitud, setProcesandoSolicitud] = useState(false)
+
+  // Servicios predefinidos
+  const serviciosDisponibles = [
+    { codigo: '739ZZ051', descripcion: 'Consultoría', pvp_jornada: 880 },
+    { codigo: '739ZZ049', descripcion: 'Implementación', pvp_jornada: 705 },
+    { codigo: '739ZZ048', descripcion: 'Formación', pvp_jornada: 705 },
+    { codigo: '739ZZ047', descripcion: 'Oficina de Proyecto', pvp_jornada: 705 },
+    { codigo: '739ZZ052', descripcion: 'Prueba de Concepto', pvp_jornada: 880 }
+  ]
+
+  // Tech Partners disponibles
+  const techPartnersDisponibles = [
+    { nombre: 'Docuten', descripcion: 'Firma electrónica y gestión documental' },
+    { nombre: 'IO Digital X', descripcion: 'Transformación digital' },
+    { nombre: 'Ivnosys', descripcion: 'Notificaciones electrónicas' },
+    { nombre: 'Doceo Software', descripcion: 'Soluciones documentales' },
+    { nombre: 'DOCAI', descripcion: 'IA para clasificación y extracción' },
+    { nombre: 'IvSign', descripcion: 'Firma digital avanzada' },
+    { nombre: 'Salesforce', descripcion: 'CRM' },
+    { nombre: 'Microsoft', descripcion: 'Azure / M365' },
+    { nombre: 'Otro', descripcion: 'Partner personalizado' }
+  ]
+
+  // Cargar items del catálogo
+  useEffect(() => {
+    loadItems()
+  }, [edicion])
+
+  // Cargar portadas guardadas
+  useEffect(() => {
+    if (user?.id) {
+      loadSavedCovers()
+    }
+  }, [user])
+
+  const loadSavedCovers = async () => {
+    try {
+      console.log('[LicenseConfigurator] Cargando portadas disponibles (públicas)...')
+
+      // Cargar TODAS las portadas desde el endpoint del backend
+      const covers = await storageService.listAllCovers()
+
+      console.log('[LicenseConfigurator] Portadas encontradas:', covers?.length || 0, covers)
+      setSavedCovers(covers || [])
+    } catch (err) {
+      console.error('Error cargando portadas:', err)
+    }
+  }
+
+  const loadItems = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('therefore_license_items')
+        .select('*')
+        .eq('edicion', edicion)
+        .eq('activo', true)
+        .order('descripcion')
+
+      if (error) throw error
+      setItems(data || [])
+    } catch (err) {
+      console.error('Error cargando items:', err)
+      message.error('Error cargando catálogo')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadQuotations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('therefore_quotations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setQuotations(data || [])
+    } catch (err) {
+      console.error('Error cargando cotizaciones:', err)
+    }
+  }
+
+  const addItem = (item) => {
+    const exists = selectedItems.find(i => i.codigo === item.codigo)
+    if (exists) {
+      setSelectedItems(selectedItems.map(i =>
+        i.codigo === item.codigo
+          ? { ...i, cantidad: i.cantidad + 1 }
+          : i
+      ))
+    } else {
+      setSelectedItems([...selectedItems, { ...item, cantidad: 1 }])
+    }
+    antMessage.success('Artículo agregado')
+  }
+
+  const addMultipleItems = () => {
+    if (selectedCatalogItems.length === 0) {
+      antMessage.warning('Selecciona al menos un artículo')
+      return
+    }
+
+    let added = 0
+    const newItems = [...selectedItems]
+
+    selectedCatalogItems.forEach(codigo => {
+      const item = items.find(i => i.codigo === codigo)
+      if (item) {
+        const exists = newItems.find(i => i.codigo === item.codigo)
+        if (!exists) {
+          newItems.push({ ...item, cantidad: 1 })
+          added++
+        }
+      }
+    })
+
+    setSelectedItems(newItems)
+    setSelectedCatalogItems([])
+    antMessage.success(`${added} artículos agregados`)
+  }
+
+  const updateQuantity = (codigo, cantidad) => {
+    if (cantidad <= 0) {
+      setSelectedItems(selectedItems.filter(i => i.codigo !== codigo))
+    } else {
+      setSelectedItems(selectedItems.map(i =>
+        i.codigo === codigo ? { ...i, cantidad } : i
+      ))
+    }
+  }
+
+  const removeItem = (codigo) => {
+    setSelectedItems(selectedItems.filter(i => i.codigo !== codigo))
+  }
+
+  const addMultipleServicios = () => {
+    if (selectedServicios.length === 0) {
+      antMessage.warning('Selecciona al menos un servicio')
+      return
+    }
+
+    const newServicios = [...servicios]
+    selectedServicios.forEach(codigo => {
+      const servicio = serviciosDisponibles.find(s => s.codigo === codigo)
+      if (servicio) {
+        newServicios.push({
+          id: Date.now() + Math.random(),
+          codigo: servicio.codigo,
+          descripcion: servicio.descripcion,
+          unidades: 1,
+          pvp_jornada: servicio.pvp_jornada
+        })
+      }
+    })
+
+    setServicios(newServicios)
+    setSelectedServicios([])
+    setServiciosModalOpen(false)
+    antMessage.success(`${selectedServicios.length} servicios agregados`)
+  }
+
+  const openTechPartnersModal = () => {
+    // Inicializar tech partners temporales con los disponibles
+    const temp = techPartnersDisponibles.map(tp => ({
+      nombre: tp.nombre,
+      descripcion: tp.descripcion,
+      importe: 0,
+      seleccionado: false
+    }))
+    setTempTechPartners(temp)
+    setTechPartnersModalOpen(true)
+  }
+
+  const updateTempPartnerImporte = (nombre, importe) => {
+    setTempTechPartners(tempTechPartners.map(tp =>
+      tp.nombre === nombre ? { ...tp, importe: parseFloat(importe) || 0, seleccionado: importe > 0 } : tp
+    ))
+  }
+
+  const saveTechPartners = () => {
+    const selected = tempTechPartners.filter(tp => tp.seleccionado && tp.importe > 0)
+    if (selected.length === 0) {
+      antMessage.warning('Ingresa al menos un importe')
+      return
+    }
+
+    const newPartners = [...techPartners]
+    selected.forEach(tp => {
+      const exists = newPartners.find(p => p.nombre === tp.nombre)
+      if (exists) {
+        exists.importe = tp.importe
+      } else {
+        newPartners.push({ nombre: tp.nombre, importe: tp.importe })
+      }
+    })
+
+    setTechPartners(newPartners)
+    setTechPartnersModalOpen(false)
+    antMessage.success(`${selected.length} tech partners agregados`)
+  }
+
+  const updateServicio = (id, field, value) => {
+    setServicios(servicios.map(s =>
+      s.id === id ? { ...s, [field]: value } : s
+    ))
+  }
+
+  const removeServicio = (id) => {
+    setServicios(servicios.filter(s => s.id !== id))
+  }
+
+  const updateTechPartner = (index, importe) => {
+    const updated = [...techPartners]
+    updated[index].importe = parseFloat(importe) || 0
+    setTechPartners(updated)
+  }
+
+  // Cálculos
+  // Para Online y Suscripción: PVP es mensual, multiplicar por 12 meses y años de contrato
+  const isRecurring = edicion === 'online' || edicion === 'suscripcion'
+  const multiplicadorTiempo = isRecurring ? (12 * anosContrato) : 1
+
+  const totalLicencias = selectedItems.reduce((sum, item) =>
+    sum + (item.pvp * item.cantidad * multiplicadorTiempo), 0
+  )
+
+  // CSS también es mensual en Online/Suscripción
+  const totalCSS = selectedItems.reduce((sum, item) =>
+    sum + ((item.css_pvp || 0) * item.cantidad * multiplicadorTiempo), 0
+  )
+
+  const totalServicios = servicios.reduce((sum, serv) =>
+    sum + (serv.pvp_jornada * serv.unidades), 0
+  )
+
+  const totalTechPartners = techPartners.reduce((sum, tp) =>
+    sum + (tp.importe || 0), 0
+  )
+
+  const totalTherefore = totalLicencias + totalCSS
+  const totalContractValue = totalTherefore + totalServicios + totalTechPartners
+
+  // Guardar cotización
+  const handleSave = async (values) => {
+    try {
+      setLoading(true)
+
+      const quotation = {
+        user_id: user.id,
+        nombre: values.nombre,
+        cliente: cliente || '',
+        oportunidad: sfdcOpp || '',
+        account_manager: accountManager || '',
+        edicion,
+        items: selectedItems,
+        servicios,
+        tech_partners: techPartners.filter(tp => tp.importe > 0),
+        total_licencias: totalLicencias,
+        total_css: totalCSS,
+        total_servicios: totalServicios,
+        total_general: totalContractValue,
+        notas: values.notas || ''
+      }
+
+      console.log('Guardando cotización:', quotation)
+
+      const { data, error } = await supabase
+        .from('therefore_quotations')
+        .insert([quotation])
+        .select()
+
+      if (error) {
+        console.error('Error de Supabase:', error)
+        throw error
+      }
+
+      message.success('Cotización guardada')
+      setSaveModalOpen(false)
+      form.resetFields()
+    } catch (err) {
+      console.error('Error guardando:', err)
+      message.error(`Error al guardar: ${err.message || 'Error desconocido'}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Cargar cotización
+  const loadQuotation = (quotation) => {
+    setEdicion(quotation.edicion)
+    setSfdcOpp(quotation.oportunidad || '')
+    setCliente(quotation.cliente || '')
+    setAccountManager(quotation.account_manager || '')
+    setSelectedItems(quotation.items || [])
+    setServicios(quotation.servicios || [])
+    setTechPartners(quotation.tech_partners || techPartners)
+    setHistoryModalOpen(false)
+    antMessage.success('Cotización cargada')
+  }
+
+  // Funciones de portada
+  const selectSavedCover = async (cover) => {
+    try {
+      antMessage.loading({ content: 'Cargando portada...', key: 'cover' })
+
+      // El endpoint ya devuelve la URL pública completa
+      const publicUrl = cover.url
+
+      const img = new Image()
+      img.onload = () => {
+        setPortada({
+          name: cover.name,
+          storageUrl: publicUrl,
+          storagePath: cover.path, // Usar cover.path en lugar de cover.storage_path
+          width: img.width,
+          height: img.height,
+          base64: null
+        })
+        setPortadaPreview(publicUrl)
+        setPortadaModalOpen(false)
+        antMessage.success({ content: 'Portada cargada', key: 'cover' })
+      }
+      img.src = publicUrl
+    } catch (err) {
+      console.error('Error cargando portada:', err)
+      antMessage.error({ content: 'Error cargando portada', key: 'cover' })
+    }
+  }
+
+  const handleCoverUpload = async (file) => {
+    if (file.type !== 'image/png') {
+      antMessage.error('Solo se aceptan archivos PNG para la portada')
+      return false
+    }
+
+    try {
+      antMessage.loading({ content: 'Subiendo portada...', key: 'portada' })
+
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const base64 = e.target.result
+        const img = new Image()
+
+        img.onload = async () => {
+          try {
+            const uploadResult = await storageService.uploadCover(file, user.id)
+
+            setPortada({
+              name: file.name,
+              storageUrl: uploadResult.publicUrl,
+              storagePath: uploadResult.path,
+              width: img.width,
+              height: img.height,
+              base64
+            })
+            setPortadaPreview(base64)
+
+            await loadSavedCovers()
+            setPortadaModalOpen(false)
+            antMessage.success({ content: 'Portada subida', key: 'portada' })
+          } catch (err) {
+            console.error('Error subiendo portada:', err)
+            antMessage.error({ content: 'Error al subir portada', key: 'portada' })
+          }
+        }
+        img.src = base64
+      }
+      reader.readAsDataURL(file)
+    } catch (err) {
+      console.error('Error subiendo portada:', err)
+      antMessage.error({ content: 'Error al subir portada', key: 'portada' })
+    }
+
+    return false
+  }
+
+  const removeCoverImage = async () => {
+    if (portada?.storagePath) {
+      await storageService.deleteDocuments([portada.storagePath])
+    }
+    setPortada(null)
+    setPortadaPreview(null)
+    setUseDefaultPortada(false)
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PROCESAMIENTO DE LENGUAJE NATURAL
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const procesarSolicitudNatural = async () => {
+    if (!solicitudNatural || solicitudNatural.trim().length < 10) {
+      antMessage.warning('Por favor, escribe una solicitud con al menos 10 caracteres')
+      return
+    }
+
+    try {
+      setProcesandoSolicitud(true)
+      antMessage.loading({ content: 'Interpretando solicitud...', key: 'parse', duration: 0 })
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+      const response = await fetch(`${API_URL}/api/parse-licensing-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ solicitud: solicitudNatural })
+      })
+
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Error al parsear solicitud')
+      }
+
+      console.log('[LicenseConfigurator] Solicitud parseada:', result.data)
+
+      // Aplicar resultados
+      await aplicarDatosParsedos(result.data)
+
+      antMessage.success({ content: 'Solicitud interpretada correctamente', key: 'parse' })
+
+    } catch (error) {
+      console.error('Error procesando solicitud:', error)
+      antMessage.error({
+        content: `Error: ${error.message}`,
+        key: 'parse'
+      })
+    } finally {
+      setProcesandoSolicitud(false)
+    }
+  }
+
+  const aplicarDatosParsedos = async (parsedData) => {
+    // Aplicar edición
+    if (parsedData.edicion) {
+      setEdicion(parsedData.edicion)
+      console.log('[LicenseConfigurator] Edición aplicada:', parsedData.edicion)
+
+      // CRÍTICO: Cargar items de la nueva edición ANTES de buscar
+      console.log('[LicenseConfigurator] Cargando catálogo para edición:', parsedData.edicion)
+      try {
+        const { data, error } = await supabase
+          .from('therefore_license_items')
+          .select('*')
+          .eq('edicion', parsedData.edicion)
+          .eq('activo', true)
+          .order('descripcion')
+
+        if (error) throw error
+        const catalogoItems = data || []
+        setItems(catalogoItems)
+        console.log(`[LicenseConfigurator] Catálogo cargado: ${catalogoItems.length} items`)
+
+        // Aplicar licencias y productos con el catálogo recién cargado
+        if (parsedData.licencias && parsedData.licencias.length > 0) {
+          parsedData.licencias.forEach(lic => {
+            buscarYAgregarLicencia(lic.tipo, lic.cantidad, catalogoItems)
+          })
+        }
+
+        if (parsedData.productos && parsedData.productos.length > 0) {
+          parsedData.productos.forEach(prod => {
+            buscarYAgregarProducto(prod.descripcion, prod.cantidad, prod.codigo_sugerido, catalogoItems)
+          })
+        }
+      } catch (err) {
+        console.error('[LicenseConfigurator] Error cargando catálogo:', err)
+        antMessage.error('Error cargando catálogo de la edición')
+        return // Detener si no se puede cargar el catálogo
+      }
+    } else {
+      // Si no hay cambio de edición, usar items actuales
+      if (parsedData.licencias && parsedData.licencias.length > 0) {
+        parsedData.licencias.forEach(lic => {
+          buscarYAgregarLicencia(lic.tipo, lic.cantidad)
+        })
+      }
+
+      if (parsedData.productos && parsedData.productos.length > 0) {
+        parsedData.productos.forEach(prod => {
+          buscarYAgregarProducto(prod.descripcion, prod.cantidad, prod.codigo_sugerido)
+        })
+      }
+    }
+
+    // Aplicar años de contrato
+    if (parsedData.anos_contrato) {
+      setAnosContrato(parsedData.anos_contrato)
+    }
+
+    // Aplicar información del cliente
+    if (parsedData.cliente?.contexto) {
+      // Podríamos usar esto para pre-rellenar el campo cliente
+      if (parsedData.cliente.contexto && !cliente) {
+        setCliente(parsedData.cliente.contexto.substring(0, 100))
+      }
+    }
+
+    // Aplicar servicios personalizados
+    if (parsedData.servicios_personalizados && parsedData.servicios_personalizados.length > 0) {
+      const nuevosServicios = parsedData.servicios_personalizados.map((serv, idx) => ({
+        id: `custom-${Date.now()}-${idx}`,
+        descripcion: serv.descripcion,
+        importe: serv.importe || 0,
+        notas: serv.notas || ''
+      }))
+      setServicios(prev => [...prev, ...nuevosServicios])
+    }
+
+    // Mostrar notas adicionales si hay
+    if (parsedData.notas_adicionales) {
+      console.log('[LicenseConfigurator] Notas:', parsedData.notas_adicionales)
+      antMessage.info({
+        content: `Nota: ${parsedData.notas_adicionales}`,
+        duration: 5
+      })
+    }
+  }
+
+  const buscarYAgregarLicencia = (tipo, cantidad, catalogoItems = null) => {
+    // Usar catalogoItems pasado como parámetro, o items del estado
+    const itemsABuscar = catalogoItems || items
+
+    // Buscar en el catálogo la licencia del tipo especificado
+    const palabrasClave = {
+      'nominal': ['nominal', 'dedicada', 'nominativa'],
+      'concurrente': ['concurrente', 'flotante', 'compartida'],
+      'readonly': ['readonly', 'solo lectura', 'read-only', 'lectura']
+    }
+
+    const keywords = palabrasClave[tipo] || []
+
+    const licenciaEncontrada = itemsABuscar.find(item => {
+      const desc = item.descripcion?.toLowerCase() || ''
+      const codigo = item.codigo?.toLowerCase() || ''
+      return keywords.some(kw => desc.includes(kw) || codigo.includes(kw))
+    })
+
+    if (licenciaEncontrada) {
+      // Verificar si ya está en selectedItems
+      const yaExiste = selectedItems.find(i => i.codigo === licenciaEncontrada.codigo)
+
+      if (yaExiste) {
+        // Actualizar cantidad
+        setSelectedItems(prev => prev.map(item =>
+          item.codigo === licenciaEncontrada.codigo
+            ? { ...item, cantidad: item.cantidad + cantidad }
+            : item
+        ))
+      } else {
+        // Agregar nuevo
+        setSelectedItems(prev => [...prev, {
+          ...licenciaEncontrada,
+          cantidad
+        }])
+      }
+
+      console.log(`[LicenseConfigurator] Licencia ${tipo} agregada: ${cantidad} unidades`)
+    } else {
+      console.warn(`[LicenseConfigurator] No se encontró licencia tipo: ${tipo}`)
+    }
+  }
+
+  const buscarYAgregarProducto = (descripcion, cantidad, codigoSugerido = null, catalogoItems = null) => {
+    // Usar catalogoItems pasado como parámetro, o items del estado
+    const itemsABuscar = catalogoItems || items
+
+    // Buscar producto por código sugerido o por descripción
+    let productoEncontrado = null
+
+    if (codigoSugerido) {
+      productoEncontrado = itemsABuscar.find(item => item.codigo === codigoSugerido)
+    }
+
+    if (!productoEncontrado) {
+      // Buscar por palabras clave en la descripción
+      const palabrasClave = descripcion.toLowerCase().split(/\s+/)
+      productoEncontrado = itemsABuscar.find(item => {
+        const desc = item.descripcion?.toLowerCase() || ''
+        const codigo = item.codigo?.toLowerCase() || ''
+        // Buscar palabras significativas (> 3 caracteres) en descripción o código
+        return palabrasClave.some(palabra =>
+          palabra.length > 3 && (desc.includes(palabra) || codigo.includes(palabra))
+        )
+      })
+    }
+
+    if (productoEncontrado) {
+      const yaExiste = selectedItems.find(i => i.codigo === productoEncontrado.codigo)
+
+      if (yaExiste) {
+        setSelectedItems(prev => prev.map(item =>
+          item.codigo === productoEncontrado.codigo
+            ? { ...item, cantidad: item.cantidad + cantidad }
+            : item
+        ))
+      } else {
+        setSelectedItems(prev => [...prev, {
+          ...productoEncontrado,
+          cantidad
+        }])
+      }
+
+      console.log(`[LicenseConfigurator] Producto agregado: ${productoEncontrado.descripcion} x${cantidad}`)
+    } else {
+      console.warn(`[LicenseConfigurator] No se encontró producto: ${descripcion}`)
+      antMessage.warning({
+        content: `No se encontró en el catálogo: "${descripcion}"`,
+        duration: 3
+      })
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Exportar a Word - Abrir modal de portada primero
+  const exportToExcel = () => {
+    setPortadaModalOpen(true)
+  }
+
+  // Generar documento Word con portada
+  const generateDocument = async () => {
+    try {
+      // PASO 1: Generar contenido narrativo con Claude
+      antMessage.loading({ content: 'Analizando propuesta con IA...', key: 'docx', duration: 0 })
+
+      const quotationData = {
+        cliente: cliente || 'Cliente',
+        sector: 'General', // TODO: podríamos extraer del contexto
+        contexto: solicitudNatural || 'Propuesta de licenciamiento Therefore™',
+        sfdcOpp: sfdcOpp || '',
+        dealSupport: dealSupport || '',
+        accountManager: accountManager || '',
+        fecha: fecha || new Date().toISOString().split('T')[0],
+        edicion,
+        selectedItems,
+        items: selectedItems,
+        servicios,
+        techPartners: techPartners.filter(tp => tp.importe > 0),
+        totalLicencias,
+        totalCSS,
+        totalServicios,
+        totalTechPartners,
+        totalGeneral: totalContractValue,
+        cuotaAnual,
+        anosContrato,
+        soporteLocal
+      }
+
+      console.log('[LicenseConfigurator] Llamando a analyze-licensing...')
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+      const analyzeResponse = await fetch(`${API_URL}/api/analyze-licensing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(quotationData)
+      })
+
+      if (!analyzeResponse.ok) {
+        const error = await analyzeResponse.json()
+        throw new Error(error.error || 'Error en análisis de la propuesta')
+      }
+
+      const analyzeResult = await analyzeResponse.json()
+
+      if (!analyzeResult.success) {
+        throw new Error('Error en análisis de la propuesta')
+      }
+
+      console.log('[LicenseConfigurator] Contenido generado:', analyzeResult.data.generatedContent)
+
+      // PASO 2: Generar documento Word con contenido narrativo
+      antMessage.loading({ content: 'Generando documento Word...', key: 'docx', duration: 0 })
+
+      const response = await fetch(`${API_URL}/api/build-docx`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectData: analyzeResult.data, // Incluye generatedContent
+          tipoDoc: 'licensing', // Nuevo tipo para documentos de licenciamiento
+          portada: portada ? {
+            storageUrl: portada.storageUrl || null,
+            base64: portada.base64,
+            width: portada.width,
+            height: portada.height
+          } : null,
+          useDefaultPortada
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error generando documento')
+      }
+
+      const { docxBase64, filename } = await response.json()
+
+      // Descargar archivo
+      const link = document.createElement('a')
+      link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${docxBase64}`
+      link.download = filename
+      link.click()
+
+      antMessage.success({ content: 'Documento generado correctamente', key: 'docx' })
+      setPortadaModalOpen(false)
+    } catch (error) {
+      console.error('Error exportando:', error)
+      antMessage.error({ content: error.message || 'Error generando documento', key: 'docx' })
+    }
+  }
+
+  // Limpiar
+  const clearConfiguration = () => {
+    Modal.confirm({
+      title: '¿Limpiar configuración?',
+      content: 'Se perderán todos los datos ingresados',
+      onOk: () => {
+        setSelectedItems([])
+        setServicios([])
+        setTechPartners([
+          { nombre: 'Docuten', importe: 0 },
+          { nombre: 'IO Digital X', importe: 0 },
+          { nombre: 'Ivnosys', importe: 0 },
+          { nombre: 'Doceo Software', importe: 0 },
+          { nombre: 'Otros', importe: 0 }
+        ])
+        setSfdcOpp('')
+        setDealSupport('')
+        setCliente('')
+        setAccountManager('')
+        antMessage.info('Configuración limpiada')
+      }
+    })
+  }
+
+  // Filtrar items del catálogo
+  const filteredItems = items.filter(item => {
+    const matchSearch = !searchText ||
+      item.descripcion?.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.codigo?.toLowerCase().includes(searchText.toLowerCase())
+
+    return matchSearch
+  })
+
+  return (
+    <div className="container-main" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* HEADER */}
+      <div className="header-main">
+        <div>
+          <h1 className="header-title">Configurador de licencias</h1>
+          <p className="header-subtitle">Cotizaciones Therefore™ OnPremise, Online y Suscripción.</p>
+        </div>
+        <div className="header-actions">
+          <HelpButton section="licenseConfigurator" />
+
+          <Button
+            icon={<HistoryOutlined />}
+            onClick={() => {
+              loadQuotations()
+              setHistoryModalOpen(true)
+            }}
+            className="btn-default"
+          >
+            Historial
+          </Button>
+
+          <Button
+            icon={<SaveOutlined />}
+            onClick={() => setSaveModalOpen(true)}
+            disabled={selectedItems.length === 0}
+            className="btn-default"
+          >
+            Guardar
+          </Button>
+
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={exportToExcel}
+            disabled={selectedItems.length === 0}
+            className="btn-default"
+          >
+            Word
+          </Button>
+
+          <Button
+            danger
+            onClick={clearConfiguration}
+            className="btn-default"
+          >
+            Limpiar
+          </Button>
+        </div>
+      </div>
+
+      {/* CONTENT: formulario a la izquierda, resumen fijo a la derecha (panel de propiedades) */}
+      <div className="lc-layout">
+      <div className="lc-main">
+
+        {/* CAMPO DE LENGUAJE NATURAL */}
+        <Card
+          size="small"
+          title="Rellenar con lenguaje natural"
+          style={{ marginBottom: 16 }}
+        >
+          <div style={{ marginBottom: 12 }}>
+            <Text>
+              Describe la propuesta en lenguaje natural y el sistema auto-completará los campos.
+              <br />
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                Ejemplo: "Necesito OnPremise con 5 nominales, 10 concurrentes y 15 readonly. Incluir Content Connector, 8 jornadas de implementación y 2 de formación. Cliente del sector retail."
+              </Text>
+            </Text>
+          </div>
+          <Space.Compact style={{ width: '100%' }}>
+            <TextArea
+              value={solicitudNatural}
+              onChange={(e) => setSolicitudNatural(e.target.value)}
+              placeholder="Escribe aquí tu solicitud en lenguaje natural..."
+              autoSize={{ minRows: 3, maxRows: 6 }}
+              style={{ flex: 1 }}
+              disabled={procesandoSolicitud}
+            />
+          </Space.Compact>
+          <div style={{ marginTop: 12, textAlign: 'right' }}>
+            <Space>
+              <Button
+                onClick={() => setSolicitudNatural('')}
+                disabled={!solicitudNatural || procesandoSolicitud}
+              >
+                Limpiar
+              </Button>
+              <Button
+                type="primary"
+                onClick={procesarSolicitudNatural}
+                loading={procesandoSolicitud}
+                disabled={!solicitudNatural || solicitudNatural.trim().length < 10}
+                icon={<PlusOutlined />}
+              >
+                {procesandoSolicitud ? 'Interpretando…' : 'Interpretar y rellenar'}
+              </Button>
+            </Space>
+          </div>
+        </Card>
+
+        {/* FILA 1: DATOS GENERALES + RESUMEN */}
+        {/* Datos Generales */}
+        <div style={{ marginBottom: 16 }}>
+            <Card size="small" title="Datos Generales de la Oferta">
+              <Row gutter={[16, 16]}>
+                <Col span={6}>
+                  <div>
+                    <Text strong>SFDC OPP</Text>
+                    <Input
+                      value={sfdcOpp}
+                      onChange={(e) => setSfdcOpp(e.target.value)}
+                      placeholder="OPP-XXXXX"
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Deal Support</Text>
+                    <Input
+                      value={dealSupport}
+                      onChange={(e) => setDealSupport(e.target.value)}
+                      placeholder="Nombre"
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Fecha</Text>
+                    <Input
+                      type="date"
+                      value={fecha}
+                      onChange={(e) => setFecha(e.target.value)}
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Años Contrato</Text>
+                    <InputNumber
+                      value={anosContrato}
+                      onChange={(val) => setAnosContrato(val || 1)}
+                      style={{ width: '100%', marginTop: 4 }}
+                      min={1}
+                      placeholder="1"
+                    />
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div>
+                    <Text strong>Account Manager</Text>
+                    <Input
+                      value={accountManager}
+                      onChange={(e) => setAccountManager(e.target.value)}
+                      placeholder="Nombre del AM"
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div>
+                    <Text strong>Cliente</Text>
+                    <Input
+                      value={cliente}
+                      onChange={(e) => setCliente(e.target.value)}
+                      placeholder="Nombre del cliente"
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+        </div>
+
+        {/* FILA 1.5: SUSCRIPCIÓN (solo para Online y Suscripción) */}
+        {/* FILA 2: TABLA LICENCIAS */}
+        <Card
+          size="small"
+          title="Licencias"
+          extra={
+            <Space>
+              <Select
+                value={edicion}
+                onChange={setEdicion}
+                style={{ width: 140 }}
+                size="small"
+              >
+                <Option value="onpremise">OnPremise</Option>
+                <Option value="online">Online</Option>
+                <Option value="suscripcion">Suscripción</Option>
+              </Select>
+              <Button
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={() => setCatalogDrawerOpen(true)}
+              >
+                Agregar productos
+              </Button>
+            </Space>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <Table
+            dataSource={selectedItems}
+            rowKey="codigo"
+            size="small"
+            pagination={false}
+            scroll={{ y: 250 }}
+            columns={[
+              {
+                title: 'Clase',
+                dataIndex: 'clase',
+                width: 100
+              },
+              {
+                title: 'Código',
+                dataIndex: 'codigo',
+                width: 120,
+                render: (text) => <Text style={{ fontFamily: 'monospace' }}>{text}</Text>
+              },
+              {
+                title: 'Concepto',
+                dataIndex: 'descripcion',
+                ellipsis: true
+              },
+              {
+                title: 'Unidad',
+                dataIndex: 'cantidad',
+                width: 90,
+                align: 'center',
+                render: (val, record) => (
+                  <InputNumber
+                    min={0}
+                    value={val}
+                    onChange={(v) => updateQuantity(record.codigo, v)}
+                    size="small"
+                    style={{ width: 70 }}
+                  />
+                )
+              },
+              {
+                title: isRecurring ? 'PVP/mes' : 'PVP',
+                dataIndex: 'pvp',
+                width: 100,
+                align: 'right',
+                render: (val) => `${val?.toFixed(2)} €`
+              },
+              {
+                title: isRecurring ? `Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'PVP Total',
+                key: 'pvp_total',
+                width: 140,
+                align: 'right',
+                render: (_, record) => {
+                  const total = record.pvp * record.cantidad * multiplicadorTiempo
+                  return `${total.toFixed(2)} €`
+                }
+              },
+              {
+                title: isRecurring ? 'CSS/mes' : 'CSS/año',
+                dataIndex: 'css_pvp',
+                width: 100,
+                align: 'right',
+                render: (val) => `${(val || 0).toFixed(2)} €`
+              },
+              {
+                title: isRecurring ? `CSS Total (${anosContrato} año${anosContrato > 1 ? 's' : ''})` : 'CSS Total',
+                key: 'css_total',
+                width: 140,
+                align: 'right',
+                render: (_, record) => {
+                  const total = (record.css_pvp || 0) * record.cantidad * multiplicadorTiempo
+                  return `${total.toFixed(2)} €`
+                }
+              },
+              {
+                title: '',
+                key: 'action',
+                width: 50,
+                render: (_, record) => (
+                  <Button
+                    danger
+                    type="text"
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    onClick={() => removeItem(record.codigo)}
+                  />
+                )
+              }
+            ]}
+          />
+          {selectedItems.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <Text type="secondary">No hay productos. Click en "Agregar productos" para añadir.</Text>
+            </div>
+          )}
+        </Card>
+
+        {/* FILA 3: SERVICIOS + TECH PARTNERS */}
+        <Row gutter={16}>
+          {/* Servicios */}
+          <Col span={12}>
+            <Card
+              size="small"
+              title="Servicios"
+              extra={
+                <Button
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => setServiciosModalOpen(true)}
+                >
+                  Agregar servicios
+                </Button>
+              }
+            >
+              <Table
+                dataSource={servicios}
+                rowKey="id"
+                size="small"
+                pagination={false}
+                scroll={{ y: 200 }}
+                columns={[
+                  {
+                    title: 'Código',
+                    dataIndex: 'codigo',
+                    width: 90,
+                    render: (text) => <Text style={{ fontFamily: 'monospace', fontSize: 11 }}>{text}</Text>
+                  },
+                  {
+                    title: 'Descripción',
+                    dataIndex: 'descripcion'
+                  },
+                  {
+                    title: 'Unidades',
+                    dataIndex: 'unidades',
+                    width: 80,
+                    align: 'center',
+                    render: (val, record) => (
+                      <InputNumber
+                        min={0}
+                        value={val}
+                        onChange={(v) => updateServicio(record.id, 'unidades', v)}
+                        size="small"
+                        style={{ width: 60 }}
+                      />
+                    )
+                  },
+                  {
+                    title: 'Total',
+                    key: 'total',
+                    width: 100,
+                    align: 'right',
+                    render: (_, record) => `${(record.pvp_jornada * record.unidades).toFixed(2)} €`
+                  },
+                  {
+                    title: '',
+                    key: 'action',
+                    width: 50,
+                    render: (_, record) => (
+                      <Button
+                        danger
+                        type="text"
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        onClick={() => removeServicio(record.id)}
+                      />
+                    )
+                  }
+                ]}
+              />
+              {servicios.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <Text type="secondary">Sin servicios</Text>
+                </div>
+              )}
+            </Card>
+          </Col>
+
+          {/* Tech Partners */}
+          <Col span={12}>
+            <Card
+              size="small"
+              title="Tech Partners"
+              extra={
+                <Button
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={openTechPartnersModal}
+                >
+                  Agregar partner
+                </Button>
+              }
+            >
+              <Table
+                dataSource={techPartners.filter(tp => tp.importe > 0)}
+                rowKey="nombre"
+                size="small"
+                pagination={false}
+                scroll={{ y: 200 }}
+                columns={[
+                  {
+                    title: 'Partner',
+                    dataIndex: 'nombre'
+                  },
+                  {
+                    title: 'Importe',
+                    dataIndex: 'importe',
+                    width: 150,
+                    align: 'right',
+                    render: (val, record, index) => (
+                      <Input
+                        type="number"
+                        value={val}
+                        onChange={(e) => {
+                          const idx = techPartners.findIndex(tp => tp.nombre === record.nombre)
+                          updateTechPartner(idx, e.target.value)
+                        }}
+                        size="small"
+                        style={{
+                          width: 130,
+                          textAlign: 'right',
+                          MozAppearance: 'textfield'
+                        }}
+                        className="no-spinner"
+                        min={0}
+                        step="0.01"
+                      />
+                    )
+                  },
+                  {
+                    title: '',
+                    key: 'action',
+                    width: 50,
+                    render: (_, record) => (
+                      <Button
+                        danger
+                        type="text"
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        onClick={() => {
+                          const idx = techPartners.findIndex(tp => tp.nombre === record.nombre)
+                          updateTechPartner(idx, 0)
+                        }}
+                      />
+                    )
+                  }
+                ]}
+              />
+              {techPartners.filter(tp => tp.importe > 0).length === 0 && (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <Text type="secondary">Sin tech partners</Text>
+                </div>
+              )}
+            </Card>
+          </Col>
+        </Row>
+      </div>
+      <aside className="lc-aside" aria-label="Resumen de la oferta">
+            <Card size="small" title="Resumen de la oferta" className="lc-summary">
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}>
+                  <Text>
+                    Total Licencias
+                    {isRecurring && <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>
+                      ({anosContrato} año{anosContrato > 1 ? 's' : ''} × 12 meses)
+                    </Text>}
+                  </Text>
+                </Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalLicencias.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}>
+                  <Text>
+                    Total CSS
+                    {isRecurring && <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>
+                      ({anosContrato} año{anosContrato > 1 ? 's' : ''} × 12 meses)
+                    </Text>}
+                  </Text>
+                </Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalCSS.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}><Text>Total Servicios</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalServicios.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 8 }}>
+                <Col span={14}><Text>Tech Partners</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong>{totalTechPartners.toFixed(2)} €</Text>
+                </Col>
+              </Row>
+              <Divider style={{ margin: '12px 0' }} />
+              <Row>
+                <Col span={14}><Text strong style={{ fontSize: 15 }}>Total</Text></Col>
+                <Col span={10} style={{ textAlign: 'right' }}>
+                  <Text strong style={{ fontSize: 20, fontVariantNumeric: 'tabular-nums' }}>
+                    {totalContractValue.toFixed(2)} €
+                  </Text>
+                </Col>
+              </Row>
+            </Card>
+      </aside>
+      </div>
+
+      {/* DRAWER CATÁLOGO */}
+      <Drawer
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginRight: 24 }}>
+            <span>Catálogo de Artículos</span>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={addMultipleItems}
+              disabled={selectedCatalogItems.length === 0}
+            >
+              Agregar seleccionados ({selectedCatalogItems.length})
+            </Button>
+          </div>
+        }
+        placement="right"
+        width={900}
+        open={catalogDrawerOpen}
+        onClose={() => {
+          setCatalogDrawerOpen(false)
+          setSelectedCatalogItems([])
+        }}
+        bodyStyle={{ padding: '16px 0' }}
+      >
+        <div style={{ padding: '0 24px', marginBottom: 16, background: '#f5f5f5', borderRadius: 4 }}>
+          <Input.Search
+            placeholder="Buscar por código o descripción..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            allowClear
+            bordered={false}
+            style={{ background: 'transparent' }}
+          />
+        </div>
+
+        <div style={{ paddingLeft: 24, paddingRight: 24 }}>
+          <Table
+            rowSelection={{
+              selectedRowKeys: selectedCatalogItems,
+              onChange: (selectedRowKeys) => setSelectedCatalogItems(selectedRowKeys)
+            }}
+            dataSource={filteredItems}
+            rowKey="codigo"
+            size="small"
+            pagination={{ pageSize: 20 }}
+            loading={loading}
+            scroll={{ y: 600 }}
+          columns={[
+            {
+              title: 'Código',
+              dataIndex: 'codigo',
+              width: 120,
+              render: (text) => <Text style={{ fontFamily: 'monospace' }}>{text}</Text>
+            },
+            {
+              title: 'Descripción',
+              dataIndex: 'descripcion',
+              ellipsis: true
+            },
+            {
+              title: 'PVP',
+              dataIndex: 'pvp',
+              width: 100,
+              align: 'right',
+              render: (val) => `${val?.toFixed(2)}€`
+            },
+            {
+              title: '',
+              key: 'action',
+              width: 100,
+              render: (_, record) => (
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => addItem(record)}
+                >
+                  Agregar
+                </Button>
+              )
+            }
+          ]}
+          />
+        </div>
+      </Drawer>
+
+      {/* Modal Servicios */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginRight: 40 }}>
+            <span>Catálogo de Servicios</span>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={addMultipleServicios}
+              disabled={selectedServicios.length === 0}
+            >
+              Agregar seleccionados ({selectedServicios.length})
+            </Button>
+          </div>
+        }
+        open={serviciosModalOpen}
+        onCancel={() => {
+          setServiciosModalOpen(false)
+          setSelectedServicios([])
+        }}
+        footer={null}
+        width={700}
+      >
+        <Table
+          dataSource={serviciosDisponibles}
+          rowKey="codigo"
+          size="small"
+          pagination={false}
+          rowSelection={{
+            selectedRowKeys: selectedServicios,
+            onChange: (selectedRowKeys) => setSelectedServicios(selectedRowKeys)
+          }}
+          columns={[
+            {
+              title: 'Código',
+              dataIndex: 'codigo',
+              width: 100,
+              render: (text) => <Text style={{ fontFamily: 'monospace', fontSize: 12 }}>{text}</Text>
+            },
+            {
+              title: 'Descripción',
+              dataIndex: 'descripcion'
+            },
+            {
+              title: 'Precio/Jornada',
+              dataIndex: 'pvp_jornada',
+              width: 120,
+              align: 'right',
+              render: (val) => `${val.toFixed(2)} €`
+            }
+          ]}
+        />
+      </Modal>
+
+      {/* Modal Tech Partners */}
+      <Modal
+        title="Catálogo de Tech Partners"
+        open={techPartnersModalOpen}
+        onCancel={() => setTechPartnersModalOpen(false)}
+        onOk={saveTechPartners}
+        okText="Agregar seleccionados"
+        cancelText="Cancelar"
+        width={700}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <Text type="secondary">Ingresa el importe para los tech partners que desees agregar:</Text>
+        </div>
+
+        <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+          {tempTechPartners.map((tp, index) => (
+            <Card key={index} size="small" style={{ marginBottom: 8 }}>
+              <Row gutter={16} align="middle">
+                <Col span={8}>
+                  <Text strong>{tp.nombre}</Text>
+                </Col>
+                <Col span={10}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>{tp.descripcion}</Text>
+                </Col>
+                <Col span={6}>
+                  <Input
+                    type="number"
+                    placeholder="Importe"
+                    value={tp.importe}
+                    onChange={(e) => updateTempPartnerImporte(tp.nombre, e.target.value)}
+                    style={{ width: '100%', textAlign: 'right', MozAppearance: 'textfield' }}
+                    className="no-spinner"
+                    min={0}
+                    step="0.01"
+                  />
+                </Col>
+              </Row>
+            </Card>
+          ))}
+        </div>
+      </Modal>
+
+      {/* Modal Guardar */}
+      <Modal
+        title="Guardar Cotización"
+        open={saveModalOpen}
+        onCancel={() => setSaveModalOpen(false)}
+        onOk={() => form.submit()}
+        confirmLoading={loading}
+      >
+        <Form form={form} layout="vertical" onFinish={handleSave}>
+          <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
+            <Input placeholder="Ej: Cotización Banco XX - OnPremise" />
+          </Form.Item>
+          <Form.Item name="notas" label="Notas">
+            <TextArea rows={3} placeholder="Notas adicionales..." />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Modal Historial */}
+      <Modal
+        title="Historial de Cotizaciones"
+        open={historyModalOpen}
+        onCancel={() => setHistoryModalOpen(false)}
+        footer={null}
+        width={900}
+      >
+        <Table
+          dataSource={quotations}
+          rowKey="id"
+          size="small"
+          columns={[
+            {
+              title: 'Nombre',
+              dataIndex: 'nombre',
+              key: 'nombre'
+            },
+            {
+              title: 'Cliente',
+              dataIndex: 'cliente',
+              key: 'cliente'
+            },
+            {
+              title: 'OPP',
+              dataIndex: 'oportunidad',
+              key: 'oportunidad'
+            },
+            {
+              title: 'Edición',
+              dataIndex: 'edicion',
+              key: 'edicion',
+              render: (val) => <Tag>{val?.toUpperCase()}</Tag>
+            },
+            {
+              title: 'Total',
+              dataIndex: 'total_general',
+              key: 'total',
+              render: (val) => `${val?.toFixed(2)}€`
+            },
+            {
+              title: 'Fecha',
+              dataIndex: 'created_at',
+              key: 'created_at',
+              render: (val) => new Date(val).toLocaleDateString()
+            },
+            {
+              title: '',
+              key: 'action',
+              render: (_, record) => (
+                <Button
+                  type="link"
+                  onClick={() => loadQuotation(record)}
+                >
+                  Cargar
+                </Button>
+              )
+            }
+          ]}
+        />
+      </Modal>
+
+      {/* Modal de Portada */}
+      <Modal
+        open={portadaModalOpen}
+        onCancel={() => setPortadaModalOpen(false)}
+        title="Seleccionar portada"
+        width={900}
+        footer={[
+          <Button key="cancel" onClick={() => setPortadaModalOpen(false)}>
+            Cancelar
+          </Button>,
+          <Button key="generate" type="primary" onClick={generateDocument}>
+            Generar Documento
+          </Button>
+        ]}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
+          {/* Cuadro para subir nueva portada */}
+          <Upload.Dragger
+            beforeUpload={handleCoverUpload}
+            showUploadList={false}
+            style={{ height: 250 }}
+          >
+            <div style={{ padding: 20, textAlign: 'center' }}>
+              <FileImageOutlined style={{ fontSize: 48, color: '#1890ff', marginBottom: 8 }} />
+              <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>
+                Nueva portada
+              </div>
+              <div style={{ fontSize: 12, color: '#999' }}>
+                Click o arrastra PNG aquí
+              </div>
+            </div>
+          </Upload.Dragger>
+
+          {/* Portadas guardadas */}
+          {savedCovers.length === 0 && (
+            <div style={{
+              gridColumn: '2 / -1',
+              padding: 40,
+              textAlign: 'center',
+              color: '#999',
+              border: '1px dashed #d9d9d9',
+              borderRadius: 4
+            }}>
+              No hay portadas guardadas aún
+            </div>
+          )}
+
+          {savedCovers.map(cover => (
+            <div
+              key={cover.path}
+              onClick={() => selectSavedCover(cover)}
+              style={{
+                cursor: 'pointer',
+                border: portada?.storagePath === cover.path ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                borderRadius: 4,
+                padding: 8,
+                transition: 'all 0.3s',
+                height: 250
+              }}
+            >
+              <img
+                src={cover.url}
+                alt={cover.name}
+                style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 4 }}
+              />
+              <div style={{ marginTop: 8, fontSize: 12, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {cover.name}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Preview de portada seleccionada */}
+        {portadaPreview && (
+          <div style={{ marginTop: 16, padding: 16, background: '#f5f5f5', borderRadius: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text strong>Portada seleccionada</Text>
+              <Button size="small" danger onClick={removeCoverImage}>
+                Quitar portada
+              </Button>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <img src={portadaPreview} alt="Preview" style={{ width: 100, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12 }}>{portada?.name}</div>
+                <div style={{ marginTop: 8 }}>
+                  <input
+                    type="checkbox"
+                    id="use-default-cover"
+                    checked={useDefaultPortada}
+                    onChange={(e) => setUseDefaultPortada(e.target.checked)}
+                  />
+                  <label htmlFor="use-default-cover" style={{ marginLeft: 8, fontSize: 12, cursor: 'pointer' }}>
+                    Usar portada por defecto de Therefore
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Opción de generar sin portada */}
+        {!portadaPreview && (
+          <div style={{ marginTop: 16, textAlign: 'center' }}>
+            <Text type="secondary">O continuar sin portada personalizada</Text>
+          </div>
+        )}
+      </Modal>
+    </div>
+  )
+}

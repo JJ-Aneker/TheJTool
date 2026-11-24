@@ -1,0 +1,164 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Cargar .env desde la raíz del proyecto
+dotenv.config({ path: join(__dirname, '.env') });
+
+import { createClient } from '@supabase/supabase-js';
+import { Router } from 'express';
+import analyzeHandler from './api/analyze.js';
+import buildDocxHandler from './api/build-docx.js';
+import exportGanttHandler from './api/export-gantt.js';
+import exportVerticalHandler from './api/export-vertical.js';
+import bedrockHandler from './api/bedrock.js';
+import * as verticalesHandlers from './api/verticales.js';
+import parseLicensingRequestHandler from './api/parse-licensing-request.js';
+import analyzeLicensingHandler from './api/analyze-licensing.js';
+import thereforeConnectHandler from './api/therefore-connect.js';
+import dashboardRouter from './routes/dashboard.js';
+import adminRouter from './routes/admin.js';
+import eformAiRouter from './routes/eformAi.js';
+import questionnaireUploadHandler from './api/_lib/questionnaires-handlers/upload.js';
+import questionnaireStatusHandler from './api/_lib/questionnaires-handlers/status.js';
+import questionnaireGenerateAnswersHandler from './api/_lib/questionnaires-handlers/generate-answers.js';
+import questionnaireDownloadExcelHandler from './api/_lib/questionnaires-handlers/download-excel.js';
+import questionnaireDeleteHandler from './api/_lib/questionnaires-handlers/delete.js';
+
+const app = express();
+const PORT = process.env.PORT || 3002;
+
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// Servir archivos estáticos desde public/
+app.use(express.static(join(__dirname, 'public')));
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[SERVER] ${req.method} ${req.path}`);
+  next();
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('[SERVER] Error:', err);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
+});
+
+// Admin authentication middleware
+async function verifyAdmin(req, res, next) {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const supabase = createClient(
+      process.env.VITE_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY
+    );
+
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Check if user is admin
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError || profile?.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    req.user = user;
+    next();
+  } catch (err) {
+    console.error('Auth error:', err);
+    res.status(500).json({ error: 'Authentication failed' });
+  }
+}
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+// EFDT API routes
+app.post('/api/analyze', analyzeHandler);
+app.post('/api/build-docx', buildDocxHandler);
+app.post('/api/export-gantt', exportGanttHandler);
+
+// Licensing configurator API routes
+app.post('/api/parse-licensing-request', parseLicensingRequestHandler);
+app.post('/api/analyze-licensing', analyzeLicensingHandler);
+app.post('/api/export-vertical', exportVerticalHandler);
+app.post('/api/therefore-connect', thereforeConnectHandler);
+
+// AWS Bedrock API management routes (admin only)
+// Unified endpoint: /api/bedrock?action=status|test|credentials|usage
+app.get('/api/bedrock', verifyAdmin, bedrockHandler);
+app.post('/api/bedrock', verifyAdmin, bedrockHandler);
+app.put('/api/bedrock', verifyAdmin, bedrockHandler);
+
+// Health check for Bedrock endpoint (for debugging)
+app.get('/api/bedrock-health', (req, res) => {
+  res.json({
+    status: 'ok',
+    env: {
+      AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID ? '***' : 'NOT SET',
+      AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY ? '***' : 'NOT SET',
+      AWS_REGION: process.env.AWS_REGION || 'NOT SET'
+    }
+  });
+});
+
+// Verticales management routes
+app.get('/api/verticales', verticalesHandlers.getAllVerticals);
+app.post('/api/verticales', verticalesHandlers.createVertical);
+app.get('/api/verticales/:id', verticalesHandlers.getVerticalById);
+app.put('/api/verticales/:id', verticalesHandlers.updateVertical);
+app.delete('/api/verticales/:id', verticalesHandlers.deleteVertical);
+
+// Dashboard routes (real data for Home view)
+app.use('/api/dashboard', dashboardRouter);
+
+// Admin routes (user management with Supabase Admin API)
+app.use('/api/admin', adminRouter);
+
+// eForm AI routes (generador de eForms con IA - solo admin)
+app.use('/api/eform-ai', eformAiRouter);
+
+// Questionnaires routes (procesamiento de cuestionarios de seguridad IT)
+app.post('/api/questionnaires/upload', questionnaireUploadHandler);
+app.get('/api/questionnaires/:id/status', questionnaireStatusHandler);
+app.post('/api/questionnaires/:id/generate-answers', questionnaireGenerateAnswersHandler);
+app.get('/api/questionnaires/:id/download-excel', questionnaireDownloadExcelHandler);
+app.delete('/api/questionnaires/:id', questionnaireDeleteHandler);
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`📍 API endpoint: http://localhost:${PORT}/api/analyze`);
+  console.log(`📍 Build endpoint: http://localhost:${PORT}/api/build-docx`);
+  console.log(`📍 Bedrock endpoint: http://localhost:${PORT}/api/bedrock?action=status|test|credentials|usage`);
+  console.log(`📍 Health check: http://localhost:${PORT}/api/bedrock-health`);
+  console.log(`📍 Questionnaires upload: http://localhost:${PORT}/api/questionnaires/upload`);
+  console.log(`📍 Questionnaires status: http://localhost:${PORT}/api/questionnaires/:id/status`);
+  console.log(`📍 Questionnaires generate: http://localhost:${PORT}/api/questionnaires/:id/generate-answers`);
+  console.log(`📍 Questionnaires download: http://localhost:${PORT}/api/questionnaires/:id/download-excel`);
+  console.log(`\n📋 Environment:`);
+  console.log(`   AWS_REGION: ${process.env.AWS_REGION || 'NOT SET'}`);
+  console.log(`   AWS_ACCESS_KEY_ID: ${process.env.AWS_ACCESS_KEY_ID ? '***' : 'NOT SET'}`);
+});

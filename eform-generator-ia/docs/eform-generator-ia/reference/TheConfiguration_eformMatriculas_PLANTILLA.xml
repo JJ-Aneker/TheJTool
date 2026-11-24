@@ -1,0 +1,63 @@
+<Configuration><Version>570425345</Version><NewImportExport>1</NewImportExport><Categories></Categories><QueryTemplates></QueryTemplates><CaseDefinitions></CaseDefinitions><Folders></Folders><Datatypes></Datatypes><KeywordDictionaries></KeywordDictionaries><Counters></Counters><Templates></Templates><WFProcesses></WFProcesses><UCProfiles></UCProfiles><TreeViews></TreeViews><CloudStorages></CloudStorages><Preprocessors></Preprocessors><Forms></Forms><FormImgs></FormImgs><ReportDefinitions></ReportDefinitions><ReportTemplates></ReportTemplates><PowerBIDataSets></PowerBIDataSets><PowerBITables></PowerBITables><EForms><EForm><FNo>-1</FNo><FVer>1</FVer><FName>Matriculacion Alumno Secundaria</FName><FDef>{
+  "display": "form",
+  "settings": {},
+  "components": [
+    {
+      "label": "Datos",
+      "type": "panel",
+      "key": "panelDatos",
+      "input": false,
+      "tableView": false,
+      "collapsible": false,
+      "reorder": false,
+      "properties": {},
+      "customConditional": "",
+      "logic": [],
+      "attributes": {},
+      "conditional": {
+        "show": "",
+        "when": "",
+        "json": ""
+      },
+      "components": [
+        {
+          "label": "Nombre",
+          "allowMultipleMasks": false,
+          "showWordCount": false,
+          "showCharCount": false,
+          "tableView": true,
+          "alwaysEnabled": false,
+          "type": "textfield",
+          "input": true,
+          "key": "nombre",
+          "inputFormat": "plain",
+          "encrypted": false,
+          "properties": {},
+          "customConditional": "",
+          "logic": [],
+          "attributes": {},
+          "reorder": false,
+          "validate": {
+            "required": true,
+            "maxLength": 100,
+            "customMessage": "",
+            "json": ""
+          },
+          "conditional": {
+            "show": "",
+            "when": "",
+            "json": ""
+          }
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "label": "Enviar",
+      "key": "submit",
+      "theme": "primary",
+      "input": true,
+      "tableView": true
+    }
+  ]
+}</FDef><DCrea>20260331141757233</DCrea><FCreUs>4</FCreUs><FCreUsNam>JJ</FCreUsNam><Id>A3C4D5E6-F7A8-9012-CDEF-123456789012</Id><FormID>MatriculacionAlumnoSecundaria</FormID></EForm></EForms><ESignatureProviders></ESignatureProviders><Roles></Roles><RoleAssignments></RoleAssignments><CommonScripts></CommonScripts><OfficeProfiles></OfficeProfiles><IxProfiles></IxProfiles><Queries></Queries><Users></Users><CaptProfiles></CaptProfiles><References></References><CntConnSrcs></CntConnSrcs><Dashboards></Dashboards><Stamps></Stamps><RetentionPolicies></RetentionPolicies><SmartCaptureProcessors></SmartCaptureProcessors><SmartCaptureQueues></SmartCaptureQueues><DocDownloadProviders></DocDownloadProviders><Credentials></Credentials></Configuration>

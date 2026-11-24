@@ -1,0 +1,174 @@
+{
+  "modelos": {
+    "onpremise": {
+      "titulo": "Therefore™ On-Premise",
+      "descripcion": "Modelo de compra perpetua (CapEx) con servidores propios del cliente. Incluye licencia de servidor obligatoria y almacenamiento aportado por el cliente. Mantenimiento mediante cuota anual."
+    },
+    "online": {
+      "titulo": "Therefore™ Online (Cloud)",
+      "descripcion": "Modelo SaaS (OpEx) con cuota mensual. Infraestructura en nube Microsoft Azure gestionada por Canon. Licencia de servidor incluida (no se cotiza). Almacenamiento incluido (10 GB por usuario completo). Escalado ágil mes a mes."
+    },
+    "suscripcion": {
+      "titulo": "Therefore™ Subscription",
+      "descripcion": "Modelo de cuota mensual recurrente (OpEx) con servidores propios del cliente. Incluye licencia de servidor obligatoria y almacenamiento aportado por el cliente. Mantenimiento mediante cuota mensual."
+    }
+  },
+  "tipos_licencia": {
+    "concurrente": {
+      "titulo": "Licencia Concurrente (Flotante)",
+      "descripcion": "Licencia asignada a un pool compartido de acceso dinámico. Se libera al cerrar sesión para otro usuario. Ideal para turnos rotativos o consultas esporádicas. Acceso funcional completo (workflows, subida, indexación).",
+      "uso_recomendado": "Entornos con múltiples usuarios que no necesitan acceso simultáneo continuo"
+    },
+    "nominal": {
+      "titulo": "Licencia Nominal (Dedicada)",
+      "descripcion": "Licencia asignada a una persona específica con acceso garantizado e ininterrumpido. Máxima disponibilidad sin depender del pool. Diseñada para usuarios clave (RRHH, Contabilidad, Dirección). Acceso funcional completo.",
+      "uso_recomendado": "Usuarios que necesitan acceso permanente y prioritario al sistema"
+    },
+    "readonly": {
+      "titulo": "Licencia de Solo Lectura (Read-Only)",
+      "descripcion": "Licencia de consulta gestionada por grupo para acceso básico. Permite buscar y descargar documentos. Sin acceso a tareas de workflow ni subida. No añade almacenamiento en Therefore Online.",
+      "uso_recomendado": "Usuarios que solo necesitan consultar documentación existente"
+    }
+  },
+  "conectores": {
+    "content_connector": {
+      "codigo": "THE.EA.CC",
+      "titulo": "Therefore™ Content Connector",
+      "subtitulo": "La 'Navaja Suiza' de la Ingesta",
+      "descripcion": "Módulo indispensable presente en prácticamente cualquier oferta de Therefore para automatizar la captura de información.",
+      "caracteristicas": [
+        "Monitorización de emails y carpetas: Importación desatendida desde buzones de correo y carpetas de red compartidas",
+        "OCR Zonal, Códigos de Barras y TXT: Extracción de metadatos e indexación automática",
+        "Firmas Digitales de Terceros: Descarga y archivo automático desde plataformas de firma electrónica"
+      ],
+      "valor": "Automatiza la captura de documentos desde múltiples fuentes sin intervención manual"
+    },
+    "universal_connector": {
+      "codigo": "THE.EA.UC",
+      "titulo": "Therefore™ Universal Connector",
+      "subtitulo": "Integración sin Código con Cualquier Aplicación",
+      "descripcion": "Aplicación cliente ligera que mapea visualmente campos de cualquier aplicación Windows, web o ERP mediante combinación de teclas (Hotkey).",
+      "caracteristicas": [
+        "Búsqueda Instantánea: Selecciona un dato en pantalla (DNI, Nº Factura) y abre el expediente directamente",
+        "Archivado Directo: Guarda documentos asociando automáticamente metadatos visibles sin teclear",
+        "Cero desarrollo: No requiere conectores a medida ni modificar software existente"
+      ],
+      "valor": "Integración flexible con sistemas propios sin programación ni costes de desarrollo",
+      "ejemplo": "En el software de nóminas, resaltar el DNI y abrir automáticamente el expediente laboral"
+    },
+    "sap_connector": {
+      "codigo": "THE.EA.SAP",
+      "titulo": "Conector SAP ERP & S/4HANA (ArchivLink)",
+      "descripcion": "Integración certificada bidireccional con SAP mediante protocolo ArchivLink estándar.",
+      "caracteristicas": [
+        "Archivo automático desde transacciones SAP",
+        "Consulta de documentos desde SAP sin salir del ERP",
+        "Cumplimiento normativo de archivado fiscal"
+      ],
+      "valor": "Integración nativa con SAP sin desarrollo a medida"
+    },
+    "dynamics_connector": {
+      "codigo": "THE.EA.DYN",
+      "titulo": "Conector Microsoft Dynamics 365 / Business Central",
+      "descripcion": "Integración certificada bidireccional con plataformas Microsoft Dynamics.",
+      "caracteristicas": [
+        "Sincronización automática de documentos y metadatos",
+        "Acceso desde el ERP a documentos archivados",
+        "Workflows coordinados entre sistemas"
+      ],
+      "valor": "Unifica gestión documental con procesos de negocio en Dynamics"
+    },
+    "sharepoint_connector": {
+      "codigo": "THE.EA.SP",
+      "titulo": "Conector Microsoft SharePoint",
+      "descripcion": "Integración con SharePoint para migración y sincronización de contenidos.",
+      "caracteristicas": [
+        "Migración de bibliotecas de documentos",
+        "Sincronización bidireccional de metadatos",
+        "Preservación de permisos y estructura"
+      ],
+      "valor": "Evolución natural desde SharePoint a gestión documental avanzada"
+    },
+    "factura_electronica": {
+      "codigo": "THE.EA.FE",
+      "titulo": "Conector Factura Electrónica",
+      "descripcion": "Procesamiento especializado de normativas fiscales vigentes (Facturae, UBL).",
+      "caracteristicas": [
+        "Importación y validación automática de XML/UBL",
+        "Cumplimiento con estándares europeos y Facturae",
+        "Extracción de metadatos sin OCR"
+      ],
+      "valor": "Cumplimiento normativo automático en facturación electrónica"
+    },
+    "portal_web": {
+      "codigo": "THE.EA.WP",
+      "titulo": "Portal Web",
+      "subtitulo": "Acceso Ilimitado para Usuarios Externos",
+      "descripcion": "Portal seguro para que clientes, proveedores o socios externos interactúen con el gestor documental mediante navegador web.",
+      "caracteristicas": [
+        "Usuarios ilimitados: Licenciamiento por conector, no por usuario",
+        "Seguridad controlada: El administrador define exactamente qué puede consultar o subir cada usuario externo",
+        "Reducción drástica del TCO en entornos con muchos colaboradores externos"
+      ],
+      "valor": "Acceso seguro para partners sin coste por usuario adicional"
+    }
+  },
+  "ia_modules": {
+    "smart_capture": {
+      "codigo": "THE.EA.SC",
+      "titulo": "Therefore™ Smart Capture",
+      "subtitulo": "Extracción Inteligente sin Plantillas",
+      "descripcion": "Motor de IA para captura automatizada de facturas, pedidos y albaranes que aprende del feedback del usuario.",
+      "caracteristicas": [
+        "Extracción automática sin configuración previa de plantillas",
+        "Aprendizaje continuo con feedback del usuario",
+        "Paquetes disponibles: 100, 1.000, 10.000 y 100.000 páginas",
+        "On-Premise: Contador acumulable año tras año",
+        "Subscription/Online: Rollover mensual (páginas no usadas se acumulan)"
+      ],
+      "valor": "Automatiza la captura de datos de facturas sin mantenimiento de plantillas",
+      "gestion_excedentes": "Páginas en exceso se tarifican a 0,50€/imagen"
+    },
+    "document_intelligence": {
+      "codigo": "THE.EA.DI",
+      "titulo": "Document Intelligence (IA)",
+      "subtitulo": "Clasificación y Enrutamiento Inteligente",
+      "descripcion": "Clasificación y enrutamiento inteligente basado en aprendizaje automático y Azure AI Document Intelligence.",
+      "caracteristicas": [
+        "Clasificación automática por tipo de documento",
+        "Enrutamiento a workflows según contenido",
+        "Paquetes: 100, 1.000, 10.000 y 100.000 imágenes",
+        "Consumo anual en On-Premise, mensual en Subscription/Online"
+      ],
+      "requisitos": "Requiere Conector Document Intelligence + Bolsa de imágenes",
+      "valor": "Automatiza el triaje y enrutamiento de documentos por contenido"
+    },
+    "copilot_connector": {
+      "codigo": "THE.EA.CP",
+      "titulo": "Conector Microsoft Copilot",
+      "subtitulo": "Base de Conocimiento Documental en M365",
+      "descripcion": "Integración de la base documental de Therefore™ en el ecosistema Microsoft 365 Copilot.",
+      "caracteristicas": [
+        "Microsoft Graph: Indexación segura de contenido",
+        "Seguridad estricta: Respeta permisos de usuario de Therefore",
+        "Consultas en lenguaje natural a través del agente de Therefore en Copilot"
+      ],
+      "valor": "Acceso conversacional a documentos desde Microsoft 365",
+      "ejemplo": "Preguntar en Teams 'últimas facturas del proveedor X' y obtener respuesta directa"
+    }
+  },
+  "almacenamiento": {
+    "online_storage": {
+      "titulo": "Almacenamiento Cloud en Azure",
+      "descripcion": "En Therefore Online, cada usuario nominal o concurrente añade automáticamente 10 GB a un fondo común corporativo. Los usuarios de solo lectura no aportan almacenamiento.",
+      "ejemplo": "5 usuarios nominales (50 GB) + 2 concurrentes (20 GB) = 70 GB totales",
+      "ampliacion": "Packs disponibles en tramos de 10 GB, 100 GB y 1 TB",
+      "monitorizacion": "Canon monitoriza mensualmente el uso. Si se alcanza el límite, se añade capacidad automáticamente para evitar interrupciones. Se asigna siempre la franja de precio más económica."
+    }
+  },
+  "reglas": {
+    "online_minimo": "Mínimo de arranque: 2 usuarios completos (2 Nominales, 2 Concurrentes o 1+1)",
+    "tramos_onpremise": "Tramo 1: 1-9 usuarios | Tramo 2: 10-24 | Tramo 3: 25-49 | Tramo 4+: 50-99 y +100",
+    "tramos_online": "Tramo comercial unificado de 0 a 99 usuarios con escalado ágil mes a mes"
+  }
+}

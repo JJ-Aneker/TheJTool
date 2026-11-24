@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therefore Migrator</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181b23;
+  --surface2: #1f2330;
+  --surface3: #252a3a;
+  --border: rgba(255,255,255,0.07);
+  --border-md: rgba(255,255,255,0.12);
+  --border-hi: rgba(255,255,255,0.22);
+  --text: #e8eaf0;
+  --text-muted: #8890a8;
+  --text-hint: #4a5068;
+  --accent: #4f8ef7;
+  --accent2: #7c3aed;
+  --accent-glow: rgba(79,142,247,0.15);
+  --success: #34d399;
+  --success-bg: rgba(52,211,153,0.1);
+  --danger: #f87171;
+  --danger-bg: rgba(248,113,113,0.1);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251,191,36,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 5px;
+  --font: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-mono: 'Cascadia Code', 'Consolas', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13.5px; line-height: 1.5; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
+
+/* LAYOUT */
+.app { display: grid; grid-template-rows: 48px 1fr; height: 100vh; }
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px; position: relative; z-index: 100;
+}
+.topbar-logo { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+.topbar-logo-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.topbar-logo span { color: var(--accent); }
+.topbar-tag { font-size: 11px; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border-md); padding: 2px 8px; border-radius: 20px; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.main { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 48px); overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: 20px 16px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto;
+}
+.sidebar-section { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); padding: 0 8px; margin: 12px 0 4px; }
+.sidebar-section:first-child { margin-top: 0; }
+.step-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.12s; color: var(--text-muted);
+  border: 1px solid transparent; font-size: 13px;
+  background: none; width: 100%; text-align: left;
+}
+.step-btn:hover { background: var(--surface2); color: var(--text); }
+.step-btn.active { background: var(--accent-glow); border-color: rgba(79,142,247,0.3); color: var(--accent); }
+.step-btn.done { color: var(--success); }
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--surface3); color: var(--text-hint);
+  font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-btn.done .step-num { background: var(--success-bg); color: var(--success); }
+.step-btn.active .step-num { background: var(--accent); color: #fff; }
+
+.sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* CONTENT */
+.content { overflow-y: auto; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+.panel { display: none; flex-direction: column; gap: 16px; }
+.panel.active { display: flex; }
+
+.panel-header { margin-bottom: 4px; }
+.panel-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+.panel-sub { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+/* CARDS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+.card-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-muted); margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+}
+
+/* FORM */
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.field label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.field-hint { font-size: 11px; color: var(--text-hint); }
+input[type=text], input[type=password], input[type=number], select, textarea {
+  background: var(--surface2); border: 1px solid var(--border-md);
+  border-radius: var(--radius-xs); color: var(--text);
+  padding: 8px 11px; font-size: 13px; font-family: var(--font);
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field-row-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+
+/* TOGGLE */
+.toggle-group { display: flex; gap: 6px; }
+.toggle-opt {
+  flex: 1; padding: 8px 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-md); background: var(--surface2);
+  color: var(--text-muted); cursor: pointer; transition: all 0.12s;
+  text-align: center; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.toggle-opt:hover { border-color: var(--border-hi); color: var(--text); }
+.toggle-opt.selected { background: var(--accent-glow); border-color: rgba(79,142,247,0.4); color: var(--accent); }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-md); background: var(--surface2);
+  color: var(--text); font-size: 13px; font-family: var(--font);
+  cursor: pointer; transition: all 0.12s; white-space: nowrap; font-weight: 500;
+}
+.btn:hover { background: var(--surface3); border-color: var(--border-hi); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { opacity: 0.88; background: var(--accent); }
+.btn-success { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+.btn-danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+.btn-lg { padding: 10px 22px; font-size: 14px; }
+.btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* ALERTS */
+.alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; display: flex; align-items: flex-start; gap: 9px; }
+.alert-info { background: var(--accent-glow); color: #93b8fa; border: 1px solid rgba(79,142,247,0.2); }
+.alert-success { background: var(--success-bg); color: var(--success); border: 1px solid rgba(52,211,153,0.2); }
+.alert-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
+.alert-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+
+/* PROGRESS */
+.progress-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.progress-bar-wrap { height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.4s; }
+.progress-label { font-size: 13px; color: var(--text-muted); }
+.progress-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.p-stat { display: flex; flex-direction: column; }
+.p-stat-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.p-stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.p-stat-val.ok { color: var(--success); }
+.p-stat-val.err { color: var(--danger); }
+.p-stat-val.skip { color: var(--amber); }
+
+/* LOG */
+.log-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); height: 260px; overflow-y: auto; padding: 12px 14px; font-family: var(--font-mono); font-size: 12px; line-height: 1.6; }
+.log-entry { display: flex; gap: 10px; }
+.log-time { color: var(--text-hint); flex-shrink: 0; }
+.log-msg { flex: 1; word-break: break-all; }
+.log-msg.ok { color: var(--success); }
+.log-msg.err { color: var(--danger); }
+.log-msg.warn { color: var(--amber); }
+.log-msg.info { color: var(--accent); }
+
+/* STATUS TABLE */
+.status-table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead { position: sticky; top: 0; z-index: 5; }
+th { background: var(--surface); color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--border-md); white-space: nowrap; }
+td { padding: 7px 14px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
+.badge-ok { background: var(--success-bg); color: var(--success); border: 1px solid rgba(52,211,153,0.3); }
+.badge-err { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+.badge-skip { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+.badge-run { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+
+/* SPINNER */
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: var(--bg);
+  padding: 10px 18px; border-radius: var(--radius-sm);
+  font-size: 13px; z-index: 9999; opacity: 0; transition: opacity 0.2s; pointer-events: none; font-weight: 500;
+}
+
+/* SUMMARY BOX */
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.summary-stat {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;
+}
+.summary-stat-val { font-size: 26px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.summary-stat-lbl { font-size: 11px; color: var(--text-muted); }
+.ok-val { color: var(--success); }
+.err-val { color: var(--danger); }
+.skip-val { color: var(--amber); }
+
+.conn-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text-hint); flex-shrink: 0; }
+.conn-indicator.connected { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.conn-indicator.error { background: var(--danger); }
+
+.mode-section { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: none; }
+.mode-section.visible { display: block; }
+.mode-section-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; font-size: 13px; }
+.checkbox-row:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-icon">📦</div>
+      <span>Therefore</span>Migrator
+    </div>
+    <div class="topbar-tag">v1.0</div>
+    <div class="topbar-right">
+      <div id="connSrcIndicator" class="conn-indicator" title="Conexión origen"></div>
+      <span style="font-size:11px;color:var(--text-hint)">Origen</span>
+      <span style="font-size:14px;color:var(--text-hint)">→</span>
+      <div id="connDstIndicator" class="conn-indicator" title="Conexión destino"></div>
+      <span style="font-size:11px;color:var(--text-hint)">Destino</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-section">Configuración</div>
+      <button class="step-btn active" onclick="showPanel('panelSrc')" id="btnSrc">
+        <div class="step-num">1</div>
+        Servidor Origen
+      </button>
+      <button class="step-btn" onclick="showPanel('panelDst')" id="btnDst">
+        <div class="step-num">2</div>
+        Servidor Destino
+      </button>
+      <button class="step-btn" onclick="showPanel('panelOpts')" id="btnOpts">
+        <div class="step-num">3</div>
+        Opciones de Migración
+      </button>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">Ejecución</div>
+
+      <button class="step-btn" onclick="showPanel('panelRun')" id="btnRun">
+        <div class="step-num">▶</div>
+        Ejecutar
+      </button>
+      <button class="step-btn" onclick="showPanel('panelLog')" id="btnLog">
+        <div class="step-num">📋</div>
+        Log Detallado
+      </button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- PANEL 1: ORIGEN -->
+      <div class="panel active" id="panelSrc">
+        <div class="panel-header">
+          <div class="panel-title">Servidor Origen</div>
+          <div class="panel-sub">Therefore On-Premise desde el que se leerán los documentos</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔌 Conexión</div>
+          <div class="field">
+            <label>URL del servidor</label>
+            <input type="text" id="srcUrl" placeholder="https://servidor:8000" />
+            <span class="field-hint">Sin barra final</span>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Usuario</label>
+              <input type="text" id="srcUser" placeholder="admin" />
+              <span class="field-hint">Si requiere dominio: DOMINIO\usuario</span>
+            </div>
+            <div class="field">
+              <label>Contraseña</label>
+              <input type="password" id="srcPass" placeholder="••••••••" />
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:4px">
+            <button class="btn btn-primary btn-sm" onclick="testConn('src')">
+              <span class="spinner" id="spinSrc" style="display:none"></span>
+              Probar conexión
+            </button>
+            <span id="srcConnMsg" style="font-size:12px;color:var(--text-muted)"></span>
+          </div>
+        </div>
+
+        <div class="card" id="srcCatCard" style="display:none">
+          <div class="card-title">📂 Categoría Origen</div>
+          <div class="field-row">
+            <div class="field">
+              <label>Número de categoría</label>
+              <input type="number" id="srcCatNo" placeholder="ej. 42" min="1" />
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button class="btn btn-sm" onclick="loadCategoryInfo()">
+                <span class="spinner" id="spinCat" style="display:none"></span>
+                Cargar info categoría
+              </button>
+            </div>
+          </div>
+          <div id="srcCatInfo"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="showPanel('panelDst')">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PANEL 2: DESTINO -->
+      <div class="panel" id="panelDst">
+        <div class="panel-header">
+          <div class="panel-title">Servidor Destino</div>
+          <div class="panel-sub">Therefore On-Premise donde se crearán los documentos copiados</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🎯 Modo de operación</div>
+          <div class="toggle-group" style="margin-bottom:16px">
+            <div class="toggle-opt selected" id="modeCopy" onclick="selectMode('copy')">📋 Copiar a otro servidor</div>
+            <div class="toggle-opt" id="modeDl" onclick="selectMode('download')">⬇ Descargar a carpeta local</div>
+          </div>
+
+          <div class="mode-section visible" id="sectionCopy">
+            <div class="mode-section-title">Configuración destino Therefore</div>
+            <div class="field-row-3">
+              <div class="field">
+                <label>URL del servidor destino</label>
+                <input type="text" id="dstUrl" placeholder="https://otro-servidor:8000" />
+              </div>
+              <div class="field">
+                <label>Usuario</label>
+                <input type="text" id="dstUser" placeholder="admin" />
+              </div>
+              <div class="field">
+                <label>Contraseña</label>
+                <input type="password" id="dstPass" placeholder="••••••••" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Categoría destino (número)</label>
+              <input type="number" id="dstCatNo" placeholder="ej. 18" min="1" style="max-width:160px" />
+              <span class="field-hint">Los documentos se crearán en esta categoría</span>
+            </div>
+            <div class="btn-row" style="margin-top:4px">
+              <button class="btn btn-primary btn-sm" onclick="testConn('dst')">
+                <span class="spinner" id="spinDst" style="display:none"></span>
+                Probar conexión
+              </button>
+              <span id="dstConnMsg" style="font-size:12px;color:var(--text-muted)"></span>
+            </div>
+          </div>
+
+          <div class="mode-section" id="sectionDownload">
+            <div class="mode-section-title">Descarga local (navegador)</div>
+            <div class="alert alert-info">
+              ℹ Los ficheros se descargarán directamente al directorio de descargas del navegador. Cada stream se descargará con su nombre original. No se requiere configurar servidor destino.
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" onclick="showPanel('panelSrc')">← Atrás</button>
+          <button class="btn btn-primary" onclick="showPanel('panelOpts')">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PANEL 3: OPCIONES -->
+      <div class="panel" id="panelOpts">
+        <div class="panel-header">
+          <div class="panel-title">Opciones de Migración</div>
+          <div class="panel-sub">Configura el comportamiento del proceso</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⚙️ Comportamiento</div>
+
+          <div class="field">
+            <label>Concurrencia (documentos en paralelo)</label>
+            <input type="number" id="optConcurrency" value="3" min="1" max="10" style="max-width:100px" />
+            <span class="field-hint">Recomendado: 3–5. Más alto = más rápido pero más carga en el servidor.</span>
+          </div>
+
+          <div class="field">
+            <label style="margin-bottom:6px">Opciones adicionales</label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="optCopyMeta" checked />
+              Copiar metadatos (index data) junto con los ficheros
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="optSkipErrors" checked />
+              Continuar si un documento falla (skip &amp; log)
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="optVerbose" />
+              Log detallado (muestra cada stream procesado)
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔍 Filtro de documentos (opcional)</div>
+          <div class="field-row">
+            <div class="field">
+              <label>DocNo desde</label>
+              <input type="number" id="filterDocFrom" placeholder="(sin límite)" min="1" />
+            </div>
+            <div class="field">
+              <label>DocNo hasta</label>
+              <input type="number" id="filterDocTo" placeholder="(sin límite)" min="1" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Máximo de documentos a procesar</label>
+            <input type="number" id="filterMaxDocs" placeholder="(todos)" min="1" style="max-width:160px" />
+            <span class="field-hint">Útil para pruebas. Dejar vacío para procesar la categoría completa.</span>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" onclick="showPanel('panelDst')">← Atrás</button>
+          <button class="btn btn-primary btn-lg" onclick="startMigration()">▶ Iniciar migración</button>
+        </div>
+      </div>
+
+      <!-- PANEL 4: EJECUCIÓN -->
+      <div class="panel" id="panelRun">
+        <div class="panel-header">
+          <div class="panel-title">Progreso de Migración</div>
+          <div class="panel-sub" id="runSubtitle">Listo para iniciar</div>
+        </div>
+
+        <div class="progress-card" id="progressCard">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;font-weight:600" id="progressPhase">—</div>
+            <div style="font-size:13px;color:var(--text-muted)" id="progressPct">0%</div>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+          </div>
+          <div class="progress-stats">
+            <div class="p-stat"><div class="p-stat-val" id="statTotal">—</div><div class="p-stat-lbl">Total docs</div></div>
+            <div class="p-stat"><div class="p-stat-val ok" id="statOk">0</div><div class="p-stat-lbl">OK</div></div>
+            <div class="p-stat"><div class="p-stat-val err" id="statErr">0</div><div class="p-stat-lbl">Error</div></div>
+            <div class="p-stat"><div class="p-stat-val skip" id="statSkip">0</div><div class="p-stat-lbl">Skip</div></div>
+            <div class="p-stat"><div class="p-stat-val" id="statRate" style="color:var(--text-muted)">—</div><div class="p-stat-lbl">Docs/min</div></div>
+          </div>
+          <div class="progress-label" id="progressMsg">Esperando inicio...</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📋 Log en tiempo real</div>
+          <div class="log-wrap" id="liveLog"><div class="log-entry"><span class="log-time">--:--:--</span><span class="log-msg info">Listo. Configura los servidores y pulsa Iniciar.</span></div></div>
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn btn-sm" onclick="clearLog()">Limpiar log</button>
+            <button class="btn btn-sm" onclick="exportLog()">Exportar log</button>
+            <button class="btn btn-danger btn-sm" id="btnStop" style="display:none" onclick="stopMigration()">⏹ Detener</button>
+          </div>
+        </div>
+
+        <div id="summarySection" style="display:none">
+          <div class="card">
+            <div class="card-title">✅ Resumen Final</div>
+            <div class="summary-grid" id="summaryGrid"></div>
+          </div>
+          <div class="card" id="errDocsCard" style="display:none">
+            <div class="card-title" style="color:var(--danger)">⚠ Documentos con error</div>
+            <div class="status-table-wrap">
+              <table id="errTable">
+                <thead><tr><th>DocNo</th><th>Error</th></tr></thead>
+                <tbody id="errTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 5: LOG DETALLADO -->
+      <div class="panel" id="panelLog">
+        <div class="panel-header">
+          <div class="panel-title">Log Detallado</div>
+          <div class="panel-sub">Registro completo de todas las operaciones</div>
+        </div>
+        <div class="card">
+          <div class="btn-row" style="margin-bottom:12px">
+            <button class="btn btn-sm" onclick="clearLog()">Limpiar</button>
+            <button class="btn btn-sm" onclick="exportLog()">⬇ Exportar .txt</button>
+          </div>
+          <div class="log-wrap" id="fullLog" style="height:calc(100vh - 280px)">
+            <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-msg info">Log vacío.</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const S = {
+  mode: 'copy',           // 'copy' | 'download'
+  srcHeaders: null,
+  dstHeaders: null,
+  srcBase: null,
+  dstBase: null,
+  srcUser: null, srcPass: null,
+  dstUser: null, dstPass: null,
+  running: false,
+  stopRequested: false,
+  logEntries: [],
+  stats: { total: 0, ok: 0, err: 0, skip: 0 },
+  startTime: null,
+  errors: [],
+};
+
+// ═══════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+  const map = { panelSrc:'btnSrc', panelDst:'btnDst', panelOpts:'btnOpts', panelRun:'btnRun', panelLog:'btnLog' };
+  if (map[id]) document.getElementById(map[id]).classList.add('active');
+}
+
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', dur);
+}
+
+function setProgress(pct, phase, msg) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = Math.round(pct) + '%';
+  if (phase) document.getElementById('progressPhase').textContent = phase;
+  if (msg) document.getElementById('progressMsg').textContent = msg;
+}
+
+function updateStats() {
+  const s = S.stats;
+  document.getElementById('statTotal').textContent = s.total || '—';
+  document.getElementById('statOk').textContent = s.ok;
+  document.getElementById('statErr').textContent = s.err;
+  document.getElementById('statSkip').textContent = s.skip;
+  if (S.startTime && s.ok + s.err > 0) {
+    const elapsed = (Date.now() - S.startTime) / 60000;
+    document.getElementById('statRate').textContent = Math.round((s.ok + s.err) / elapsed);
+  }
+}
+
+function selectMode(m) {
+  S.mode = m;
+  document.getElementById('modeCopy').classList.toggle('selected', m === 'copy');
+  document.getElementById('modeDl').classList.toggle('selected', m === 'download');
+  document.getElementById('sectionCopy').classList.toggle('visible', m === 'copy');
+  document.getElementById('sectionDownload').classList.toggle('visible', m === 'download');
+}
+
+// ═══════════════════════════════════════════════════════
+// LOGGING
+// ═══════════════════════════════════════════════════════
+function now() {
+  const d = new Date();
+  return d.toTimeString().slice(0,8);
+}
+
+function addLog(msg, type='') {
+  const entry = { time: now(), msg, type };
+  S.logEntries.push(entry);
+  const html = `<div class="log-entry"><span class="log-time">${entry.time}</span><span class="log-msg ${type}">${escHtml(msg)}</span></div>`;
+  ['liveLog','fullLog'].forEach(id => {
+    const el = document.getElementById(id);
+    el.insertAdjacentHTML('beforeend', html);
+    el.scrollTop = el.scrollHeight;
+  });
+}
+
+function clearLog() {
+  S.logEntries = [];
+  ['liveLog','fullLog'].forEach(id => document.getElementById(id).innerHTML = '');
+}
+
+function exportLog() {
+  const lines = S.logEntries.map(e => `[${e.time}] ${e.msg}`).join('\n');
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'therefore-migrator-log.txt';
+  a.click();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════════════
+// API HELPERS
+// ═══════════════════════════════════════════════════════
+function makeHeaders(user, pass) {
+  // Basic Auth directa con usuario:contraseña — válido en Therefore On-Premise sin necesidad de token
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Basic ' + btoa(unescape(encodeURIComponent(user + ':' + pass))),
+  };
+}
+
+async function apiCall(base, headers, operation, body) {
+  const url = base.replace(/\/$/, '') + '/theservice/v0001/restun/' + operation;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  });
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => String(resp.status));
+    throw new Error(`HTTP ${resp.status}: ${txt}`);
+  }
+  return resp.json();
+}
+
+// Verifica credenciales llamando a GetWebAPIServerVersion (no falla con body {})
+async function verifyConn(base, user, pass) {
+  const h = makeHeaders(user, pass);
+  // Log diagnóstico: mostrar el Authorization construido
+  addLog(`Auth header: ${h.Authorization}`, 'info');
+  const resp = await fetch(base.replace(/\/$/, '') + '/theservice/v0001/restun/GetWebAPIServerVersion', {
+    method: 'POST', headers: h, body: JSON.stringify({})
+  });
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => '');
+    throw new Error('HTTP ' + resp.status + ' ' + txt.slice(0, 200));
+  }
+  const data = await resp.json();
+  return data.Version || data.version || '(versión desconocida)';
+}
+
+// Descarga un stream como blob
+async function downloadStream(base, headers, docNo, streamNo, versionNo=0) {
+  const url = `${base.replace(/\/$/, '')}/theservice/v0001/restun/GetDocumentStream`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ DocNo: docNo, StreamNo: streamNo, VersionNo: versionNo }),
+  });
+  if (!resp.ok) throw new Error(`GetDocumentStream HTTP ${resp.status}`);
+  const data = await resp.json();
+  // El stream viene en base64 en el campo StreamData
+  if (!data.StreamData) throw new Error('StreamData vacío');
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════
+// TEST CONNECTION
+// ═══════════════════════════════════════════════════════
+async function testConn(side) {
+  const isS = side === 'src';
+  const urlEl = document.getElementById(isS ? 'srcUrl' : 'dstUrl');
+  const userEl = document.getElementById(isS ? 'srcUser' : 'dstUser');
+  const passEl = document.getElementById(isS ? 'srcPass' : 'dstPass');
+  const spin = document.getElementById(isS ? 'spinSrc' : 'spinDst');
+  const msg = document.getElementById(isS ? 'srcConnMsg' : 'dstConnMsg');
+  const ind = document.getElementById(isS ? 'connSrcIndicator' : 'connDstIndicator');
+
+  const base = urlEl.value.trim();
+  const user = userEl.value.trim();
+  const pass = passEl.value;
+
+  if (!base || !user || !pass) { toast('Completa URL, usuario y contraseña'); return; }
+
+  spin.style.display = 'inline-block';
+  msg.textContent = 'Conectando...';
+  msg.style.color = 'var(--text-muted)';
+  ind.className = 'conn-indicator';
+
+  try {
+    const version = await verifyConn(base, user, pass);
+    const headers = makeHeaders(user, pass);
+    if (isS) {
+      S.srcHeaders = headers; S.srcBase = base;
+      S.srcUser = user; S.srcPass = pass;
+      document.getElementById('srcCatCard').style.display = 'block';
+      document.getElementById('btnSrc').classList.add('done');
+    } else {
+      S.dstHeaders = headers; S.dstBase = base;
+      S.dstUser = user; S.dstPass = pass;
+      document.getElementById('btnDst').classList.add('done');
+    }
+    msg.textContent = `✓ Conectado (v${version})`;
+    msg.style.color = 'var(--success)';
+    ind.className = 'conn-indicator connected';
+    addLog(`Conexión ${isS ? 'origen' : 'destino'} OK: ${base} — v${version}`, 'ok');
+  } catch(e) {
+    msg.textContent = '✗ ' + e.message;
+    msg.style.color = 'var(--danger)';
+    ind.className = 'conn-indicator error';
+    addLog(`Error conexión ${isS ? 'origen' : 'destino'}: ${e.message}`, 'err');
+  } finally {
+    spin.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// LOAD CATEGORY INFO
+// ═══════════════════════════════════════════════════════
+async function loadCategoryInfo() {
+  if (!S.srcHeaders) { toast('Conéctate primero al origen'); return; }
+  const catNo = parseInt(document.getElementById('srcCatNo').value);
+  if (!catNo) { toast('Introduce un número de categoría'); return; }
+
+  const spin = document.getElementById('spinCat');
+  spin.style.display = 'inline-block';
+  const infoEl = document.getElementById('srcCatInfo');
+  infoEl.innerHTML = '';
+
+  try {
+    const data = await apiCall(S.srcBase, S.srcHeaders, 'GetCategoryInfo', { CategoryNo: catNo });
+    const fields = (data.Fields || data.CategoryFields || []);
+    const name = data.Name || data.CategoryName || '(sin nombre)';
+
+    infoEl.innerHTML = `
+      <div class="alert alert-success" style="margin-top:12px">
+        ✓ Categoría <strong>${escHtml(name)}</strong> (No. ${catNo}) — ${fields.length} campo(s)
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:6px">
+        ${fields.slice(0,12).map(f => `<span style="background:var(--surface3);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-family:var(--font-mono)">${escHtml(f.ColName||f.FieldName||f.Caption||'')}</span>`).join('')}
+        ${fields.length > 12 ? `<span style="color:var(--text-hint)">+${fields.length-12} más</span>` : ''}
+      </div>`;
+    addLog(`Categoría ${catNo} OK: "${name}", ${fields.length} campos`, 'ok');
+  } catch(e) {
+    infoEl.innerHTML = `<div class="alert alert-danger" style="margin-top:12px">✗ ${escHtml(e.message)}</div>`;
+    addLog(`Error al leer categoría ${catNo}: ${e.message}`, 'err');
+  } finally {
+    spin.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ENUMERATE ALL DOCS (ExecuteMultiQuery + pagination)
+// ═══════════════════════════════════════════════════════
+async function getAllDocNos(catNo, filterFrom, filterTo, maxDocs) {
+  addLog(`ExecuteSingleQuery Cat.${catNo}...`, 'info');
+
+  // ExecuteSingleQuery con paginación — más compatible con Therefore On-Premise
+  const body = {
+    CategoryNo: String(catNo),
+    Conditions: [],
+    MaxRows: 500,
+    StartRow: 0,
+    TimeZone: '0',
+  };
+
+  let docNos = [];
+  let startRow = 0;
+  let page = 0;
+
+  while (true) {
+    if (S.stopRequested) break;
+    body.StartRow = startRow;
+    page++;
+
+    const resp = await apiCall(S.srcBase, S.srcHeaders, 'ExecuteSingleQuery', body);
+    addLog(`Página ${page} (desde fila ${startRow}): keys=${Object.keys(resp).join(',')}`, 'info');
+
+    const rows = resp.ResultRows || resp.Rows || [];
+    rows.forEach(row => {
+      if (row.DocNo != null) docNos.push(row.DocNo);
+    });
+
+    addLog(`Página ${page}: ${rows.length} filas, acumulado ${docNos.length}`, '');
+
+    // Si devuelve menos de MaxRows, ya no hay más
+    if (rows.length < body.MaxRows) break;
+    startRow += rows.length;
+
+    // Límite de seguridad
+    if (docNos.length >= 500000) break;
+  }
+
+  // Aplicar filtros
+  if (filterFrom) docNos = docNos.filter(n => n >= filterFrom);
+  if (filterTo) docNos = docNos.filter(n => n <= filterTo);
+  if (maxDocs && docNos.length > maxDocs) docNos = docNos.slice(0, maxDocs);
+
+  addLog(`Total documentos a procesar: ${docNos.length}`, 'info');
+  return docNos;
+}
+
+// ═══════════════════════════════════════════════════════
+// GET INDEX DATA  → build CreateDocument payload
+// ═══════════════════════════════════════════════════════
+async function getIndexData(docNo) {
+  const data = await apiCall(S.srcBase, S.srcHeaders, 'GetDocumentIndexData', { DocNo: docNo });
+  return data;
+}
+
+// Convierte los items del GetDocumentIndexData al formato para CreateDocument
+function convertIndexItems(indexDataItems, dstCatNo) {
+  if (!indexDataItems) return [];
+  return indexDataItems.map(item => {
+    // Limpiar campos de solo-lectura que no se pueden enviar al crear
+    const out = Object.assign({}, item);
+    delete out.FieldNo;
+    delete out.FieldID;
+    delete out.ColName;
+    // Conservar el tipo y valor
+    return out;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// PROCESS ONE DOCUMENT
+// ═══════════════════════════════════════════════════════
+async function processDocument(docNo, dstCatNo, copyMeta, verbose) {
+  // 1. Obtener info del documento (streams)
+  let docInfo;
+  try {
+    docInfo = await apiCall(S.srcBase, S.srcHeaders, 'GetDocument', {
+      DocNo: docNo,
+      VersionNo: 0,
+      IsStreamsInfoNeeded: true,
+      IsIndexDataNeeded: copyMeta,
+    });
+  } catch(e) {
+    throw new Error(`GetDocument: ${e.message}`);
+  }
+
+  const streamsInfo = docInfo.StreamsInfo || [];
+  const streamCount = streamsInfo.length || 1;
+  if (verbose) addLog(`  DocNo ${docNo}: ${streamCount} stream(s)`, '');
+
+  // 2. Descargar todos los streams
+  const streams = [];
+  for (let s = 0; s < streamCount; s++) {
+    const streamName = streamsInfo[s] ? (streamsInfo[s].StreamName || `stream_${s}`) : `stream_${s}`;
+    if (verbose) addLog(`  Descargando stream ${s}: ${streamName}`, '');
+
+    let streamData;
+    try {
+      streamData = await downloadStream(S.srcBase, S.srcHeaders, docNo, s);
+    } catch(e) {
+      throw new Error(`Stream ${s} (${streamName}): ${e.message}`);
+    }
+
+    streams.push({
+      streamName,
+      base64: streamData.StreamData,
+      idx: s,
+    });
+  }
+
+  // 3a. MODO DOWNLOAD: guardar localmente
+  if (S.mode === 'download') {
+    streams.forEach(str => {
+      const blob = b64ToBlob(str.base64, 'application/octet-stream');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      // Prefijo con DocNo para identificar
+      a.download = `${docNo}_${str.idx}_${str.streamName}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    });
+    return { docNo, newDocNo: null, streams: streams.length };
+  }
+
+  // 3b. MODO COPY: crear documento en destino
+  const payload = {
+    CategoryNo: dstCatNo,
+    Streams: streams.map(str => ({
+      StreamName: str.streamName,
+      StreamData: str.base64,
+      ConvertTo: 0,
+    })),
+  };
+
+  // Añadir index data si se pidió
+  if (copyMeta && docInfo.IndexData && docInfo.IndexData.Items) {
+    payload.IndexDataItems = convertIndexItems(docInfo.IndexData.Items, dstCatNo);
+  }
+
+  let result;
+  try {
+    result = await apiCall(S.dstBase, S.dstHeaders, 'CreateDocument', payload);
+  } catch(e) {
+    throw new Error(`CreateDocument: ${e.message}`);
+  }
+
+  const newDocNo = result.DocNo || result.NewDocNo || '?';
+  if (verbose) addLog(`  ✓ Creado en destino: DocNo ${newDocNo}`, 'ok');
+
+  return { docNo, newDocNo, streams: streams.length };
+}
+
+function b64ToBlob(b64, mime) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+// ═══════════════════════════════════════════════════════
+// CONCURRENCY POOL
+// ═══════════════════════════════════════════════════════
+async function runWithConcurrency(tasks, concurrency, onComplete) {
+  const results = [];
+  let idx = 0;
+
+  async function worker() {
+    while (idx < tasks.length) {
+      if (S.stopRequested) break;
+      const i = idx++;
+      try {
+        const r = await tasks[i]();
+        results.push({ ok: true, ...r });
+      } catch(e) {
+        results.push({ ok: false, docNo: null, error: e.message });
+      }
+      onComplete(results.length, tasks.length);
+    }
+  }
+
+  const workers = Array.from({ length: concurrency }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════
+// MAIN: START MIGRATION
+// ═══════════════════════════════════════════════════════
+async function startMigration() {
+  // Validaciones
+  if (!S.srcHeaders || !S.srcBase) { toast('Conéctate primero al servidor origen'); showPanel('panelSrc'); return; }
+  if (S.mode === 'copy' && (!S.dstHeaders || !S.dstBase)) { toast('Conéctate al servidor destino'); showPanel('panelDst'); return; }
+
+  const catNo = parseInt(document.getElementById('srcCatNo').value);
+  if (!catNo) { toast('Indica la categoría origen'); showPanel('panelSrc'); return; }
+
+  const dstCatNo = S.mode === 'copy' ? parseInt(document.getElementById('dstCatNo').value) : null;
+  if (S.mode === 'copy' && !dstCatNo) { toast('Indica la categoría destino'); showPanel('panelDst'); return; }
+
+  const concurrency = Math.max(1, Math.min(10, parseInt(document.getElementById('optConcurrency').value) || 3));
+  const copyMeta = document.getElementById('optCopyMeta').checked;
+  const skipErrors = document.getElementById('optSkipErrors').checked;
+  const verbose = document.getElementById('optVerbose').checked;
+  const filterFrom = parseInt(document.getElementById('filterDocFrom').value) || null;
+  const filterTo = parseInt(document.getElementById('filterDocTo').value) || null;
+  const maxDocs = parseInt(document.getElementById('filterMaxDocs').value) || null;
+
+  // Reset estado
+  S.running = true;
+  S.stopRequested = false;
+  S.stats = { total: 0, ok: 0, err: 0, skip: 0 };
+  S.startTime = Date.now();
+  S.errors = [];
+
+  showPanel('panelRun');
+  document.getElementById('btnStop').style.display = 'inline-flex';
+  document.getElementById('summarySection').style.display = 'none';
+  document.getElementById('runSubtitle').textContent = `Cat. origen: ${catNo}${S.mode === 'copy' ? ` → Cat. destino: ${dstCatNo}` : ' → Descarga local'}`;
+
+  clearLog();
+  addLog(`=== Migración iniciada ===`, 'info');
+  addLog(`Modo: ${S.mode === 'copy' ? 'Copiar a servidor destino' : 'Descargar local'}`, 'info');
+  addLog(`Categoría origen: ${catNo}${dstCatNo ? ` | Destino: ${dstCatNo}` : ''}`, 'info');
+  addLog(`Concurrencia: ${concurrency} | Metadatos: ${copyMeta ? 'Sí' : 'No'}`, 'info');
+
+  setProgress(0, 'Enumerando documentos...', 'Consultando categoría origen...');
+
+  let docNos;
+  try {
+    docNos = await getAllDocNos(catNo, filterFrom, filterTo, maxDocs);
+  } catch(e) {
+    addLog('Error al enumerar documentos: ' + e.message, 'err');
+    setProgress(0, 'Error', e.message);
+    S.running = false;
+    document.getElementById('btnStop').style.display = 'none';
+    return;
+  }
+
+  if (docNos.length === 0) {
+    addLog('No se encontraron documentos.', 'warn');
+    setProgress(100, 'Completado', 'Sin documentos en la categoría.');
+    S.running = false;
+    document.getElementById('btnStop').style.display = 'none';
+    showSummary();
+    return;
+  }
+
+  S.stats.total = docNos.length;
+  updateStats();
+  setProgress(2, 'Procesando documentos...', `0 / ${docNos.length}`);
+  addLog(`--- Iniciando proceso de ${docNos.length} documentos ---`, 'info');
+
+  // Construir tareas
+  const tasks = docNos.map(docNo => async () => {
+    if (S.stopRequested) {
+      S.stats.skip++;
+      return { docNo, skipped: true };
+    }
+    try {
+      const r = await processDocument(docNo, dstCatNo, copyMeta, verbose);
+      S.stats.ok++;
+      return r;
+    } catch(e) {
+      S.stats.err++;
+      const errMsg = e.message;
+      S.errors.push({ docNo, error: errMsg });
+      addLog(`✗ DocNo ${docNo}: ${errMsg}`, 'err');
+      if (!skipErrors) {
+        S.stopRequested = true;
+        throw e;
+      }
+      return { docNo, error: errMsg };
+    }
+  });
+
+  await runWithConcurrency(tasks, concurrency, (done, total) => {
+    const pct = 2 + (done / total) * 97;
+    setProgress(pct, 'Procesando...', `${done} / ${total} documentos`);
+    updateStats();
+
+    // Log cada 10
+    if (done % 10 === 0 || done === total) {
+      addLog(`Progreso: ${done}/${total} — OK: ${S.stats.ok} | Err: ${S.stats.err}`, done === total ? 'ok' : '');
+    }
+  });
+
+  const elapsed = ((Date.now() - S.startTime) / 1000).toFixed(1);
+  addLog(`=== Migración finalizada en ${elapsed}s ===`, 'ok');
+  addLog(`OK: ${S.stats.ok} | Errores: ${S.stats.err} | Saltados: ${S.stats.skip}`, 'ok');
+
+  setProgress(100, 'Completado', `${S.stats.ok} documentos procesados correctamente`);
+  S.running = false;
+  document.getElementById('btnStop').style.display = 'none';
+  showSummary();
+}
+
+function stopMigration() {
+  if (!S.running) return;
+  S.stopRequested = true;
+  addLog('⏹ Detención solicitada — esperando fin de lote en curso...', 'warn');
+  document.getElementById('btnStop').disabled = true;
+}
+
+function showSummary() {
+  const el = document.getElementById('summarySection');
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const elapsed = ((Date.now() - S.startTime) / 1000).toFixed(1);
+  document.getElementById('summaryGrid').innerHTML = `
+    <div class="summary-stat"><div class="summary-stat-val">${S.stats.total}</div><div class="summary-stat-lbl">Total docs</div></div>
+    <div class="summary-stat"><div class="summary-stat-val ok-val">${S.stats.ok}</div><div class="summary-stat-lbl">Procesados OK</div></div>
+    <div class="summary-stat"><div class="summary-stat-val err-val">${S.stats.err}</div><div class="summary-stat-lbl">Con error</div></div>
+    <div class="summary-stat"><div class="summary-stat-val skip-val">${S.stats.skip}</div><div class="summary-stat-lbl">Saltados</div></div>
+    <div class="summary-stat"><div class="summary-stat-val" style="color:var(--text-muted)">${elapsed}s</div><div class="summary-stat-lbl">Tiempo total</div></div>
+  `;
+
+  if (S.errors.length > 0) {
+    const card = document.getElementById('errDocsCard');
+    card.style.display = 'block';
+    const tbody = document.getElementById('errTableBody');
+    tbody.innerHTML = S.errors.map(e =>
+      `<tr><td><span style="font-family:var(--font-mono)">${e.docNo}</span></td><td style="color:var(--danger);white-space:normal">${escHtml(e.error)}</td></tr>`
+    ).join('');
+  }
+}
+</script>
+</body>
+</html>

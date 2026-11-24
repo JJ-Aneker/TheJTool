@@ -1,0 +1,47 @@
+/* TenantManager table styles - Dark mode fix */
+
+/* Override fixed right column background in dark mode */
+.ant-table-wrapper .ant-table-fixed-right {
+  background-color: transparent !important;
+}
+
+.ant-table-wrapper .ant-table-fixed-right .ant-table-cell {
+  background-color: var(--bg-card) !important;
+  background: var(--bg-card) !important;
+}
+
+.ant-table-wrapper .ant-table-row .ant-table-cell {
+  background-color: transparent;
+}
+
+.ant-table-wrapper .ant-table-row:hover .ant-table-cell {
+  background-color: transparent !important;
+}
+
+/* Force dark background for table cells in dark mode */
+.ant-table-wrapper .ant-table {
+  background-color: var(--bg-card);
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  background-color: transparent !important;
+  border-bottom-color: var(--border-default);
+}
+
+.ant-table-wrapper .ant-table-tbody > tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Specific fix for actions column */
+.ant-table-wrapper .ant-table-cell:last-child {
+  background-color: var(--bg-card) !important;
+}
+
+.ant-table-wrapper .ant-table-cell:last-child .ant-space {
+  background-color: transparent;
+}
+
+/* Button styling */
+.ant-table-wrapper .ant-btn {
+  background-color: transparent !important;
+}

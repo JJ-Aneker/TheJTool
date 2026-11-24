@@ -1,0 +1,702 @@
+/* Therefore EFDT Generator Styles - Unified with eFormBuilder & CategoryBuilder */
+/* Fully adapted for dark/light theme using design tokens */
+
+/* ── CONTAINER ────────────────────────────────────────────────────────────────── */
+.efdt-root {
+  font-family: inherit;
+  color: var(--text-primary);
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ───────────────────────────────────────────────────────────────────── */
+.efdt-header {
+  border-bottom: 1px solid var(--border-default);
+  padding-bottom: 16px;
+  margin-bottom: 0;
+}
+
+.efdt-header > div:first-child {
+  margin-bottom: 0;
+}
+
+.efdt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.efdt-logo-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.efdt-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.efdt-header-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.efdt-header-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── PROGRESS BAR ──────────────────────────────────────────────────────────────── */
+.efdt-progress-container {
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-hover);
+  padding: 12px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.efdt-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 77, 79, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.efdt-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-error), #ff6b6b, #ff4d4f);
+  transition: width 0.2s ease;
+  box-shadow: 0 0 6px rgba(255, 77, 79, 0.4);
+}
+
+.efdt-progress-message {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  animation: fadeInOut 0.5s ease-in-out;
+}
+
+.efdt-progress-percent {
+  font-weight: 600;
+  color: var(--accent-error);
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* ── STEPS BAR ────────────────────────────────────────────────────────────────── */
+.efdt-steps-bar {
+  padding: 12px 0 20px;
+}
+
+/* ── TOP ACTIONS ──────────────────────────────────────────────────────────────── */
+.efdt-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0 16px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+/* ── CONTENT ──────────────────────────────────────────────────────────────────── */
+.efdt-content {
+  flex: 1;
+}
+
+/* ── GRID LAYOUTS ─────────────────────────────────────────────────────────────── */
+.efdt-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.efdt-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* Briefing step grid - single row layout 60-30-10 */
+.efdt-grid-briefing {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) 220px;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.efdt-panel-config {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.efdt-panel-portada-mini {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.efdt-panel-files {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+@media (max-width: 1200px) {
+  .efdt-grid-briefing { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 200px; }
+}
+
+@media (max-width: 900px) {
+  .efdt-grid-2 { grid-template-columns: 1fr; }
+  .efdt-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .efdt-grid-briefing { grid-template-columns: 1fr; }
+  .efdt-panel-config { grid-column: 1; grid-row: auto; }
+  .efdt-panel-portada-mini { grid-column: 1; grid-row: auto; }
+  .efdt-panel-files { grid-column: 1; grid-row: auto; }
+}
+
+/* ── PANEL / CARD ─────────────────────────────────────────────────────────────── */
+.efdt-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.efdt-panel-title {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-default);
+  background: transparent;
+}
+
+.efdt-panel-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── FORM FIELDS ──────────────────────────────────────────────────────────────── */
+.efdt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.efdt-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* ── FILE LIST ────────────────────────────────────────────────────────────────── */
+.efdt-file-list {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.efdt-file-list-title {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-default);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.efdt-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-default);
+  transition: background 0.15s;
+}
+
+.efdt-file-item:last-child { border-bottom: none; }
+.efdt-file-item:hover { background: var(--bg-hover); }
+
+.efdt-file-name {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.efdt-file-size {
+  font-size: 10px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── UPLOAD DRAGGER ──────────────────────────────────────────────────────────── */
+.efdt-dragger .ant-upload-drag {
+  border-radius: var(--radius-md) !important;
+  border-color: var(--border-default) !important;
+  background: var(--bg-canvas) !important;
+}
+
+.efdt-dragger .ant-upload-drag:hover {
+  border-color: var(--accent-primary) !important;
+}
+
+.efdt-dragger-active .ant-upload-drag {
+  border-color: var(--accent-primary) !important;
+  background: var(--accent-primary-soft) !important;
+  box-shadow: inset 0 0 0 1px var(--accent-primary) !important;
+}
+
+/* ── PORTADA A4 VERTICAL ─────────────────────────────────────────────────────── */
+.efdt-portada-container {
+  width: 100%;
+  height: 180px;
+  aspect-ratio: 210 / 297;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.efdt-portada-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #f5f5f5;
+}
+
+.efdt-portada-dropzone {
+  width: 100%;
+  height: 180px;
+  aspect-ratio: 210 / 297;
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-canvas);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.efdt-portada-dropzone:hover {
+  border-color: var(--accent-error);
+  background: rgba(255, 77, 79, 0.02);
+}
+
+/* ── HINTS ────────────────────────────────────────────────────────────────────── */
+.efdt-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--bg-canvas);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.efdt-hint-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* ── TIP ──────────────────────────────────────────────────────────────────────── */
+.efdt-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 80, 80, 0.08);
+  border: 1px solid rgba(255, 80, 80, 0.2);
+  border-radius: var(--radius-md);
+}
+
+/* ── META BAR ──────────────────────────────────────────────────────────────────── */
+.efdt-meta-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+}
+
+/* ── COLLAPSE / ACCORDION ─────────────────────────────────────────────────────── */
+.efdt-collapse {
+  border-radius: var(--radius-md) !important;
+  overflow: hidden;
+}
+
+.efdt-collapse .ant-collapse-header {
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  background: var(--bg-card) !important;
+}
+
+.efdt-collapse .ant-collapse-header:hover {
+  color: var(--accent-primary) !important;
+}
+
+.efdt-collapse .ant-collapse-content {
+  background: var(--bg-card) !important;
+  color: var(--text-primary);
+}
+
+.efdt-collapse .ant-collapse-content-box {
+  padding: 16px !important;
+}
+
+/* ── DATA FIELDS (for review section) ──────────────────────────────────────────── */
+.efdt-data-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.efdt-data-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.efdt-data-value {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+  padding: 6px 0;
+}
+
+/* ── EDITABLE DATA VALUE ──────────────────────────────────────────────────────── */
+.efdt-data-value input,
+.efdt-data-value .ant-input {
+  background: var(--bg-input) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-data-value input:focus,
+.efdt-data-value .ant-input:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1) !important;
+}
+
+/* ── ACTIONS FOOTER ───────────────────────────────────────────────────────────── */
+.efdt-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+/* ── BUTTONS ──────────────────────────────────────────────────────────────────── */
+.efdt-btn-primary {
+  background: var(--accent-error) !important;
+  border-color: var(--accent-error) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.efdt-btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow-md);
+}
+
+.efdt-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── SUCCESS CARD ─────────────────────────────────────────────────────────────── */
+.efdt-success-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
+.efdt-success-icon {
+  font-size: 48px;
+  color: var(--accent-success);
+}
+
+/* ── POST-DOWNLOAD TIPS ───────────────────────────────────────────────────────── */
+.efdt-post-download-tips {
+  margin-top: 32px;
+  padding: 16px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  text-align: left;
+  width: 100%;
+  max-width: 480px;
+}
+
+.efdt-tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.efdt-tip-row:last-child { margin-bottom: 0; }
+
+/* ── ESTIMATION TABLE ────────────────────────────────────────────────────────── */
+.efdt-est-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  background: var(--bg-card);
+}
+
+.efdt-est-table th {
+  background: var(--accent-error);
+  color: #fff;
+  font-weight: 600;
+  padding: 7px 8px;
+  text-align: left;
+  border: 1px solid var(--accent-error);
+}
+
+.efdt-est-table td {
+  padding: 5px 6px;
+  border: 1px solid var(--border-default);
+  vertical-align: middle;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.efdt-est-table tbody tr:nth-child(even) td {
+  background: var(--bg-hover);
+}
+
+.efdt-est-table tbody tr:hover td {
+  background: rgba(54, 99, 255, 0.1);
+}
+
+.efdt-est-total td {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 8px 6px;
+  border-color: var(--border-default);
+}
+
+/* ── REFINE BOX ──────────────────────────────────────────────────────────────── */
+.efdt-refine-box {
+  margin-top: 16px;
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.efdt-refine-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 80, 80, 0.08);
+  border-bottom: 1px solid rgba(255, 80, 80, 0.2);
+}
+
+.efdt-refine-body {
+  padding: 12px 14px;
+  background: var(--bg-card);
+}
+
+/* ── ANT DESIGN OVERRIDES ─────────────────────────────────────────────────────── */
+.efdt-root .ant-input,
+.efdt-root .ant-input-number,
+.efdt-root .ant-input-number-input,
+.efdt-root .ant-select-selector,
+.efdt-root .ant-picker {
+  background: var(--bg-input) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+  font-family: inherit;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-input::placeholder,
+.efdt-root .ant-input-number::placeholder {
+  color: var(--text-secondary);
+}
+
+.efdt-root .ant-input:focus,
+.efdt-root .ant-input-number:focus,
+.efdt-root .ant-input-number-input:focus,
+.efdt-root .ant-select-focused .ant-select-selector,
+.efdt-root .ant-picker:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(54, 99, 255, 0.1) !important;
+}
+
+.efdt-root .ant-select-item {
+  color: var(--text-primary);
+}
+
+.efdt-root .ant-select-item-option-selected {
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-input-textarea-wrapper .ant-input-textarea {
+  background: var(--bg-input);
+}
+
+.efdt-root .ant-input-textarea .ant-input {
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+.efdt-root .ant-btn-primary {
+  background: var(--accent-error) !important;
+  border-color: var(--accent-error) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow-md);
+}
+
+.efdt-root .ant-btn-default {
+  color: var(--text-primary) !important;
+  border-color: var(--border-default) !important;
+  background: transparent;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-btn-default:hover {
+  color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-btn-text {
+  color: var(--accent-error) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-btn-text:hover {
+  color: #ff6b6b !important;
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-btn-icon-only {
+  border-color: var(--border-default);
+  background: transparent;
+  color: var(--accent-primary) !important;
+}
+
+.efdt-root .ant-btn-icon-only:hover {
+  color: var(--accent-primary) !important;
+  background: var(--bg-hover);
+}
+
+.efdt-root .ant-alert {
+  background: var(--bg-card) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+  transition: all 200ms ease;
+}
+
+.efdt-root .ant-alert-error {
+  background: rgba(255, 80, 80, 0.12) !important;
+  border-color: var(--accent-error) !important;
+}
+
+.efdt-root .ant-alert-error .ant-alert-message {
+  color: var(--accent-error) !important;
+}
+
+.efdt-root .ant-tag {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.efdt-root .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-tail::after {
+  background: var(--accent-error);
+}
+
+.efdt-root .ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-tail::after {
+  background: var(--accent-success);
+}
+
+.efdt-root .ant-badge-status-dot {
+  background: var(--accent-primary);
+}
+
+.efdt-root .ant-collapse {
+  background: var(--bg-card);
+  border-color: var(--border-default);
+}
+
+/* ── MOSAICO PORTADAS ──────────────────────────────────────────────────────────── */
+.cover-upload-btn:hover {
+  background: var(--color-background-secondary) !important;
+  border-color: var(--accent-primary) !important;
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-default);
+}

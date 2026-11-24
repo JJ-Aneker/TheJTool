@@ -1,0 +1,1165 @@
+/* Therefore eForms Builder Styles */
+.eform-container {
+  font-family: inherit;
+  color: var(--text-primary);
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.eform-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.eform-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.eform-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.eform-view-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.eform-panel {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 16px !important;
+  margin-bottom: 16px !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.eform-panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
+}
+
+.eform-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.eform-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.eform-input,
+.eform-select,
+.eform-textarea {
+  width: 100%;
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px 10px !important;
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 200ms ease;
+}
+
+.eform-input:focus,
+.eform-select:focus,
+.eform-textarea:focus {
+  border-color: var(--accent-primary) !important;
+  background: var(--bg-input) !important;
+}
+
+.eform-textarea {
+  resize: vertical;
+  font-family: 'Monaco', monospace;
+}
+
+.eform-btn {
+  background: transparent !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  font-size: 12px !important;
+  padding: 6px 12px !important;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 200ms ease;
+}
+
+.eform-btn:hover {
+  border-color: var(--border-hover) !important;
+  background: var(--bg-hover) !important;
+}
+
+.eform-btn.active {
+  border-color: var(--accent-primary) !important;
+  background: var(--accent-primary-soft) !important;
+  color: var(--accent-primary) !important;
+}
+
+.eform-btn-primary {
+  background: var(--accent-primary) !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  padding: 9px 18px !important;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 200ms ease;
+}
+
+.eform-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.eform-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.eform-btn-success {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--accent-success);
+  font-size: 13px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 200ms ease;
+}
+
+.eform-btn-success:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.eform-btn-danger {
+  background: rgba(255, 80, 80, 0.1);
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  border-radius: var(--radius-md);
+  color: var(--accent-error);
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.eform-btn-danger:hover {
+  background: rgba(255, 80, 80, 0.15);
+}
+
+.eform-btn-small {
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 11px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.eform-btn-small:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+}
+
+.eform-btn-expand {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 200ms ease;
+}
+
+.eform-btn-expand:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+}
+
+.eform-btn-col {
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.eform-btn-col.active {
+  border-color: var(--accent-primary);
+  background: rgba(54, 99, 255, 0.15);
+  color: var(--accent-primary);
+}
+
+.eform-badge {
+  font-size: 10px;
+  background: rgba(54, 99, 255, 0.12);
+  color: var(--accent-primary);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(54, 99, 255, 0.2);
+  display: inline-block;
+}
+
+.eform-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 11px;
+  transition: color 200ms ease;
+}
+
+.eform-toggle[data-on="true"] {
+  color: var(--accent-primary);
+}
+
+.eform-toggle-switch {
+  width: 26px;
+  height: 15px;
+  border-radius: 8px;
+  background: rgba(54, 99, 255, 0.2);
+  border: 1px solid var(--border-default);
+  display: inline-block;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 200ms ease;
+}
+
+.eform-toggle[data-on="true"] .eform-toggle-switch {
+  background: var(--accent-primary);
+}
+
+.eform-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: left 150ms ease;
+}
+
+.eform-toggle[data-on="true"] .eform-toggle-thumb {
+  background: #000;
+  left: 12px;
+}
+
+.eform-full-width {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eform-csv-importer {
+  margin-bottom: 16px;
+}
+
+.eform-csv-panel {
+  background: var(--bg-card);
+  border: 1px solid rgba(54, 99, 255, 0.25);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.eform-csv-help {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  line-height: 1.8;
+}
+
+.eform-csv-help code {
+  color: var(--accent-success);
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.eform-csv-help b {
+  color: var(--text-primary);
+}
+
+.eform-csv-preview {
+  margin-top: 10px;
+}
+
+.eform-error {
+  color: var(--accent-error);
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.eform-error-inline {
+  color: var(--accent-error);
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.eform-preview-info {
+  font-size: 12px;
+  color: var(--accent-success);
+  margin-bottom: 6px;
+}
+
+.eform-sections-list {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  margin-bottom: 8px;
+  max-height: 130px;
+  overflow-y: auto;
+}
+
+.eform-section-name {
+  font-size: 11px;
+  color: var(--accent-primary);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.eform-field-item {
+  font-size: 11px;
+  color: var(--text-secondary);
+  padding-left: 10px;
+  margin-bottom: 2px;
+}
+
+.eform-field-item span {
+  color: var(--text-muted);
+}
+
+.eform-warnings {
+  font-size: 11px;
+  color: var(--kpi-amber);
+  background: rgba(255, 167, 38, 0.08);
+  border: 1px solid rgba(255, 167, 38, 0.2);
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+}
+
+.eform-csv-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.eform-section {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.eform-sec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.eform-section-name {
+  font-weight: 600;
+  color: var(--accent-primary);
+  flex: 1;
+}
+
+.eform-field-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  color: var(--text-primary) !important;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.eform-field-col-etiqueta {
+  grid-column: 1;
+}
+
+.eform-field-col-key {
+  grid-column: 2;
+}
+
+.eform-field-col-tipo {
+  grid-column: 3;
+}
+
+.eform-field-col-opciones {
+  grid-column: 4;
+}
+
+.eform-field-row {
+  background: transparent !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px !important;
+  margin-bottom: 6px !important;
+}
+
+.eform-field-main {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.eform-input-compact {
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+  height: auto;
+}
+
+.eform-select-compact {
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+  height: auto;
+}
+
+.eform-field-quick-options {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.eform-field-group-full {
+  grid-column: 1 / -1;
+}
+
+.eform-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-bottom: 2px;
+}
+
+.eform-field-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-bottom: 2px;
+}
+
+.eform-field-expanded {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border-top: 1px solid var(--border-default);
+  padding-top: 10px;
+  grid-column: 1 / -1;
+}
+
+.eform-preview {
+  background: var(--bg-canvas) !important;
+  border-radius: var(--radius-md);
+  font-family: Arial, sans-serif;
+  max-height: 560px;
+  overflow-y: auto;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-default);
+}
+
+.eform-preview-header {
+  background: var(--accent-primary) !important;
+  color: #fff !important;
+  border-radius: 6px 6px 0 0;
+  padding: 14px 18px;
+}
+
+.eform-preview-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.eform-preview-description {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-top: 3px;
+}
+
+.eform-preview-body {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  padding: 18px;
+}
+
+.eform-preview-section {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border-default) !important;
+  padding-bottom: 5px;
+  margin-bottom: 12px;
+}
+
+.eform-preview-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.eform-preview-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary) !important;
+  margin-bottom: 4px;
+}
+
+.eform-preview-button {
+  background: var(--accent-primary) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  padding: 9px 22px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.eform-identity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.eform-description-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.eform-cols-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.eform-info-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+.eform-info-text p {
+  margin-bottom: 8px;
+}
+
+.eform-info-text code {
+  background: rgba(54, 99, 255, 0.1);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--accent-success);
+  font-family: monospace;
+}
+
+.eform-xml-output {
+  margin-top: 14px;
+}
+
+.eform-xml-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.eform-char-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.eform-checklist {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 2.1;
+}
+
+.eform-checklist-item {
+  display: flex;
+  gap: 8px;
+}
+
+.eform-checklist-item span:first-child {
+  color: rgba(54, 99, 255, 0.45);
+  flex-shrink: 0;
+}
+
+.eform-info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.eform-info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.eform-info-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.eform-info-card code {
+  background: rgba(54, 99, 255, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: var(--accent-success);
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.eform-info-card p {
+  margin: 0;
+}
+
+.eform-info-card strong {
+  color: var(--text-primary);
+}
+
+/* Table Header */
+.eform-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  background: var(--bg-hover) !important;
+  border-bottom: 1px solid var(--border-default) !important;
+  margin-bottom: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+}
+
+.eform-table-header .eform-table-col {
+  padding: 8px;
+  border-right: 1px solid var(--border-default);
+}
+
+.eform-table-header .eform-table-col:last-child {
+  border-right: none;
+}
+
+/* Table Rows */
+.eform-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.eform-table-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.eform-table-row .eform-table-col {
+  padding: 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.eform-table-row .eform-table-col:last-child {
+  border-right: none;
+}
+
+.eform-section-header-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 6px;
+}
+
+.eform-table-key {
+  color: var(--accent-success);
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.eform-table-type {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+/* XML Modal Content */
+.eform-xml-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eform-xml-textarea {
+  height: 400px !important;
+  font-family: 'Monaco', monospace !important;
+  font-size: 11px !important;
+}
+
+.eform-footer {
+  margin-top: 16px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .eform-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+/* ══════════ Editor a dos columnas (estilo Linear) ══════════ */
+.efx-tabs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: 16px;
+}
+
+.eform-container .efx-tab {
+  padding: 8px 0 !important;
+  background: none !important;
+  border: none !important;
+  border-radius: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.eform-container .efx-tab.is-active {
+  color: var(--text-primary);
+  font-weight: 500;
+  box-shadow: inset 0 -2px 0 var(--accent-primary);
+}
+
+.efx-tabs-meta {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.efx-layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1000px) {
+  .efx-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+.efx-structure {
+  min-width: 0;
+  max-height: 100%;
+  overflow: auto;
+  padding-bottom: 24px;
+}
+
+/* Filas de la estructura */
+.eform-container .efx-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 2px 6px 2px 8px !important;
+  border-radius: 6px;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: var(--text-primary);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.eform-container .efx-row:hover {
+  background: var(--bg-hover) !important;
+}
+
+.eform-container .efx-row.is-selected {
+  background: var(--accent-primary-soft) !important;
+  border-color: color-mix(in srgb, var(--accent-primary) 35%, transparent) !important;
+}
+
+.efx-form-row {
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.efx-form-name,
+.efx-section-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.efx-section {
+  margin-top: 6px;
+}
+
+.efx-section-row {
+  font-size: 12px !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary) !important;
+}
+
+.eform-container .efx-caret {
+  width: 20px;
+  height: 20px;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.efx-field {
+  padding-left: 26px !important;
+}
+
+.efx-grip {
+  width: 10px;
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: -2px;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.efx-row:hover .efx-grip,
+.efx-row.is-selected .efx-grip {
+  opacity: 1;
+}
+
+.eform-container input.efx-row-input {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0 4px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+}
+
+.eform-container input.efx-row-input::placeholder {
+  color: var(--text-muted);
+}
+
+.efx-type {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.efx-req {
+  width: 12px;
+  color: var(--accent-warning);
+  font-size: 12px;
+  text-align: center;
+}
+
+.eform-container .efx-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 6px 26px;
+  padding: 6px 8px !important;
+  border: none !important;
+  background: none !important;
+  color: var(--text-secondary);
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.eform-container .efx-add:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover) !important;
+}
+
+.eform-container .efx-add-panel {
+  margin-left: 0;
+  margin-top: 10px;
+}
+
+.efx-shortcuts {
+  margin: 16px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Panel de propiedades */
+.efx-props {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+.efx-props-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.efx-prop {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.efx-prop-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.efx-prop-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.efx-switches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.efx-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.efx-mono input,
+input.efx-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.efx-remove {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.efx-preview-wrap {
+  max-width: 900px;
+}
+
+.efx-props {
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+}
+
+/* ══════════ Constructor de categorías: tres columnas ══════════ */
+.efx-cat-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .efx-cat-layout { grid-template-columns: 180px minmax(0, 1fr); }
+  .efx-cat-layout .efx-props { grid-column: 1 / -1; position: static; }
+}
+
+.efx-cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 12px;
+  border-right: 1px solid var(--border-default);
+  min-height: 300px;
+}
+
+.eform-container .efx-cat-item {
+  font-size: 13px;
+}
+
+.efx-col-icon {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.eform-container .efx-row.efx-col-row {
+  padding-left: 52px !important;
+}
+
+/* ══════════ Módulo único de eForms ══════════ */
+.eform-container .efx-back,
+.container-main .efx-back {
+  padding: 0 !important;
+  margin-bottom: 4px;
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  background: none !important;
+}
+
+.eform-container .efx-back:hover,
+.container-main .efx-back:hover {
+  color: var(--text-primary) !important;
+}
+
+.efx-lock {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.efx-row.is-locked .efx-row-input {
+  color: var(--text-secondary) !important;
+  cursor: pointer;
+}
+
+.efx-json {
+  max-height: 240px;
+  overflow: auto;
+  margin: 0;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--bg-hover);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: pre;
+}
+
+.efx-preview-locked {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px dashed var(--border-hover);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.efx-empty {
+  padding: 56px 16px;
+  text-align: center;
+  border: 1px dashed var(--border-hover);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.efx-ai-wrap {
+  max-width: 900px;
+}

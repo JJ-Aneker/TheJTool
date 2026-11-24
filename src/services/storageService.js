@@ -1,0 +1,198 @@
+import { supabase } from '../config/supabaseClient'
+import { logger } from '../utils/logger'
+
+const DOCUMENT_BUCKET = 'document-uploads'
+
+export const storageService = {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DOCUMENT UPLOADS (para generador de documentos)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Sube un archivo temporal para análisis
+   * @param {File} file - Archivo a subir
+   * @param {string} userId - ID del usuario
+   * @returns {Promise<{path: string, url: string, name: string, type: string, size: number}>}
+   */
+  async uploadDocument(file, userId) {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+
+      // 1. Get a signed upload URL from backend (bypasses RLS INSERT policy)
+      const sigRes = await fetch(`${API_URL}/api/admin/storage/signed-upload-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, fileName: file.name })
+      })
+      const sig = await sigRes.json()
+      if (!sig.success) throw new Error(sig.error || 'Error obteniendo URL de subida')
+
+      // 2. Upload directly to Storage using the signed URL (no RLS needed)
+      const { error: uploadError } = await supabase.storage
+        .from(DOCUMENT_BUCKET)
+        .uploadToSignedUrl(sig.path, sig.token, file, { cacheControl: '3600' })
+
+      if (uploadError) throw uploadError
+
+      return {
+        path: sig.path,
+        url: sig.publicUrl,
+        name: file.name,
+        type: file.type,
+        size: file.size
+      }
+    } catch (error) {
+      logger.error('Error uploading document:', error)
+      throw new Error(`Error al subir archivo: ${error.message}`)
+    }
+  },
+
+  /**
+   * Lista TODAS las portadas disponibles (públicas para todos los usuarios)
+   * Lee directamente del bucket público de Supabase Storage
+   * @returns {Promise<Array>} Lista de portadas
+   */
+  async listAllCovers() {
+    try {
+      console.log('[StorageService] Iniciando listado de portadas...')
+
+      // Leer directamente del Storage público
+      const { data: folders, error: foldersError } = await supabase.storage
+        .from('document-uploads')
+        .list('', { limit: 1000 })
+
+      console.log('[StorageService] Folders encontrados:', folders?.length || 0, folders)
+
+      if (foldersError) {
+        console.error('[StorageService] Error listing folders:', foldersError)
+        return []
+      }
+
+      const allCovers = []
+
+      for (const folder of folders || []) {
+        console.log('[StorageService] Procesando item:', folder.name, 'metadata:', folder.metadata)
+
+        // Skip files: files have metadata property, folders don't
+        if (folder.metadata !== null) {
+          console.log('[StorageService] Skipping file (has metadata):', folder.name)
+          continue
+        }
+
+        const { data: files, error: filesError } = await supabase.storage
+          .from('document-uploads')
+          .list(folder.name, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } })
+
+        console.log(`[StorageService] Files en ${folder.name}:`, files?.length || 0, files)
+
+        if (filesError) {
+          console.error(`[StorageService] Error listing files in ${folder.name}:`, filesError)
+          continue
+        }
+
+        const covers = (files || [])
+          .filter(f => f.name.toLowerCase().endsWith('.png'))
+          .map(f => {
+            const path = `${folder.name}/${f.name}`
+            const { data: { publicUrl } } = supabase.storage
+              .from('document-uploads')
+              .getPublicUrl(path)
+            return {
+              name: f.name,
+              path,
+              url: publicUrl,
+              created_at: f.created_at,
+              size: f.metadata?.size || 0,
+              owner: folder.name
+            }
+          })
+
+        console.log(`[StorageService] Portadas PNG en ${folder.name}:`, covers.length, covers)
+        allCovers.push(...covers)
+      }
+
+      // Sort by created_at desc
+      allCovers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+
+      console.log('[StorageService] Total portadas encontradas:', allCovers.length)
+      return allCovers
+    } catch (error) {
+      logger.error('Error listing covers:', error)
+      return []
+    }
+  },
+
+  /**
+   * Elimina documentos temporales
+   * @param {string[]} paths - Array de paths a eliminar
+   */
+  async deleteDocuments(paths) {
+    try {
+      if (!paths || paths.length === 0) return
+
+      console.log('[Storage] Eliminando documentos:', paths.length)
+
+      const { error } = await supabase.storage
+        .from(DOCUMENT_BUCKET)
+        .remove(paths)
+
+      if (error) {
+        logger.error('Error deleting documents:', error)
+      } else {
+        console.log('[Storage] Documentos eliminados')
+      }
+    } catch (error) {
+      logger.error('Error deleting documents:', error)
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AVATARS (funcionalidad existente)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async uploadAvatar(file, userId) {
+    try {
+      // Crear nombre único para el archivo
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${userId}-${Date.now()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      // Subir archivo a Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      // Obtener URL pública
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      return { success: true, url: data.publicUrl }
+    } catch (error) {
+      logger.error('Error uploading avatar:', error)
+      return { success: false, error: error.message }
+    }
+  },
+
+  async deleteAvatar(avatarUrl) {
+    try {
+      // Extraer el path del URL
+      if (!avatarUrl) return { success: true }
+
+      const urlPath = avatarUrl.split('/avatars/')[1]
+      if (!urlPath) return { success: true }
+
+      const { error } = await supabase.storage
+        .from('avatars')
+        .remove([`avatars/${urlPath}`])
+
+      if (error) throw error
+      return { success: true }
+    } catch (error) {
+      logger.error('Error deleting avatar:', error)
+      return { success: false, error: error.message }
+    }
+  }
+}

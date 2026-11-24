@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TheJTool - Home Mockup (Propuesta PRO)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1419;
+      color: #e6edf3;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+      border-radius: 16px;
+      padding: 48px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 400px;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="white" opacity="0.1"/></svg>');
+      opacity: 0.3;
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero h1 { font-size: 42px; font-weight: 700; margin-bottom: 12px; }
+    .hero p { font-size: 18px; opacity: 0.9; margin-bottom: 24px; }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .hero-stat-value { font-size: 36px; font-weight: 700; display: block; }
+    .hero-stat-label { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+
+    /* Quick Actions */
+    .section { margin-bottom: 32px; }
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .action-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .action-card:hover {
+      border-color: #1f6feb;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(31, 111, 235, 0.2);
+    }
+    .action-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .action-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .action-desc { font-size: 13px; opacity: 0.7; }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-action {
+      font-size: 13px;
+      color: #1f6feb;
+      cursor: pointer;
+    }
+
+    /* Recent Reports */
+    .report-item {
+      padding: 12px;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .report-item:last-child { border-bottom: none; }
+    .report-info { flex: 1; }
+    .report-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .report-meta { font-size: 12px; opacity: 0.6; }
+    .report-badge {
+      background: #1f6feb;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Activity Timeline */
+    .activity-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #30363d;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+      width: 32px;
+      height: 32px;
+      background: #1f6feb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .activity-content { flex: 1; }
+    .activity-text { font-size: 14px; margin-bottom: 4px; }
+    .activity-time { font-size: 12px; opacity: 0.6; }
+
+    /* System Status */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #0d1117;
+      border-radius: 8px;
+    }
+    .status-label { font-size: 13px; }
+    .status-value {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3fb950;
+    }
+    .status-dot.warning { background: #f59e0b; }
+    .status-dot.error { background: #ef4444; }
+
+    /* Recent Documents */
+    .doc-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: #0d1117;
+    }
+    .doc-icon {
+      width: 40px;
+      height: 40px;
+      background: #1f6feb;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .doc-info { flex: 1; }
+    .doc-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .doc-meta { font-size: 12px; opacity: 0.6; }
+
+    /* Charts Placeholder */
+    .chart-placeholder {
+      background: linear-gradient(135deg, #1f6feb20 0%, #1f6feb05 100%);
+      border: 1px dashed #30363d;
+      border-radius: 8px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .badge-new { background: #3fb950; color: white; }
+    .badge-hot { background: #ef4444; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Hero Section -->
+    <div class="hero">
+      <div class="hero-content">
+        <h1>🚀 TheJToolbox</h1>
+        <p>Therefore™ Administration Panel - Dashboard</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-value">2</span>
+            <span class="hero-stat-label">Tenants Activos</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">45</span>
+            <span class="hero-stat-label">Categorías</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">128</span>
+            <span class="hero-stat-label">eForms</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">1,234</span>
+            <span class="hero-stat-label">Docs este mes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section">
+      <h2 class="section-title">⚡ Acciones Rápidas</h2>
+      <div class="quick-actions">
+        <div class="action-card">
+          <span class="action-icon">📊</span>
+          <div class="action-title">Nuevo Report</div>
+          <div class="action-desc">Ejecutar consulta</div>
+        </div>
+        <div class="action-card">
+          <span class="action-icon">📝</span>
+          <div class="action-title">Crear eForm</div>
+          <div class="action-desc">Diseñar formulario</div>
+        </div>
+        <div class="action-card">
+          <span class="action-icon">📄</span>
+          <div class="action-title">Generar Documento</div>
+          <div class="action-desc">Con IA</div>
+        </div>
+        <div class="action-card">
+          <span class="action-icon">🗂️</span>
+          <div class="action-title">Nueva Categoría</div>
+          <div class="action-desc">Category Builder</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+
+      <!-- Recent Reports -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            📊 Últimos Reports
+            <span class="badge badge-new">3 nuevos</span>
+          </div>
+          <div class="card-action">Ver todos →</div>
+        </div>
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-name">Facturas Q1 2026</div>
+            <div class="report-meta">BuildingCenter • Hace 2 min</div>
+          </div>
+          <div class="report-badge">245 docs</div>
+        </div>
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-name">Contratos Activos</div>
+            <div class="report-meta">Legal • Hace 15 min</div>
+          </div>
+          <div class="report-badge">89 docs</div>
+        </div>
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-name">Expedientes HR</div>
+            <div class="report-meta">HR Department • Hace 1h</div>
+          </div>
+          <div class="report-badge">312 docs</div>
+        </div>
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-name">Albaranes Pendientes</div>
+            <div class="report-meta">Compras • Hace 2h</div>
+          </div>
+          <div class="report-badge">45 docs</div>
+        </div>
+      </div>
+
+      <!-- Recent Documents Generated -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📄 Documentos Generados</div>
+          <div class="card-action">Ver todos →</div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon">📋</div>
+          <div class="doc-info">
+            <div class="doc-name">EFDT - Proyecto NotifApp</div>
+            <div class="doc-meta">Generado hace 5 min • 45 páginas</div>
+          </div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon">📊</div>
+          <div class="doc-info">
+            <div class="doc-name">Budget - Integración SAGE</div>
+            <div class="doc-meta">Generado hace 1h • 12 páginas</div>
+          </div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon">📝</div>
+          <div class="doc-info">
+            <div class="doc-name">Requirements - Portal Empleado</div>
+            <div class="doc-meta">Generado hace 3h • 28 páginas</div>
+          </div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon">🔄</div>
+          <div class="doc-info">
+            <div class="doc-name">Change Request - v2.1</div>
+            <div class="doc-meta">Generado ayer • 8 páginas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔧 Estado del Sistema</div>
+          <div class="card-action">Detalles →</div>
+        </div>
+        <div class="status-grid">
+          <div class="status-item">
+            <div class="status-label">BuildingCenter</div>
+            <div class="status-value">
+              <span class="status-dot"></span>
+              Conectado
+            </div>
+          </div>
+          <div class="status-item">
+            <div class="status-label">AWS Bedrock</div>
+            <div class="status-value">
+              <span class="status-dot"></span>
+              Activo
+            </div>
+          </div>
+          <div class="status-item">
+            <div class="status-label">Database</div>
+            <div class="status-value">
+              <span class="status-dot"></span>
+              Online
+            </div>
+          </div>
+          <div class="status-item">
+            <div class="status-label">Storage</div>
+            <div class="status-value">
+              <span class="status-dot warning"></span>
+              78% usado
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 20px;">
+          <div class="chart-placeholder">
+            📈 Gráfico de uso (últimos 7 días)
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            ⚡ Actividad Reciente
+            <span class="badge badge-hot">Live</span>
+          </div>
+          <div class="card-action">Ver todo →</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">📊</div>
+          <div class="activity-content">
+            <div class="activity-text"><strong>Juan Pérez</strong> ejecutó report "Facturas Q1"</div>
+            <div class="activity-time">Hace 2 minutos</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">📝</div>
+          <div class="activity-content">
+            <div class="activity-text"><strong>María López</strong> creó nuevo eForm "Solicitud Vacaciones"</div>
+            <div class="activity-time">Hace 15 minutos</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">📄</div>
+          <div class="activity-content">
+            <div class="activity-text"><strong>Sistema</strong> generó documento EFDT automáticamente</div>
+            <div class="activity-time">Hace 1 hora</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">🔄</div>
+          <div class="activity-content">
+            <div class="activity-text"><strong>Admin</strong> actualizó categoría "Contratos"</div>
+            <div class="activity-time">Hace 2 horas</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div style="text-align: center; padding: 40px; opacity: 0.5; border-top: 1px solid #30363d; margin-top: 40px;">
+    <p style="font-size: 14px;">🎨 Mockup - Propuesta de Nuevo Home PRO</p>
+    <p style="font-size: 12px; margin-top: 8px;">Este es el diseño propuesto. ¿Qué te parece?</p>
+  </div>
+
+</body>
+</html>

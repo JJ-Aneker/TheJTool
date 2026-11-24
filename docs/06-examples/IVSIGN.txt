@@ -1,0 +1,632 @@
+
+
+
+
+
+MEMORIA TÉCNICA Y PRESUPUESTO
+
+	CENTRALIZACIÓN Y GESTIÓN DE LOS CERTIFICADOS DIGITALES	
+IVSIGN
+
+
+CONTENIDOS
+1 OBJETO Y ALCANCE DEL SERVICIO	3
+2 IVSIGN	3
+2.1 GESTIÓN CENTRALIZADA DE CERTIFICADOS DIGITALES	4
+2.1.1 PANEL DE CONTROL PARA ADMINISTRADORES Y SUPER ADMINISTRADORES	4
+2.1.2 PANEL DE CONTROL PARA USUARIOS	5
+2.1.3 ARQUITECTURA DEL SISTEMA	5
+2.1.4 COMPONENTES DEL SISTEMA DE ALMACENAMIENTO CENTRALIZADO DE CLAVES	6
+2.1.5 SEGURIDAD MEJORADA EN LA CUSTODIA DE LAS CLAVES PRIVADAS	6
+2.1.6 DRIVER IVSIGN KEYCONTROLLER. INTEGRACIÓN INSTANTÁNEA Y ACTIVACIÓN DE CLAVES	7
+2.1.7 INTEGRACIÓN CON DIRECTORIO CORPORATIVO (ACTIVE DIRECTORY, SAML, LDAP, LDAPS, ADFS, FEDERACIÓN DE IDENTIDADES) - OPCIONAL	7
+2.1.8 AUTENTICACIÓN MULTI-CREDENCIAL – PARA LA FIRMA CUALIFICADA	8
+2.1.9 CONTROL DE USO DE LOS CERTIFICADOS	8
+2.1.10 AUDITORÍA Y TRAZABILIDAD	8
+2.1.11 INFORMES DE USO	9
+2.1.12 SERVICIOS DE INTEGRACIÓN	9
+2.1.13 PKI, EMISIÓN DIRECTA DE CERTIFICADOS DIGITALES EN EL ALMACÉN CENTRALIZADO	10
+2.2 EIDAS: CONTROL EXCLUSIVO DEL CERTIFICADO POR PARTE DEL FIRMANTE	10
+2.2.1 SIGNATURIT: PRESTADOR DE SERVICIOS DE CONFIANZA CUALIFICADO SEGÚN EIDAS	10
+3 PRESUPUESTO	10
+1 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+96 003 12 03
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+info@signaturit.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Paris · Barcelona · Valencia
+
+1 OBJETO Y ALCANCE DEL SERVICIO
+El objeto de la presente propuesta es poner a disposición de Canon, en calidad de partner, la plataforma IvSign, solución destinada a la centralización, gestión y uso controlado de certificados digitales, para su posterior prestación al cliente final Michelin. El alcance del servicio comprende el acceso a la plataforma y a sus funcionalidades principales para centralizar certificados, facilitar su administración, controlar los permisos de uso, mejorar la trazabilidad de las operaciones realizadas y favorecer una gestión más segura y eficiente de los certificados dentro de la organización. Asimismo, la propuesta contempla las actividades necesarias para la puesta en marcha del servicio, incluyendo la configuración inicial acordada, el soporte funcional correspondiente y el acompañamiento necesario para facilitar su adopción por parte del cliente final, quedando excluidos aquellos desarrollos, integraciones específicas o servicios adicionales que no se encuentren expresamente recogidos en la presente oferta.
+
+2 IVSIGN
+El sistema de almacenamiento centralizado de claves permite la implantación y uso de la firma electrónica en las organizaciones de una forma segura y confiable. Mediante la emisión o importación de los certificados electrónicos en un sistema centralizado no se requerirá ningún tipo de hardware en los puestos de trabajo de los usuarios. El usuario podrá utilizar el certificado digital para firmar electrónicamente cualquier documento desde cualquier otra aplicación o página web habilitada (incluyendo las de las administraciones públicas).
+IvSign facilita la movilidad de los usuarios entre diferentes equipos de la organización manteniendo los certificados accesibles:
+* Los empleados podrán seguir utilizando sus certificados del mismo modo, pero sin necesidad del soporte físico ni del tarjetero, y en cualquier equipo.
+* Los certificados de persona jurídica o representación estarán sujetos a un control absoluto de su uso, de forma centralizada y sin necesidad de replicarlos en diferentes servidores y aplicaciones a lo largo de la organización.
+
+La plataforma IvSign, se administra desde un panel de control con interfaz Web accesible con usuario y contraseña:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+Desde este punto, el administrador o usuario podrá controlar y gestionar los componentes de la solución
+2.1 GESTIÓN CENTRALIZADA DE CERTIFICADOS DIGITALES:
+
+2.1.1 Panel de control para administradores y super administradores
+
+Aquellos usuarios a los que se habilite el perfil de administrador (de la organización) o super administrador (grupo de organizaciones) podrán gestionar aspectos tales como:
+* Organizaciones: (solo super administradores)
+* Información de la organización: datos básicos, nº de usuarios, nº de certificados, nº de firmas, nº de documentos firmados, etc.
+* Usuarios: Alta / baja de usuarios, edición de datos, habilitar/deshabilitar, certificados en cuenta de usuario.
+* Certificados: Importar certificados (de cualquier Autoridad de Certificación) en formato software P12 o PFX, inventario de certificados en la organización, estado, descripción, emisor, id, fecha de emisión, fecha de caducidad, nº de serie, edición de datos, cambio de pin, cambio
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+de propietario, habilitar/deshabilitar, eliminación temporal o definitiva, aplicación de políticas de uso
+* Administrar reglas de de uso)
+* Configuración general: permisos generales de usuarios (opciones disponibles), opciones de disponibilidad de certificados, seguridad de acceso o uso, configuración de notificaciones, plantillas de correo, etc.
+* Informes: Información agregada sobre el uso de los certificados: anual, mensual, por usuario, certificado, aplicación, hora, URL, día de la semana, según tipo de operación, etc.
+* Gestión de dispositivos autorizados para acceso y uso de los certificados
+* Registro de auditoría: Cualquier evento que se produzca en la plataforma, bien administrándola, o bien mediante el uso de cualquiera de los componentes de integración quedará reflejado en la auditoría de la misma, la cual podrá ser consultada desde la propia página de administración, permitiendo realizar filtros sobre cualquiera de sus campos.
+En la auditoría de uso de los certificados de la compañía quedará registrada la información sobre: fecha, operador, usuario, tipo de operación, nº de serie del certificado, hash, aplicación, resultado de la operación, equipo o IP, URL, módulo, etc.
+2.1.2 Panel de control para usuarios
+A los usuarios se les podrá habilitar un panel de control web similar al descrito anteriormente donde podrán realizar las principales gestiones relacionadas con sus certificados centralizados:
+
+
+Siendo las capacidades más destacadas la posibilidad de importar certificados existentes en formato P12 o PFX, habilitarlos o deshabilitarlos, establecer y gestionar las reglas de uso de los certificados, así como revisar detalladamente el uso realizado de sus certificados a través de la auditoría.
+2.1.3 Arquitectura del sistema
+El sistema estará hospedado en el CPD de Signaturit Soluciones con una arquitectura redundante en alta disponibilidad, dimensionada de acuerdo con las necesidades de los clientes y carga de trabajo soportada, que garantiza la prestación del servicio ante posibles incidencias. Igualmente, el sistema es completamente escalable, permitiendo la adición de nodos según la evolución de la demanda.
+El sistema integra módulos seguros de creación de firma (HSM), para la generación y almacenamiento de los certificados de una forma segura, permitiendo el uso exclusivo por parte del firmante en función de la autenticación en el cliente IvCKC y el PIN de firma.
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+2.1.4 Componentes del sistema de almacenamiento centralizado de claves
+El sistema consta de los siguientes componentes:
+* IvSign Almacén central de certificados. Los certificados se encuentran almacenados en un único punto y mediante un sistema Web se permite su gestión de forma segura y centralizada dentro de la organización.
+* Componente de usuario para acceso a las claves IvSign KeyController (ver apartado 2.1.6). Se trata de un driver para acceder a los certificados, de forma que cada equipo que instale este componente podrá utilizar las claves centralizadas sin necesidad de ningún tipo de hardware ni integración software. Es decir, podrá utilizar los certificados centralizados para autenticación o firma electrónica con cualquier aplicación Windows.
+* Además, está adaptado para su uso mediante driver PKCS#11, compatible con sistemas operativos Linux y MAC y Almacenes de Claves como Firefox.1
+* Dispositivo HSM: Se trata de un componente que dota de total seguridad al sistema, almacenando las claves privadas en un dispositivo hardware centralizado, equivalente a un certificado digital en Smartcard o tarjeta criptográfica.
+* Integración de la Plataforma de PKI. La plataforma de emisión de certificados digitales aporta una total independencia a la organización en la gestión de los certificados digitales.
+
+2.1.5 Seguridad mejorada en la custodia de las claves privadas
+Las organizaciones manejan dos tipos de certificados:
+* Los institucionales o de la organización como pueden ser los de persona jurídica o representación.
+* Los personales de cada directivo o empleado.
+Los primeros se emplean para propósitos específicos, en muchos casos utilizados por sistemas de información de forma automática o en posesión de un empleado que debe de realizar determinados trámites por Internet.
+La custodia y gestión de uso de estos certificados es una tarea compleja, ya que habitualmente se encuentran dispersos en los equipos de aquellas personas que los necesitan para realizar su trabajo o en servidores diversos sobre los cuales se puede perder el control, suponiendo importantes riesgos para el organismo.
+Los segundos son certificados personales en posesión de los empleados para el ejercicio de sus funciones. Se encuentran en tarjetas criptográficas personales que introducen en la organización ciertos problemas operativos:
+* Carga de gestión de las tarjetas y tarjeteros (reparto, gestión de claves PUK, incidencias físicas y
+de hardware, …)
+* Pérdidas y olvidos que impiden el funcionamiento normal de un empleado.
+* Mayor riesgo de deterioro y sustitución.
+
+
+
+
+1 Las adaptaciones del driver PKCS#11 para entornos LINUX y MAC no se encuentran disponibles como parte de la descarga estándar. Su puesta en marcha se valorará en función de la demanda, acordando con el cliente su viabilidad.
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+Con IvSign los certificados se almacenan de forma centralizada, controlada y segura en un HSM que actúa como una caja fuerte evitando los riesgos mencionados y eliminando los problemas de gestión de las tarjetas.
+
+2.1.6 Driver IvSign KeyController. Integración instantánea y activación de claves
+Los certificados de IvSign se utilizan como si estuviesen en la maquina local, mediante el componente IvSign KeyController instalado en el equipo que se encarga de replicar la parte pública de los certificados autorizados de cada usuario a su almacén local creando la impresión de que se encuentran instalados localmente.
+El driver sigue el estándar CSP (Crypto Service Provider) de Microsoft, por lo que es incluso configurable para el uso mediante servicios Windows, según las credenciales del mismo. Siendo por tanto accesibles por cualquier aplicación de Windows como Internet Explorer, Chrome, Xolido Sign, Adobe Acrobat Reader, etc.
+Concretamente, la Plataforma es compatible con equipos basados en Windows 7 o superior y al menos, los siguientes navegadores y sus correspondientes actualizaciones:
+* Chrome Version 72.0.3626.109
+* Firefox Version 64.0
+* Microsoft Internet Explorer Version 11
+El driver puede instalarse manualmente o a través de métodos de distribución a nivel corporativo (GPO) para instalación desatendida.
+Los certificados centralizados en ningún caso podrán exportarse o copiarse con su clave privada puesto que esta clave nunca sale del almacenamiento centralizado IvSign. Los certificados centralizados dejan de estar disponibles en el momento en que no está instalado KeyController o configurada su autenticación con IvSign.
+Antes de realizar cualquier operación el sistema solicitará el PIN de activación que protege a la clave privada del certificado localizada en el HSM. Este PIN solamente es conocido por el titular del certificado.
+En ningún paso del proceso se almacena el PIN que protege las claves generadas de forma centralizada en ningún medio extraíble, físico o similar. Por tanto, se puede asegurar que PIN que protege las claves únicamente está controlado por el titular del certificado.
+Los principales beneficios son:
+* Mejora la seguridad en la custodia de las claves privadas de los certificados.
+* Facilita la movilidad de los usuarios entre diferentes equipos de la organización. manteniendo los certificados accesibles.
+* Trazabilidad en el uso de los certificados digitales de la organización.
+
+2.1.7 Integración con directorio corporativo (Active Directory, SAML, LDAP, LDAPS, ADFS, federación de identidades) - opcional
+Siempre y cuando las condiciones técnicas lo permitan, se permite definir centralizadamente los usuarios o grupos de usuarios que tendrán acceso a los certificados mediante integración con Directorio Corporativo: Active Directory, SAML, LDAP, LDAPS o ADFS, así como mediante federación de identidades.
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+2.1.8 Autenticación multi-credencial – Para la firma cualificada
+Para el uso de la firma cualificada, además del pin del certificado, el doble factor de autenticación propuesto es:
+* Google Authenticator o Microsoft Authenticator.
+También puede funcionar para los controles de uso de un certificado de firma avanzada, es decir, mediante las capacidades de delegación del certificado, se podrá limitar el uso de un certificado digital para las personas deseadas y solamente para las aplicaciones o páginas indicadas, estableciendo si se desea reglas adicionales sobre los días y horas en que se puede utilizar, evitando así riesgos en el uso del certificado electrónico.
+
+2.1.9 Control de Uso de los certificados
+IvSign permite controlar el uso de los certificados mediante políticas o reglas a:
+* Usuarios
+* Rango de fechas.
+* Días de la semana y horas del día
+* Procesos concretos (listas blancas o listas negras)
+* Páginas web (listas blancas o listas negras)
+* Equipos concretos o IPs
+Se podrá limitar el uso de un certificado digital para las personas deseadas y solamente para las aplicaciones o páginas indicadas, estableciendo si se desea reglas adicionales sobre los días y horas en que se puede utilizar, evitando así riesgos en el uso del certificado electrónico.
+2.1.10 Auditoría y trazabilidad
+El panel de control de IvSign ofrece un inventario completo de los certificados existentes, de su vigencia y de los usuarios y procesos autorizados a utilizarlos, así como un seguimiento centralizado de los certificados que se utilizan, del momento en qué se utilizan, de quién los utiliza y de qué están firmando.
+El servidor IvSign registra todas las operaciones realizadas tanto satisfactorias como fallidas. Entre los datos auditados, se registran:
+* Fecha
+* Equipo o IP
+* Usuario
+* Tipo de Acción
+* Categoría
+* Certificado
+* Datos Adicionales
+* Información adicional.
+? Subject del certificado.
+? Emisor
+? Proceso
+? Host
+? URL: (IvSign extrae la URL correcta de Internet Explorer, Chrome y Firefox siendo la única solución existente en el mercado que es capaz de hacerlo correctamente)
+* Estado o resultado de la operación.
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+La auditoría registra tanto operaciones administrativas en la plataforma como operaciones de uso de los certificados. Sobre el uso de los certificados se registra el uso propio de cada usuario sobre sus certificados, incluyendo los errores, intentos de uso fallido, etc. Esta información está disponible tanto en la auditoría de usuario como en la auditoría de la organización.
+2.1.11 Informes de uso
+Permite consultar, de forma diferenciada, la información relativa a las firmas y las autenticaciones en web con certificados centralizados, realizadas por el propio usuario.
+Los informes se mostrarán en formato lista y gráficamente, según los filtros seleccionados. Existen dos tipos de filtros:
+* Filtros por tipo de uso:
+? Uso por certificado. Se muestran los resultados agrupados por certificados.
+? Uso por aplicación. Se muestran los resultados agrupados por la aplicación que ha hecho uso del certificado.
+? Uso por URL. Se muestran los resultados agrupados por la url a la que se ha accedido con los certificados.
+? Uso por hora. Se muestran los resultados agrupados por la hora en la que se han realizado acciones con los certificados.
+? Uso por día de la semana. Se muestran los resultados agrupados por el día de la semana en la que se han realizado las acciones con los certificados.
+* Filtro por fecha. Se podrá seleccionar el mes sobre el que se desea consultar su uso.
+
+2.1.12 Servicios de integración
+Nuestras API´s son públicas y se puede acceder a ellas a través de apidoc.Signaturit.com:
+
+
+
+IvSign tiene una interfaz de programación de aplicaciones (API) accesible a través de los protocolos REST y SOAP que permite ejecutar cualquier operación que se pueda realizar desde el panel de control.
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+En ese sentido, nosotros somos los primeros consumidores de nuestras API´s, ya que nuestra suite de productos está integrada entre sí.
+La API se divide en varias versiones, que evolucionan al mismo tiempo que las versiones de IvSign. En cada nueva versión de IvSign es prioritario no cambiar nada de la API, sin embargo, esto no siempre es posible debido a problemas de seguridad o las nuevas necesidades del producto. En esos casos, se crea una nueva versión de la API, manteniendo la compatibilidad con la anterior, proporcionando a los integradores tiempo para cambiar y probar sus aplicaciones.
+Siempre se recomienda actualizar las aplicaciones de los integradores a la última versión de API disponible porque las versiones antiguas de API no estarán disponibles eventualmente.
+2.1.13 PKI, Emisión directa de certificados digitales en el almacén centralizado
+IvSign cuenta con la integración de los servicios del Prestador de Servicios de Certificación (PSC), Ivnosys, que entre otras funcionalidades permite que los nuevos certificados digitales sean generados directamente en el almacén centralizado, sin exponer su clave privada en ningún momento. Este enlace con IvSign Global CA de Ivnosys puede activarse opcionalmente.
+2.2 EIDAS:	CONTROL	EXCLUSIVO	DEL	CERTIFICADO	POR	PARTE	DEL FIRMANTE.
+Para el cumplimiento del reglamento eIDAS, que exige que para que un sistema pueda emitir y considerar sus sistemas de firma como cualificados, las claves privadas deben contar con un control exclusivo por parte del firmante y con un alto nivel de confianza.
+
+2.2.1 Signaturit: Prestador de Servicios de Confianza Cualificado según eIDAS
+Signaturit Soluciones se encuentra registrado en el Ministerio de Energía, Turismo y Agenda Digital como Proveedor de Servicios de confianza cualificado según el reglamento eIDAS Nº 910/2014, lo que permite dotar a las firmas realizadas mediante los certificados cualificados del máximo reconocimiento legal, según esta normativa europea y su correspondiente transposición a la legislación española.
+Actualmente, la TSL española refleja que Signaturit Soluciones es un prestador de servicios clasificados como cualificados:
+https://sede.minetur.gob.es/prestadores/tsl/tsl.pdf
+
+3 PRESUPUESTO
+
+
+Licencias IvSignUnidadesConceptoTipoPVD1Suscripción anual plataforma IvSignAnual924,00 €106Licencias IvSign SaaS hasta 106 usuariosAnual6.488,26 €1Onboarding-0,00 €1Soporte EstándarAnual0,00 €
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+Servicios opcionales de IvSignUnidadesConceptoTipoPVD1Servicio Conexión Directorio ActivoAnual1.538,46 €	PVD: Precio venta distribuidor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+ORDEN DE COMPRA:
+Fecha: 15/05/2026
+
+* Datos del Cliente
+
+Razón SocialReferenciaCIFValidez OfertaDomicilio SocialFecha Inicio contrataciónContactoFecha Fin de contratación
+
+* Oferta comercial
+Precios con IVA no incluido. Se presentará una factura por importe del 100% de la propuesta, correspondiente al primer año de servicio, tras la aceptación.
+
+Licencias IvSignUnidadesConceptoTipoPVD1Suscripción anual plataforma IvSignAnual924,00 €106Licencias IvSign SaaS hasta 106 usuariosAnual6.488,26 €1Onboarding-0,00 €1Soporte EstándarAnual0,00 €Servicios opcionales de IvSignUnidadesConceptoTipoPVP1Servicio Conexión Directorio ActivoAnual1.538,46 €
+
+* Información de Facturación
+
+Condiciones de pagoTRANSFERENCIA A 30 DÍAS DE FECHA DE FACTURADe conformidad con lo anterior, el Cliente acepta las condiciones de contratación descritas mediante el uso de la firma electrónica, otorgándole pleno valor legal.
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+Condiciones de contratación
+1. Partes
+PROVEEDOR: el proveedor de los Servicios contratados es la Entidad jurídica cuyos datos corporativos aparecen en la Orden de compra la cual mantendrá la relación contractual principal con el CLIENTE obligándose ante él conforme las presentes Condiciones Generales.
+CLIENTE: la persona física o jurídica identificada en la Orden de Compra que solicita los Servicios en las condiciones indicadas en la Orden de Compra.
+PRESTADOR DE SERVICIOS DE CONFIANZA: tratándose de Servicios de confianza conforme al Reglamento eIDAS, el Prestador de Servicios de Confianza es la entidad jurídica que figura en la Lista de Prestadores de Servicios de Confianza de la Unión Europea y que prestará dichos Servicios al CLIENTE y usuarios. Consultar el Prestador así como los Términos y Condiciones de uso de sus servicios respectivos en el Anexo I.
+2. Alcance. Las presentes Condiciones Generales de contratación se aplicarán a la relación contractual entre el Proveedor y el Cliente formalizada mediante la aceptación de la correspondiente Orden de compra, respecto de los Servicios contratados. La modificación posterior por adquisición de nuevos o diferentes productos, se considera una nueva contratación a todos los efectos aplicándose a la relación contractual las Condiciones Generales de contratación vigentes en dicho momento. En caso de modificación por adquisición de más volumen de Créditos, las Condiciones Generales de contratación iniciales seguirán siendo aplicables, y prevalecerán en caso de contradicción o duplicidades con las que se pudieran firmar con ocasión de la modificación.
+3. Objeto. Constituye el objeto del presente Contrato la prestación de “Servicios” descritos en la Orden de compra en base a los cuales el Proveedor concederá al Cliente una licencia de uso sobre los Servicios (bajo la modalidad Software as a Service) no exclusiva e intransferible y limitada al tiempo de duración del contrato.
+La contratación de Créditos (firmas, SMS, sellos, etc.) y/o unidades de Certificados estará necesariamente vinculada a la contratación de Servicios con licencia de uso (Plataforma, Software, etc.) bien a través del mismo pedido, bien a través de otro pedido anterior, y su consumo deberá efectuarse dentro del plazo de duración del Contrato inicial o de sus correspondientes renovaciones.
+Se incluye en el Anexo I una referencia a todos los Servicios ofrecidos por el Proveedor con referencia en su caso al Prestador de Servicios de Confianza que prestará el Servicio final (si diferente del Proveedor) y a la documentación legal aplicable a cada servicio de confianza. Dicho Anexo I es parte integrante del presente Contrato.
+4. Duración - Renovación. El presente Contrato tendrá como duración inicial el periodo comprendido entre la “Fecha inicio de contratación” (fecha de la puesta a disposición de la licencia) y la “Fecha fin de contratación” según figura en la Orden de Compra, ello, independientemente de la fecha de su firma, renovándose de forma tácita y automática a la fecha aniversario por periodos sucesivos e iguales salvo que cualquiera de las Partes decidiese no renovarlo previa comunicación escrita a la otra Parte y con un plazo mínimo de SESENTA (60) días de antelación a la fecha aniversario.
+La adquisición de Créditos adicionales durante la vigencia del Contrato, se considerará como una adenda a dicho Contrato sin que su duración y demás condiciones se vean modificadas.
+Para el supuesto de venta de ciertos Servicios que requieran trabajos de implantación específica (integración, personalización, instalación on premises, etc.), la fecha aniversario a efectos de renovación anual del Contrato o terminación anticipada, coincidirá con la fecha de inicio de la prestación de servicio que constará en el ‘Acta de fin de implantación’ emitido por el Proveedor. Los trabajos de simple configuración de herramientas (para plataformas Signaturit e IvSign) en cambio no implicarán modificación de la fecha aniversario, manteniéndose como fecha de inicio de la prestación de los servicios la Fecha inicio de contratación que figura en el Orden de compra.
+5. Efectos de la terminación. El período inicial del Contrato y los periodos de las renovaciones tacitas son de obligado cumplimiento. En caso de que el Cliente desease terminar el Contrato anticipadamente por voluntad propia perderá las cantidades abonadas hasta dicho momento en concepto de penalización.
+Asimismo, tanto en caso de terminación anticipada como o en caso de comunicar su voluntad de no renovarlo a la fecha aniversario, el Cliente no podrá reclamar la devolución de los importes abonados por unidades de Créditos
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+no agotadas, Certificados no expedidos o licencias no activadas durante la vigencia del contrato y tampoco liberará al mismo de cualquier otro pago debido.
+Los Certificados electrónicos almacenados en la solución de centralización del Proveedor y que siguieran vigentes en el momento de dicha terminación, no podrán ser recuperados, sin que proceda indemnización alguna a favor del Cliente.
+6. Facturación - Pago. Salvo acuerdo especifico entre las Partes, la primera factura se emitirá a la “Fecha inicio de contratación” (fecha de la puesta a disposición de la licencia) y las siguientes según la periodicidad acordada en la Orden de Compra tanto para la duración inicial como para las eventuales prorrogas tacitas.
+Salvo que la Orden de Compra estipule otro plazo, el pago del precio de los Servicios contratados como el IVA u otros impuestos (que pudieran proceder o ser de aplicación) deberá efectuarse por el Cliente a los TREINTA (30) días fecha recepción factura, mediante transferencia bancaria.
+El Cliente no podrá alegar la falta de consumo completo de Créditos o de Certificados contratados para retrasar el pago.
+Las Partes acuerdan que la facturación se hará por los medios electrónicos y en formato digital que marque el Proveedor.
+Para el supuesto de Servicios con trabajos de implantación específica (integración, personalización, on premises, etc.) o en caso de retraso en el inicio de la prestación de los Servicios por razones imputables exclusivamente al Proveedor, la licencia anual tomará como fecha de inicio la fecha del ‘Acta de fin de implantación’ de los Servicios contratados, y dicha fecha será considerada como fecha aniversario para la facturación de las renovaciones. Los trabajos de implantación mismos se facturarán a la Fecha inicio de contratación que figura en la orden de compra.
+En caso de demora en la implantación por causa del Cliente, la factura se emitirá a la fecha de entrega inicialmente prevista en el Acta de inicio, y dicha fecha será considerada como fecha aniversario para las renovaciones.
+7. Intereses de demora. En caso de retraso en el pago de las sumas adeudadas por el Cliente más allá del plazo estipulado tendrá por efecto su incursión en mora, sin necesidad de requerimiento escrito del Proveedor y obligará al Cliente (i) los intereses de demora desde el momento en que la cantidad debió ser pagada hasta la fecha efectiva de su pago, de acuerdo con la Ley 3/2004, de 29 de diciembre, por la que se establecen medidas de lucha contra la morosidad en las operaciones comerciales, (ii) al pago de una cantidad fija de 40 euros por factura debida y (iii) los gastos o comisiones por devolución de recibos que soporte el Proveedor, sin perjuicio de cualquier otra acción que el Proveedor pueda ejercer contra el Cliente a este respecto, como la suspensión de los Servicios hasta regularización de los pagos pendientes.
+8. Actualización de los precios. Los precios se actualizarán en la fecha aniversario del Contrato, conforme a la variación del Índice General Nacional de Precios al Consumo (el I.P.C. general). Para la primera actualización se tomará como mes de referencia el último índice publicado a la fecha de celebración del contrato. Las sucesivas actualizaciones se realizarán sobre el precio anteriormente actualizado. El precio actualizado se incluirá en la factura con expresión del porcentaje de alteración aplicado y será exigible al Cliente a partir de su notificación.
+Asimismo, durante la vigencia del Contrato, el Proveedor se reserva el derecho a modificar el precio de los Servicios suscritos como consecuencia de un incremento de las tarifas aplicadas por los operadores o subcontratistas, informando previamente al Cliente, con una antelación de SESENTA (60) días, antes de la fecha de entrada en vigor de las nuevas tarifas aplicables. El Cliente tendrá la opción de resolver el Contrato notificándolo al Proveedor mediante acuse de recibo dentro del plazo indicado. Transcurrido el plazo de preaviso de SESENTA (60) días, y sin notificación alguna por parte del Cliente, las nuevas tarifas entrarán automáticamente en vigor.
+9. Propiedad intelectual e industrial. El Cliente manifiesta conocer que la firma del Contrato no supondrá adquisición alguna de los derechos de propiedad intelectual o de cualquier otra clase que verse sobre la información, contenido, diseño, estructura, compilación, código fuente y en general todo aquello que tenga una relación directa o indirecta con el Proveedor y los servicios que oferta.
+10. Obligaciones del Proveedor. El Proveedor garantiza haber adoptado las medidas técnicas necesarias para el cumplimiento de lo establecido en este Contrato, así como con todo aquello relacionado con el mantenimiento de
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+los Servicios objeto de este Contrato y la seguridad, confidencialidad, protección de datos, el nivel adecuado de servicios y el seguro de responsabilidad civil que dé cobertura a todas las obligaciones contraídas.
+El incumplimiento o cumplimiento defectuoso de las obligaciones del Proveedor que no esté sujeto a controversia (reconocido por el Proveedor), dará derecho al Cliente a resolver el contrato con efecto inmediato, y a obtener la devolución de las cantidades abonadas por anticipado y por los servicios no prestados correctamente, sin perjuicio de las reclamaciones por daños y perjuicios que el Cliente tuviese derecho a iniciar en el marco de lo acordado en clausula 12.
+11. Obligaciones del Cliente. i) Hacer un buen uso de los Servicios, comprometiéndose a no contravenir el Contrato, la legislación vigente ni lesionar los derechos e intereses de terceros; ii) pagar los importes relativos a las facturas emitidas en tiempo y forma; y iii) hacer buen uso de su usuario y contraseña de acceso a los Servicios y no ponerlos a disposición de terceros.
+El incumplimiento de las obligaciones del Cliente, la reventa sin consentimiento de los productos del Proveedor por parte del Cliente, la falta de pago total o parcial tras haber sido requerido para ello, conllevará la resolución del contrato con efecto inmediato, finalizando la prestación de los Servicios (incluido la revocación de los certificados emitidos) sin posibilidad de reembolso, y sin perjuicio de las reclamaciones por daños y perjuicios que el Proveedor tuviese derecho a iniciar.
+El Cliente deberá realizar el proceso de puesta en marcha del Servicio con acceso por licencia SaaS (u “onboarding”) dentro del plazo de 3 meses desde la Fecha de inicio de contratación. Pasado este plazo, la asistencia personal para formación o configuración podrá ser facturada al Cliente.
+12. Responsabilidad. El Proveedor se compromete a poner toda la diligencia razonable en la ejecución de los Servicios de acuerdo con las mejores prácticas de su profesión y en colaboración con el Cliente, pero sólo estará vinculado por una obligación de medios. El Proveedor no podrá ser considerado responsable en ningún caso por daños distintos de los que resulten directa y exclusivamente de un fallo en la ejecución de los Servicios solicitados.
+El Proveedor no podrá ser considerado responsable en caso de utilización no conforme de los Servicios, en caso de aplicación descuidada o de no aplicación de los consejos de utilización proporcionados en el marco de la asistencia o de consejos que no emanen del Proveedor.
+El Proveedor quedará exonerado de toda responsabilidad en caso de imposibilidad de acceso a los Servicios debido a un acontecimiento ajeno a su voluntad.
+En caso de que la responsabilidad del Proveedor se mantuviera, por cualquier motivo y sea cual sea la base jurídica invocada o retenida, las Partes acuerdan expresamente que el importe de todos los daños y perjuicios combinados y acumulados se limitaría al importe sin impuestos pagado por el Cliente por los Servicios en cuestión durante los 12 (doce) meses anteriores al hecho generador del daño. Lo anterior se entiende sin perjuicio de los derechos de reclamación de terceros afectados contra el Proveedor en su condición de Prestador de Servicios de Confianza.
+13. Actualización de los Servicios. Teniendo en cuenta la evolución de la tecnología y la necesidad de adaptarla a las mejoras en materia de calidad y seguridad de la información o por razón de cumplimiento normativo, el Proveedor se reserva el derecho de desplegar versiones actualizadas de los Servicios contratados o, incluso a ofrecer su sustitución por otros de similares características y funcionalidades, pudiendo el Cliente en estos casos solicitar la resolución anticipada del Contrato si no está conforme con las nuevas condiciones ofrecidas, con devolución de parte del precio por el tiempo no disfrutado.
+14. Confidencialidad y protección de datos. Toda información surgida como consecuencia de la contratación de los Servicios, así como la que surja durante su relación comercial, será considerada confidencial, no pudiendo difundirla, utilizarla, copiarla o suministrarla a terceros, entre otros, salvo acuerdo previo y expreso de la otra Parte. Para los Servicios en los que el Proveedor y el Cliente, intervienen como Encargado y Responsable de Tratamiento de Datos Personales, respectivamente, se comprometen a cumplir con lo previsto en el Anexo II en materia de protección de datos, sin perjuicios de las obligaciones que puedan aplicar al Prestador de Servicios de Confianza como Responsable del tratamiento por la propia naturaleza del servicio prestado.
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+15. Acuerdo Nivel de Servicio. Salvo los casos de contratación de un ANS especifico, se aplicarán las condiciones de nivel de servicio publicadas en la página web del Proveedor (ver url en Anexo I)). El acceso al soporte se encuentra en la siguiente dirección: https://help.signaturit.com/hc/es/requests/new
+16. Jurisdicción y legislación La presente relación comercial se regirá por la legislación española, sometiéndose las Partes a la jurisdicción exclusiva de los Tribunales de Valencia para la resolución de cualquier disputa que aconteciera, con renuncia expresa a cualquier fuero propio pudiendo designar libremente la representación letrada que estimen oportuna.
+De conformidad con lo anterior, las Partes reconocen que este Contrato ha sido convenientemente aceptado por las Partes quienes han suscrito y prestado su consentimiento expresamente para la perfección del mismo mediante el uso de la firma electrónica,reconociéndole plena eficacia jurídica.
+17. Condiciones adicionales de contratación: Todo lo que no resulte expresamente regulado por la presente, se sujetará a lo dispuesto en la documentación legal aplicable a cada uno de los Servicios contratados según se indica en el Anexo I.
+
+
+ANEXO II. Contrato de Encargado de Tratamiento
+
+De acuerdo en el artículo 28 y relacionados del Reglamento General de Protección de Datos (“RGPD”) y la Ley Orgánica de Protección de Datos y Garantía de los Derechos Digitales (“LOPDGDD”) de España, el tratamiento de datos de carácter personal por cuenta de terceros requiere de la celebración de un contrato privado. Salvo que la naturaleza del Servicio implique que el Proveedor o Prestador final del Servicio tenga por ley la condición de RESPONSABLE (en cuyo caso, se informará oportunamente al Cliente y los usuarios), el Cliente actuará como responsable de los ficheros y datos personales y el Proveedor actuará, como encargado del tratamiento. Si el Servicio final fuera prestado por un Prestador de Servicios de Confianza diferente del Proveedor según indicado en el Anexo I, el Prestador intervendrá como ENCARGADO y el Proveedor como SUB-ENCARGADO.
+1. Objeto, finalidad y duración. El presente anexo fija los términos y condiciones del tratamiento por parte del ENCARGADO de los datos personales contenidos en los sistemas o ficheros del RESPONSABLE con la finalidad de prestar los Servicios del contrato principal y con la misma duración que éste.
+Tipo de datos personales: Datos identificativos y/o biométricos de la firma o del rostro (para VideoID u Onboarding) Categorías de interesados: Clientes y usuarios del Responsable.
+Tratamientos: Recogida, registro, comunicación por transmisión.
+2. Obligaciones del encargado. El tratamiento se realizará de conformidad con lo establecido en el RGPD y la LOPDGDD. El ENCARGADO se compromete a cumplir con las instrucciones del RESPONSABLE, cumpliendo con el artículo 32 del RGPD:
+* Medidas técnicas y organizativas para garantizar la seguridad, confidencialidad e integridad de los datos de carácter personal (encriptación, cifrado y seudonimización, entre otras).
+* No aplicar, comunicar ni utilizar los datos de carácter personal con finalidades diferentes a las establecidas.
+* Guardar bajo su control y custodia los datos personales facilitados y a no divulgarlos, transferirlos, ni siquiera para su conservación.
+* Llevar un registro de todas las categorías de actividades de tratamiento efectuadas.
+* No subcontratar ninguna de las prestaciones que formen parte del objeto de este Contrato que comporten un tratamiento de datos personales salvo los servicios auxiliares necesarios para el normal funcionamiento de los servicios se encuentran recogidos en el DPA.
+* Notificar sin dilación indebida de aquellas violaciones de la seguridad.
+* Colaborar en el ejercicio de los derechos de los interesados (acceso, rectificación, supresión, limitación, portabilidad y/o oposición).
+* Realizar formaciones periódicas en materia de protección de datos a sus empleados en general y a los empleados que tengan acceso a datos personales en particular, para asegurar un tratamiento acorde al RGPD.
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+* Poner a disposición la información necesaria relativa al cumplimiento en materia de protección de datos personales y permitir al RESPONSABLE la realización de auditorías en materia de protección de datos siempre y cuando: i) se otorgue un preaviso mínimo de 15 días; ii) el RESPONSABLE esté a cargo de soportar los costes y gastos asociados a dicha auditoría.
+3. Medidas de seguridad. El ENCARGADO de tratamiento dispone de las medidas de seguridad propias de la certificación ISO 27001, ISO 20000 o el ENS, entre otras, las evaluaciones de impacto y deberá asistir al RESPONSABLE en la respuesta al ejercicio de los derechos correspondientes a los interesados.
+4. Obligaciones del responsable. El RESPONSABLE manifiesta cumplir con todas las medidas técnicas y organizativas necesarias en cumplimiento de la normativa de Protección de Datos y defensa de los derechos de los interesados. El RESPONSABLE se obliga a colaborar y comunicar al ENCARGADO cualquier variación que se produzca de los datos personales facilitados, para que ésta proceda a su actualización.
+Para más información consultar la Política de privacidad del Proveedor disponible en la página web del Proveedor o escriba al correo electrónico dpo@signaturit.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+www.signaturit.com
+
+96 003 12 03
+
+info@signaturit.com
+
+Paris · Barcelona · Valencia
+
+
+
+
