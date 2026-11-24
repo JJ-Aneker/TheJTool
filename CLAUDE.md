@@ -15,22 +15,22 @@ Always respond in the same language the user writes in (Spanish, English, German
 
 ## Documentation
 
-All reference documentation is in the `docs/therefore/` folder of this project.
+All reference documentation is in the `docs/05-therefore/therefore/` folder of this project.
 **Always read the relevant file before answering** — do not rely on memory alone.
 
 | Topic | File |
 |-------|------|
-| Web API endpoints | `docs/therefore/web-api-endpoints.md` |
-| API authentication & headers | `docs/therefore/web-api-common-headers.md` |
-| API code examples (curl/JS) | `docs/therefore/web-api-patterns.md` |
-| .NET SDK classes & methods | `docs/therefore/sdk-api-overview.md` |
-| Workflow design, scripting, DCOM | `docs/therefore/workflow-patterns.md` |
-| Solution Designer (categories, fields) | `docs/therefore/solution-designer-guide.md` |
-| **eForm XML import/export** | `docs/therefore/JJ_-_eform-import-export-guide.md` |
-| **eForm API calls, data loading, modals** | `docs/therefore/JJ-therefore-eforms-data-loading-guide.md` |
-| **External tools integration** | `docs/therefore/external-tools-integration.md` |
-| Terminology & concepts | `docs/therefore/therefore-glossary.md` |
-| Online documentation URLs | `docs/therefore/online-resources.md` |
+| Web API endpoints | `docs/05-therefore/therefore/web-api-endpoints.md` |
+| API authentication & headers | `docs/05-therefore/therefore/web-api-common-headers.md` |
+| API code examples (curl/JS) | `docs/05-therefore/therefore/web-api-patterns.md` |
+| .NET SDK classes & methods | `docs/05-therefore/therefore/sdk-api-overview.md` |
+| Workflow design, scripting, DCOM | `docs/05-therefore/therefore/workflow-patterns.md` |
+| Solution Designer (categories, fields) | `docs/05-therefore/therefore/solution-designer-guide.md` |
+| **eForm XML import/export** | `docs/05-therefore/therefore/JJ_-_eform-import-export-guide.md` |
+| **eForm API calls, data loading, modals** | `docs/05-therefore/therefore/JJ-therefore-eforms-data-loading-guide.md` |
+| **External tools integration** | `docs/05-therefore/therefore/external-tools-integration.md` |
+| Terminology & concepts | `docs/05-therefore/therefore/therefore-glossary.md` |
+| Online documentation URLs | `docs/05-therefore/therefore/online-resources.md` |
 
 ---
 
@@ -38,8 +38,8 @@ All reference documentation is in the `docs/therefore/` folder of this project.
 
 **Never generate an eForm XML from scratch. Always use the native template.**
 
-The file `docs/therefore/TheConfiguration_eformMatriculas_PLANTILLA.xml` is the
-reference export from this Therefore instance. The script `docs/therefore/generar_eform.py`
+The file `docs/05-therefore/therefore/TheConfiguration_eformMatriculas_PLANTILLA.xml` is the
+reference export from this Therefore instance. The script `docs/05-therefore/therefore/generar_eform.py`
 implements the correct method: surgical replacements on the native XML.
 
 Building the XML manually causes `SAXMLReader: Parse failed` consistently, even when
@@ -48,7 +48,7 @@ the content is correct. The only reliable method is:
 2. Export → modify FDef → re-import for changes to existing eForms
 3. Never escape JSON quotes as `&quot;` in `<FDef>` — JSON goes RAW
 
-See `docs/therefore/JJ_-_eform-import-export-guide.md` for full rules.
+See `docs/05-therefore/therefore/JJ_-_eform-import-export-guide.md` for full rules.
 
 ---
 
@@ -56,7 +56,7 @@ See `docs/therefore/JJ_-_eform-import-export-guide.md` for full rules.
 
 **Never build a category XML from scratch. Always clone from the native template.**
 
-The file `docs/therefore/TheConfiguration_categoria_PLANTILLA.xml` is the reference export. The script `docs/therefore/clonar_categoria.py` handles all required changes automatically:
+The file `docs/05-therefore/therefore/TheConfiguration_categoria_PLANTILLA.xml` is the reference export. The script `docs/05-therefore/therefore/clonar_categoria.py` handles all required changes automatically:
 
 - Regenerates GUIDs for: the category itself, all 116 fields, all 14 counters, all 2 templates
 - Resets counter `<Next>` values to 1
@@ -81,7 +81,7 @@ clonar_en_lote('TheConfiguration_categoria_PLANTILLA.xml', [
 ])
 ```
 
-See `docs/therefore/JJ-therefore-category-cloning-guide.md` for full reference.
+See `docs/05-therefore/therefore/JJ-therefore-category-cloning-guide.md` for full reference.
 
 ---
 
@@ -92,7 +92,7 @@ See `docs/therefore/JJ-therefore-category-cloning-guide.md` for full reference.
 | Base URL | `https://buildingcenter.thereforeonline.com/theservice/v0001/restun` |
 | Auth | HTTP Basic or token (`UseToken: 1`) |
 | eForm creator user | `FCreUs: 4` / `FCreUsNam: JJ` |
-| eForm template | `docs/therefore/TheConfiguration_eformMatriculas_PLANTILLA.xml` |
+| eForm template | `docs/05-therefore/therefore/TheConfiguration_eformMatriculas_PLANTILLA.xml` |
 
 ---
 
