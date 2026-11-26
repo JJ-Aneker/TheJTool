@@ -1,97 +1,50 @@
+// src/views/RFPAnalyzer.jsx
+// Análisis automático de RFPs con IA para decisión go/no-go
 import { useState, useEffect } from 'react'
+import { Upload, Card, Tag, Button, Timeline, Select, Input, Table, Spin, Dropdown, message as antdMessage, Empty, Progress } from 'antd'
 import {
-  Upload, Spin, Button, Table, Select, Tag, Card, message, Modal,
-  Row, Col, Statistic, Timeline, Dropdown, Space, Input, Badge, Empty
-} from 'antd'
-import {
-  InboxOutlined, FileTextOutlined, CheckCircleOutlined,
-  CloseCircleOutlined, ExclamationCircleOutlined, DownloadOutlined,
-  FilterOutlined, SearchOutlined, MoreOutlined, FileWordOutlined,
-  ClockCircleOutlined, CheckOutlined, SyncOutlined, InboxOutlined as ArchiveOutlined
+  InboxOutlined, FileTextOutlined, DownloadOutlined, CheckCircleOutlined,
+  ClockCircleOutlined, ExclamationCircleOutlined, FilterOutlined,
+  SearchOutlined, PlusOutlined, ArrowLeftOutlined, FileWordOutlined,
+  FilePdfOutlined, LoadingOutlined, DeleteOutlined
 } from '@ant-design/icons'
-import { useTranslation } from 'react-i18next'
 import { supabase } from '../config/supabaseClient'
+import { message } from '../utils/message'
 import axios from 'axios'
 import '../styles/rfp-analyzer.css'
 
 const { Dragger } = Upload
-const { Option } = Select
+const { Search } = Input
 
-// Mapeo de estados
 const STATUS_CONFIG = {
-  nueva: { label: 'Nueva', color: 'blue', icon: <InboxOutlined /> },
-  analizada: { label: 'Analizada', color: 'orange', icon: <SyncOutlined /> },
+  nueva: { label: 'Nueva', color: 'blue', icon: <FileTextOutlined /> },
+  analizada: { label: 'Analizada', color: 'green', icon: <CheckCircleOutlined /> },
   revisada: { label: 'Revisada', color: 'purple', icon: <CheckCircleOutlined /> },
-  en_decision: { label: 'En decisión', color: 'cyan', icon: <ClockCircleOutlined /> },
-  archivada: { label: 'Archivada', color: 'default', icon: <ArchiveOutlined /> }
+  en_decision: { label: 'En decisión', color: 'orange', icon: <ClockCircleOutlined /> },
+  archivada: { label: 'Archivada', color: 'default', icon: <ExclamationCircleOutlined /> }
 }
 
 const VIABILITY_CONFIG = {
-  alta: { label: 'Alta', color: 'success', icon: <CheckCircleOutlined /> },
-  media: { label: 'Media', color: 'warning', icon: <ExclamationCircleOutlined /> },
-  baja: { label: 'Baja', color: 'error', icon: <CloseCircleOutlined /> }
+  alta: { label: 'Alta', color: '#10b981', icon: '✓' },
+  media: { label: 'Media', color: '#f59e0b', icon: '~' },
+  baja: { label: 'Baja', color: '#ef4444', icon: '✗' }
 }
 
-export default function RFPAnalyzerV2() {
-  const { t } = useTranslation()
-  const [loading, setLoading] = useState(false)
-  const [analyzing, setAnalyzing] = useState(false)
-  const [dashboardLoading, setDashboardLoading] = useState(false)
-
-  // Dashboard stats
-  const [stats, setStats] = useState(null)
-  const [upcomingDeadlines, setUpcomingDeadlines] = useState([])
-
-  // RFPs
+export default function RFPAnalyzer() {
   const [rfps, setRfps] = useState([])
   const [currentRfp, setCurrentRfp] = useState(null)
-  const [sections, setSections] = useState([])
-
-  // Upload
+  const [loading, setLoading] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [dashboardStats, setDashboardStats] = useState(null)
   const [fileList, setFileList] = useState([])
   const [rfpName, setRfpName] = useState('')
-
-  // Filtros
-  const [filters, setFilters] = useState({
-    viability: null,
-    status: null,
-    search: ''
-  })
+  const [filters, setFilters] = useState({ viability: null, status: null, search: '' })
 
   useEffect(() => {
-    if (!currentRfp) {
-      loadDashboard()
-      loadRfps()
-    }
-  }, [currentRfp])
-
-  const loadDashboard = async () => {
-    try {
-      setDashboardLoading(true)
-      const { data: { session } } = await supabase.auth.getSession()
-
-      if (!session) {
-        message.error('No estás autenticado')
-        return
-      }
-
-      const response = await axios.get(
-        '/api/rfp-dashboard',
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`
-          }
-        }
-      )
-
-      setStats(response.data.stats)
-      setUpcomingDeadlines(response.data.upcomingDeadlines)
-    } catch (error) {
-      console.error('Error loading dashboard:', error)
-    } finally {
-      setDashboardLoading(false)
-    }
-  }
+    loadRfps()
+    loadDashboard()
+  }, [])
 
   const loadRfps = async () => {
     try {
@@ -121,62 +74,77 @@ export default function RFPAnalyzerV2() {
     }
   }
 
-  const handleUpload = async () => {
-    if (fileList.length === 0) {
-      message.warning('Selecciona al menos un archivo')
+  const loadDashboard = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const response = await axios.get(
+        '/api/rfp-dashboard',
+        { headers: { Authorization: `Bearer ${session.access_token}` } }
+      )
+      setDashboardStats(response.data)
+    } catch (error) {
+      console.error('Error loading dashboard:', error)
+    }
+  }
+
+  const handleAnalyze = async () => {
+    if (!rfpName.trim()) {
+      message.error('Escribe un nombre para esta RFP')
       return
     }
 
-    if (!rfpName.trim()) {
-      message.warning('Ingresa un nombre para la RFP')
+    if (fileList.length === 0) {
+      message.error('Sube al menos un archivo PDF o DOCX')
       return
     }
 
     try {
       setAnalyzing(true)
+      setAnalysisProgress(0)
       const { data: { session } } = await supabase.auth.getSession()
-
-      if (!session) {
-        message.error('No estás autenticado')
-        return
-      }
 
       const formData = new FormData()
       formData.append('name', rfpName)
-      fileList.forEach(file => {
-        formData.append('files', file)
-      })
+      fileList.forEach(file => formData.append('files', file))
+
+      // Simular progreso
+      const progressInterval = setInterval(() => {
+        setAnalysisProgress(prev => {
+          if (prev >= 90) return prev
+          return prev + Math.random() * 15
+        })
+      }, 500)
 
       const response = await axios.post(
         '/api/analyze-rfp',
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${session.access_token}`
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'multipart/form-data'
           }
         }
       )
 
-      message.success('RFP analizada correctamente')
+      clearInterval(progressInterval)
+      setAnalysisProgress(100)
 
-      // Limpiar form
+      message.success('RFP analizada correctamente')
       setFileList([])
       setRfpName('')
-
-      // Recargar lista y abrir la nueva RFP
       await loadRfps()
-      loadRfpDetails(response.data.rfp_id)
-
+      await loadDashboard()
+      setCurrentRfp(response.data)
     } catch (error) {
       console.error('Error analyzing RFP:', error)
-      message.error(error.response?.data?.error || 'Error al analizar la RFP')
+      message.error('Error al analizar la RFP: ' + (error.response?.data?.error || error.message))
     } finally {
       setAnalyzing(false)
+      setAnalysisProgress(0)
     }
   }
 
-  const loadRfpDetails = async (rfpId) => {
+  const loadRfpDetail = async (rfpId) => {
     try {
       setLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
@@ -191,22 +159,21 @@ export default function RFPAnalyzerV2() {
       )
 
       setCurrentRfp(response.data)
-      setSections(response.data.sections || [])
     } catch (error) {
-      console.error('Error loading RFP details:', error)
-      message.error('Error al cargar los detalles de la RFP')
+      console.error('Error loading RFP:', error)
+      message.error('Error al cargar el detalle de la RFP')
     } finally {
       setLoading(false)
     }
   }
 
-  const updateRfpStatus = async (rfpId, status) => {
+  const updateStatus = async (rfpId, newStatus) => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
 
       await axios.patch(
         `/api/rfp-status/${rfpId}`,
-        { status },
+        { status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`
@@ -215,51 +182,23 @@ export default function RFPAnalyzerV2() {
       )
 
       message.success('Estado actualizado')
-
-      if (currentRfp && currentRfp.id === rfpId) {
-        setCurrentRfp({ ...currentRfp, status })
+      await loadRfps()
+      await loadDashboard()
+      if (currentRfp?.id === rfpId) {
+        setCurrentRfp({ ...currentRfp, status: newStatus })
       }
-
-      loadRfps()
-      loadDashboard()
     } catch (error) {
       console.error('Error updating status:', error)
       message.error('Error al actualizar el estado')
     }
   }
 
-  const updateSection = async (sectionId, field, value) => {
+  const generateDocument = async (type) => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
-
-      await axios.put(
-        `/api/rfp-sections/${sectionId}`,
-        { [field]: value },
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`
-          }
-        }
-      )
-
-      setSections(sections.map(s =>
-        s.id === sectionId ? { ...s, [field]: value } : s
-      ))
-
-      message.success('Sección actualizada')
-    } catch (error) {
-      console.error('Error updating section:', error)
-      message.error('Error al actualizar la sección')
-    }
-  }
-
-  const generateDocument = async (rfpId, type) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-
       const endpoint = type === 'viability'
-        ? `/api/rfp-generate-viability/${rfpId}`
-        : `/api/rfp-generate-tasks/${rfpId}`
+        ? `/api/rfp-generate-viability/${currentRfp.id}`
+        : `/api/rfp-generate-tasks/${currentRfp.id}`
 
       const response = await axios.post(
         endpoint,
@@ -272,7 +211,6 @@ export default function RFPAnalyzerV2() {
         }
       )
 
-      // Descargar archivo
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       })
@@ -347,14 +285,14 @@ export default function RFPAnalyzerV2() {
           style={{ width: '100%' }}
           size="small"
         >
-          <Option value="Comercial">Comercial</Option>
-          <Option value="Técnica">Técnica</Option>
-          <Option value="Legal">Legal</Option>
-          <Option value="Marketing">Marketing</Option>
-          <Option value="Seguridad IT / GDPR">Seguridad IT / GDPR</Option>
-          <Option value="Medio Ambiente">Medio Ambiente</Option>
-          <Option value="Operaciones">Operaciones</Option>
-          <Option value="Otra">Otra</Option>
+          <Select.Option value="Comercial">Comercial</Select.Option>
+          <Select.Option value="Técnica">Técnica</Select.Option>
+          <Select.Option value="Legal">Legal</Select.Option>
+          <Select.Option value="Marketing">Marketing</Select.Option>
+          <Select.Option value="Seguridad IT / GDPR">Seguridad IT / GDPR</Select.Option>
+          <Select.Option value="Medio Ambiente">Medio Ambiente</Select.Option>
+          <Select.Option value="Operaciones">Operaciones</Select.Option>
+          <Select.Option value="Otra">Otra</Select.Option>
         </Select>
       )
     },
@@ -363,335 +301,394 @@ export default function RFPAnalyzerV2() {
       dataIndex: 'priority',
       key: 'priority',
       width: '15%',
-      render: (priority, record) => (
-        <Select
-          value={priority}
-          onChange={(value) => updateSection(record.id, 'priority', value)}
-          style={{ width: '100%' }}
+      render: (priority) => (
+        <Tag color={priority === 'critical' ? 'red' : 'default'}>
+          {priority === 'critical' ? 'Crítico' : 'Opcional'}
+        </Tag>
+      )
+    },
+    {
+      title: 'Responsable',
+      dataIndex: 'assigned_to',
+      key: 'assigned_to',
+      width: '25%',
+      render: (assigned, record) => (
+        <Input
+          value={assigned || ''}
+          onChange={(e) => updateSection(record.id, 'assigned_to', e.target.value)}
+          placeholder="Asignar..."
           size="small"
-        >
-          <Option value="critical">Crítica</Option>
-          <Option value="optional">Opcional</Option>
-        </Select>
+        />
       )
     },
     {
       title: 'Estado',
-      dataIndex: 'status',
-      key: 'status',
-      width: '20%',
+      dataIndex: 'section_status',
+      key: 'section_status',
+      width: '10%',
       render: (status, record) => (
-        <Select
-          value={status}
-          onChange={(value) => updateSection(record.id, 'status', value)}
-          style={{ width: '100%' }}
-          size="small"
+        <Tag
+          color={status === 'done' ? 'green' : status === 'in_progress' ? 'blue' : 'default'}
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            const nextStatus = status === 'pending' ? 'in_progress' : status === 'in_progress' ? 'done' : 'pending'
+            updateSection(record.id, 'section_status', nextStatus)
+          }}
         >
-          <Option value="pending">Pendiente</Option>
-          <Option value="in_progress">En curso</Option>
-          <Option value="completed">Completado</Option>
-        </Select>
+          {status === 'done' ? 'Hecho' : status === 'in_progress' ? 'En progreso' : 'Pendiente'}
+        </Tag>
       )
     }
   ]
 
-  // Vista de detalle de RFP
-  if (currentRfp) {
-    const statusConfig = STATUS_CONFIG[currentRfp.status] || STATUS_CONFIG.nueva
+  const updateSection = async (sectionId, field, value) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
 
+      await axios.put(
+        `/api/rfp-sections/${sectionId}`,
+        { [field]: value },
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        }
+      )
+
+      setCurrentRfp({
+        ...currentRfp,
+        sections: currentRfp.sections.map(s =>
+          s.id === sectionId ? { ...s, [field]: value } : s
+        )
+      })
+    } catch (error) {
+      console.error('Error updating section:', error)
+    }
+  }
+
+  // ========================================================================
+  // RENDER: Vista principal (lista + carga)
+  // ========================================================================
+  if (!currentRfp) {
     return (
       <div className="rfp-analyzer">
-        <div className="rfp-header">
+        <header className="rfp-header">
           <div>
-            <Button onClick={() => setCurrentRfp(null)} style={{ marginBottom: '8px' }}>
-              ← Volver a lista
-            </Button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-              <h1 style={{ margin: 0 }}>{currentRfp.name}</h1>
-              <Tag icon={statusConfig.icon} color={statusConfig.color}>
-                {statusConfig.label}
-              </Tag>
-            </div>
-            <p style={{ margin: 0, color: 'var(--text-muted)' }}>
-              Creado el {new Date(currentRfp.created_at).toLocaleDateString('es-ES')}
-            </p>
+            <h1>RFP Analyzer</h1>
+            <p>Análisis automático de RFPs con IA para decisión go/no-go</p>
           </div>
-          <Space>
-            <Dropdown
-              menu={{
-                items: Object.keys(STATUS_CONFIG).map(key => ({
-                  key,
-                  icon: STATUS_CONFIG[key].icon,
-                  label: STATUS_CONFIG[key].label,
-                  onClick: () => updateRfpStatus(currentRfp.id, key)
-                }))
-              }}
-            >
-              <Button>Cambiar estado</Button>
-            </Dropdown>
-            <Button
-              icon={<FileWordOutlined />}
-              onClick={() => generateDocument(currentRfp.id, 'viability')}
-            >
-              Informe de Viabilidad
-            </Button>
-            <Button
-              icon={<FileWordOutlined />}
-              onClick={() => generateDocument(currentRfp.id, 'tasks')}
-            >
-              Plan de Tareas
-            </Button>
-          </Space>
-        </div>
+        </header>
 
-        <div className="rfp-content">
-          {/* Viabilidad Card */}
-          <Card
-            className={`viability-card viability-${currentRfp.viability}`}
-            style={{ marginBottom: '24px' }}
-          >
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'start' }}>
-              <div style={{ fontSize: '32px' }}>
-                {VIABILITY_CONFIG[currentRfp.viability]?.icon}
-              </div>
-              <div style={{ flex: 1 }}>
-                <h3>Viabilidad: {currentRfp.viability?.toUpperCase()}</h3>
-                <p>{currentRfp.viability_reason}</p>
-              </div>
-            </div>
-          </Card>
+        {/* Dashboard de métricas */}
+        {dashboardStats && (
+          <div className="rfp-metrics">
+            <Card className="rfp-metric-card">
+              <div className="metric-value">{dashboardStats.stats.total}</div>
+              <div className="metric-label">Total RFPs</div>
+            </Card>
+            <Card className="rfp-metric-card viability-alta">
+              <div className="metric-value">{dashboardStats.stats.alta}</div>
+              <div className="metric-label">Viabilidad Alta</div>
+            </Card>
+            <Card className="rfp-metric-card viability-media">
+              <div className="metric-value">{dashboardStats.stats.media}</div>
+              <div className="metric-label">Viabilidad Media</div>
+            </Card>
+            <Card className="rfp-metric-card viability-baja">
+              <div className="metric-value">{dashboardStats.stats.baja}</div>
+              <div className="metric-label">Viabilidad Baja</div>
+            </Card>
+          </div>
+        )}
 
-          {/* Plazos y Riesgos */}
-          <Row gutter={24} style={{ marginBottom: '24px' }}>
-            {currentRfp.deadlines && (
-              <Col span={12}>
-                <Card title="📅 Plazos Críticos">
-                  {currentRfp.deadlines.deadline && (
-                    <p><strong>Deadline:</strong> {currentRfp.deadlines.deadline}</p>
-                  )}
-                  {currentRfp.deadlines.milestones?.map((m, i) => (
-                    <p key={i}><strong>{m.date}:</strong> {m.description}</p>
-                  ))}
-                </Card>
-              </Col>
+        <div className="rfp-main-layout">
+          {/* Panel izquierdo: Nueva RFP */}
+          <section className="rfp-upload-panel">
+            <Card title="Nueva RFP" bordered={false}>
+              <div className="rfp-upload-form">
+                <label className="rfp-field">
+                  <span className="rfp-label">Nombre de la RFP</span>
+                  <Input
+                    placeholder="ej: VWFS - Test análisis"
+                    value={rfpName}
+                    onChange={e => setRfpName(e.target.value)}
+                    size="large"
+                    disabled={analyzing}
+                  />
+                </label>
+
+                <div className="rfp-field">
+                  <span className="rfp-label">Pliego y documentos</span>
+                  <Dragger {...uploadProps} disabled={analyzing}>
+                    <p className="ant-upload-drag-icon">
+                      <InboxOutlined />
+                    </p>
+                    <p className="ant-upload-text">Click o arrastra archivos aquí</p>
+                    <p className="ant-upload-hint">
+                      Soporta PDF y DOCX (máx 25MB por archivo)
+                    </p>
+                  </Dragger>
+                </div>
+
+                {analyzing && (
+                  <div className="rfp-analysis-progress">
+                    <div className="progress-row">
+                      <span>Analizando con IA...</span>
+                      <span className="cell-muted">{Math.round(analysisProgress)} %</span>
+                    </div>
+                    <Progress
+                      percent={analysisProgress}
+                      showInfo={false}
+                      strokeColor="#1890ff"
+                    />
+                  </div>
+                )}
+
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  icon={analyzing ? <LoadingOutlined /> : <FileTextOutlined />}
+                  onClick={handleAnalyze}
+                  disabled={analyzing || !rfpName.trim() || fileList.length === 0}
+                >
+                  {analyzing ? 'Analizando...' : 'Analizar RFP'}
+                </Button>
+              </div>
+            </Card>
+
+            {/* Próximas deadlines */}
+            {dashboardStats?.upcoming_deadlines?.length > 0 && (
+              <Card title="Próximas Deadlines" className="rfp-deadlines-card" bordered={false}>
+                <Timeline
+                  items={dashboardStats.upcoming_deadlines.map(rfp => ({
+                    color: new Date(rfp.deadline) < new Date() ? 'red' : 'blue',
+                    children: (
+                      <div>
+                        <div className="timeline-title">{rfp.name}</div>
+                        <div className="timeline-date">
+                          {new Date(rfp.deadline).toLocaleDateString('es-ES', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </div>
+                      </div>
+                    )
+                  }))}
+                />
+              </Card>
             )}
+          </section>
 
-            {currentRfp.risks && currentRfp.risks.length > 0 && (
-              <Col span={12}>
-                <Card title="🚨 Riesgos Principales">
-                  {currentRfp.risks.slice(0, 3).map((risk, i) => (
-                    <div key={i} style={{ marginBottom: '8px' }}>
-                      <Tag color={risk.severity === 'high' ? 'error' : risk.severity === 'medium' ? 'warning' : 'default'}>
-                        {risk.severity}
-                      </Tag>
-                      <span>{risk.risk}</span>
+          {/* Panel derecho: Lista de RFPs */}
+          <section className="rfp-list-panel">
+            <Card
+              title="RFPs Analizadas"
+              extra={
+                <div className="rfp-filters">
+                  <Search
+                    placeholder="Buscar..."
+                    allowClear
+                    onChange={e => setFilters({ ...filters, search: e.target.value })}
+                    style={{ width: 200 }}
+                  />
+                  <Select
+                    placeholder="Viabilidad"
+                    allowClear
+                    style={{ width: 120 }}
+                    onChange={value => setFilters({ ...filters, viability: value })}
+                  >
+                    <Select.Option value="alta">Alta</Select.Option>
+                    <Select.Option value="media">Media</Select.Option>
+                    <Select.Option value="baja">Baja</Select.Option>
+                  </Select>
+                  <Select
+                    placeholder="Estado"
+                    allowClear
+                    style={{ width: 140 }}
+                    onChange={value => setFilters({ ...filters, status: value })}
+                  >
+                    <Select.Option value="nueva">Nueva</Select.Option>
+                    <Select.Option value="analizada">Analizada</Select.Option>
+                    <Select.Option value="revisada">Revisada</Select.Option>
+                    <Select.Option value="en_decision">En decisión</Select.Option>
+                    <Select.Option value="archivada">Archivada</Select.Option>
+                  </Select>
+                </div>
+              }
+              bordered={false}
+            >
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <Spin />
+                </div>
+              ) : filteredRfps.length === 0 ? (
+                <Empty description="No hay RFPs que mostrar" />
+              ) : (
+                <div className="rfp-list">
+                  {filteredRfps.map(rfp => (
+                    <div
+                      key={rfp.id}
+                      className="rfp-list-item"
+                      onClick={() => loadRfpDetail(rfp.id)}
+                    >
+                      <div className="rfp-list-icon">
+                        <FileTextOutlined style={{ fontSize: 24, color: '#1890ff' }} />
+                      </div>
+                      <div className="rfp-list-info">
+                        <div className="rfp-list-name">{rfp.name}</div>
+                        <div className="rfp-list-meta">
+                          <Tag
+                            color={VIABILITY_CONFIG[rfp.viability]?.color}
+                            style={{ borderRadius: 4 }}
+                          >
+                            {VIABILITY_CONFIG[rfp.viability]?.icon} {VIABILITY_CONFIG[rfp.viability]?.label}
+                          </Tag>
+                          <Tag color={STATUS_CONFIG[rfp.status]?.color}>
+                            {STATUS_CONFIG[rfp.status]?.icon} {STATUS_CONFIG[rfp.status]?.label}
+                          </Tag>
+                          {rfp.deadline && (
+                            <span className="cell-muted">
+                              <ClockCircleOutlined /> {new Date(rfp.deadline).toLocaleDateString('es-ES')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ))}
-                </Card>
-              </Col>
-            )}
-          </Row>
-
-          {/* Requisitos Técnicos */}
-          {currentRfp.technical_requirements && currentRfp.technical_requirements.length > 0 && (
-            <Card title="🔧 Requisitos Técnicos" style={{ marginBottom: '24px' }}>
-              <ul style={{ marginLeft: '20px' }}>
-                {currentRfp.technical_requirements.map((req, i) => (
-                  <li key={i}>{req}</li>
-                ))}
-              </ul>
+                </div>
+              )}
             </Card>
-          )}
-
-          {/* Secciones */}
-          <Card title="📋 Secciones de Trabajo">
-            <Table
-              columns={sectionsColumns}
-              dataSource={sections}
-              rowKey="id"
-              pagination={false}
-              size="small"
-            />
-          </Card>
+          </section>
         </div>
       </div>
     )
   }
 
-  // Vista principal con dashboard
+  // ========================================================================
+  // RENDER: Vista de detalle de RFP
+  // ========================================================================
   return (
     <div className="rfp-analyzer">
-      <div className="rfp-header">
+      <header className="rfp-header">
         <div>
-          <h1>RFP Analyzer</h1>
-          <p>Análisis automático de RFPs con IA para decisión go/no-go</p>
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => setCurrentRfp(null)}
+            style={{ marginRight: 16 }}
+          >
+            Volver
+          </Button>
+          <h1 style={{ display: 'inline-block', margin: 0 }}>{currentRfp.name}</h1>
         </div>
-      </div>
+        <div>
+          <Dropdown
+            menu={{
+              items: Object.keys(STATUS_CONFIG).map(key => ({
+                key,
+                label: STATUS_CONFIG[key].label,
+                icon: STATUS_CONFIG[key].icon,
+                onClick: () => updateStatus(currentRfp.id, key)
+              }))
+            }}
+          >
+            <Button>
+              Cambiar estado: <Tag color={STATUS_CONFIG[currentRfp.status]?.color}>{STATUS_CONFIG[currentRfp.status]?.label}</Tag>
+            </Button>
+          </Dropdown>
+        </div>
+      </header>
 
-      {/* Dashboard */}
-      <Spin spinning={dashboardLoading}>
-        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Total RFPs"
-                value={stats?.total_rfps || 0}
-                prefix={<FileTextOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Viabilidad Alta"
-                value={stats?.viability_alta || 0}
-                valueStyle={{ color: '#10b981' }}
-                prefix={<CheckCircleOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Viabilidad Media"
-                value={stats?.viability_media || 0}
-                valueStyle={{ color: '#f59e0b' }}
-                prefix={<ExclamationCircleOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Viabilidad Baja"
-                value={stats?.viability_baja || 0}
-                valueStyle={{ color: '#ef4444' }}
-                prefix={<CloseCircleOutlined />}
-              />
-            </Card>
-          </Col>
-        </Row>
+      <div className="rfp-content">
+        {/* Viabilidad */}
+        <Card className={`viability-card viability-${currentRfp.viability}`}>
+          <h3>
+            <span className="viability-icon">{VIABILITY_CONFIG[currentRfp.viability]?.icon}</span>
+            Viabilidad: {VIABILITY_CONFIG[currentRfp.viability]?.label}
+          </h3>
+          <p>{currentRfp.viability_reason}</p>
+        </Card>
 
-        {/* Próximos Deadlines */}
-        {upcomingDeadlines.length > 0 && (
-          <Card title="⏰ Próximos Deadlines (30 días)" style={{ marginBottom: '24px' }}>
+        {/* Plazos */}
+        {currentRfp.deadline && (
+          <Card title="Plazos Críticos">
+            <p><strong>Deadline de propuesta:</strong> {new Date(currentRfp.deadline).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            {currentRfp.milestones && currentRfp.milestones.length > 0 && (
+              <Timeline
+                items={currentRfp.milestones.map(m => ({
+                  children: (
+                    <div>
+                      <div><strong>{new Date(m.date).toLocaleDateString('es-ES')}</strong></div>
+                      <div className="cell-muted">{m.description}</div>
+                    </div>
+                  )
+                }))}
+              />
+            )}
+          </Card>
+        )}
+
+        {/* Riesgos */}
+        {currentRfp.risks && currentRfp.risks.length > 0 && (
+          <Card title="Riesgos Principales">
             <Timeline
-              items={upcomingDeadlines.map(item => ({
-                color: item.daysUntil <= 7 ? 'red' : item.daysUntil <= 15 ? 'orange' : 'blue',
+              items={currentRfp.risks.map(risk => ({
+                color: risk.severity === 'high' ? 'red' : risk.severity === 'medium' ? 'orange' : 'blue',
                 children: (
                   <div>
-                    <strong>{item.name}</strong>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                      {item.deadline} ({item.daysUntil} días)
-                    </div>
+                    <div><strong>{risk.risk}</strong></div>
+                    <div className="cell-muted">{risk.description}</div>
                   </div>
                 )
               }))}
             />
           </Card>
         )}
-      </Spin>
 
-      {/* Upload */}
-      <Card title="Nueva RFP" style={{ marginBottom: '24px' }}>
-        <Input
-          placeholder="Nombre de la RFP (ej: VWFS - Facturación Electrónica)"
-          value={rfpName}
-          onChange={(e) => setRfpName(e.target.value)}
-          style={{ marginBottom: '16px' }}
-        />
-
-        <Dragger {...uploadProps}>
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-          </p>
-          <p className="ant-upload-text">Click o arrastra archivos aquí</p>
-          <p className="ant-upload-hint">
-            Soporta PDF y DOCX (máx 25MB por archivo)
-          </p>
-        </Dragger>
-
-        <Button
-          type="primary"
-          onClick={handleUpload}
-          loading={analyzing}
-          disabled={fileList.length === 0 || !rfpName.trim()}
-          style={{ marginTop: '16px', width: '100%' }}
-        >
-          {analyzing ? 'Analizando con IA...' : 'Analizar RFP'}
-        </Button>
-      </Card>
-
-      {/* Filtros */}
-      <Card title="📋 RFPs Analizadas" style={{ marginBottom: '24px' }}>
-        <Space style={{ marginBottom: '16px', width: '100%' }} wrap>
-          <Input
-            placeholder="Buscar por nombre..."
-            prefix={<SearchOutlined />}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            style={{ width: 200 }}
-          />
-          <Select
-            placeholder="Filtrar por viabilidad"
-            allowClear
-            onChange={(value) => setFilters({ ...filters, viability: value })}
-            style={{ width: 180 }}
-          >
-            <Option value="alta">Alta</Option>
-            <Option value="media">Media</Option>
-            <Option value="baja">Baja</Option>
-          </Select>
-          <Select
-            placeholder="Filtrar por estado"
-            allowClear
-            onChange={(value) => setFilters({ ...filters, status: value })}
-            style={{ width: 180 }}
-          >
-            {Object.keys(STATUS_CONFIG).map(key => (
-              <Option key={key} value={key}>{STATUS_CONFIG[key].label}</Option>
-            ))}
-          </Select>
-        </Space>
-
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <Spin />
-          </div>
-        ) : filteredRfps.length === 0 ? (
-          <Empty description="No hay RFPs que coincidan con los filtros" />
-        ) : (
-          <div className="rfp-list">
-            {filteredRfps.map(rfp => {
-              const statusConfig = STATUS_CONFIG[rfp.status] || STATUS_CONFIG.nueva
-              const viabilityConfig = VIABILITY_CONFIG[rfp.viability]
-
-              return (
-                <div
-                  key={rfp.id}
-                  className="rfp-list-item"
-                  onClick={() => loadRfpDetails(rfp.id)}
-                >
-                  <FileTextOutlined style={{ fontSize: '20px', color: 'var(--accent-primary)' }} />
-                  <div className="rfp-list-info">
-                    <div className="rfp-list-name">{rfp.name}</div>
-                    <div className="rfp-list-date">
-                      {new Date(rfp.created_at).toLocaleDateString('es-ES')}
-                    </div>
-                  </div>
-                  <Space>
-                    <Tag icon={statusConfig.icon} color={statusConfig.color}>
-                      {statusConfig.label}
-                    </Tag>
-                    <Tag icon={viabilityConfig?.icon} color={viabilityConfig?.color}>
-                      {rfp.viability?.toUpperCase() || 'N/A'}
-                    </Tag>
-                  </Space>
-                </div>
-              )
-            })}
-          </div>
+        {/* Requisitos Técnicos */}
+        {currentRfp.technical_requirements && currentRfp.technical_requirements.length > 0 && (
+          <Card title="Requisitos Técnicos">
+            <ul>
+              {currentRfp.technical_requirements.map((req, idx) => (
+                <li key={idx}>{req}</li>
+              ))}
+            </ul>
+          </Card>
         )}
-      </Card>
+
+        {/* Secciones de trabajo */}
+        {currentRfp.sections && currentRfp.sections.length > 0 && (
+          <Card title="Reparto de Trabajo por Áreas">
+            <Table
+              columns={sectionsColumns}
+              dataSource={currentRfp.sections}
+              rowKey="id"
+              pagination={false}
+              size="small"
+            />
+          </Card>
+        )}
+
+        {/* Acciones */}
+        <Card title="Generar Documentos">
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Button
+              type="primary"
+              icon={<FileWordOutlined />}
+              onClick={() => generateDocument('viability')}
+            >
+              Informe de Viabilidad (.docx)
+            </Button>
+            <Button
+              icon={<FileWordOutlined />}
+              onClick={() => generateDocument('tasks')}
+            >
+              Plan de Reparto de Tareas (.docx)
+            </Button>
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }

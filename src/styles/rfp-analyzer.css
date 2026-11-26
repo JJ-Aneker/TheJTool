@@ -1,7 +1,9 @@
+/* RFP Analyzer - Document Generator style */
 .rfp-analyzer {
   padding: 24px;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
+  background: var(--bg-page);
 }
 
 .rfp-header {
@@ -14,9 +16,9 @@
 }
 
 .rfp-header h1 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin: 0 0 4px 0;
   color: var(--text-primary);
 }
 
@@ -26,107 +28,329 @@
   margin: 0;
 }
 
-.rfp-upload-container {
-  max-width: 800px;
-  margin: 0 auto;
+/* ========== Dashboard de Métricas ========== */
+.rfp-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.rfp-list {
+.rfp-metric-card {
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.rfp-metric-card .ant-card-body {
+  padding: 20px 16px;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: 8px;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rfp-metric-card.viability-alta .metric-value {
+  color: #10b981;
+}
+
+.rfp-metric-card.viability-media .metric-value {
+  color: #f59e0b;
+}
+
+.rfp-metric-card.viability-baja .metric-value {
+  color: #ef4444;
+}
+
+/* ========== Layout Principal ========== */
+.rfp-main-layout {
+  display: grid;
+  grid-template-columns: 450px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .rfp-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== Panel de Carga (Izquierda) ========== */
+.rfp-upload-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rfp-upload-panel .ant-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.rfp-upload-panel .ant-card-head {
+  border-bottom: 1px solid var(--border-default);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.rfp-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rfp-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.rfp-list-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.rfp-list-item:hover {
-  background: var(--bg-hover);
-  border-color: var(--accent-primary);
-}
-
-.rfp-list-info {
-  flex: 1;
-}
-
-.rfp-list-name {
+.rfp-label {
   font-weight: 500;
   font-size: 14px;
   color: var(--text-primary);
 }
 
-.rfp-list-date {
+.rfp-analysis-progress {
+  padding: 16px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+}
+
+.rfp-analysis-progress .progress-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ========== Deadlines Card ========== */
+.rfp-deadlines-card .ant-timeline-item-content {
+  margin-left: 24px;
+}
+
+.timeline-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.timeline-date {
   font-size: 12px;
   color: var(--text-muted);
 }
 
+/* ========== Panel de Lista (Derecha) ========== */
+.rfp-list-panel .ant-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(--0, 0, 0, 0.08);
+  min-height: 600px;
+}
+
+.rfp-filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.rfp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rfp-list-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg-card);
+}
+
+.rfp-list-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.rfp-list-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e6f7ff;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.rfp-list-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rfp-list-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rfp-list-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ========== Vista de Detalle ========== */
 .rfp-content {
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .viability-card {
-  border-radius: 8px;
+  border-radius: 12px;
   border-width: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .viability-card.viability-alta {
-  background: #f0fdf4;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
   border-color: #10b981;
 }
 
 .viability-card.viability-media {
-  background: #fffbeb;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
   border-color: #f59e0b;
 }
 
 .viability-card.viability-baja {
-  background: #fef2f2;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
   border-color: #ef4444;
 }
 
 .viability-card h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.viability-icon {
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .viability-card p {
   margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Cards generales */
+.rfp-content .ant-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.rfp-content .ant-card-head {
+  border-bottom: 1px solid var(--border-default);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Timeline en detalle */
+.rfp-content .ant-timeline-item-content {
+  margin-left: 24px;
+}
+
+.rfp-content .ant-timeline-item-content strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Tabla de secciones */
+.rfp-content .ant-table-wrapper {
+  overflow-x: auto;
+}
+
+/* Utilidades */
+.cell-muted {
   color: var(--text-muted);
+  font-size: 13px;
 }
 
 /* Dark theme adjustments */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .viability-card.viability-alta {
-    background: rgba(16, 185, 129, 0.1);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%);
   }
 
   :root:not([data-theme="light"]) .viability-card.viability-media {
-    background: rgba(245, 158, 11, 0.1);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.08) 100%);
   }
 
   :root:not([data-theme="light"]) .viability-card.viability-baja {
-    background: rgba(239, 68, 68, 0.1);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
+  }
+
+  :root:not([data-theme="light"]) .rfp-list-icon {
+    background: rgba(24, 144, 255, 0.15);
+  }
+
+  :root:not([data-theme="light"]) .rfp-analysis-progress {
+    background: rgba(24, 144, 255, 0.1);
+    border-color: rgba(24, 144, 255, 0.3);
   }
 }
 
 :root[data-theme="dark"] .viability-card.viability-alta {
-  background: rgba(16, 185, 129, 0.1);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%);
 }
 
 :root[data-theme="dark"] .viability-card.viability-media {
-  background: rgba(245, 158, 11, 0.1);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.08) 100%);
 }
 
 :root[data-theme="dark"] .viability-card.viability-baja {
-  background: rgba(239, 68, 68, 0.1);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
+}
+
+:root[data-theme="dark"] .rfp-list-icon {
+  background: rgba(24, 144, 255, 0.15);
+}
+
+:root[data-theme="dark"] .rfp-analysis-progress {
+  background: rgba(24, 144, 255, 0.1);
+  border-color: rgba(24, 144, 255, 0.3);
 }
