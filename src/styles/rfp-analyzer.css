@@ -43,13 +43,16 @@
 }
 
 .rfp-metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  padding: 20px 16px;
   text-align: center;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 150ms ease;
 }
 
-.rfp-metric-card .ant-card-body {
-  padding: 20px 16px;
+.rfp-metric-card:hover {
+  border-color: var(--border-hover);
 }
 
 .metric-value {

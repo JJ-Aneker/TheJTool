@@ -382,22 +382,22 @@ export default function RFPAnalyzer() {
         {/* Dashboard de métricas */}
         {dashboardStats && (
           <div className="rfp-metrics">
-            <Card className="rfp-metric-card">
+            <div className="rfp-metric-card">
               <div className="metric-value">{dashboardStats.stats.total}</div>
               <div className="metric-label">Total RFPs</div>
-            </Card>
-            <Card className="rfp-metric-card viability-alta">
+            </div>
+            <div className="rfp-metric-card viability-alta">
               <div className="metric-value">{dashboardStats.stats.alta}</div>
               <div className="metric-label">Viabilidad Alta</div>
-            </Card>
-            <Card className="rfp-metric-card viability-media">
+            </div>
+            <div className="rfp-metric-card viability-media">
               <div className="metric-value">{dashboardStats.stats.media}</div>
               <div className="metric-label">Viabilidad Media</div>
-            </Card>
-            <Card className="rfp-metric-card viability-baja">
+            </div>
+            <div className="rfp-metric-card viability-baja">
               <div className="metric-value">{dashboardStats.stats.baja}</div>
               <div className="metric-label">Viabilidad Baja</div>
-            </Card>
+            </div>
           </div>
         )}
 
