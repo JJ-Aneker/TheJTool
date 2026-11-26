@@ -29,10 +29,7 @@ import questionnaireStatusHandler from './api/_lib/questionnaires-handlers/statu
 import questionnaireGenerateAnswersHandler from './api/_lib/questionnaires-handlers/generate-answers.js';
 import questionnaireDownloadExcelHandler from './api/_lib/questionnaires-handlers/download-excel.js';
 import questionnaireDeleteHandler from './api/_lib/questionnaires-handlers/delete.js';
-import analyzeRfpRouter from './api/analyze-rfp.js';
-import rfpSectionsRouter from './api/rfp-sections.js';
-import rfpDashboardRouter from './api/rfp-dashboard.js';
-import rfpGenerateDocsRouter from './api/rfp-generate-docs.js';
+import rfpApiRouter from './api/rfp-api.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -151,11 +148,8 @@ app.post('/api/questionnaires/:id/generate-answers', questionnaireGenerateAnswer
 app.get('/api/questionnaires/:id/download-excel', questionnaireDownloadExcelHandler);
 app.delete('/api/questionnaires/:id', questionnaireDeleteHandler);
 
-// RFP Analyzer routes (análisis automático de RFPs con IA)
-app.use('/api', analyzeRfpRouter);
-app.use('/api', rfpSectionsRouter);
-app.use('/api', rfpDashboardRouter);
-app.use('/api', rfpGenerateDocsRouter);
+// RFP Analyzer routes (análisis automático de RFPs con IA - consolidated)
+app.use('/api', rfpApiRouter);
 
 // Start server
 app.listen(PORT, () => {
