@@ -18,11 +18,11 @@ import exportGanttHandler from './api/export-gantt.js';
 import exportVerticalHandler from './api/export-vertical.js';
 import bedrockHandler from './api/bedrock.js';
 import * as verticalesHandlers from './api/verticales.js';
-// import parseLicensingRequestHandler from './api/parse-licensing-request.js'; // DISABLED - Vercel limit
-// import analyzeLicensingHandler from './api/analyze-licensing.js'; // DISABLED - Vercel limit
+import parseLicensingRequestHandler from './api/parse-licensing-request.js';
+import analyzeLicensingHandler from './api/analyze-licensing.js';
 import thereforeConnectHandler from './api/therefore-connect.js';
-// import dashboardRouter from './api/dashboard-routes.js'; // DISABLED - Vercel limit
-// import adminRouter from './api/admin-routes.js'; // DISABLED - Vercel limit
+import dashboardRouter from './api/dashboard-routes.js';
+import adminRouter from './api/admin-routes.js';
 import eformAiRouter from './api/eform-ai-routes.js';
 import questionnaireUploadHandler from './api/_lib/questionnaires-handlers/upload.js';
 import questionnaireStatusHandler from './api/_lib/questionnaires-handlers/status.js';
@@ -102,8 +102,8 @@ app.post('/api/build-docx', buildDocxHandler);
 app.post('/api/export-gantt', exportGanttHandler);
 
 // Licensing configurator API routes
-// app.post('/api/parse-licensing-request', parseLicensingRequestHandler); // DISABLED - Vercel limit
-// app.post('/api/analyze-licensing', analyzeLicensingHandler); // DISABLED - Vercel limit
+app.post('/api/parse-licensing-request', parseLicensingRequestHandler);
+app.post('/api/analyze-licensing', analyzeLicensingHandler);
 app.post('/api/export-vertical', exportVerticalHandler);
 app.post('/api/therefore-connect', thereforeConnectHandler);
 
@@ -133,10 +133,10 @@ app.put('/api/verticales/:id', verticalesHandlers.updateVertical);
 app.delete('/api/verticales/:id', verticalesHandlers.deleteVertical);
 
 // Dashboard routes (real data for Home view)
-// app.use('/api/dashboard', dashboardRouter); // DISABLED - Vercel limit
+app.use('/api/dashboard', dashboardRouter);
 
 // Admin routes (user management with Supabase Admin API)
-// app.use('/api/admin', adminRouter); // DISABLED - Vercel limit
+app.use('/api/admin', adminRouter);
 
 // eForm AI routes (generador de eForms con IA - solo admin)
 app.use('/api/eform-ai', eformAiRouter);

@@ -49,6 +49,22 @@
     "api/eform-ai-routes.js": {
       "maxDuration": 120,
       "memory": 1024
+    },
+    "api/parse-licensing-request.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/analyze-licensing.js": {
+      "maxDuration": 120,
+      "memory": 1024
+    },
+    "api/admin-routes.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/dashboard-routes.js": {
+      "maxDuration": 60,
+      "memory": 1024
     }
   },
   "headers": [
