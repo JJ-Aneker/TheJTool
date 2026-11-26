@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFP Analyzer - TheJTool</title>
+  <style>
+    :root {
+      --accent-primary: #3663FF;
+      --bg-canvas: #f5f7fa;
+      --bg-card: #ffffff;
+      --text-primary: #1a1d24;
+      --text-muted: #6b7280;
+      --border-default: #e5e7eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .layout-2col {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border-default);
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--accent-primary);
+      background: #f9fafb;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: var(--text-muted);
+    }
+
+    .upload-zone h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .upload-zone p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background: #2451d6;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+
+    .viability-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-default);
+      margin-bottom: 16px;
+    }
+
+    .viability-card.success {
+      background: #f0fdf4;
+      border-color: var(--success);
+    }
+
+    .viability-card.warning {
+      background: #fffbeb;
+      border-color: var(--warning);
+    }
+
+    .viability-card.danger {
+      background: #fef2f2;
+      border-color: var(--danger);
+    }
+
+    .viability-icon {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .viability-content h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .viability-content p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .table th {
+      text-align: left;
+      padding: 12px;
+      background: #f9fafb;
+      border-bottom: 1px solid var(--border-default);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .table tr:hover {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge.cubre {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge.parcial {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge.con-socio {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge.no-cubre {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge.critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge.optional {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .badge.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge.in-progress {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge.completed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .risk-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .risk-item {
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 3px solid;
+      margin-bottom: 8px;
+      background: #f9fafb;
+    }
+
+    .risk-item.high {
+      border-color: var(--danger);
+      background: #fef2f2;
+    }
+
+    .risk-item.medium {
+      border-color: var(--warning);
+      background: #fffbeb;
+    }
+
+    .risk-item.low {
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .risk-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .risk-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border-default);
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .tab:hover {
+      color: var(--text-primary);
+    }
+
+    .file-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .file-icon {
+      font-size: 24px;
+    }
+
+    .file-info {
+      flex: 1;
+    }
+
+    .file-name {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    select {
+      padding: 8px 12px;
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>RFP Analyzer</h1>
+      <p>Análisis automático de RFPs con IA para decisión go/no-go</p>
+    </div>
+
+    <div class="layout-2col">
+      <!-- LEFT SIDEBAR -->
+      <div>
+        <div class="card">
+          <div class="card-title">📄 RFPs Recientes</div>
+          <div class="file-list">
+            <div class="file-item" style="border: 2px solid var(--accent-primary); background: #eff6ff;">
+              <div class="file-icon">📋</div>
+              <div class="file-info">
+                <div class="file-name">VWFS - Facturación Electrónica</div>
+                <div class="file-size">Hace 2 horas · 1.2 MB</div>
+              </div>
+            </div>
+            <div class="file-item">
+              <div class="file-icon">📋</div>
+              <div class="file-info">
+                <div class="file-name">Kutxabank - DMS OnPremise</div>
+                <div class="file-size">Hace 1 día · 850 KB</div>
+              </div>
+            </div>
+            <div class="file-item">
+              <div class="file-icon">📋</div>
+              <div class="file-info">
+                <div class="file-name">VOX - Integración Sage X3</div>
+                <div class="file-size">Hace 3 días · 620 KB</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="width: 100%; margin-top: 12px;">
+            + Nueva RFP
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div>
+        <div class="card">
+          <div class="tabs">
+            <button class="tab active">Resumen</button>
+            <button class="tab">Matriz de Encaje</button>
+            <button class="tab">Requisitos Ocultos</button>
+            <button class="tab">Riesgos</button>
+            <button class="tab">Secciones</button>
+          </div>
+
+          <!-- VIABILITY CARD -->
+          <div class="viability-card danger">
+            <div class="viability-icon">🔴</div>
+            <div class="viability-content">
+              <h3>No-Go Recomendado</h3>
+              <p>Therefore™ solo cubre archivo y custodia. El proyecto requiere plataforma SEFE, portal masivo, rendimiento garantizado y cumplimiento regulatorio automático sin coste.</p>
+            </div>
+          </div>
+
+          <!-- INFO GRID -->
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Cliente</span>
+              <span class="info-value">Volkswagen Financial Services Spain</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Deadline</span>
+              <span class="info-value" style="color: var(--danger);">20/11/2026 (3 días)</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Volumen Anual</span>
+              <span class="info-value">1.3M facturas (emitidas + recibidas)</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Duración</span>
+              <span class="info-value">3 años + 2 años prórroga</span>
+            </div>
+          </div>
+
+          <div class="card-title" style="margin-top: 24px;">📊 Matriz de Encaje</div>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+            De 19 requisitos: <strong style="color: var(--success);">1 Cubre</strong>,
+            <strong style="color: var(--warning);">5 Parcial</strong>,
+            <strong style="color: #1e40af;">9 Con socio</strong>,
+            <strong style="color: var(--danger);">4 No cubre</strong>
+          </p>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Requisito</th>
+                <th>Encaje</th>
+                <th>Área</th>
+                <th>Comentario</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Archivo y custodia documental</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 7</span></td>
+                <td><span class="badge cubre">Cubre</span></td>
+                <td>Técnica</td>
+                <td>Therefore™ nativo con retención y auditoría</td>
+              </tr>
+              <tr>
+                <td><strong>Plataforma SEFE homologada</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 4</span></td>
+                <td><span class="badge no-cubre">No cubre</span></td>
+                <td>Legal</td>
+                <td>Therefore™ NO es plataforma de intercambio SEFE</td>
+              </tr>
+              <tr>
+                <td><strong>Emisión formato UBL/CII/Facturae</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 7</span></td>
+                <td><span class="badge con-socio">Con socio</span></td>
+                <td>Técnica</td>
+                <td>Requiere plataforma tercera (ej: Edicom, Pagero)</td>
+              </tr>
+              <tr>
+                <td><strong>Portal web masivo (proveedores)</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 5</span></td>
+                <td><span class="badge no-cubre">No cubre</span></td>
+                <td>Técnica</td>
+                <td>Portal para miles de usuarios externos es desarrollo complejo</td>
+              </tr>
+              <tr>
+                <td><strong>Rendimiento < 5s por doc</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 13</span></td>
+                <td><span class="badge no-cubre">No cubre</span></td>
+                <td>Técnica</td>
+                <td>Therefore Online con 1.3M docs/año no garantiza < 5s</td>
+              </tr>
+              <tr>
+                <td><strong>Integración SIEM corporativo</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 12</span></td>
+                <td><span class="badge parcial">Parcial</span></td>
+                <td>Seguridad IT</td>
+                <td>Therefore tiene logging pero requiere conector custom al SIEM</td>
+              </tr>
+              <tr>
+                <td><strong>SBOM por release</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 9</span></td>
+                <td><span class="badge parcial">Parcial</span></td>
+                <td>Seguridad IT</td>
+                <td>Depende del fabricante (Canon) por versión</td>
+              </tr>
+              <tr>
+                <td><strong>Actualización regulatoria sin coste</strong><br><span style="font-size: 12px; color: var(--text-muted);">Pág. 11</span></td>
+                <td><span class="badge no-cubre">No cubre</span></td>
+                <td>Legal</td>
+                <td>Cambios legales específicos requieren desarrollo o tercero</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="card-title" style="margin-top: 32px;">🚨 Brechas Bloqueantes</div>
+          <ul class="risk-list">
+            <li class="risk-item high">
+              <div class="risk-title">1. No somos plataforma SEFE homologada</div>
+              <div class="risk-desc">La normativa exige intercambio a través de plataformas certificadas. Therefore™ es un DMS, no una plataforma de facturación electrónica.</div>
+            </li>
+            <li class="risk-item high">
+              <div class="risk-title">2. Rendimiento no garantizable</div>
+              <div class="risk-desc">1.3M facturas/año con SLA < 5s por documento no es viable en Therefore Online sin arquitectura dedicada costosa.</div>
+            </li>
+            <li class="risk-item high">
+              <div class="risk-title">3. Portal web para miles de proveedores externos</div>
+              <div class="risk-desc">Requiere desarrollo complejo de portal, vigilancia de buzones, carga masiva web. No es "configuración" de Therefore™.</div>
+            </li>
+            <li class="risk-item medium">
+              <div class="risk-title">4. Arquitectura "capa fina" del cliente</div>
+              <div class="risk-desc">VWFS quiere evitar vendor lock-in. Therefore™ requeriría integraciones profundas con SAP que crean dependencia.</div>
+            </li>
+            <li class="risk-item high">
+              <div class="risk-title">5. Actualizaciones regulatorias sin coste</div>
+              <div class="risk-desc">El pliego exige que el proveedor asuma cambios legales futuros. Therefore™ no tiene esta capacidad.</div>
+            </li>
+            <li class="risk-item high">
+              <div class="risk-title">6. Riesgo regulatorio y penalizaciones</div>
+              <div class="risk-desc">Penalizaciones sobre el total del servicio cuando nuestra parte sería solo archivo/custodia (minoritaria).</div>
+            </li>
+          </ul>
+
+          <div class="card-title" style="margin-top: 32px;">🛡️ Requisitos Ocultos (IT-STD)</div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Bloque</th>
+                <th>Depende de</th>
+                <th>Esfuerzo</th>
+                <th>Riesgo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>IT-STD Corporativos</strong><br><span style="font-size: 12px; color: var(--text-muted);">Matriz requisito-control-evidencia</span></td>
+                <td>Fabricante</td>
+                <td>Alto</td>
+                <td><span class="badge critical">Alto</span></td>
+              </tr>
+              <tr>
+                <td><strong>SSDLC (SAST/SCA/DAST/pentest/SBOM)</strong><br><span style="font-size: 12px; color: var(--text-muted);">Sin CVE críticas/altas en go-live</span></td>
+                <td>Fabricante</td>
+                <td>Alto</td>
+                <td><span class="badge critical">Alto</span></td>
+              </tr>
+              <tr>
+                <td><strong>Integración SIEM</strong><br><span style="font-size: 12px; color: var(--text-muted);">Eventos de seguridad/operación en tiempo real</span></td>
+                <td>Mixto</td>
+                <td>Medio</td>
+                <td><span class="badge critical">Medio</span></td>
+              </tr>
+              <tr>
+                <td><strong>mTLS, PAM, KMS/HSM</strong><br><span style="font-size: 12px; color: var(--text-muted);">Cifrado avanzado y gestión de secretos</span></td>
+                <td>Fabricante</td>
+                <td>Alto</td>
+                <td><span class="badge critical">Alto</span></td>
+              </tr>
+              <tr>
+                <td><strong>RGPD/DORA</strong><br><span style="font-size: 12px; color: var(--text-muted);">Resiliencia operativa digital</span></td>
+                <td>Fabricante</td>
+                <td>Alto</td>
+                <td><span class="badge critical">Alto</span></td>
+              </tr>
+              <tr>
+                <td><strong>RPO ≤1h, RTO ≤4h</strong><br><span style="font-size: 12px; color: var(--text-muted);">Continuidad y disaster recovery</span></td>
+                <td>Fabricante</td>
+                <td>Muy Alto</td>
+                <td><span class="badge critical">Alto</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top: 32px; padding: 16px; background: #fef2f2; border: 1px solid var(--danger); border-radius: 8px;">
+            <strong style="color: var(--danger);">⚠️ Recomendación Final: NO-GO</strong>
+            <p style="margin-top: 8px; font-size: 14px; color: var(--text-muted);">
+              Therefore™ solo cubre archivo y custodia (1 de 19 requisitos). El proyecto requiere:
+            </p>
+            <ul style="margin: 12px 0 0 20px; font-size: 14px; color: var(--text-muted);">
+              <li>Plataforma SEFE homologada (NO somos)</li>
+              <li>Portal masivo para miles de proveedores externos (desarrollo complejo)</li>
+              <li>Rendimiento < 5s con 1.3M facturas/año (no garantizable en Online)</li>
+              <li>Actualizaciones regulatorias sin coste (no tenemos esta capacidad)</li>
+              <li>IT-STD, SIEM, SBOM, DORA (depende 100% del fabricante)</li>
+            </ul>
+            <p style="margin-top: 12px; font-size: 14px;">
+              <strong>Ir con socio homologado (ej: Edicom, Pagero) traslada el trabajo pero NO la responsabilidad.</strong>
+              Canon respondería de un servicio que no controla, con penalizaciones sobre el total.
+            </p>
+          </div>
+
+          <div style="margin-top: 24px; display: flex; gap: 12px;">
+            <button class="btn">📄 Exportar Informe Completo (DOCX)</button>
+            <button class="btn btn-secondary">📋 Carta de Declinación</button>
+            <button class="btn btn-secondary">❓ Consultas al Cliente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

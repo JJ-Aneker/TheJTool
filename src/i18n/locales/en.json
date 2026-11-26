@@ -47,6 +47,7 @@
   "nav": {
     "home": "Home",
     "categoryBuilder": "Category Builder",
+    "migrator": "Document migrator",
     "eformBuilder": "eForms",
     "documentGenerator": "Document generator",
     "thereforeReporter": "Report generator",
@@ -66,6 +67,7 @@
     "groupDev": "Technical development",
     "questionnaires": "IT Questionnaires",
     "licenseConfig": "License Configurator",
+    "rfpAnalyzer": "RFP Analyzer",
     "manual": "Manual",
     "eformGeneratorAI": "AI eForm Generator"
   },

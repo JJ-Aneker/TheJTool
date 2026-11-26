@@ -74,7 +74,7 @@ export function getDocumentType(id) {
 export function getDocumentTypeOptions() {
   return DOCUMENT_TYPES_ARRAY.map(type => ({
     value: type.id,
-    label: `${type.icon} ${type.label}`,
+    label: type.label,
     description: type.description,
     tipoDuracion: type.tipoDuracion
   }))

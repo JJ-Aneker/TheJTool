@@ -1,365 +1,138 @@
-import React, { useState, useMemo, useCallback } from 'react'
-import { Card, Input, Button, Space, Slider, Empty, Tag, Tooltip, Row, Col, DatePicker } from 'antd'
-import { message } from '../utils/message'
-import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
+import { useMemo, useState } from 'react'
+import { DatePicker, Empty, Tooltip } from 'antd'
+import { DownloadOutlined, LoadingOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
+import { message } from '../utils/message'
+import { ganttService } from '../services/ganttService.js'
 import '../styles/gantt-viewer.css'
 
-/**
- * Calcula solo días laborables (lunes-viernes)
- * Ignora sábados y domingos completamente
- * Si días=5, cuenta 5 días laborables desde la fecha de inicio
- */
-function addWorkingDays(date, days) {
-  let current = new Date(date)
-  let daysAdded = 0
+const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+const WEEKDAYS = ['D', 'L', 'M', 'X', 'J', 'V', 'S']
 
-  while (daysAdded < days) {
-    const dayOfWeek = current.getDay()
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      daysAdded++
-      if (daysAdded >= days) break
-    }
-    current.setDate(current.getDate() + 1)
+const isWorkday = d => d.getDay() >= 1 && d.getDay() <= 5
+const fmt = d => `${d.getDate()} ${MONTHS[d.getMonth()]}`
+
+// Primer día laborable a partir de una semana desde hoy
+export function defaultGanttStart() {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  d.setDate(d.getDate() + 7)
+  while (!isWorkday(d)) d.setDate(d.getDate() + 1)
+  return dayjs(d)
+}
+
+// n días laborables a partir de start (start incluido si es laborable)
+function workdays(start, n) {
+  const out = []
+  const d = new Date(start)
+  while (!isWorkday(d)) d.setDate(d.getDate() + 1)
+  while (out.length < n) {
+    if (isWorkday(d)) out.push(new Date(d))
+    d.setDate(d.getDate() + 1)
   }
-
-  return current
+  return out
 }
 
 /**
- * Calcula días laborables entre dos fechas
+ * Planificación de las tareas de la estimación, una detrás de otra, en días
+ * laborables. Se recalcula al cambiar la estimación o la fecha de inicio.
+ * Las tareas pendientes de valorar se muestran sin barra.
  */
-function countWorkingDays(start, end) {
-  let current = new Date(start)
-  let count = 0
+export default function GanttViewer({ projectData, startDate, onStartDateChange }) {
+  const [localStart, setLocalStart] = useState(defaultGanttStart)
+  const start = startDate || localStart
+  const setStart = onStartDateChange || setLocalStart
+  const [downloading, setDownloading] = useState(false)
 
-  while (current < end) {
-    const dayOfWeek = current.getDay()
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      count++
-    }
-    current.setDate(current.getDate() + 1)
-  }
+  const tareas = projectData?.estimacion?.tareas || []
 
-  return count
-}
-
-export default function GanttViewer({ projectData }) {
-  // Calcular fecha de inicio: HOY + 7 días
-  const calculateDefaultStartDate = () => {
-    const today = new Date()
-    today.setDate(today.getDate() + 7) // Añadir 7 días
-    return today
-  }
-
-  const [tasksState, setTasksState] = useState(
-    projectData?.estimacion?.tareas?.map((t, i) => ({
-      ...t,
-      id: `task-${i}`,
-      dias: t.dias || 1,  // Asegurar que tiene dias
-      progress: t.progress || 0
-    })) || []
-  )
-  const [projectStart] = useState(calculateDefaultStartDate())
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [exportStartDate, setExportStartDate] = useState(dayjs(calculateDefaultStartDate()))
-
-  // Recalcular fechas basadas en duración en días laborables
-  const tasksWithDates = useMemo(() => {
-    if (!tasksState || tasksState.length === 0) return []
-
-    let currentDate = new Date(projectStart)
-
-    return tasksState.map((task) => {
-      const dias = Math.max(task.dias || 1, 0.5)
-      const startDate = new Date(currentDate)
-      const endDate = addWorkingDays(startDate, Math.ceil(dias))
-
-      const subtasks = task.subtareas?.map((subtask, subIdx) => {
-        const subtaskDias = Math.max(subtask.dias || 0.5, 0.5)
-        return {
-          ...subtask,
-          startDate: addWorkingDays(startDate, Math.ceil(subtaskDias * subIdx)),
-          endDate: addWorkingDays(
-            startDate,
-            Math.ceil(subtaskDias * (subIdx + 1))
-          )
-        }
-      }) || []
-
-      currentDate = endDate
-
-      return {
-        ...task,
-        dias,
-        startDate,
-        endDate,
-        subtasks
-      }
+  const { rows, days, totalDays } = useMemo(() => {
+    let offset = 0
+    const rows = tareas.map((t, i) => {
+      if (t.pendiente) return { ...t, key: i, pending: true }
+      const dias = Math.max(Number(t.dias) || 0, 0.25)
+      const from = Math.floor(offset + 1e-9)
+      const to = Math.max(from, Math.ceil(offset + dias - 1e-9) - 1)
+      offset += dias
+      return { ...t, key: i, from, to, dias }
     })
-  }, [tasksState, projectStart])
+    const totalDays = Math.max(1, Math.ceil(offset - 1e-9))
+    return { rows, totalDays, days: workdays(start.toDate(), totalDays) }
+  }, [tareas, start])
 
-  // Rango de fechas para visualización
-  const allDates = useMemo(() => {
-    if (tasksWithDates.length === 0) return []
-
-    const start = new Date(projectStart)
-    const end = tasksWithDates[tasksWithDates.length - 1]?.endDate || new Date()
-
-    const dates = []
-    let current = new Date(start)
-
-    while (current <= end) {
-      if (current.getDay() >= 1 && current.getDay() <= 5) {
-        dates.push(new Date(current))
-      }
-      current.setDate(current.getDate() + 1)
-    }
-
-    return dates
-  }, [tasksWithDates, projectStart])
-
-  // Actualizar progreso
-  const handleProgressChange = useCallback((taskId, value) => {
-    setTasksState(prev =>
-      prev.map(t =>
-        t.id === taskId ? { ...t, progress: value } : t
-      )
-    )
-  }, [])
-
-  // Actualizar fecha inicio
-  const handleStartDateChange = useCallback((taskId, newDate) => {
-    setTasksState(prev =>
-      prev.map(t =>
-        t.id === taskId ? { ...t, startDate: new Date(newDate) } : t
-      )
-    )
-  }, [])
-
-  // Descargar Gantt desde backend
-  const handleDownloadExcel = useCallback(async () => {
-    if (!projectData || tasksWithDates.length === 0) {
-      message.error('No hay tareas para exportar')
-      return
-    }
-
-    setIsDownloading(true)
+  const download = async () => {
+    setDownloading(true)
     try {
-      message.loading('Generando Gantt con macros...')
-
-      const response = await fetch('/api/export-gantt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectData,
-          startDate: exportStartDate.format('YYYY-MM-DD')
-        })
-      })
-
-      if (!response.ok) {
-        try {
-          const error = await response.json()
-          throw new Error(error.error || `HTTP ${response.status}`)
-        } catch (e) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-      }
-
-      const blob = await response.blob()
-
-      if (blob.size === 0) {
-        throw new Error('El servidor devolvió un archivo vacío')
-      }
-
-      const contentDisposition = response.headers.get('content-disposition')
-      let filename = `Gantt_${new Date().getTime()}.xlsm`
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="?([^"]+)"?/)
-        if (match) filename = match[1]
-      }
-
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-
-      message.success('Gantt descargado. Abre el archivo y haz clic en "Actualizar" para ejecutar la macro')
-    } catch (error) {
-      message.error(error.message || 'Error al exportar Gantt')
-      console.error('Export error:', error)
+      await ganttService.generateGantt(projectData, start.format('YYYY-MM-DD'))
+      message.success('Gantt descargado. Ábrelo y pulsa «Actualizar» para ejecutar la macro.')
+    } catch (err) {
+      message.error('No se pudo descargar el Gantt: ' + err.message)
     } finally {
-      setIsDownloading(false)
+      setDownloading(false)
     }
-  }, [projectData, tasksWithDates, exportStartDate])
-
-  if (!tasksWithDates.length) {
-    return <Empty description="No hay tareas para mostrar" />
   }
+
+  if (!tareas.length) return <Empty description="No hay tareas en la estimación" />
+
+  const end = days[days.length - 1]
 
   return (
-    <div className="gantt-viewer">
-      <Card
-        title="📊 Diagrama Gantt Interactivo"
-        className="gantt-card"
-        extra={
-          <Space>
+    <div className="gv">
+      <div className="gv-toolbar">
+        <span className="gv-summary">
+          {rows.filter(r => !r.pending).length} tareas · {totalDays} {totalDays === 1 ? 'día laborable' : 'días laborables'}
+          {end && <> · del {fmt(days[0])} al {fmt(end)} {end.getFullYear()}</>}
+        </span>
+        <div className="gv-controls">
+          <label className="gv-start">
+            <span className="cell-muted">Inicio</span>
             <DatePicker
-              value={exportStartDate}
-              onChange={setExportStartDate}
+              value={start}
+              onChange={v => v && setStart(v)}
               format="DD/MM/YYYY"
-              size="small"
+              allowClear={false}
+              disabledDate={d => d.day() === 0 || d.day() === 6}
             />
-            <Button type="primary" icon={<ReloadOutlined />} size="small">
-              Recalcular
-            </Button>
-            <Button
-              type="primary"
-              icon={<DownloadOutlined />}
-              size="small"
-              loading={isDownloading}
-              onClick={handleDownloadExcel}
-            >
-              Descargar Gantt .xlsm
-            </Button>
-          </Space>
-        }
-      >
-        {/* Resumen */}
-        <Row gutter={[16, 16]} className="gantt-summary">
-          <Col span={6}>
-            <Tag color="blue">
-              📅 {tasksWithDates.length} Tareas
-            </Tag>
-          </Col>
-          <Col span={6}>
-            <Tag color="green">
-              ⏱️ {Math.ceil(tasksWithDates.reduce((s, t) => s + (t.dias || 0), 0))} días
-            </Tag>
-          </Col>
-          <Col span={6}>
-            <Tag color="purple">
-              👥 {Math.round(tasksWithDates.reduce((s, t) => s + (t.horas || 0), 0))}h
-            </Tag>
-          </Col>
-          <Col span={6}>
-            <Tag color="orange">
-              💰 {tasksWithDates.reduce((s, t) => s + (t.importe || 0), 0).toLocaleString('es-ES')}€
-            </Tag>
-          </Col>
-        </Row>
+          </label>
+          <button className="btn-default" onClick={download} disabled={downloading}>
+            {downloading ? <LoadingOutlined /> : <DownloadOutlined />} Descargar Gantt (.xlsm)
+          </button>
+        </div>
+      </div>
 
-        {/* Tabla Gantt */}
-        <div className="gantt-table">
-          <div className="gantt-header">
-            <div className="gantt-col gantt-col-task">Tarea</div>
-            <div className="gantt-col gantt-col-dates">Inicio</div>
-            <div className="gantt-col gantt-col-dates">Fin</div>
-            <div className="gantt-col gantt-col-progress">%</div>
-            <div className="gantt-col-timeline">
-              {allDates.map((date, idx) => (
-                <div key={idx} className="gantt-day-header">
-                  {date.getDate()}
-                </div>
-              ))}
-            </div>
+      <div className="gv-scroll">
+        <div className="gv-grid" style={{ '--gv-days': days.length }}>
+          {/* Cabecera */}
+          <div className="gv-head gv-col-task">Tarea</div>
+          <div className="gv-head gv-col-date">Inicio</div>
+          <div className="gv-head gv-col-date">Fin</div>
+          <div className="gv-head gv-timeline">
+            {days.map((d, i) => (
+              <div key={i} className={`gv-day ${d.getDay() === 1 ? 'is-monday' : ''}`}>
+                <span className="gv-day-w">{WEEKDAYS[d.getDay()]}</span>
+                <span className="gv-day-n">{d.getDate()}</span>
+              </div>
+            ))}
           </div>
 
-          {/* Filas de tareas */}
-          {tasksWithDates.map((task, taskIdx) => (
-            <div key={task.id} className="gantt-row">
-              {/* Tarea principal */}
-              <div className="gantt-row-main">
-                <div className="gantt-col gantt-col-task gantt-task-main">
-                  <strong>{task.descripcion}</strong>
-                </div>
-                <div className="gantt-col gantt-col-dates">
-                  {task.startDate.toLocaleDateString('es-ES')}
-                </div>
-                <div className="gantt-col gantt-col-dates">
-                  {task.endDate.toLocaleDateString('es-ES')}
-                </div>
-                <div className="gantt-col gantt-col-progress">
-                  <Slider
-                    value={task.progress || 0}
-                    onChange={(val) => handleProgressChange(task.id, val)}
-                    max={100}
-                    step={10}
-                    tooltipVisible={false}
-                    className="gantt-slider"
-                  />
-                  <span className="gantt-percent">{task.progress || 0}%</span>
-                </div>
-                <div className="gantt-col-timeline">
-                  {allDates.map((date, dateIdx) => {
-                    const isInRange = date >= task.startDate && date <= task.endDate
-
-                    let barClass = ''
-                    if (isInRange) {
-                      const pct = task.progress || 0
-                      if (pct <= 0) barClass = 'progress-0'
-                      else if (pct <= 25) barClass = 'progress-25'
-                      else if (pct <= 50) barClass = 'progress-50'
-                      else if (pct <= 75) barClass = 'progress-75'
-                      else barClass = 'progress-100'
-                    }
-
-                    return (
-                      <Tooltip key={dateIdx} title={date.toLocaleDateString('es-ES')}>
-                        <div className={`gantt-bar ${barClass}`} />
-                      </Tooltip>
-                    )
-                  })}
-                </div>
+          {/* Filas */}
+          {rows.map(r => (
+            <div key={r.key} className={`gv-row ${r.pending ? 'is-pending' : ''}`}>
+              <div className="gv-col-task" title={r.descripcion}>{r.descripcion}</div>
+              <div className="gv-col-date">{r.pending ? '—' : fmt(days[r.from])}</div>
+              <div className="gv-col-date">{r.pending ? <span className="gv-pending">Pendiente</span> : fmt(days[r.to])}</div>
+              <div className="gv-timeline">
+                {days.map((d, i) => <div key={i} className={`gv-cell ${d.getDay() === 1 ? 'is-monday' : ''}`} />)}
+                {!r.pending && (
+                  <Tooltip title={`${r.descripcion} · ${String(r.dias).replace('.', ',')} ${r.dias === 1 ? 'día' : 'días'}`}>
+                    <div className="gv-bar" style={{ gridColumn: `${r.from + 1} / ${r.to + 2}` }} />
+                  </Tooltip>
+                )}
               </div>
-
-              {/* Subtareas */}
-              {task.subtareas?.map((subtask, subIdx) => (
-                <div key={`${task.id}-sub-${subIdx}`} className="gantt-row-sub">
-                  <div className="gantt-col gantt-col-task gantt-task-sub">
-                    ├─ {subtask.descripcion}
-                  </div>
-                  <div className="gantt-col gantt-col-dates">
-                    {subtask.startDate?.toLocaleDateString('es-ES') || '-'}
-                  </div>
-                  <div className="gantt-col gantt-col-dates">
-                    {subtask.endDate?.toLocaleDateString('es-ES') || '-'}
-                  </div>
-                  <div className="gantt-col gantt-col-progress">
-                    <span className="gantt-percent">-</span>
-                  </div>
-                  <div className="gantt-col-timeline">
-                    {allDates.map((date, dateIdx) => {
-                      const isInRange =
-                        subtask.startDate &&
-                        subtask.endDate &&
-                        date >= subtask.startDate &&
-                        date <= subtask.endDate
-
-                      return (
-                        <Tooltip key={dateIdx} title={date.toLocaleDateString('es-ES')}>
-                          <div className={`gantt-bar ${isInRange ? 'subtask' : ''}`} />
-                        </Tooltip>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
             </div>
           ))}
         </div>
-
-        {/* Leyenda */}
-        <div className="gantt-legend">
-          <Tag color="purple">█ Completado</Tag>
-          <Tag color="cyan">█ Pendiente</Tag>
-          <Tag color="green">— Subtarea</Tag>
-        </div>
-      </Card>
+      </div>
     </div>
   )
 }

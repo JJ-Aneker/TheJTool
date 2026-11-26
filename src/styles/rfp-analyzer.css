@@ -1,0 +1,127 @@
+.rfp-analyzer {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.rfp-header {
+  margin-bottom: 24px;
+}
+
+.rfp-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.rfp-header p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.rfp-upload-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.rfp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rfp-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rfp-list-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+}
+
+.rfp-list-info {
+  flex: 1;
+}
+
+.rfp-list-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.rfp-list-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.rfp-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.viability-card {
+  border-radius: 8px;
+  border-width: 2px;
+}
+
+.viability-card.viability-alta {
+  background: #f0fdf4;
+  border-color: #10b981;
+}
+
+.viability-card.viability-media {
+  background: #fffbeb;
+  border-color: #f59e0b;
+}
+
+.viability-card.viability-baja {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+
+.viability-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.viability-card p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .viability-card.viability-alta {
+    background: rgba(16, 185, 129, 0.1);
+  }
+
+  :root:not([data-theme="light"]) .viability-card.viability-media {
+    background: rgba(245, 158, 11, 0.1);
+  }
+
+  :root:not([data-theme="light"]) .viability-card.viability-baja {
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+:root[data-theme="dark"] .viability-card.viability-alta {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+:root[data-theme="dark"] .viability-card.viability-media {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+:root[data-theme="dark"] .viability-card.viability-baja {
+  background: rgba(239, 68, 68, 0.1);
+}

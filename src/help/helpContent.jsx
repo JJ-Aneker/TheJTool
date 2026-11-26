@@ -42,100 +42,38 @@ Si el menú ocupa demasiado espacio, puedes <strong>colapsarlo</strong>: haz cli
 
     documentGenerator: {
       id: 'documentGenerator',
-      title: 'Generador de Documentación',
-      icon: '⚡',
-      intro: 'El Generador analiza documentos de briefing con inteligencia artificial y produce documentos técnicos profesionales (EFDT, Requisitos, Presupuestos…) listos para entregar al cliente.',
+      title: 'Generador de documentos',
+      icon: '',
+      intro: 'Convierte un briefing en un documento Word (EFDT, requisitos, presupuesto, oferta…) en tres pasos: Briefing, Revisión y Documento. Los pasos están arriba y la acción principal de cada uno, en la esquina superior derecha.',
       sections: [
         {
           id: 'dg-step1',
-          title: 'Paso 1 — Configura el documento',
-          body: `Al entrar verás un panel de configuración a la izquierda. Rellena estos campos en orden:
-<ol>
-  <li><strong>Tipo de documento</strong> — Elige qué vas a generar:
-    <ul>
-      <li><em>EFDT</em>: Especificación Funcional y Diseño Técnico (el más completo)</li>
-      <li><em>Requisitos</em>: Lista priorizada de requisitos funcionales</li>
-      <li><em>Presupuesto</em>: Tabla de tareas con días y costes</li>
-      <li><em>Propuesta comercial</em>: Documento ejecutivo orientado al cliente</li>
-      <li><em>Solicitud de cambio</em>: Para gestionar cambios en proyectos en curso</li>
-    </ul>
-  </li>
-  <li><strong>Vertical</strong> — Tipo de proyecto (NotifApp, HR, Facturas…). Aporta contexto específico a la IA.</li>
-  <li><strong>Portada</strong> — Imagen de portada del documento (ver más abajo cómo añadirla).</li>
-</ol>`
-        },
-        {
-          id: 'dg-portada',
-          title: 'Paso 2 — Añadir portada',
-          body: `<ol>
-  <li>Haz clic en el botón <strong>de portada</strong> (icono imagen) en el panel de configuración</li>
-  <li>Se abre un modal con las portadas guardadas y un hueco para subir nueva</li>
-  <li>Para <strong>subir una nueva portada</strong>: arrastra tu archivo PNG al recuadro "Nueva portada" o haz clic en él
-    <br/><em>Requisito técnico: PNG, 794×1123 px (A4 a 96 dpi)</em></li>
-  <li>Para <strong>usar una portada guardada</strong>: haz clic en cualquiera de las miniaturas del grid</li>
-  <li>Al seleccionar, el modal se cierra y la portada aparece en el panel</li>
-</ol>
-<strong>Tip:</strong> Las portadas se guardan en la nube. Solo necesitas subirlas una vez y puedes reutilizarlas en todos los documentos futuros.`
-        },
-        {
-          id: 'dg-briefing',
-          title: 'Paso 3 — Sube el briefing',
-          body: `<ol>
-  <li>En la zona central, arrastra tus archivos o haz clic en <strong>"Subir documentos"</strong></li>
-  <li>Formatos aceptados: <strong>PDF, Word (.docx), HTML, .eml, texto plano</strong></li>
-  <li>Puedes subir <strong>varios archivos a la vez</strong> — la IA los lee todos juntos</li>
-  <li>Verás la lista de archivos subidos con su tamaño</li>
-</ol>
-<strong>¿Qué incluir en el briefing para mejores resultados?</strong>
-<ul>
-  <li>Nombre del cliente y del proyecto</li>
-  <li>Objetivos y alcance funcional</li>
-  <li>Descripción de los tipos de documentos que gestionará Therefore™</li>
-  <li>Departamentos y usuarios implicados</li>
-  <li>Integraciones con otros sistemas (SAP, Salesforce, etc.)</li>
-  <li>Volumen estimado de documentos al año</li>
-</ul>`
-        },
-        {
-          id: 'dg-analyze',
-          title: 'Paso 4 — Analizar con IA',
-          body: `<ol>
-  <li>Cuando tengas el briefing subido, haz clic en <strong>"Analizar briefing"</strong> (botón azul)</li>
-  <li>La IA procesa los documentos. Esto tarda entre <strong>20 y 60 segundos</strong> según la longitud</li>
-  <li>Una barra de progreso muestra el estado del análisis</li>
-  <li>Al terminar, los campos del documento se rellenan automáticamente</li>
-</ol>
-<strong>Mientras esperas:</strong> no cierres la pestaña ni recargues la página. Si el análisis se detiene, vuelve a hacer clic en "Analizar".`
+          title: '1. Briefing',
+          body: `<ul>
+  <li><strong>Qué documento</strong>: elige el tipo, la vertical (si la dejas vacía se detecta sola) y, si quieres, escribe instrucciones para la IA: CIFs, integraciones, presupuesto máximo, licencias…</li>
+  <li><strong>Material de partida</strong>: sube el briefing y los documentos del cliente (PDF, Word, TXT, HTML o correos .eml). Puedes subir varios a la vez.</li>
+  <li><strong>Portada</strong>: sin portada, la de por defecto o una personalizada (PNG A4, 794 × 1123 px). Las portadas que subas quedan guardadas para otros documentos.</li>
+</ul>
+Pulsa <strong>Analizar briefing</strong>. Tarda entre 20 y 60 segundos. Tras el análisis, los documentos subidos se borran del almacenamiento.`
         },
         {
           id: 'dg-review',
-          title: 'Paso 5 — Revisar y editar los datos',
-          body: `Una vez terminado el análisis, puedes <strong>editar cualquier campo</strong> directamente haciendo clic en él. Comprueba especialmente:
-<ul>
-  <li>Nombre del cliente y del proyecto</li>
-  <li>Alcance funcional — añade o quita funcionalidades según lo acordado</li>
-  <li>Estimaciones de tiempo — ajusta los días si son demasiado altos o bajos</li>
-  <li>Estructura de categorías — renombra o reordena según la nomenclatura del cliente</li>
+          title: '2. Revisión',
+          body: `<ul>
+  <li>A la izquierda tienes el <strong>índice</strong> para saltar a cada sección: cliente, alcance, licencias, estimación, estructura, avisos y planificación.</li>
+  <li>A la derecha, el <strong>resumen</strong> con esfuerzo, tarifa, importe, IVA y total. La tarifa sale de la vertical y puedes cambiarla: los importes se recalculan.</li>
+  <li>En la <strong>estimación</strong> puedes editar días u horas, añadir o quitar tareas y marcar una tarea como <em>Pendiente</em>: aparece en el documento sin importe y no suma.</li>
+  <li><strong>Pedir cambios a la IA</strong> (arriba a la derecha): describe el cambio, por ejemplo «Reduce la estimación a 8 días». Si no te convence, pulsa <strong>Deshacer</strong>.</li>
+  <li>En <strong>Avisos</strong> verás los datos que faltan; <em>Completar con la IA</em> te prepara la instrucción.</li>
+  <li>La <strong>planificación</strong> se actualiza sola al cambiar la estimación. Elige la fecha de inicio y descarga el Gantt en Excel.</li>
 </ul>
-<strong>Refinar con IA:</strong> Si quieres que la IA ajuste algo específico sin volver a subir el briefing:
-<ol>
-  <li>Busca la caja de texto "Refinar análisis" (parte inferior del panel)</li>
-  <li>Escribe tu instrucción en lenguaje natural, por ejemplo:<br/>
-      <em>"El presupuesto máximo es 20.000€, ajusta las estimaciones"</em><br/>
-      <em>"Añade un riesgo de integración con SAP"</em></li>
-  <li>Haz clic en "Refinar con IA"</li>
-</ol>`
+Cuando esté listo, pulsa <strong>Generar documento</strong>.`
         },
         {
-          id: 'dg-generate',
-          title: 'Paso 6 — Generar el documento Word',
-          body: `<ol>
-  <li>Cuando estés satisfecho con los datos, haz clic en <strong>"Generar documento"</strong></li>
-  <li>Se genera un archivo <strong>.docx</strong> con el diseño profesional completo</li>
-  <li>El archivo se descarga automáticamente a tu carpeta de descargas</li>
-  <li>Ábrelo en Microsoft Word para revisión final o para enviarlo al cliente</li>
-</ol>
-<strong>Nota:</strong> El documento incluye automáticamente la portada seleccionada, tabla de contenidos, y todos los datos del análisis formateados según la plantilla corporativa.`
+          id: 'dg-done',
+          title: '3. Documento',
+          body: `Descarga el Word desde <strong>Descargar Word</strong>. También puedes descargar el Gantt, volver a la revisión para cambiar algo o empezar un documento nuevo.
+<br/><strong>Antes de enviarlo:</strong> abre el documento en Word, pulsa Ctrl+A y F9 para actualizar el índice y sustituye los marcadores como &lt;&lt;EMPRESA CLIENT&gt;&gt;.`
         }
       ]
     },
@@ -519,6 +457,42 @@ El CIF debe validarse con patrón de CIF español.</pre>
 </ul>
 
 <strong>💡 Truco:</strong> Si no estás seguro de cómo pedirlo, empieza simple y usa "Refinar" (próximamente) para ir añadiendo funcionalidades.`
+        }
+      ]
+    },
+
+    thereforeMigrator: {
+      id: 'thereforeMigrator',
+      title: 'Migrador de documentos',
+      icon: '',
+      intro: 'Copia documentos (archivos e índices) de una categoría de Therefore™ a otra, en la misma u otra instancia, o descárgalos a una carpeta de tu equipo con un Excel de índices.',
+      sections: [
+        {
+          id: 'mg-steps',
+          title: 'Cómo se hace',
+          body: `<ol>
+  <li><strong>Origen</strong>: elige la instancia (de las guardadas en <em>Instancias</em>) y la categoría. Debajo puedes filtrar qué documentos migrar por cualquier campo (texto con <code>*</code> como comodín, o rangos de fechas y números) y por número de documento. <em>Contar documentos</em> te dice cuántos cumplen los filtros.</li>
+  <li><strong>Destino</strong>: <em>Copiar a otra categoría</em> (instancia y categoría) o <em>Descargar a una carpeta</em> (solo Chrome o Edge).</li>
+  <li><strong>Campos</strong>: los campos se emparejan solos por nombre. Revisa la tabla y cambia lo que haga falta; los que dejes en <em>No copiar</em> quedan vacíos en el destino.</li>
+  <li><strong>Opciones</strong>: máximo de documentos y documentos en paralelo. Pulsa <em>Ver los 3 primeros</em> para comprobar cómo quedan los índices sin escribir nada.</li>
+  <li><strong>Migrar</strong>: verás el avance, los errores y el tiempo restante. Mantén la pestaña abierta.</li>
+</ol>`
+        },
+        {
+          id: 'mg-safe',
+          title: 'Sin duplicados y reanudable',
+          body: `Cada documento copiado queda registrado. Si repites la migración o la continúas tras detenerla, los que ya se copiaron se saltan.
+<br/>Para guardar este registro en la base de datos hay que ejecutar una vez <code>supabase/migrations/20261124_migrator.sql</code> en Supabase; sin él, se guarda solo en este navegador.`
+        },
+        {
+          id: 'mg-limits',
+          title: 'Límites',
+          body: `<ul>
+  <li>No se copian campos de tabla ni contadores (los contadores los genera Therefore™ en el destino).</li>
+  <li>Si un campo obligatorio del destino queda sin asignar, la creación de documentos fallará: asígnale un campo de origen.</li>
+  <li>Para migraciones muy grandes (decenas de miles de documentos) es mejor una herramienta de escritorio que no dependa del navegador.</li>
+</ul>
+Al terminar puedes descargar un informe en Excel con el número de cada documento en origen y destino.`
         }
       ]
     },
@@ -999,94 +973,35 @@ To <strong>collapse</strong> the menu: click the arrow (←) in the menu header.
 
     documentGenerator: {
       id: 'documentGenerator',
-      title: 'Document Generator',
-      icon: '⚡',
-      intro: 'The Generator uses AI to analyze briefing documents and produce professional technical documents (EFDT, Requirements, Budgets…) ready to send to clients.',
+      title: 'Document generator',
+      icon: '',
+      intro: 'Turns a briefing into a Word document (EFDT, requirements, budget, offer…) in three steps: Briefing, Review and Document. The steps are at the top and each step\'s main action is in the top-right corner.',
       sections: [
         {
           id: 'dg-step1',
-          title: 'Step 1 — Configure the document',
-          body: `On the left you'll see a configuration panel. Fill in these fields:
-<ol>
-  <li><strong>Document type</strong>:
-    <ul>
-      <li><em>EFDT</em>: Functional Specification &amp; Technical Design (most complete)</li>
-      <li><em>Requirements</em>: Prioritized list of functional requirements</li>
-      <li><em>Budget</em>: Task table with days and costs</li>
-      <li><em>Commercial proposal</em>: Executive document for the client</li>
-      <li><em>Change request</em>: For changes to ongoing projects</li>
-    </ul>
-  </li>
-  <li><strong>Vertical</strong>: Project type (NotifApp, HR, Invoices…). Gives the AI extra context.</li>
-  <li><strong>Cover page</strong>: Cover image for the document.</li>
-</ol>`
-        },
-        {
-          id: 'dg-portada',
-          title: 'Step 2 — Add a cover page',
-          body: `<ol>
-  <li>Click the <strong>cover button</strong> (image icon) in the configuration panel</li>
-  <li>A modal opens with saved covers and a slot for a new upload</li>
-  <li>To <strong>upload a new cover</strong>: drag your PNG onto the "New cover" box or click it<br/>
-      <em>Technical requirement: PNG, 794×1123 px (A4 at 96 dpi)</em></li>
-  <li>To <strong>use a saved cover</strong>: click any thumbnail in the grid</li>
-</ol>
-<strong>Tip:</strong> Covers are saved in the cloud. Upload once, reuse in all future documents.`
-        },
-        {
-          id: 'dg-briefing',
-          title: 'Step 3 — Upload the briefing',
-          body: `<ol>
-  <li>Drag your files to the main area or click <strong>"Upload documents"</strong></li>
-  <li>Accepted formats: <strong>PDF, Word (.docx), HTML, .eml, plain text</strong></li>
-  <li>You can upload <strong>multiple files at once</strong> — the AI reads them all together</li>
-</ol>
-<strong>What to include for best results:</strong>
-<ul>
-  <li>Client and project name</li>
-  <li>Objectives and functional scope</li>
-  <li>Document types to manage in Therefore™</li>
-  <li>Departments and users involved</li>
-  <li>Integrations with other systems (SAP, Salesforce, etc.)</li>
-  <li>Estimated annual document volume</li>
-</ul>`
-        },
-        {
-          id: 'dg-analyze',
-          title: 'Step 4 — AI analysis',
-          body: `<ol>
-  <li>Click <strong>"Analyze briefing"</strong> (blue button)</li>
-  <li>The AI processes the documents: <strong>20–60 seconds</strong> depending on length</li>
-  <li>A progress bar shows the status</li>
-  <li>When done, all document fields are filled automatically</li>
-</ol>
-<strong>While waiting:</strong> don't close the tab or refresh. If analysis stops, click "Analyze" again.`
+          title: '1. Briefing',
+          body: `<ul>
+  <li><strong>Which document</strong>: choose the type, the vertical (detected automatically if empty) and optional instructions for the AI.</li>
+  <li><strong>Source material</strong>: upload the briefing and the customer documents (PDF, Word, TXT, HTML or .eml emails).</li>
+  <li><strong>Cover</strong>: none, the default one or a custom PNG (A4, 794 × 1123 px). Uploaded covers are kept for future documents.</li>
+</ul>
+Click <strong>Analizar briefing</strong>. It takes 20–60 seconds. Uploaded documents are deleted from storage after the analysis.`
         },
         {
           id: 'dg-review',
-          title: 'Step 5 — Review and edit',
-          body: `Click any field to edit it. Check especially:
-<ul>
-  <li>Client and project name</li>
-  <li>Functional scope — add or remove features as agreed</li>
-  <li>Time estimates — adjust days if needed</li>
-  <li>Category structure — rename to match client naming</li>
+          title: '2. Review',
+          body: `<ul>
+  <li>The <strong>index</strong> on the left jumps to each section; the <strong>summary</strong> on the right shows effort, daily rate, amount, VAT and total. The rate comes from the vertical and can be changed.</li>
+  <li>In the <strong>estimate</strong> you can edit days or hours, add or remove tasks and mark a task as <em>Pending</em> (shown without amount, not added to the total).</li>
+  <li><strong>Pedir cambios a la IA</strong> applies a change you describe; use <strong>Deshacer</strong> to revert it.</li>
+  <li>The <strong>schedule</strong> updates with the estimate. Pick the start date and download the Gantt.</li>
 </ul>
-<strong>Refine with AI</strong> — to adjust something without re-uploading:
-<ol>
-  <li>Find the "Refine analysis" text box</li>
-  <li>Write in natural language: <em>"Maximum budget is €20,000"</em> or <em>"Add a SAP integration risk"</em></li>
-  <li>Click "Refine with AI"</li>
-</ol>`
+When ready, click <strong>Generar documento</strong>.`
         },
         {
-          id: 'dg-generate',
-          title: 'Step 6 — Generate the Word document',
-          body: `<ol>
-  <li>Click <strong>"Generate document"</strong></li>
-  <li>A <strong>.docx</strong> file downloads to your downloads folder</li>
-  <li>Open it in Microsoft Word for final review or to send to the client</li>
-</ol>`
+          id: 'dg-done',
+          title: '3. Document',
+          body: `Download the Word file, the Gantt, go back to the review or start a new document. Before sending it, open it in Word and press Ctrl+A then F9 to update the table of contents.`
         }
       ]
     },
@@ -1280,6 +1195,27 @@ Tax ID should be validated with Spanish CIF pattern.</pre>
   <li>Select target category → <em>eForms</em> tab → <strong>Import eForm</strong></li>
   <li>Save changes</li>
 </ol>`
+        }
+      ]
+    },
+
+    thereforeMigrator: {
+      id: 'thereforeMigrator',
+      title: 'Document migrator',
+      icon: '',
+      intro: 'Copies documents (files and index data) from one Therefore™ category to another, on the same or another instance, or downloads them to a folder with an Excel file of index data.',
+      sections: [
+        {
+          id: 'mg-steps',
+          title: 'How it works',
+          body: `<ol>
+  <li><strong>Source</strong>: choose the instance and category, and optionally filter documents by any field or document number range (<em>Contar documentos</em> shows how many match).</li>
+  <li><strong>Destination</strong>: copy to another category, or download to a folder (Chrome or Edge).</li>
+  <li><strong>Fields</strong>: fields are matched by name automatically; review and adjust.</li>
+  <li><strong>Options</strong>: maximum, parallel documents, and a preview of the first 3 documents (nothing is written).</li>
+  <li><strong>Migrate</strong>: progress, errors and remaining time. Keep the tab open.</li>
+</ol>
+Copied documents are recorded, so repeating or resuming a migration skips them. Run <code>supabase/migrations/20261124_migrator.sql</code> once in Supabase to store this record in the database.`
         }
       ]
     },

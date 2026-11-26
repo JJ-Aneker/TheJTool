@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { Layout, Menu, Spin, Dropdown } from 'antd'
-import {
+import { SwapOutlined,
   FormOutlined,
   CloudOutlined,
   ApiOutlined,
@@ -55,6 +55,8 @@ const BedrrockPanel = lazy(() => import('./views/BedrrockPanel'))
 const Manual = lazy(() => import('./views/Manual'))
 const QuestionnaireManager = lazy(() => import('./views/QuestionnaireManager'))
 const LicenseConfigurator = lazy(() => import('./views/LicenseConfigurator'))
+const ThereforeMigrator = lazy(() => import('./views/ThereforeMigrator'))
+const RFPAnalyzer = lazy(() => import('./views/RFPAnalyzer'))
 
 const { Content } = Layout
 
@@ -81,6 +83,7 @@ const getMenuItems = (isAdmin = false, t = (key) => key) => {
     { key: 'questionnaires',     icon: <FileExcelOutlined />,    label: t('nav.questionnaires'), path: '/questionnaires' },
     { key: 'reporter',           icon: <FileTextOutlined />,     label: t('nav.thereforeReporter'), path: '/reporter' },
     { key: 'license-config',     icon: <KeyOutlined />,          label: t('nav.licenseConfig'),  path: '/license-configurator' },
+    { key: 'rfp-analyzer',       icon: <FileTextOutlined />,     label: t('nav.rfpAnalyzer'),    path: '/rfp-analyzer' },
     { key: 'manual',             icon: <BookOutlined />,         label: t('nav.manual'),           path: '/manual' },
 
     // DESARROLLO TÉCNICO (todos)
@@ -88,6 +91,7 @@ const getMenuItems = (isAdmin = false, t = (key) => key) => {
     { key: 'dev-header', type: 'group', label: t('nav.groupDev') },
     { key: 'eforms',             icon: <FormOutlined />,         label: t('nav.eformBuilder'),    path: '/eforms' },
     { key: 'category-builder',   icon: <AppstoreOutlined />,     label: t('nav.categoryBuilder'), path: '/category-builder' },
+    { key: 'migrator',           icon: <SwapOutlined />,         label: t('nav.migrator'),        path: '/migrator' },
     { key: 'api-explorer',       icon: <ApiOutlined />,          label: t('nav.apiExplorer'),     path: '/api-explorer' },
   ]
 
@@ -417,11 +421,13 @@ function AppContent() {
               <Route path="/eform-generator-ai" element={<Navigate to="/eforms?nuevo=ia" replace />} />
               <Route path="/eforms" element={<EFormBuilder />} />
               <Route path="/category-builder" element={<CategoryBuilder />} />
+              <Route path="/migrator" element={<ThereforeMigrator />} />
               <Route path="/tenants" element={<TenantManager />} />
               <Route path="/questionnaires" element={<QuestionnaireManager />} />
               <Route path="/document-generator" element={<DocumentGenerator />} />
               <Route path="/reporter" element={<ThereforeReporter />} />
               <Route path="/license-configurator" element={<LicenseConfigurator />} />
+              <Route path="/rfp-analyzer" element={<RFPAnalyzer />} />
               <Route path="/web-services" element={<WebServicesManager />} />
               <Route path="/manual" element={<Manual />} />
               <Route path="/api-explorer" element={<Placeholder icon={<ApiOutlined />} title="Explorador API REST" status="construction" />} />

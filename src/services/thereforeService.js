@@ -4,6 +4,21 @@
 import axios from 'axios'
 import { logger } from '../utils/logger'
 
+// Convierte una respuesta de error de la Web API en un texto legible.
+// Therefore™ devuelve { WSError: { ErrorCodeString, ErrorMessage } } (a menudo con HTTP 500).
+export async function describeError(resp) {
+  let detail = ''
+  try {
+    const txt = await resp.text()
+    try {
+      const j = JSON.parse(txt)
+      const e = j.WSError || j
+      detail = [e.ErrorCodeString, (e.ErrorMessage || e.Message || '').trim()].filter(Boolean).join(': ')
+    } catch { detail = txt }
+  } catch { /* sin cuerpo */ }
+  return `HTTP ${resp.status}${detail ? ` · ${String(detail).slice(0, 300)}` : ''}`
+}
+
 class ThereforeService {
   constructor() {
     this.tokens = {} // Cache de tokens por URL
@@ -386,7 +401,7 @@ class ThereforeService {
         })
       })
 
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+      if (!resp.ok) throw new Error(await describeError(resp))
       const data = await resp.json()
 
       let rows = []

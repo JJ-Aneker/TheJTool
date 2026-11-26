@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Table, Button, Modal, Input, Select, Spin, Tooltip, Dropdown, Segmented, Checkbox, Alert } from 'antd'
-import axios from 'axios'
 import { message } from '../utils/message'
 import HelpButton from '../components/HelpButton'
 import {
@@ -13,6 +12,7 @@ import { useAuth } from '../hooks/useAuth'
 import { handleError } from '../utils/errorHandler'
 import { logger } from '../utils/logger'
 import { thereforeService } from '../services/thereforeService'
+import { connectTenant } from '../services/thereforeConnect'
 import { logReportExecution } from '../services/dashboardService'
 import { formatShortDate, formatFullDate } from '../utils/format'
 import '../styles/reporter.css'
@@ -235,35 +235,7 @@ export default function ThereforeReporter() {
 
   const tenantName = id => tenants.find(t => t.id === id)?.nombre
 
-  // ─────────────────────── Conexión ───────────────────────
-  // 1) El servidor obtiene el token (la contraseña no sale del servidor).
-  // 2) Si el servidor no llega a la instancia (on-premise en red interna) o el
-  //    servidor local aún no tiene la ruta, se conecta directamente desde aquí.
-  const connectTenant = async (tenantId) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const { data } = await axios.post('/api/therefore-connect', { tenantId }, {
-        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
-      })
-      return thereforeService.fromToken(data)
-    } catch (err) {
-      const status = err.response?.status
-      const code = err.response?.data?.code
-      const fallback = !err.response || status === 404 || code === 'UNREACHABLE'
-      if (!fallback) throw new Error(err.response?.data?.error || err.message)
-    }
-
-    const { data: cred, error } = await supabase
-      .from('tenants')
-      .select('url, tenant, usuario, password, is_on_premise')
-      .eq('id', tenantId)
-      .single()
-    if (error || !cred) throw new Error('Instancia no encontrada')
-    const { headers, baseUrl } = await thereforeService.connect(
-      cred.url, cred.usuario, cred.password, cred.is_on_premise ? true : (cred.tenant || '')
-    )
-    return { headers, baseUrl }
-  }
+  // La conexión (token desde el servidor, con alternativa directa) está en services/thereforeConnect.js
 
   // ───────────────────────── Editor ─────────────────────────
 

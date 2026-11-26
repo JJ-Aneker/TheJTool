@@ -29,6 +29,8 @@ import questionnaireStatusHandler from './api/_lib/questionnaires-handlers/statu
 import questionnaireGenerateAnswersHandler from './api/_lib/questionnaires-handlers/generate-answers.js';
 import questionnaireDownloadExcelHandler from './api/_lib/questionnaires-handlers/download-excel.js';
 import questionnaireDeleteHandler from './api/_lib/questionnaires-handlers/delete.js';
+import analyzeRfpRouter from './api/analyze-rfp.js';
+import rfpSectionsRouter from './api/rfp-sections.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -146,6 +148,10 @@ app.get('/api/questionnaires/:id/status', questionnaireStatusHandler);
 app.post('/api/questionnaires/:id/generate-answers', questionnaireGenerateAnswersHandler);
 app.get('/api/questionnaires/:id/download-excel', questionnaireDownloadExcelHandler);
 app.delete('/api/questionnaires/:id', questionnaireDeleteHandler);
+
+// RFP Analyzer routes (análisis automático de RFPs con IA)
+app.use('/api', analyzeRfpRouter);
+app.use('/api', rfpSectionsRouter);
 
 // Start server
 app.listen(PORT, () => {

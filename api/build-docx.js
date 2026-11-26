@@ -650,6 +650,7 @@ function buildEstimacion(d) {
   const totalHoras   = d.estimacion?.totalHoras || 0;
   const totalImporte = d.estimacion?.totalImporte || 0;
   const totalConIva  = d.estimacion?.totalConIva || Math.round(totalImporte * 1.21);
+  const tarifaDia    = Number(d.estimacion?.tarifaDia) || 800;
 
   return [
     h1('Estimación de esfuerzo'),
@@ -696,7 +697,7 @@ function buildEstimacion(d) {
           hdrCell('Valor', Math.round(CONTENT_W * 0.45), { center: true }),
         ]}),
         ...[
-          ['Tarifa día (800 €/día)',     '800,00 €/día'],
+          ['Tarifa día',                  `${formatImporte(tarifaDia)}/día`],
           ['Esfuerzo total confirmado',  `${totalDias} días · ${totalHoras} h`],
           ['Importe total (sin IVA)',     formatImporte(totalImporte)],
           ['IVA (21%)',                   formatImporte(totalImporte * 0.21)],
