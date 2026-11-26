@@ -76,7 +76,7 @@ export default function RFPAnalyzerV2() {
       }
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/rfp-dashboard`,
+        '/api/rfp-dashboard',
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`
@@ -104,7 +104,7 @@ export default function RFPAnalyzerV2() {
       }
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/analyze-rfp`,
+        '/api/analyze-rfp',
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`
@@ -148,7 +148,7 @@ export default function RFPAnalyzerV2() {
       })
 
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/analyze-rfp`,
+        '/api/analyze-rfp',
         formData,
         {
           headers: {
@@ -182,7 +182,7 @@ export default function RFPAnalyzerV2() {
       const { data: { session } } = await supabase.auth.getSession()
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/analyze-rfp/${rfpId}`,
+        `/api/analyze-rfp/${rfpId}`,
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`
@@ -205,7 +205,7 @@ export default function RFPAnalyzerV2() {
       const { data: { session } } = await supabase.auth.getSession()
 
       await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/rfp-status/${rfpId}`,
+        `/api/rfp-status/${rfpId}`,
         { status },
         {
           headers: {
@@ -233,7 +233,7 @@ export default function RFPAnalyzerV2() {
       const { data: { session } } = await supabase.auth.getSession()
 
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/rfp-sections/${sectionId}`,
+        `/api/rfp-sections/${sectionId}`,
         { [field]: value },
         {
           headers: {
@@ -262,7 +262,7 @@ export default function RFPAnalyzerV2() {
         : `/api/rfp-generate-tasks/${rfpId}`
 
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}${endpoint}`,
+        endpoint,
         {},
         {
           headers: {
