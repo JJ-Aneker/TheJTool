@@ -850,4 +850,539 @@ router.post('/rfp-generate-tasks/:id', async (req, res) => {
   }
 })
 
+// ============================================================================
+// TAGS - Gestión de etiquetas personalizadas
+// ============================================================================
+
+// GET /api/rfp-tags - Listar todos los tags
+router.get('/rfp-tags', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('rfp_tags')
+      .select('*')
+      .order('name')
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error fetching tags:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// POST /api/rfp-tags - Crear nuevo tag
+router.post('/rfp-tags', async (req, res) => {
+  try {
+    const { name, color, description } = req.body
+    const authHeader = req.headers.authorization
+    const token = authHeader?.replace('Bearer ', '')
+    const { data: { user } } = await supabase.auth.getUser(token)
+
+    const { data, error } = await supabase
+      .from('rfp_tags')
+      .insert({ name, color, description, created_by: user.id })
+      .select()
+      .single()
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error creating tag:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// POST /api/rfp-tags/assign - Asignar tag a RFP
+router.post('/rfp-tags/assign', async (req, res) => {
+  try {
+    const { rfp_id, tag_id } = req.body
+    const authHeader = req.headers.authorization
+    const token = authHeader?.replace('Bearer ', '')
+    const { data: { user } } = await supabase.auth.getUser(token)
+
+    const { data, error } = await supabase
+      .from('rfp_tag_assignments')
+      .insert({ rfp_id, tag_id, assigned_by: user.id })
+      .select()
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error assigning tag:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// DELETE /api/rfp-tags/assign - Desasignar tag de RFP
+router.delete('/rfp-tags/assign', async (req, res) => {
+  try {
+    const { rfp_id, tag_id } = req.body
+
+    const { error } = await supabase
+      .from('rfp_tag_assignments')
+      .delete()
+      .eq('rfp_id', rfp_id)
+      .eq('tag_id', tag_id)
+
+    if (error) throw error
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Error unassigning tag:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// ============================================================================
+// REQUISITOS - Extracción y gestión de requisitos
+// ============================================================================
+
+// GET /api/rfp-requirements/:rfpId - Obtener requisitos de una RFP
+router.get('/rfp-requirements/:rfpId', async (req, res) => {
+  try {
+    const { rfpId } = req.params
+
+    const { data, error } = await supabase
+      .from('rfp_requirements')
+      .select('*')
+      .eq('rfp_id', rfpId)
+      .order('priority', { ascending: false })
+      .order('created_at')
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error fetching requirements:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// POST /api/rfp-requirements/extract/:rfpId - Extraer requisitos con IA
+router.post('/rfp-requirements/extract/:rfpId', async (req, res) => {
+  try {
+    const { rfpId } = req.params
+    const authHeader = req.headers.authorization
+    const token = authHeader?.replace('Bearer ', '')
+    const { data: { user } } = await supabase.auth.getUser(token)
+
+    // Obtener RFP
+    const { data: rfp, error: rfpError } = await supabase
+      .from('rfps')
+      .select('*')
+      .eq('id', rfpId)
+      .single()
+
+    if (rfpError) throw rfpError
+
+    // Extraer texto del análisis previo (simplificado - idealmente releer PDF)
+    const textToAnalyze = `RFP: ${rfp.name}\nViabilidad: ${rfp.viability}\nRazón: ${rfp.viability_reason}`
+
+    const systemPrompt = `Eres un experto en análisis de RFPs para sistemas DMS como Therefore™.
+
+Extrae TODOS los requisitos técnicos del pliego y clasifícalos según:
+
+1. **Categoría**: Core DMS, Autenticación, Web/Portal, Integración, Workflow, Seguridad, Búsqueda, Reporting, etc.
+
+2. **Cobertura Therefore™**:
+   - "nativo": Therefore™ lo incluye sin desarrollo
+   - "desarrollo": Requiere customización/desarrollo
+   - "integracion": Requiere integrar con terceros
+   - "no_aplica": No es un requisito DMS
+
+3. **Esfuerzo**:
+   - "bajo": < 2 días
+   - "medio": 2-5 días
+   - "alto": 5-10 días
+   - "muy_alto": > 10 días
+
+4. **Prioridad**: 1-10 (10 = crítico)
+
+Responde SOLO en JSON válido con este formato:
+{
+  "requirements": [
+    {
+      "requirement_text": "...",
+      "category": "...",
+      "therefore_coverage": "...",
+      "effort_level": "...",
+      "priority": 1-10,
+      "notes": "..."
+    }
+  ]
+}`
+
+    const response = await callBedrock({
+      model: 'claude-sonnet-4-5',
+      system: systemPrompt,
+      messages: [{ role: 'user', content: `Extrae los requisitos de este RFP:\n\n${textToAnalyze}` }],
+      max_tokens: 4096
+    }, {
+      userId: user.id,
+      module: 'rfp-requirements-extraction'
+    })
+
+    const content = response.content[0].text
+    let parsed
+
+    try {
+      parsed = JSON.parse(content)
+    } catch (e) {
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/)
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[1])
+      } else {
+        const jsonMatch2 = content.match(/\{[\s\S]*\}/)
+        if (jsonMatch2) {
+          parsed = JSON.parse(jsonMatch2[0])
+        } else {
+          throw new Error('No se pudo extraer JSON de la respuesta')
+        }
+      }
+    }
+
+    // Insertar requisitos
+    const requirements = parsed.requirements.map(req => ({
+      rfp_id: rfpId,
+      ...req
+    }))
+
+    const { data: inserted, error: insertError } = await supabase
+      .from('rfp_requirements')
+      .insert(requirements)
+      .select()
+
+    if (insertError) throw insertError
+
+    res.json({ success: true, requirements: inserted, count: inserted.length })
+  } catch (error) {
+    console.error('Error extracting requirements:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// PUT /api/rfp-requirements/:id - Actualizar requisito
+router.put('/rfp-requirements/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const updates = req.body
+
+    const { data, error } = await supabase
+      .from('rfp_requirements')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error updating requirement:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// ============================================================================
+// SCORING - Sistema de puntuación automática
+// ============================================================================
+
+// GET /api/rfp-scoring/:rfpId - Obtener scoring de una RFP
+router.get('/rfp-scoring/:rfpId', async (req, res) => {
+  try {
+    const { rfpId } = req.params
+
+    const { data, error } = await supabase
+      .from('rfp_scoring')
+      .select('*')
+      .eq('rfp_id', rfpId)
+      .single()
+
+    if (error && error.code !== 'PGRST116') throw error
+    res.json(data || null)
+  } catch (error) {
+    console.error('Error fetching scoring:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// POST /api/rfp-scoring - Crear/Actualizar scoring
+router.post('/rfp-scoring', async (req, res) => {
+  try {
+    const { rfp_id, viabilidad_tecnica, margen_esperado, expertise_equipo, riesgo_contractual, timeline_factible, notes } = req.body
+
+    const { data, error } = await supabase
+      .from('rfp_scoring')
+      .upsert({
+        rfp_id,
+        viabilidad_tecnica,
+        margen_esperado,
+        expertise_equipo,
+        riesgo_contractual,
+        timeline_factible,
+        notes
+      }, { onConflict: 'rfp_id' })
+      .select()
+      .single()
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error saving scoring:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// GET /api/rfp-scoring-ranking - Ranking de RFPs por score
+router.get('/rfp-scoring-ranking', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('rfp_scoring')
+      .select(`
+        *,
+        rfps:rfp_id (
+          id,
+          name,
+          viability,
+          status,
+          deadline
+        )
+      `)
+      .order('score_total', { ascending: false })
+      .limit(20)
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error fetching ranking:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// ============================================================================
+// BIBLIOTECA DE RESPUESTAS
+// ============================================================================
+
+// GET /api/answer-library - Listar respuestas de biblioteca
+router.get('/answer-library', async (req, res) => {
+  try {
+    const { category, search } = req.query
+    let query = supabase
+      .from('rfp_answer_library')
+      .select('*')
+      .order('usage_count', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    if (category) {
+      query = query.eq('question_category', category)
+    }
+
+    if (search) {
+      query = query.or(`question_text.ilike.%${search}%,keywords.cs.{${search}}`)
+    }
+
+    const { data, error } = await query
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error fetching answer library:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// POST /api/answer-library - Crear respuesta en biblioteca
+router.post('/answer-library', async (req, res) => {
+  try {
+    const { question_text, question_category, answer_template, keywords } = req.body
+    const authHeader = req.headers.authorization
+    const token = authHeader?.replace('Bearer ', '')
+    const { data: { user } } = await supabase.auth.getUser(token)
+
+    const { data, error } = await supabase
+      .from('rfp_answer_library')
+      .insert({
+        question_text,
+        question_category,
+        answer_template,
+        keywords,
+        created_by: user.id
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error creating answer:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// ============================================================================
+// CLÁUSULAS DE RIESGO - Análisis con IA
+// ============================================================================
+
+// GET /api/rfp-risk-clauses/:rfpId - Obtener cláusulas de riesgo
+router.get('/rfp-risk-clauses/:rfpId', async (req, res) => {
+  try {
+    const { rfpId } = req.params
+
+    const { data, error } = await supabase
+      .from('rfp_risk_clauses')
+      .select('*')
+      .eq('rfp_id', rfpId)
+      .order('risk_level', { ascending: false })
+      .order('created_at')
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error fetching risk clauses:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// POST /api/rfp-risk-clauses/analyze/:rfpId - Analizar cláusulas con IA
+router.post('/rfp-risk-clauses/analyze/:rfpId', async (req, res) => {
+  try {
+    const { rfpId } = req.params
+    const authHeader = req.headers.authorization
+    const token = authHeader?.replace('Bearer ', '')
+    const { data: { user } } = await supabase.auth.getUser(token)
+
+    // Obtener RFP
+    const { data: rfp, error: rfpError } = await supabase
+      .from('rfps')
+      .select('*')
+      .eq('id', rfpId)
+      .single()
+
+    if (rfpError) throw rfpError
+
+    const systemPrompt = `Eres un experto legal en análisis de RFPs y contratos públicos.
+
+Analiza el pliego y detecta cláusulas de riesgo clasificadas en:
+
+1. **Tipo**:
+   - "penalizacion": Multas, penalizaciones económicas
+   - "garantia": Garantías ilimitadas, responsabilidades excesivas
+   - "exclusividad": Cláusulas de exclusividad sin compensación
+   - "restrictivo": Lenguaje muy restrictivo ("obligatorio bajo pena de exclusión")
+   - "oportunidad": Cláusulas positivas ("se valorará positivamente")
+
+2. **Nivel de riesgo**:
+   - "alto": Riesgo financiero o legal significativo
+   - "medio": Requiere atención pero manejable
+   - "bajo": Menor relevancia
+   - "positivo": Oportunidad (para tipo "oportunidad")
+
+Responde SOLO en JSON:
+{
+  "clauses": [
+    {
+      "clause_text": "...",
+      "clause_type": "...",
+      "risk_level": "...",
+      "section_reference": "...",
+      "recommendation": "..."
+    }
+  ]
+}`
+
+    const response = await callBedrock({
+      model: 'claude-sonnet-4-5',
+      system: systemPrompt,
+      messages: [{ role: 'user', content: `Analiza las cláusulas de riesgo de este RFP:\n\nNombre: ${rfp.name}\n\nViabilidad: ${rfp.viability}\nRazón: ${rfp.viability_reason}\n\nRiesgos identificados:\n${JSON.stringify(rfp.risks || [])}` }],
+      max_tokens: 4096
+    }, {
+      userId: user.id,
+      module: 'rfp-risk-analysis'
+    })
+
+    const content = response.content[0].text
+    let parsed
+
+    try {
+      parsed = JSON.parse(content)
+    } catch (e) {
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/)
+      if (jsonMatch) parsed = JSON.parse(jsonMatch[1])
+      else throw new Error('No se pudo extraer JSON')
+    }
+
+    // Insertar cláusulas
+    const clauses = parsed.clauses.map(clause => ({
+      rfp_id: rfpId,
+      ...clause
+    }))
+
+    const { data: inserted, error: insertError } = await supabase
+      .from('rfp_risk_clauses')
+      .insert(clauses)
+      .select()
+
+    if (insertError) throw insertError
+
+    res.json({ success: true, clauses: inserted, count: inserted.length })
+  } catch (error) {
+    console.error('Error analyzing risk clauses:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// ============================================================================
+// COMPARACIONES
+// ============================================================================
+
+// POST /api/rfp-compare - Comparar RFPs
+router.post('/rfp-compare', async (req, res) => {
+  try {
+    const { rfp_ids, name } = req.body
+    const authHeader = req.headers.authorization
+    const token = authHeader?.replace('Bearer ', '')
+    const { data: { user } } = await supabase.auth.getUser(token)
+
+    // Obtener RFPs con scoring
+    const { data: rfps, error: rfpsError } = await supabase
+      .from('rfps')
+      .select(`
+        *,
+        scoring:rfp_scoring(*)
+      `)
+      .in('id', rfp_ids)
+
+    if (rfpsError) throw rfpsError
+
+    // Calcular datos de comparación
+    const comparison_data = {
+      rfps: rfps.map(r => ({
+        id: r.id,
+        name: r.name,
+        viability: r.viability,
+        status: r.status,
+        deadline: r.deadline,
+        score: r.scoring?.[0]?.score_total || 0,
+        recommendation: r.scoring?.[0]?.recommendation || 'pending'
+      })),
+      generated_at: new Date().toISOString()
+    }
+
+    // Guardar comparación
+    const { data, error } = await supabase
+      .from('rfp_comparisons')
+      .insert({
+        name: name || `Comparación ${new Date().toLocaleDateString()}`,
+        rfp_ids,
+        comparison_data,
+        created_by: user.id
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    res.json(data)
+  } catch (error) {
+    console.error('Error comparing RFPs:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router
