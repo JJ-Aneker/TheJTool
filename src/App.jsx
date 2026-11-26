@@ -404,7 +404,7 @@ function AppContent() {
           display: 'flex',
           flexDirection: 'column',
           minHeight: 0,
-          overflow: 'hidden'
+          overflow: 'auto'
         }}>
           <Suspense fallback={
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '400px', gap: 16 }}>
