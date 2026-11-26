@@ -10,7 +10,43 @@
       "maxDuration": 120,
       "memory": 1024
     },
-    "api/**/*.js": {
+    "api/analyze.js": {
+      "maxDuration": 120,
+      "memory": 1024
+    },
+    "api/analyze-licensing.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/bedrock.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/export-gantt.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/export-vertical.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/parse-licensing-request.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/questionnaires.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/rfp-api.js": {
+      "maxDuration": 120,
+      "memory": 1024
+    },
+    "api/therefore-connect.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/verticales.js": {
       "maxDuration": 60,
       "memory": 1024
     }
