@@ -1,0 +1,11 @@
+# Excluir archivos backup de API
+api/*.backup
+
+# Excluir archivos de desarrollo
+*.log
+.env.local
+.DS_Store
+
+# Excluir archivos temporales
+uploads/
+temp/
