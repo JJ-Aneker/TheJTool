@@ -65,6 +65,10 @@
     "api/dashboard-routes.js": {
       "maxDuration": 60,
       "memory": 1024
+    },
+    "api/check-env.js": {
+      "maxDuration": 10,
+      "memory": 256
     }
   },
   "headers": [
