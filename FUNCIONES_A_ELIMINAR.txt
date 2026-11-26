@@ -1,0 +1,18 @@
+ELIMINAR TEMPORALMENTE (3 funciones):
+
+1. parse-licensing-request.js
+   - Función: Parsear texto en lenguaje natural para licencias
+   - Impacto: El configurador de licencias pierde el parser de texto
+   - Workaround: Usuario ingresa datos manualmente en el form
+
+2. admin-routes.js  
+   - Función: Gestión de usuarios (solo admin)
+   - Impacto: Panel de admin pierde algunas funciones
+   - Workaround: Gestión directa en Supabase Dashboard
+
+3. dashboard-routes.js
+   - Función: Stats del dashboard (Home)
+   - Impacto: Dashboard Home pierde métricas
+   - Workaround: Métricas se pueden calcular en frontend
+
+RESULTADO: 12 funciones exactas

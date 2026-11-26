@@ -14,10 +14,6 @@
       "maxDuration": 120,
       "memory": 1024
     },
-    "api/analyze-licensing.js": {
-      "maxDuration": 60,
-      "memory": 1024
-    },
     "api/bedrock.js": {
       "maxDuration": 60,
       "memory": 1024
@@ -48,6 +44,10 @@
     },
     "api/verticales.js": {
       "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/eform-ai-routes.js": {
+      "maxDuration": 120,
       "memory": 1024
     }
   },

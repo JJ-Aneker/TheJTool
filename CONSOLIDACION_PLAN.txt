@@ -1,0 +1,30 @@
+FUNCIONES ACTUALES (15):
+1. analyze.js
+2. analyze-licensing.js
+3. bedrock.js
+4. build-docx.js
+5. eform-ai.js
+6. export-gantt.js
+7. export-vertical.js
+8. parse-licensing-request.js
+9. questionnaires.js
+10. rfp-api.js
+11. therefore-connect.js
+12. verticales.js
+13. admin-routes.js
+14. dashboard-routes.js
+15. eform-ai-routes.js
+
+CONSOLIDAR EN (12):
+1. analyze.js
+2. licensing-api.js (← analyze-licensing + parse-licensing-request)
+3. bedrock.js
+4. build-docx.js
+5. eform-api.js (← eform-ai + eform-ai-routes)
+6. export-gantt.js
+7. export-vertical.js
+8. questionnaires.js
+9. rfp-api.js
+10. therefore-connect.js
+11. verticales.js
+12. app-routes.js (← admin-routes + dashboard-routes)
