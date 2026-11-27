@@ -671,6 +671,25 @@ router.post('/rfp-generate-viability/:id', async (req, res) => {
       return res.status(404).json({ error: 'RFP no encontrada' })
     }
 
+    // Cargar datos avanzados
+    const { data: scoring } = await supabase
+      .from('rfp_scoring')
+      .select('*')
+      .eq('rfp_id', id)
+      .single()
+
+    const { data: requirements } = await supabase
+      .from('rfp_requirements')
+      .select('*')
+      .eq('rfp_id', id)
+      .order('priority', { ascending: false })
+
+    const { data: riskClauses } = await supabase
+      .from('rfp_risk_clauses')
+      .select('*')
+      .eq('rfp_id', id)
+      .order('risk_level', { ascending: true })
+
     const sections = []
 
     sections.push(
@@ -738,7 +757,148 @@ router.post('/rfp-generate-viability/:id', async (req, res) => {
       sections.push(p('', { sa: 240 }))
     }
 
-    sections.push(h2('Recomendación'), p('Basado en el análisis realizado:', { sb: 120 }))
+    // SCORING DE DECISIÓN
+    if (scoring) {
+      sections.push(
+        h1('SCORING DE DECISIÓN'),
+        p('Análisis cuantitativo de viabilidad:', { sb: 160 })
+      )
+
+      const scoreComponents = [
+        { label: 'Viabilidad Técnica (30%)', value: scoring.viabilidad_tecnica },
+        { label: 'Margen Esperado (25%)', value: scoring.margen_esperado },
+        { label: 'Expertise Equipo (20%)', value: scoring.expertise_equipo },
+        { label: 'Riesgo Contractual (15%)', value: scoring.riesgo_contractual },
+        { label: 'Timeline Factible (10%)', value: scoring.timeline_factible }
+      ]
+
+      scoreComponents.forEach(comp => {
+        sections.push(p(`${comp.label}: ${comp.value}/100`, { sb: 80 }))
+      })
+
+      sections.push(
+        p(`PUNTUACIÓN TOTAL: ${scoring.score_total}/100`, { bold: true, size: 14, sa: 160, sb: 160 })
+      )
+
+      const recommendationText = {
+        go: '✅ GO - Se recomienda presentar oferta',
+        review: '⚠️ REVIEW - Evaluación adicional necesaria',
+        no_go: '❌ NO-GO - No se recomienda presentar oferta'
+      }
+
+      const recommendationColor = {
+        go: C.GREEN,
+        review: C.ORANGE,
+        no_go: C.RED
+      }
+
+      sections.push(
+        p(recommendationText[scoring.recommendation] || 'N/A', {
+          bold: true,
+          color: recommendationColor[scoring.recommendation] || C.BLACK,
+          sa: 160
+        })
+      )
+
+      if (scoring.notes) {
+        sections.push(
+          p('Notas del análisis:', { bold: true, sb: 120 }),
+          p(scoring.notes, { sa: 240 })
+        )
+      }
+    }
+
+    // REQUISITOS DETALLADOS
+    if (requirements && requirements.length > 0) {
+      sections.push(
+        h1('ANÁLISIS DETALLADO DE REQUISITOS'),
+        p(`Total de requisitos identificados: ${requirements.length}`, { sb: 160 })
+      )
+
+      const coverageStats = {
+        nativo: requirements.filter(r => r.therefore_coverage === 'nativo').length,
+        desarrollo: requirements.filter(r => r.therefore_coverage === 'desarrollo').length,
+        integracion: requirements.filter(r => r.therefore_coverage === 'integracion').length,
+        no_aplica: requirements.filter(r => r.therefore_coverage === 'no_aplica').length
+      }
+
+      sections.push(
+        p('Cobertura Therefore™:', { bold: true, sb: 120 }),
+        bullet(`Requisitos nativos: ${coverageStats.nativo} (${Math.round(coverageStats.nativo/requirements.length*100)}%)`),
+        bullet(`Requiere desarrollo: ${coverageStats.desarrollo} (${Math.round(coverageStats.desarrollo/requirements.length*100)}%)`),
+        bullet(`Requiere integración: ${coverageStats.integracion} (${Math.round(coverageStats.integracion/requirements.length*100)}%)`),
+        p('', { sa: 240 })
+      )
+
+      const highPriority = requirements.filter(r => r.priority >= 8)
+      if (highPriority.length > 0) {
+        sections.push(
+          p('Requisitos de Alta Prioridad (≥8):', { bold: true, sb: 120 })
+        )
+        highPriority.slice(0, 10).forEach(req => {
+          const coverageLabel = {
+            nativo: '✓ Nativo',
+            desarrollo: '⚒ Desarrollo',
+            integracion: '🔗 Integración',
+            no_aplica: '— N/A'
+          }
+          sections.push(
+            bullet(`[P${req.priority}] ${req.requirement_text.substring(0, 100)}${req.requirement_text.length > 100 ? '...' : ''}`),
+            p(`   Cobertura: ${coverageLabel[req.therefore_coverage] || 'N/A'} | Esfuerzo: ${req.effort_level || 'N/A'}`, { sb: 80 })
+          )
+        })
+        sections.push(p('', { sa: 240 }))
+      }
+    }
+
+    // ANÁLISIS DE RIESGO DETALLADO
+    if (riskClauses && riskClauses.length > 0) {
+      sections.push(
+        h1('ANÁLISIS DE CLÁUSULAS DE RIESGO'),
+        p(`Total de cláusulas identificadas: ${riskClauses.length}`, { sb: 160 })
+      )
+
+      const highRisk = riskClauses.filter(c => c.risk_level === 'alto')
+      if (highRisk.length > 0) {
+        sections.push(
+          p(`⚠️ CLÁUSULAS DE ALTO RIESGO: ${highRisk.length}`, { bold: true, color: C.RED, sb: 120 })
+        )
+        highRisk.forEach(clause => {
+          const typeLabel = {
+            penalizacion: '💰 Penalización',
+            garantia: '📋 Garantía',
+            exclusividad: '🔒 Exclusividad',
+            restrictivo: '⚠️ Restrictivo',
+            oportunidad: '✨ Oportunidad'
+          }
+          sections.push(
+            p(`${typeLabel[clause.clause_type] || clause.clause_type}:`, { bold: true, sb: 80 }),
+            p(`"${clause.clause_text.substring(0, 200)}${clause.clause_text.length > 200 ? '...' : ''}"`, { italic: true, sb: 80 })
+          )
+          if (clause.recommendation) {
+            sections.push(
+              p(`Recomendación: ${clause.recommendation}`, { sb: 160 })
+            )
+          }
+        })
+        sections.push(p('', { sa: 240 }))
+      }
+
+      const mediumRisk = riskClauses.filter(c => c.risk_level === 'medio')
+      if (mediumRisk.length > 0) {
+        sections.push(
+          p(`⚡ Cláusulas de Riesgo Medio: ${mediumRisk.length}`, { bold: true, color: C.ORANGE, sb: 120 })
+        )
+        mediumRisk.slice(0, 5).forEach(clause => {
+          sections.push(
+            bullet(`${clause.clause_text.substring(0, 150)}${clause.clause_text.length > 150 ? '...' : ''}`)
+          )
+        })
+        sections.push(p('', { sa: 240 }))
+      }
+    }
+
+    sections.push(h1('RECOMENDACIÓN FINAL'), p('Basado en el análisis realizado:', { sb: 120 }))
 
     if (rfp.viability === 'alta') {
       sections.push(
