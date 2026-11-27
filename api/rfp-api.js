@@ -229,7 +229,7 @@ router.post('/analyze-rfp', upload.array('files', 5), async (req, res) => {
 
         fs.unlinkSync(tempPath)
 
-        // Analyze with Bedrock
+        // 1. Analyze with Bedrock (viability)
         const analysis = await analyzeWithBedrock(extractedText, firstFile.originalname, user.id)
 
         // Update RFP with analysis results
@@ -244,6 +244,123 @@ router.post('/analyze-rfp', upload.array('files', 5), async (req, res) => {
             status: 'analizada'
           })
           .eq('id', rfpData.id)
+
+        console.log(`[RFP ${rfpData.id}] Análisis básico completado`)
+
+        // 2. AUTO-EXTRACT REQUIREMENTS with AI
+        try {
+          const reqSystemPrompt = `Eres un experto en análisis de RFPs y sistemas DMS.
+Analiza el siguiente texto y extrae TODOS los requisitos técnicos y funcionales.
+
+Para cada requisito:
+- requirement_text: descripción clara del requisito
+- category: clasificación (Core DMS, Autenticación, Web/Portal, Integración, Workflow, Seguridad, Búsqueda, Reporting, Otros)
+- therefore_coverage: "nativo" (Therefore™ lo tiene), "desarrollo" (hay que desarrollarlo), "integracion" (requiere integración), "no_aplica"
+- effort_level: "bajo" (<2 días), "medio" (2-5 días), "alto" (5-10 días), "muy_alto" (>10 días)
+- priority: 1-10 (10 = crítico, 1 = nice-to-have)
+- notes: observaciones breves
+
+Responde SOLO en JSON válido con este formato:
+{
+  "requirements": [
+    {
+      "requirement_text": "...",
+      "category": "...",
+      "therefore_coverage": "...",
+      "effort_level": "...",
+      "priority": 1-10,
+      "notes": "..."
+    }
+  ]
+}`
+
+          const reqResponse = await callBedrock({
+            model: 'claude-haiku-4-5-20251001',
+            system: reqSystemPrompt,
+            messages: [{ role: 'user', content: `Extrae los requisitos de este RFP:\n\n${extractedText}` }],
+            max_tokens: 4096
+          }, {
+            userId: user.id,
+            module: 'rfp-requirements-extraction-auto'
+          })
+
+          const reqContent = reqResponse.content[0].text
+          const reqParsed = JSON.parse(reqContent)
+
+          if (reqParsed.requirements && reqParsed.requirements.length > 0) {
+            const requirementsToInsert = reqParsed.requirements.map(req => ({
+              rfp_id: rfpData.id,
+              requirement_text: req.requirement_text,
+              category: req.category,
+              therefore_coverage: req.therefore_coverage,
+              effort_level: req.effort_level,
+              priority: req.priority || 5,
+              notes: req.notes || null
+            }))
+
+            await supabase.from('rfp_requirements').insert(requirementsToInsert)
+            console.log(`[RFP ${rfpData.id}] ${reqParsed.requirements.length} requisitos extraídos`)
+          }
+        } catch (reqError) {
+          console.error(`[RFP ${rfpData.id}] Error extrayendo requisitos:`, reqError.message)
+        }
+
+        // 3. AUTO-ANALYZE RISK CLAUSES with AI
+        try {
+          const riskSystemPrompt = `Eres un experto legal en análisis de RFPs y contratos públicos.
+Analiza el siguiente RFP y detecta TODAS las cláusulas de riesgo: penalizaciones, garantías, exclusividades, restricciones.
+
+Para cada cláusula:
+- clause_text: texto exacto de la cláusula
+- clause_type: "penalizacion", "garantia", "exclusividad", "restrictivo", "oportunidad"
+- risk_level: "alto" (peligroso), "medio" (revisar), "bajo" (menor), "positivo" (favorable)
+- section_reference: referencia al apartado del pliego
+- recommendation: qué hacer con esta cláusula
+
+Responde SOLO en JSON válido:
+{
+  "clauses": [
+    {
+      "clause_text": "...",
+      "clause_type": "...",
+      "risk_level": "...",
+      "section_reference": "...",
+      "recommendation": "..."
+    }
+  ]
+}`
+
+          const riskResponse = await callBedrock({
+            model: 'claude-haiku-4-5-20251001',
+            system: riskSystemPrompt,
+            messages: [{ role: 'user', content: `Analiza las cláusulas de riesgo de este RFP:\n\nNombre: ${rfpData.name}\n\nViabilidad: ${analysis.viability}\nRazón: ${analysis.viability_reason}\n\nRiesgos identificados:\n${JSON.stringify(analysis.risks || [])}` }],
+            max_tokens: 4096
+          }, {
+            userId: user.id,
+            module: 'rfp-risk-analysis-auto'
+          })
+
+          const riskContent = riskResponse.content[0].text
+          const riskParsed = JSON.parse(riskContent)
+
+          if (riskParsed.clauses && riskParsed.clauses.length > 0) {
+            const clausesToInsert = riskParsed.clauses.map(clause => ({
+              rfp_id: rfpData.id,
+              clause_text: clause.clause_text,
+              clause_type: clause.clause_type,
+              risk_level: clause.risk_level,
+              section_reference: clause.section_reference || null,
+              recommendation: clause.recommendation || null
+            }))
+
+            await supabase.from('rfp_risk_clauses').insert(clausesToInsert)
+            console.log(`[RFP ${rfpData.id}] ${riskParsed.clauses.length} cláusulas de riesgo identificadas`)
+          }
+        } catch (riskError) {
+          console.error(`[RFP ${rfpData.id}] Error analizando riesgos:`, riskError.message)
+        }
+
+        console.log(`[RFP ${rfpData.id}] ✅ Análisis completo terminado`)
 
       } catch (error) {
         console.error('Background analysis error:', error)
