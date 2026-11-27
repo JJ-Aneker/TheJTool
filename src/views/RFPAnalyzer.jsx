@@ -7,15 +7,13 @@ import {
   ClockCircleOutlined, ExclamationCircleOutlined, FilterOutlined,
   SearchOutlined, PlusOutlined, ArrowLeftOutlined, FileWordOutlined,
   FilePdfOutlined, LoadingOutlined, DeleteOutlined, TrophyOutlined,
-  FileSearchOutlined, WarningOutlined, BellOutlined
+  BellOutlined
 } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { message } from '../utils/message'
 import axios from 'axios'
 import RFPTags from '../components/RFPTags'
 import RFPScoring from '../components/RFPScoring'
-import RFPRequirements from '../components/RFPRequirements'
-import RFPRiskAnalysis from '../components/RFPRiskAnalysis'
 import '../styles/rfp-analyzer.css'
 
 const { Dragger } = Upload
@@ -794,24 +792,6 @@ export default function RFPAnalyzer() {
                   </span>
                 ),
                 children: <RFPScoring rfpId={currentRfp.id} />
-              },
-              {
-                key: 'requirements',
-                label: (
-                  <span>
-                    <FileSearchOutlined /> Requisitos
-                  </span>
-                ),
-                children: <RFPRequirements rfpId={currentRfp.id} />
-              },
-              {
-                key: 'risks',
-                label: (
-                  <span>
-                    <WarningOutlined /> Análisis de Riesgo
-                  </span>
-                ),
-                children: <RFPRiskAnalysis rfpId={currentRfp.id} />
               }
             ]}
           />
