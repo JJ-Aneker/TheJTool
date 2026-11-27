@@ -593,6 +593,19 @@ export default function RFPAnalyzer() {
                         </div>
                         <div className="rfp-list-info">
                           <div className="rfp-list-name">{rfp.name}</div>
+
+                          {/* Barra de progreso mientras se analiza */}
+                          {rfp.status === 'nueva' && (
+                            <Progress
+                              percent={100}
+                              status="active"
+                              strokeColor={{ from: '#108ee9', to: '#87d068' }}
+                              size="small"
+                              showInfo={false}
+                              style={{ marginBottom: 8 }}
+                            />
+                          )}
+
                           <div className="rfp-list-meta">
                             <Tag
                               color={VIABILITY_CONFIG[rfp.viability]?.color}
