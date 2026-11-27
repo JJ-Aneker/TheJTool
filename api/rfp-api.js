@@ -1042,7 +1042,7 @@ Responde SOLO en JSON válido con este formato:
 }`
 
     const response = await callBedrock({
-      model: 'claude-sonnet-4-5',
+      model: 'claude-haiku-4-5-20251001',
       system: systemPrompt,
       messages: [{ role: 'user', content: `Extrae los requisitos de este RFP:\n\n${textToAnalyze}` }],
       max_tokens: 4096
@@ -1319,7 +1319,7 @@ Responde SOLO en JSON:
 }`
 
     const response = await callBedrock({
-      model: 'claude-sonnet-4-5',
+      model: 'claude-haiku-4-5-20251001',
       system: systemPrompt,
       messages: [{ role: 'user', content: `Analiza las cláusulas de riesgo de este RFP:\n\nNombre: ${rfp.name}\n\nViabilidad: ${rfp.viability}\nRazón: ${rfp.viability_reason}\n\nRiesgos identificados:\n${JSON.stringify(rfp.risks || [])}` }],
       max_tokens: 4096
