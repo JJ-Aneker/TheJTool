@@ -183,49 +183,80 @@ router.post('/analyze-rfp', upload.array('files', 5), async (req, res) => {
       })
     }
 
-    // Extract text from first file
-    const firstFile = files[0]
-    let extractedText = ''
-
-    const fileBuffer = fs.readFileSync(firstFile.path)
-    const tempPath = `uploads/temp_${Date.now()}_${firstFile.originalname}`
-    fs.writeFileSync(tempPath, fileBuffer)
-
-    if (firstFile.mimetype === 'application/pdf') {
-      extractedText = await extractPdfText(tempPath)
-    } else if (firstFile.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-      extractedText = await extractDocxText(tempPath)
-    } else {
-      fs.unlinkSync(tempPath)
-      return res.status(400).json({ error: 'Formato no soportado. Solo PDF y DOCX.' })
-    }
-
-    fs.unlinkSync(tempPath)
-
-    // Analyze with Bedrock
-    const analysis = await analyzeWithBedrock(extractedText, firstFile.originalname, user.id)
-
-    // Save to Supabase
+    // Create RFP immediately with status "nueva" (before analysis)
     const { data: rfpData, error: rfpError } = await supabase
       .from('rfp_analyses')
       .insert({
         user_id: user.id,
         name,
         files_urls: uploadedFiles,
-        viability: analysis.viability,
-        viability_reason: analysis.viability_reason,
-        deadlines: analysis.deadlines,
-        risks: analysis.risks,
-        technical_requirements: analysis.technical_requirements,
-        status: 'analizada' // Auto-set status after analysis
+        status: 'nueva' // Will update to "analizada" after processing
       })
       .select()
       .single()
 
     if (rfpError) {
-      console.error('Error saving RFP analysis:', rfpError)
-      return res.status(500).json({ error: 'Error al guardar el análisis' })
+      console.error('Error saving RFP:', rfpError)
+      return res.status(500).json({ error: 'Error al guardar RFP' })
     }
+
+    // Clean up temp files
+    files.forEach(f => fs.unlinkSync(f.path))
+
+    // RESPOND IMMEDIATELY (avoids 60s timeout)
+    res.json(rfpData)
+
+    // Continue processing in background (after response sent)
+    const processAnalysis = async () => {
+      try {
+        const firstFile = files[0]
+        let extractedText = ''
+
+        // Download from storage for processing
+        const { data: fileData } = await supabase.storage
+          .from('rfp-documents')
+          .download(uploadedFiles[0].path)
+
+        const buffer = Buffer.from(await fileData.arrayBuffer())
+        const tempPath = `/tmp/temp_${Date.now()}_${firstFile.originalname}`
+        fs.writeFileSync(tempPath, buffer)
+
+        if (firstFile.mimetype === 'application/pdf') {
+          extractedText = await extractPdfText(tempPath)
+        } else if (firstFile.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          extractedText = await extractDocxText(tempPath)
+        }
+
+        fs.unlinkSync(tempPath)
+
+        // Analyze with Bedrock
+        const analysis = await analyzeWithBedrock(extractedText, firstFile.originalname, user.id)
+
+        // Update RFP with analysis results
+        await supabase
+          .from('rfp_analyses')
+          .update({
+            viability: analysis.viability,
+            viability_reason: analysis.viability_reason,
+            deadlines: analysis.deadlines,
+            risks: analysis.risks,
+            technical_requirements: analysis.technical_requirements,
+            status: 'analizada'
+          })
+          .eq('id', rfpData.id)
+
+      } catch (error) {
+        console.error('Background analysis error:', error)
+        // Update status to show error
+        await supabase
+          .from('rfp_analyses')
+          .update({ status: 'error_analisis' })
+          .eq('id', rfpData.id)
+      }
+    }
+
+    // Start background processing (don't await)
+    processAnalysis().catch(err => console.error('Process error:', err))
 
     // Save sections
     const sectionsToInsert = analysis.sections.map((section, index) => ({

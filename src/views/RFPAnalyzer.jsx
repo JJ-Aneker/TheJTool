@@ -113,14 +113,7 @@ export default function RFPAnalyzer() {
       formData.append('name', rfpName)
       fileList.forEach(file => formData.append('files', file))
 
-      // Simular progreso
-      const progressInterval = setInterval(() => {
-        setAnalysisProgress(prev => {
-          if (prev >= 90) return prev
-          return prev + Math.random() * 15
-        })
-      }, 500)
-
+      // Upload file and create RFP (responds immediately)
       const response = await axios.post(
         '/api/analyze-rfp',
         formData,
@@ -132,15 +125,56 @@ export default function RFPAnalyzer() {
         }
       )
 
-      clearInterval(progressInterval)
-      setAnalysisProgress(100)
-
-      message.success('RFP analizada correctamente')
+      const rfpId = response.data.id
+      message.success('RFP creada. Analizando en segundo plano...')
       setFileList([])
       setRfpName('')
       await loadRfps()
-      await loadDashboard()
-      setCurrentRfp(response.data)
+
+      // Poll for analysis completion
+      let progress = 20
+      const pollInterval = setInterval(async () => {
+        try {
+          progress = Math.min(progress + 10, 95)
+          setAnalysisProgress(progress)
+
+          const { data: { session: currentSession } } = await supabase.auth.getSession()
+          const statusResponse = await axios.get(
+            `/api/analyze-rfp/${rfpId}`,
+            {
+              headers: { Authorization: `Bearer ${currentSession.access_token}` }
+            }
+          )
+
+          if (statusResponse.data.status === 'analizada') {
+            clearInterval(pollInterval)
+            setAnalysisProgress(100)
+            message.success('Análisis completado')
+            await loadRfps()
+            await loadDashboard()
+            setCurrentRfp(statusResponse.data)
+            setAnalyzing(false)
+            setAnalysisProgress(0)
+          } else if (statusResponse.data.status === 'error_analisis') {
+            clearInterval(pollInterval)
+            message.error('Error en el análisis. Revisa el RFP.')
+            setAnalyzing(false)
+            setAnalysisProgress(0)
+          }
+        } catch (err) {
+          console.error('Polling error:', err)
+        }
+      }, 3000) // Poll every 3 seconds
+
+      // Safety timeout: stop polling after 5 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval)
+        if (analyzing) {
+          message.warning('El análisis está tardando más de lo esperado. Recarga la página.')
+          setAnalyzing(false)
+          setAnalysisProgress(0)
+        }
+      }, 300000)
     } catch (error) {
       console.error('Error analyzing RFP:', error)
       message.error('Error al analizar la RFP: ' + (error.response?.data?.error || error.message))
