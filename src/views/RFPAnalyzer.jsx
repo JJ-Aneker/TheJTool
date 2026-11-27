@@ -38,6 +38,7 @@ const VIABILITY_CONFIG = {
 export default function RFPAnalyzer() {
   const [rfps, setRfps] = useState([])
   const [currentRfp, setCurrentRfp] = useState(null)
+  const [currentTags, setCurrentTags] = useState([])
   const [loading, setLoading] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [analysisProgress, setAnalysisProgress] = useState(0)
