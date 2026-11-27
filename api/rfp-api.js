@@ -21,7 +21,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY
 )
 
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({ dest: '/tmp/' })
 
 // ============================================================================
 // ANALYZE RFP (from analyze-rfp.js)
