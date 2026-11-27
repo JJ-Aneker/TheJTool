@@ -608,6 +608,13 @@ export default function RFPAnalyzer() {
             Volver
           </Button>
           <h1 style={{ display: 'inline-block', margin: 0 }}>{currentRfp.name}</h1>
+          <div style={{ marginTop: 8 }}>
+            <RFPTags
+              rfpId={currentRfp.id}
+              currentTags={currentTags}
+              onTagsChange={setCurrentTags}
+            />
+          </div>
         </div>
         <div>
           <Dropdown
