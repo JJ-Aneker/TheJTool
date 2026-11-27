@@ -84,6 +84,54 @@
   ],
   "rewrites": [
     {
+      "source": "/api/analyze-rfp/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-status/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-tags/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-requirements/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-scoring/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-risk-clauses/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/answer-library/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-compare",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-generate-viability/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-generate-tasks/:path*",
+      "destination": "/api/rfp-api"
+    },
+    {
+      "source": "/api/rfp-dashboard",
+      "destination": "/api/rfp-api"
+    },
+    {
       "source": "/((?!api).*)",
       "destination": "/index.html"
     }
