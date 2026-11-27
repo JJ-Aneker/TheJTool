@@ -165,6 +165,7 @@ export default function RFPAnalyzer() {
       )
 
       setCurrentRfp(response.data)
+      setCurrentTags(response.data.tags || [])
     } catch (error) {
       console.error('Error loading RFP:', error)
       message.error('Error al cargar el detalle de la RFP')
