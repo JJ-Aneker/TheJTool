@@ -285,7 +285,24 @@ Responde SOLO en JSON válido con este formato:
           })
 
           const reqContent = reqResponse.content[0].text
-          const reqParsed = JSON.parse(reqContent)
+          let reqParsed
+
+          try {
+            reqParsed = JSON.parse(reqContent)
+          } catch (e) {
+            // Try to extract JSON from markdown code blocks
+            const jsonMatch = reqContent.match(/```json\s*([\s\S]*?)\s*```/)
+            if (jsonMatch) {
+              reqParsed = JSON.parse(jsonMatch[1])
+            } else {
+              const jsonMatch2 = reqContent.match(/\{[\s\S]*\}/)
+              if (jsonMatch2) {
+                reqParsed = JSON.parse(jsonMatch2[0])
+              } else {
+                throw new Error('No se pudo extraer JSON de la respuesta')
+              }
+            }
+          }
 
           if (reqParsed.requirements && reqParsed.requirements.length > 0) {
             const requirementsToInsert = reqParsed.requirements.map(req => ({
@@ -341,7 +358,24 @@ Responde SOLO en JSON válido:
           })
 
           const riskContent = riskResponse.content[0].text
-          const riskParsed = JSON.parse(riskContent)
+          let riskParsed
+
+          try {
+            riskParsed = JSON.parse(riskContent)
+          } catch (e) {
+            // Try to extract JSON from markdown code blocks
+            const jsonMatch = riskContent.match(/```json\s*([\s\S]*?)\s*```/)
+            if (jsonMatch) {
+              riskParsed = JSON.parse(jsonMatch[1])
+            } else {
+              const jsonMatch2 = riskContent.match(/\{[\s\S]*\}/)
+              if (jsonMatch2) {
+                riskParsed = JSON.parse(jsonMatch2[0])
+              } else {
+                throw new Error('No se pudo extraer JSON de la respuesta')
+              }
+            }
+          }
 
           if (riskParsed.clauses && riskParsed.clauses.length > 0) {
             const clausesToInsert = riskParsed.clauses.map(clause => ({
