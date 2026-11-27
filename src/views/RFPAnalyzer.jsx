@@ -1,16 +1,21 @@
 // src/views/RFPAnalyzer.jsx
 // Análisis automático de RFPs con IA para decisión go/no-go
 import { useState, useEffect } from 'react'
-import { Upload, Card, Tag, Button, Timeline, Select, Input, Table, Spin, Dropdown, message as antdMessage, Empty, Progress } from 'antd'
+import { Upload, Card, Tag, Button, Timeline, Select, Input, Table, Spin, Dropdown, message as antdMessage, Empty, Progress, Tabs } from 'antd'
 import {
   InboxOutlined, FileTextOutlined, DownloadOutlined, CheckCircleOutlined,
   ClockCircleOutlined, ExclamationCircleOutlined, FilterOutlined,
   SearchOutlined, PlusOutlined, ArrowLeftOutlined, FileWordOutlined,
-  FilePdfOutlined, LoadingOutlined, DeleteOutlined
+  FilePdfOutlined, LoadingOutlined, DeleteOutlined, TrophyOutlined,
+  FileSearchOutlined, WarningOutlined, BellOutlined
 } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { message } from '../utils/message'
 import axios from 'axios'
+import RFPTags from '../components/RFPTags'
+import RFPScoring from '../components/RFPScoring'
+import RFPRequirements from '../components/RFPRequirements'
+import RFPRiskAnalysis from '../components/RFPRiskAnalysis'
 import '../styles/rfp-analyzer.css'
 
 const { Dragger } = Upload
@@ -366,6 +371,20 @@ export default function RFPAnalyzer() {
     }
   }
 
+  // Función para calcular urgencia de deadline
+  const getDeadlineUrgency = (deadline) => {
+    if (!deadline) return null
+    const now = new Date()
+    const deadlineDate = new Date(deadline)
+    const hoursLeft = (deadlineDate - now) / (1000 * 60 * 60)
+
+    if (hoursLeft < 0) return { level: 'passed', color: 'red', icon: <ExclamationCircleOutlined />, text: 'Vencido' }
+    if (hoursLeft < 6) return { level: 'critical', color: 'red', icon: <BellOutlined />, text: `${Math.floor(hoursLeft)}h` }
+    if (hoursLeft < 24) return { level: 'high', color: 'orange', icon: <ClockCircleOutlined />, text: `${Math.floor(hoursLeft)}h` }
+    if (hoursLeft < 48) return { level: 'medium', color: 'gold', icon: <ClockCircleOutlined />, text: '< 2 días' }
+    return null
+  }
+
   // ========================================================================
   // RENDER: Vista principal (lista + carga)
   // ========================================================================
@@ -527,36 +546,44 @@ export default function RFPAnalyzer() {
                 <Empty description="No hay RFPs que mostrar" />
               ) : (
                 <div className="rfp-list">
-                  {filteredRfps.map(rfp => (
-                    <div
-                      key={rfp.id}
-                      className="rfp-list-item"
-                      onClick={() => loadRfpDetail(rfp.id)}
-                    >
-                      <div className="rfp-list-icon">
-                        <FileTextOutlined style={{ fontSize: 24, color: '#1890ff' }} />
-                      </div>
-                      <div className="rfp-list-info">
-                        <div className="rfp-list-name">{rfp.name}</div>
-                        <div className="rfp-list-meta">
-                          <Tag
-                            color={VIABILITY_CONFIG[rfp.viability]?.color}
-                            style={{ borderRadius: 4 }}
-                          >
-                            {VIABILITY_CONFIG[rfp.viability]?.icon} {VIABILITY_CONFIG[rfp.viability]?.label}
-                          </Tag>
-                          <Tag color={STATUS_CONFIG[rfp.status]?.color}>
-                            {STATUS_CONFIG[rfp.status]?.icon} {STATUS_CONFIG[rfp.status]?.label}
-                          </Tag>
-                          {rfp.deadline && (
-                            <span className="cell-muted">
-                              <ClockCircleOutlined /> {new Date(rfp.deadline).toLocaleDateString('es-ES')}
-                            </span>
-                          )}
+                  {filteredRfps.map(rfp => {
+                    const urgency = getDeadlineUrgency(rfp.deadline)
+                    return (
+                      <div
+                        key={rfp.id}
+                        className="rfp-list-item"
+                        onClick={() => loadRfpDetail(rfp.id)}
+                      >
+                        <div className="rfp-list-icon">
+                          <FileTextOutlined style={{ fontSize: 24, color: '#1890ff' }} />
+                        </div>
+                        <div className="rfp-list-info">
+                          <div className="rfp-list-name">{rfp.name}</div>
+                          <div className="rfp-list-meta">
+                            <Tag
+                              color={VIABILITY_CONFIG[rfp.viability]?.color}
+                              style={{ borderRadius: 4 }}
+                            >
+                              {VIABILITY_CONFIG[rfp.viability]?.icon} {VIABILITY_CONFIG[rfp.viability]?.label}
+                            </Tag>
+                            <Tag color={STATUS_CONFIG[rfp.status]?.color}>
+                              {STATUS_CONFIG[rfp.status]?.icon} {STATUS_CONFIG[rfp.status]?.label}
+                            </Tag>
+                            {urgency && (
+                              <Tag color={urgency.color} icon={urgency.icon}>
+                                {urgency.text}
+                              </Tag>
+                            )}
+                            {rfp.deadline && !urgency && (
+                              <span className="cell-muted">
+                                <ClockCircleOutlined /> {new Date(rfp.deadline).toLocaleDateString('es-ES')}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </Card>
@@ -657,36 +684,94 @@ export default function RFPAnalyzer() {
           </Card>
         )}
 
-        {/* Secciones de trabajo */}
-        {currentRfp.sections && currentRfp.sections.length > 0 && (
-          <Card title="Reparto de Trabajo por Áreas">
-            <Table
-              columns={sectionsColumns}
-              dataSource={currentRfp.sections}
-              rowKey="id"
-              pagination={false}
-              size="small"
-            />
-          </Card>
-        )}
+        {/* Tabs con funcionalidades avanzadas */}
+        <Card>
+          <Tabs
+            defaultActiveKey="overview"
+            items={[
+              {
+                key: 'overview',
+                label: (
+                  <span>
+                    <FileTextOutlined /> Resumen
+                  </span>
+                ),
+                children: (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {/* Requisitos Técnicos */}
+                    {currentRfp.technical_requirements && currentRfp.technical_requirements.length > 0 && (
+                      <Card title="🔧 Requisitos Técnicos">
+                        <ul style={{ marginLeft: '20px' }}>
+                          {currentRfp.technical_requirements.map((req, i) => (
+                            <li key={i}>{req}</li>
+                          ))}
+                        </ul>
+                      </Card>
+                    )}
 
-        {/* Acciones */}
-        <Card title="Generar Documentos">
-          <div style={{ display: 'flex', gap: 12 }}>
-            <Button
-              type="primary"
-              icon={<FileWordOutlined />}
-              onClick={() => generateDocument('viability')}
-            >
-              Informe de Viabilidad (.docx)
-            </Button>
-            <Button
-              icon={<FileWordOutlined />}
-              onClick={() => generateDocument('tasks')}
-            >
-              Plan de Reparto de Tareas (.docx)
-            </Button>
-          </div>
+                    {/* Secciones de trabajo */}
+                    {currentRfp.sections && currentRfp.sections.length > 0 && (
+                      <Card title="Reparto de Trabajo por Áreas">
+                        <Table
+                          columns={sectionsColumns}
+                          dataSource={currentRfp.sections}
+                          rowKey="id"
+                          pagination={false}
+                          size="small"
+                        />
+                      </Card>
+                    )}
+
+                    {/* Generar Documentos */}
+                    <Card title="Generar Documentos">
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <Button
+                          type="primary"
+                          icon={<FileWordOutlined />}
+                          onClick={() => generateDocument('viability')}
+                        >
+                          Informe de Viabilidad (.docx)
+                        </Button>
+                        <Button
+                          icon={<FileWordOutlined />}
+                          onClick={() => generateDocument('tasks')}
+                        >
+                          Plan de Reparto de Tareas (.docx)
+                        </Button>
+                      </div>
+                    </Card>
+                  </div>
+                )
+              },
+              {
+                key: 'scoring',
+                label: (
+                  <span>
+                    <TrophyOutlined /> Scoring
+                  </span>
+                ),
+                children: <RFPScoring rfpId={currentRfp.id} />
+              },
+              {
+                key: 'requirements',
+                label: (
+                  <span>
+                    <FileSearchOutlined /> Requisitos
+                  </span>
+                ),
+                children: <RFPRequirements rfpId={currentRfp.id} />
+              },
+              {
+                key: 'risks',
+                label: (
+                  <span>
+                    <WarningOutlined /> Análisis de Riesgo
+                  </span>
+                ),
+                children: <RFPRiskAnalysis rfpId={currentRfp.id} />
+              }
+            ]}
+          />
         </Card>
       </div>
     </div>
