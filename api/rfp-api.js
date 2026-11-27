@@ -997,7 +997,7 @@ router.post('/rfp-requirements/extract/:rfpId', async (req, res) => {
 
     // Obtener RFP
     const { data: rfp, error: rfpError } = await supabase
-      .from('rfps')
+      .from('rfp_analyses')
       .select('*')
       .eq('id', rfpId)
       .single()
@@ -1281,7 +1281,7 @@ router.post('/rfp-risk-clauses/analyze/:rfpId', async (req, res) => {
 
     // Obtener RFP
     const { data: rfp, error: rfpError } = await supabase
-      .from('rfps')
+      .from('rfp_analyses')
       .select('*')
       .eq('id', rfpId)
       .single()
@@ -1373,7 +1373,7 @@ router.post('/rfp-compare', async (req, res) => {
 
     // Obtener RFPs con scoring
     const { data: rfps, error: rfpsError } = await supabase
-      .from('rfps')
+      .from('rfp_analyses')
       .select(`
         *,
         scoring:rfp_scoring(*)
