@@ -375,45 +375,7 @@ Responde SOLO en JSON válido:
     // Start background processing (don't await)
     processAnalysis().catch(err => console.error('Process error:', err))
 
-    // Save sections
-    const sectionsToInsert = analysis.sections.map((section, index) => ({
-      rfp_id: rfpData.id,
-      section_name: section.section_name,
-      area: section.area,
-      priority: section.priority || 'optional',
-      status: 'pending',
-      order_index: index
-    }))
-
-    const { error: sectionsError } = await supabase
-      .from('rfp_sections')
-      .insert(sectionsToInsert)
-
-    if (sectionsError) {
-      console.error('Error saving sections:', sectionsError)
-      return res.status(500).json({ error: 'Error al guardar las secciones' })
-    }
-
-    // Cleanup temp files
-    files.forEach(file => {
-      try {
-        fs.unlinkSync(file.path)
-      } catch (e) {
-        // Ignore
-      }
-    })
-
-    res.json({
-      success: true,
-      rfp_id: rfpData.id,
-      analysis: {
-        viability: rfpData.viability,
-        viability_reason: rfpData.viability_reason,
-        deadlines: rfpData.deadlines,
-        risks: rfpData.risks,
-        technical_requirements: rfpData.technical_requirements
-      }
-    })
+    // Response already sent in line 207, background process continues
 
   } catch (error) {
     console.error('Error analyzing RFP:', error)
