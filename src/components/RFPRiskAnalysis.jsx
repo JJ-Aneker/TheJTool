@@ -1,7 +1,7 @@
 // Componente de Análisis de Cláusulas de Riesgo
 import { useState, useEffect } from 'react'
 import { Card, Timeline, Button, Tag, Spin, Empty, Modal, Alert } from 'antd'
-import { WarningOutlined, ThunderboltOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { WarningOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { message } from '../utils/message'
 import axios from 'axios'
@@ -23,7 +23,6 @@ const RISK_LEVEL_CONFIG = {
 
 export default function RFPRiskAnalysis({ rfpId }) {
   const [loading, setLoading] = useState(true)
-  const [analyzing, setAnalyzing] = useState(false)
   const [clauses, setClauses] = useState([])
 
   useEffect(() => {
@@ -45,31 +44,6 @@ export default function RFPRiskAnalysis({ rfpId }) {
     }
   }
 
-  const handleAnalyze = async () => {
-    Modal.confirm({
-      title: 'Análisis de Cláusulas de Riesgo',
-      content: '¿Quieres que la IA analice el RFP y detecte cláusulas de riesgo (penalizaciones, garantías, exclusividad, etc.)? Esto puede tardar 30-60 segundos.',
-      okText: 'Sí, analizar',
-      cancelText: 'Cancelar',
-      onOk: async () => {
-        try {
-          setAnalyzing(true)
-          const { data: { session } } = await supabase.auth.getSession()
-          const response = await axios.post(`/api/rfp-risk-clauses/analyze/${rfpId}`, {}, {
-            headers: { Authorization: `Bearer ${session.access_token}` }
-          })
-
-          message.success(`${response.data.count} cláusulas detectadas`)
-          setClauses(response.data.clauses)
-        } catch (error) {
-          console.error('Error analyzing clauses:', error)
-          message.error('Error al analizar: ' + (error.response?.data?.error || error.message))
-        } finally {
-          setAnalyzing(false)
-        }
-      }
-    })
-  }
 
   // Agrupar por nivel de riesgo
   const clausesByRisk = {
@@ -97,17 +71,6 @@ export default function RFPRiskAnalysis({ rfpId }) {
           )}
         </div>
       }
-      extra={
-        <Button
-          type="primary"
-          icon={<ThunderboltOutlined />}
-          onClick={handleAnalyze}
-          loading={analyzing}
-          disabled={loading}
-        >
-          {clauses.length > 0 ? 'Re-analizar con IA' : 'Analizar Riesgos con IA'}
-        </Button>
-      }
     >
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -115,13 +78,9 @@ export default function RFPRiskAnalysis({ rfpId }) {
         </div>
       ) : clauses.length === 0 ? (
         <Empty
-          description="No hay análisis de riesgo disponible"
+          description="Las cláusulas de riesgo se analizan automáticamente al analizar el RFP. Si no aparecen, verifica que el análisis se haya completado."
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
-          <Button type="primary" icon={<ThunderboltOutlined />} onClick={handleAnalyze}>
-            Analizar Cláusulas con IA
-          </Button>
-        </Empty>
+        />
       ) : (
         <>
           {/* Alerta de alto riesgo */}

@@ -1,7 +1,7 @@
 // Componente de Requisitos Extraídos con IA
 import { useState, useEffect } from 'react'
 import { Card, Table, Button, Tag, Select, Input, Spin, Empty, Modal } from 'antd'
-import { FileSearchOutlined, ThunderboltOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { FileSearchOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { supabase } from '../config/supabaseClient'
 import { message } from '../utils/message'
 import axios from 'axios'
@@ -24,7 +24,6 @@ const EFFORT_CONFIG = {
 
 export default function RFPRequirements({ rfpId }) {
   const [loading, setLoading] = useState(true)
-  const [extracting, setExtracting] = useState(false)
   const [requirements, setRequirements] = useState([])
   const [editingKey, setEditingKey] = useState('')
 
@@ -47,31 +46,6 @@ export default function RFPRequirements({ rfpId }) {
     }
   }
 
-  const handleExtract = async () => {
-    Modal.confirm({
-      title: 'Extraer Requisitos con IA',
-      content: '¿Quieres que la IA analice el RFP y extraiga todos los requisitos técnicos automáticamente? Esto puede tardar 30-60 segundos.',
-      okText: 'Sí, extraer',
-      cancelText: 'Cancelar',
-      onOk: async () => {
-        try {
-          setExtracting(true)
-          const { data: { session } } = await supabase.auth.getSession()
-          const response = await axios.post(`/api/rfp-requirements/extract/${rfpId}`, {}, {
-            headers: { Authorization: `Bearer ${session.access_token}` }
-          })
-
-          message.success(`${response.data.count} requisitos extraídos`)
-          setRequirements(response.data.requirements)
-        } catch (error) {
-          console.error('Error extracting requirements:', error)
-          message.error('Error al extraer requisitos: ' + (error.response?.data?.error || error.message))
-        } finally {
-          setExtracting(false)
-        }
-      }
-    })
-  }
 
   const handleUpdate = async (id, field, value) => {
     try {
@@ -228,17 +202,6 @@ export default function RFPRequirements({ rfpId }) {
           )}
         </div>
       }
-      extra={
-        <Button
-          type="primary"
-          icon={<ThunderboltOutlined />}
-          onClick={handleExtract}
-          loading={extracting}
-          disabled={loading}
-        >
-          {requirements.length > 0 ? 'Re-extraer con IA' : 'Extraer con IA'}
-        </Button>
-      }
     >
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -246,13 +209,9 @@ export default function RFPRequirements({ rfpId }) {
         </div>
       ) : requirements.length === 0 ? (
         <Empty
-          description="No hay requisitos extraídos"
+          description="Los requisitos se extraen automáticamente al analizar el RFP. Si no aparecen, verifica que el análisis se haya completado."
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
-          <Button type="primary" icon={<ThunderboltOutlined />} onClick={handleExtract}>
-            Extraer Requisitos con IA
-          </Button>
-        </Empty>
+        />
       ) : (
         <>
           {/* Resumen rápido */}
